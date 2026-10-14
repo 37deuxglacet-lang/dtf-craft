@@ -1,0 +1,50 @@
+name: DTF Craft (Windows)
+
+# Builds the DTF Craft desktop app and CLI for Windows x64 and publishes a portable zip.
+on:
+  push:
+    branches: [main, dtf-craft]
+    tags: ["dtf-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      RUSTFLAGS: "-C target-feature=+crt-static"
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Tests (DTF)
+        run: |
+          cargo test --release -p photocraft-algo --lib -- dtf upscale
+          cargo test --release -p photocraft-engine --lib dtf_cmds
+      - name: Build
+        run: cargo build --release -p photocraft -p photocraft-cli
+      - name: Package
+        shell: pwsh
+        run: |
+          $out = "dtf-craft-windows-x64"
+          New-Item -ItemType Directory -Force $out | Out-Null
+          Copy-Item target/release/photocraft.exe "$out/DTF Craft.exe"
+          Copy-Item target/release/photocraft-cli.exe "$out/dtfcraft-cli.exe"
+          Copy-Item LICENSE-MIT, LICENSE-APACHE, NOTICE $out
+          Copy-Item crates/algo/models/LICENSE "$out/LICENSE-Real-ESRGAN.txt"
+          Copy-Item DTF-CRAFT.md "$out/LISEZ-MOI.md"
+          Compress-Archive -Path "$out/*" -DestinationPath "$out.zip" -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dtf-craft-windows-x64
+          path: dtf-craft-windows-x64.zip
+      - name: Release (tags)
+        if: startsWith(github.ref, 'refs/tags/dtf-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dtf-craft-windows-x64.zip
