@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! UI state as plain data, so the control channel (and later MCP) can read and drive every
 //! aspect of the interface: tools, zoom, panels, dialogs and windows.
 
@@ -1156,6 +1158,9 @@ pub struct UiState {
     #[serde(default)]
     pub analysis: crate::analysis_ui::AnalysisUi,
     pub timeline: crate::timeline_ui::TimelineUi,
+    /// Window › DTF Settings (see `dtf_panel`).
+    #[serde(default)]
+    pub dtf_panel: crate::dtf_panel::DtfPanelUi,
     /// Slice and Slice Select tools (see `slice_ui`).
     #[serde(default)]
     pub slices: crate::slice_ui::SliceUi,
@@ -1302,6 +1307,7 @@ impl Default for UiState {
             type_panels: Default::default(),
             analysis: Default::default(),
             timeline: Default::default(),
+            dtf_panel: Default::default(),
             slices: Default::default(),
             frame_tool: Default::default(),
             artboard_tool: Default::default(),

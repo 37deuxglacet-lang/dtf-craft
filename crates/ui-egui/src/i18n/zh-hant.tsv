@@ -2755,3 +2755,15 @@ curves	Smooth	平滑
 	Min Dot	最小網點
 	Max Dot	最大網點
 	Ellipse	橢圓
+	About DTF Craft	關於 DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — 以 PhotoCraft 為基礎
+	based on PhotoCraft · open source	以 PhotoCraft 為基礎 · 開放原始碼
+	Website	網站
+	Contact	聯絡
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — Stéphane GLACET 的 DTF 工具，以此為基礎：
+	DTF Settings	DTF 設定
+	Open a document to use the DTF settings.	開啟文件以使用 DTF 設定。
+	Semi-Transparent Pixels Only	僅半透明像素
+	Whole Visual — Dark Garment	整個圖案 — 深色布料
+	Whole Visual — Light Garment	整個圖案 — 淺色布料

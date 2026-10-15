@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Photoshop `.kys` sets import into Edit › Keyboard Shortcuts (#1163): rows match our
 //! commands by label, one shortcut per command, with Photoshop's menu order breaking ties.
 
@@ -143,7 +145,7 @@ fn import_button_fills_the_dialog_and_ok_applies_the_set() {
     assert!(overrides.get("select.all").is_none(), "already the default: {overrides}");
     assert!(overrides.get("view.zoomIn").is_none(), "Cmd+= is among the keys, so the default stays: {overrides}");
     let message = field(&h, "message");
-    assert_eq!(message, json!("Imported 9 shortcuts from texcuts.kys. Click OK to keep them. 2 commands are not in PhotoCraft."));
+    assert_eq!(message, json!("Imported 9 shortcuts from texcuts.kys. Click OK to keep them. 2 commands are not in DTF Craft."));
     assert_eq!(field(&h, "capture"), json!(false));
     assert_eq!(field(&h, "messageWarning"), json!(false), "an import clears the earlier shortcut conflict warning");
     // Nothing is applied until OK.

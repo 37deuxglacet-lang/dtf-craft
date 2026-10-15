@@ -48,7 +48,8 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
                 cell: cell as f32,
                 angle: num(p, "angle", 22.5).clamp(-180.0, 180.0) as f32,
                 shape: HalftoneShape::from_id(text(p, "shape", "round")).unwrap_or(HalftoneShape::Round),
-                target: HalftoneTarget::from_id(text(p, "target", "alpha")).unwrap_or(HalftoneTarget::Alpha),
+                target: HalftoneTarget::from_id(p.get("mode").and_then(Value::as_str).unwrap_or_else(|| text(p, "target", "semiTransparent")))
+                    .unwrap_or(HalftoneTarget::Alpha),
                 min_dot: (num(p, "minDot", 5.0).clamp(0.0, 100.0) / 100.0) as f32,
                 max_dot: (num(p, "maxDot", 95.0).clamp(0.0, 100.0) / 100.0) as f32,
                 low: (num(p, "inBlack", 0.0).clamp(0.0, 255.0) / 255.0) as f32,
@@ -80,6 +81,13 @@ fn check_range(cmd: &str, p: &Value, key: &str, lo: f64, hi: f64) -> Result<()> 
     }
 }
 
+/// Names of what DTF Halftone builds: a group holding the screened copy over a control fill, the
+/// source layer kept intact (hidden) underneath.
+pub const HALFTONE_GROUP: &str = "Halftone DTF";
+pub const HALFTONE_LAYER: &str = "Halftone";
+pub const HALFTONE_BACKGROUND: &str = "Fond de contrôle";
+pub const HALFTONE_BACKGROUND_COLOR: &str = "#231c1c";
+
 fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(HALFTONE, p, "frequency", 1.0, 300.0)?;
     check_range(HALFTONE, p, "angle", -180.0, 180.0)?;
@@ -89,12 +97,50 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(HALFTONE, p, "inWhite", 0.0, 255.0)?;
     check_range(HALFTONE, p, "gamma", 0.1, 9.99)?;
     check_choice(HALFTONE, p, "shape", &["round", "ellipse", "line", "square", "diamond", "cross"])?;
-    check_choice(HALFTONE, p, "target", &["alpha", "darkGarment", "lightGarment"])?;
-    let dpi = s.active().map_or(FALLBACK_DPI, |d| f64::from(d.doc.resolution_dpi)).max(1.0);
+    check_choice(HALFTONE, p, "mode", &["semiTransparent", "darkGarment", "lightGarment"])?;
+    // `target` is the first version's name for the mode ("alpha" = semi-transparent only).
+    check_choice(HALFTONE, p, "target", &["alpha", "semiTransparent", "darkGarment", "lightGarment"])?;
+    let st = s.active().ok_or(EngineError::NoDocument)?;
+    let dpi = f64::from(st.doc.resolution_dpi).max(1.0);
+    let source = st.active_layer.ok_or_else(|| EngineError::Other("select the layer to screen".into()))?;
+    match st.doc.layer(source).map(|l| &l.content) {
+        Some(photocraft_doc::LayerContent::Raster(_) | photocraft_doc::LayerContent::Smart(_)) => {}
+        _ => return Err(EngineError::Other("DTF Halftone screens a pixel layer: select the visual's layer".into())),
+    }
     let lpi = num(p, "frequency", 25.0).clamp(1.0, 300.0);
     let mut p2 = if p.is_object() { p.clone() } else { json!({}) };
     if let Value::Object(m) = &mut p2 {
+        let mode = match (m.remove("mode"), m.remove("target")) {
+            (Some(Value::String(mode)), _) => mode,
+            (_, Some(Value::String(t))) if t != "alpha" => t,
+            _ => "semiTransparent".into(),
+        };
+        m.insert("mode".into(), json!(mode));
         m.insert("__cellPx".into(), json!(dpi / lpi));
+    }
+    // The layers first, as one step: a copy of the visual named "Halftone" over a control fill,
+    // both in the "Halftone DTF" group above the source, which is hidden but left untouched.
+    let screened = crate::analysis_cmds::compound(s, HALFTONE_GROUP, |s| {
+        s.execute("layer.duplicate", json!({"layer": source.0, "name": HALFTONE_LAYER}))?;
+        let copy = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+        s.execute("layer.newFillLayer.solidColor", json!({"color": HALFTONE_BACKGROUND_COLOR}))?;
+        let fill = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+        // A selection would become the fill's mask: the control background covers the canvas.
+        if s.active().and_then(|d| d.doc.layer(fill)).is_some_and(|l| l.mask.is_some()) {
+            s.execute("layer.layerMask.delete", json!({}))?;
+        }
+        s.execute("layer.setProps", json!({"layer": fill.0, "name": HALFTONE_BACKGROUND}))?;
+        s.execute("layer.arrange.sendBackward", json!({"layer": fill.0}))?;
+        s.execute("layer.select", json!({"layer": copy.0}))?;
+        s.execute("layer.select", json!({"layer": fill.0, "mode": "add"}))?;
+        s.execute("layer.groupLayers", json!({"name": HALFTONE_GROUP}))?;
+        s.execute("layer.setProps", json!({"layer": source.0, "visible": false}))?;
+        s.execute("layer.select", json!({"layer": copy.0}))?;
+        Ok(copy)
+    })?;
+    // Then the screen on the copy (a background job in the app, like every filter).
+    if let Value::Object(m) = &mut p2 {
+        m.insert("layer".into(), json!(screened.0));
     }
     crate::filters::run_filter(s, HALFTONE, &p2)
 }
@@ -326,6 +372,27 @@ fn upscale_surface(
     Some(out)
 }
 
+/// The upscaled copy's name ("BOISERIE x2" for BOISERIE.png at ×2) and its Save As hint: the
+/// original's folder and extension under that name, when the original has a path.
+fn upscale_copy_name(doc_name: &str, path: Option<&str>, scale: f64) -> (String, Option<String>) {
+    let stem = match std::path::Path::new(doc_name).extension().and_then(|e| e.to_str()) {
+        Some(ext) if photocraft_codecs::from_extension(&ext.to_ascii_lowercase()).is_some() || ext.eq_ignore_ascii_case("psd") => {
+            std::path::Path::new(doc_name).file_stem().and_then(|s| s.to_str()).unwrap_or(doc_name).to_string()
+        }
+        _ => doc_name.to_string(),
+    };
+    let name = format!("{stem} x{}", scale.round() as u32);
+    let hint = path.map(|p| {
+        let p = std::path::Path::new(p);
+        let file = match p.extension().and_then(|e| e.to_str()) {
+            Some(ext) => format!("{name}.{ext}"),
+            None => name.clone(),
+        };
+        p.with_file_name(file).to_string_lossy().into_owned()
+    });
+    (name, hint)
+}
+
 fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
     check_choice(UPSCALE, p, "scale", &["2", "3", "4"])?;
     check_choice(UPSCALE, p, "alpha", &["model", "smooth"])?;
@@ -343,6 +410,13 @@ fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
     let (ow, oh) = (st.doc.size.width, st.doc.size.height);
     let (nw, nh) = ((f64::from(ow) * scale).round() as u32, (f64::from(oh) * scale).round() as u32);
     crate::image_cmds::check_resample_budget(UPSCALE, &st.doc, nw, nh, "")?;
+    // The original is never touched: the network enlarges a copy named "<name> x2" (x3, x4),
+    // whose Save As starts in the original's folder and format.
+    let (name, hint) = upscale_copy_name(&st.doc.name, st.path.as_deref(), scale);
+    s.execute("image.duplicate", json!({"name": name}))?;
+    if let Some(copy) = s.active_mut() {
+        copy.save_hint = hint;
+    }
     crate::jobs::edit_job(
         s,
         "AI Upscale",
@@ -428,13 +502,30 @@ fn control_background(s: &mut Session, p: &Value) -> Result<Value> {
         return Err(bad(CONTROL_BACKGROUND, "`color` must be #rrggbb"));
     }
     let previous = s.active().and_then(|d| d.active_layer);
-    s.execute("layer.newFillLayer.solidColor", json!({"color": color}))?;
-    s.execute("layer.setProps", json!({"name": BACKFILL}))?;
-    s.execute("layer.arrange.sendToBack", json!({}))?;
-    if let Some(l) = previous {
-        s.execute("layer.select", json!({"layer": l.0}))?;
-    }
-    Ok(Value::Null)
+    crate::analysis_cmds::compound(s, "Control Background", |s| {
+        // Nothing goes under a Background layer (a JPEG's picture): it becomes a normal layer first.
+        let doc = &s.active().ok_or(EngineError::NoDocument)?.doc;
+        if let Some(bg) = doc.layers.first().map(|l| l.id).filter(|id| doc.is_background(*id)) {
+            s.execute("layer.select", json!({"layer": bg.0}))?;
+            s.execute("layer.new.layerFromBackground", json!({}))?;
+        }
+        s.execute("layer.newFillLayer.solidColor", json!({"color": color}))?;
+        let fill = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+        // A selection would become the fill's mask: the control background covers the canvas.
+        if s.active().and_then(|d| d.doc.layer(fill)).is_some_and(|l| l.mask.is_some()) {
+            s.execute("layer.layerMask.delete", json!({}))?;
+        }
+        s.execute("layer.setProps", json!({"name": BACKFILL}))?;
+        // Already the bottom layer (a document of one layer, selected at the bottom): stays there.
+        let bottom = s.active().and_then(|d| d.doc.layers.first().map(|l| l.id)) == Some(fill);
+        if !bottom {
+            s.execute("layer.arrange.sendToBack", json!({}))?;
+        }
+        if let Some(l) = previous.filter(|l| s.active().is_some_and(|d| d.doc.layer(*l).is_some())) {
+            s.execute("layer.select", json!({"layer": l.0}))?;
+        }
+        Ok(Value::Null)
+    })
 }
 
 /// Deletes every layer named "backfill".
@@ -556,7 +647,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "DTF Halftone…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"target":"alpha|darkGarment|lightGarment"="alpha","frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept)"##,
+            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone" over a "Fond de contrôle" fill (#231c1c); the source layer is hidden, unchanged"##,
             enabled: crate::filters::has_filterable_layer,
             run: halftone,
             journal: true,
@@ -632,6 +723,32 @@ mod tests {
     }
 
     #[test]
+    fn halftone_builds_its_group_and_keeps_the_source() {
+        let mut s = session_with_ramp();
+        let source = s.active().unwrap().active_layer.unwrap();
+        let before = alphas(&s);
+        s.execute(HALFTONE, json!({"mode": "semiTransparent", "frequency": 30})).unwrap();
+        let d = s.active().unwrap();
+        let names: Vec<String> = d.doc.walk().into_iter().map(|(_, _, l)| l.name.clone()).collect();
+        for want in [HALFTONE_GROUP, HALFTONE_LAYER, HALFTONE_BACKGROUND] {
+            assert!(names.iter().any(|n| n == want), "{want} in {names:?}");
+        }
+        let src = d.doc.layer(source).unwrap();
+        assert!(!src.visible, "the source is hidden");
+        assert_eq!(d.doc.layer(d.active_layer.unwrap()).unwrap().name, HALFTONE_LAYER);
+        // The screened copy is binary; the source keeps its soft alpha.
+        assert!(alphas(&s).iter().all(|v| *v == 0.0 || *v == 1.0));
+        let surf = d.doc.layer(source).unwrap().surface().unwrap();
+        assert!((surf.pixel(100, 5)[3] - before[5 * 200 + 100]).abs() < 1e-6);
+        // Opaque areas stay solid in semi-transparent mode.
+        assert_eq!(alphas(&s)[5 * 200 + 199], 1.0);
+        // The structure step and the screen undo back to the original.
+        assert!(s.undo() && s.undo());
+        assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+        assert!(s.active().unwrap().doc.layers[0].visible);
+    }
+
+    #[test]
     fn bad_params_are_refused_without_editing() {
         let mut s = session_with_ramp();
         let before = alphas(&s);
@@ -701,11 +818,36 @@ mod tests {
         let c = surf.pixel(24, 16);
         assert!(c[3] > 0.9 && c[0] > 0.7 && c[1] < 0.4, "the red block is enlarged: {c:?}");
         assert!(surf.pixel(2, 2)[3] < 0.05, "transparent corner stays clear");
+        // The upscale runs on a copy named "<name> x2"; the original keeps its size.
+        assert_eq!(s.documents().len(), 2);
+        assert!(d.doc.name.ends_with(" x2"), "{}", d.doc.name);
+        assert_eq!(s.documents()[0].doc.size.width, 24);
         assert!(s.undo());
         assert_eq!(s.active().unwrap().doc.size.width, 24);
         assert!(s.execute(UPSCALE, json!({"scale": "5"})).is_err());
     }
 
+
+    #[test]
+    fn control_background_goes_under_a_background_layer_picture() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 30, "height": 20, "background": "white"})).unwrap();
+        s.execute(CONTROL_BACKGROUND, json!({})).unwrap();
+        let d = s.active().unwrap();
+        assert_eq!(d.doc.layers.len(), 2);
+        assert_eq!(d.doc.layers[0].name, BACKFILL, "the fill is at the bottom");
+        assert!(!d.doc.is_background(d.doc.layers[1].id));
+        assert!(s.undo());
+        assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+    }
+
+    #[test]
+    fn upscale_copy_takes_the_scale_in_its_name_and_the_original_folder() {
+        let (name, hint) = upscale_copy_name("BOISERIE.png", Some("/films/BOISERIE.png"), 3.0);
+        assert_eq!(name, "BOISERIE x3");
+        assert_eq!(hint.as_deref(), Some("/films/BOISERIE x3.png"));
+        assert_eq!(upscale_copy_name("Untitled-1", None, 2.0), ("Untitled-1 x2".to_string(), None));
+    }
 
     #[test]
     fn workflow_windows_run_their_steps() {

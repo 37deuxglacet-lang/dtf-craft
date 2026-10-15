@@ -1,7 +1,7 @@
 # DTF Craft
 
 Version de PhotoCraft dédiée à la préparation de fichiers DTF (impression directe sur film),
-réalisée pour FORMATION DTF — Stéphane Glacet.
+par Stéphane GLACET (FORMATION DTF) — [www.dtfcraft.fr](https://www.dtfcraft.fr), contact@stephane-glacet.com.
 
 DTF Craft est une version dérivée de [PhotoCraft](https://github.com/storytold/photocraft)
 (licence MIT ou Apache-2.0, voir `LICENSE-MIT`, `LICENSE-APACHE` et `NOTICE`). Ce n'est pas un
@@ -18,11 +18,19 @@ produit officiel du projet PhotoCraft.
 | Suppression frange… | Supprime les franges de couleur sur les bords |
 | Netteté optimisée… | Netteté optimisée avec aperçu |
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
-| Halftone DTF… | Trame les transparences, ou les zones sombres/claires pour textile foncé/clair, en points 100 % opaques (linéature en lpi, angle, forme, point min./max.) |
-| Agrandissement IA… | ×2, ×3 ou ×4 par le modèle Real-ESRGAN (hors ligne, sur le processeur) |
+| Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » (calque « Halftone » tramé + « Fond de contrôle » #231c1c) au-dessus du calque source, qui est masqué et conservé intact |
+| Agrandissement IA… | ×2, ×3 ou ×4 par le modèle Real-ESRGAN (hors ligne, sur le processeur), sur une copie nommée « nom x2 » : l'original n'est pas modifié |
 | Gang sheet… | Place automatiquement les images d'un dossier sur une laize (largeur en cm, copies, espacement, rotation) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
+
+## Panneau Réglages DTF
+
+Fenêtre › Réglages DTF ouvre un panneau flottant avec une section repliable par outil
+(Conformité impression, Fond de contrôle, Suppression fond de contrôle, Pixels semi-transparents,
+Franges, Netteté intelligente, Saturation). Chaque section a ses réglages et un bouton
+« Appliquer » ; l'aperçu s'affiche sur l'image dès qu'un réglage bouge (sauf Conformité impression
+et Suppression fond de contrôle). Les réglages appliqués sont mémorisés.
 
 ## Agrandissement IA
 
@@ -38,5 +46,6 @@ DTF Craft garde ses réglages à part de PhotoCraft : `%APPDATA%\DTF Craft` sous
 ## Compilation
 
 GitHub Actions compile la version Windows (`.github/workflows/dtf-craft-windows.yml`) à chaque
-envoi sur la branche `main` ; le zip portable est dans les artefacts de l'exécution, et publié
-en release pour les étiquettes `dtf-v*`.
+envoi sur la branche `main` ; le zip portable est dans les artefacts de l'exécution (conservés
+un jour). Aucun binaire n'est joint aux releases publiques ; sur une étiquette ou un lancement manuel
+(`upload_name`), le zip est envoyé sur l'hébergement Nuxit quand les secrets `NUXIT_FTP_*` sont définis.

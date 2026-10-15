@@ -3182,3 +3182,15 @@ curves	Smooth	Lisser
 @dtf.sharpen	Smart Sharpen…	Netteté optimisée…
 @dtf.saturation	Saturation…	Saturation…
 @filter.dtf.removeSemiTransparent	Remove Semi-Transparent Pixels…	Pixels transparents…
+	About DTF Craft	À propos de DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — basé sur PhotoCraft
+	based on PhotoCraft · open source	basé sur PhotoCraft · code source ouvert
+	Website	Site web
+	Contact	Contact
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — outils DTF par Stéphane GLACET, basé sur :
+	DTF Settings	Réglages DTF
+	Open a document to use the DTF settings.	Ouvrez un document pour utiliser les réglages DTF.
+	Semi-Transparent Pixels Only	Pixels semi-transparents seulement
+	Whole Visual — Dark Garment	Visuel entier — textile foncé
+	Whole Visual — Light Garment	Visuel entier — textile clair

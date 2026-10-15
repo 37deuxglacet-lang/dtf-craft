@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Windows only: embed the app icon and version info (VERSIONINFO) into `photocraft-cli.exe`.
 //!
 //! On every other target this does nothing, even when `PHOTOCRAFT_REQUIRE_WINRES` is set. A
@@ -17,12 +19,12 @@ fn main() -> std::io::Result<()> {
     // to `WindowsResource::new`, which reads the Cargo package version. A pre-release such as
     // `1.2.3-rc.1` stays in the strings; the numeric fields are `1.2.3.0`.
     res.set_icon("../../assets/app-icon/photocraft.ico")
-        .set("ProductName", "PhotoCraft")
-        .set("FileDescription", "PhotoCraft command-line interface")
-        .set("CompanyName", "Learning Machines LLC")
-        .set("LegalCopyright", "Copyright (c) the PhotoCraft authors. MIT OR Apache-2.0.")
-        .set("OriginalFilename", "photocraft-cli.exe")
-        .set("InternalName", "photocraft-cli");
+        .set("ProductName", "DTF Craft")
+        .set("FileDescription", "DTF Craft — ligne de commande, basé sur PhotoCraft")
+        .set("CompanyName", "Stéphane GLACET")
+        .set("LegalCopyright", "© Stéphane GLACET — basé sur PhotoCraft © the PhotoCraft authors (MIT OR Apache-2.0)")
+        .set("OriginalFilename", "dtfcraft-cli.exe")
+        .set("InternalName", "dtfcraft-cli");
     if let Err(err) = res.compile() {
         if std::env::var_os("PHOTOCRAFT_REQUIRE_WINRES").is_some() {
             return Err(std::io::Error::other(format!(

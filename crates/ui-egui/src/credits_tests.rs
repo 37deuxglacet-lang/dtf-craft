@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! The Contributors tab as drawn: the table's header stays put while its rows scroll, its columns
 //! keep their places whatever the sort, counts line up on the right, and every column fits the
 //! About window; the grab bag's rows are evenly spaced.
@@ -214,7 +216,7 @@ fn about_window(tab: &str, table: bool) -> (f32, f32, f32) {
     h.run_steps(6);
     let ok = h.query_all_by_role(Role::Button).find(|n| n.accesskit_node().label().as_deref() == Some("OK")).map(|n| n.rect()).expect("the OK button");
     // The dialog's contents: everything between its title and the OK button.
-    let title = h.query_all_by_label("About PhotoCraft").map(|n| n.rect()).find(|r| r.top() < ok.top()).expect("the dialog title");
+    let title = h.query_all_by_label("About DTF Craft").map(|n| n.rect()).find(|r| r.top() < ok.top()).expect("the dialog title");
     let lowest = h
         .query_all(egui_kittest::kittest::by().predicate(|n| n.bounding_box().is_some()))
         .map(|n| n.rect())

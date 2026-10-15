@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Community and project links: the Help menu, the About dialog, the start screen and the title
 //! bar all open these. URLs follow the crafting-app pattern (`getartcraft.com/apps/<app>`,
 //! `github.com/storytold/<app>`).
@@ -32,24 +34,17 @@ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
     json!({"url": url})
 }
 
-/// The prominent "Join us on Discord" button.
-pub fn discord_button(app: &mut PhotocraftApp, ui: &mut egui::Ui, min_width: f32) -> egui::Response {
-    let r = crate::widgets::primary_button(ui, tl!("Join us on Discord"), min_width).on_hover_text(DISCORD);
-    if r.clicked() {
-        open(app, ui.ctx(), DISCORD);
-    }
-    r
-}
-
-/// "PhotoCraft website · GitHub · ArtCraft" as links, centred. Clicks route through [`open`] (the
-/// platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable `ctx.open_url`.
+/// "Website · Contact · PhotoCraft website · GitHub" as links, centred: DTF Craft's own site and
+/// contact first, then PhotoCraft's, which DTF Craft is based on. Clicks route through [`open`]
+/// (the platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable
+/// `ctx.open_url`.
 pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     let t = crate::theme::Tokens::get(ui.ctx());
-    let links = [(tl!("PhotoCraft website"), APP_PAGE), (tl!("GitHub"), GITHUB), (tl!("ArtCraft"), ARTCRAFT_WEBSITE)];
+    let links = [(tl!("Website"), crate::brand::WEBSITE), (tl!("Contact"), crate::brand::CONTACT), (tl!("PhotoCraft website"), APP_PAGE), (tl!("GitHub"), GITHUB)];
     let font = egui::FontId::proportional(12.5);
     let sep = "  ·  ";
     let width: f32 = links.iter().map(|(l, _)| ui.painter().layout_no_wrap((*l).into(), font.clone(), t.text).size().x).sum::<f32>()
-        + 2.0 * ui.painter().layout_no_wrap(sep.into(), font.clone(), t.text).size().x;
+        + (links.len() - 1) as f32 * ui.painter().layout_no_wrap(sep.into(), font.clone(), t.text).size().x;
     let mut clicked: Option<&str> = None;
     ui.horizontal(|ui| {
         ui.spacing_mut().item_spacing.x = 0.0;
@@ -58,7 +53,7 @@ pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
             if i > 0 {
                 ui.label(egui::RichText::new(sep).font(font.clone()).color(t.text_faint));
             }
-            if ui.link(egui::RichText::new(*label).font(font.clone()).color(t.accent)).on_hover_text(*url).clicked() {
+            if ui.link(egui::RichText::new(*label).font(font.clone()).color(t.accent)).on_hover_text(url.trim_start_matches("mailto:")).clicked() {
                 clicked = Some(url);
             }
         }

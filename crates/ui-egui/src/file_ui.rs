@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Front ends of the File-menu commands added with slices: the Save for Web (Legacy) dialog
 //! (Original / Optimized / 2-Up / 4-Up previews, GIF / PNG-8 / PNG-24 / JPEG / WBMP settings,
 //! image size, per-slice output), the Print dialog (page preview with position, scale, marks;
@@ -1016,7 +1018,7 @@ fn print_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, Va
                 "colorHandling",
                 &[
                     ("printerManages", tl!("Printer Manages Colors")),
-                    ("photocraftManages", tl!("PhotoCraft Manages Colors")),
+                    ("photocraftManages", &*crate::brand::rebrand(tl!("PhotoCraft Manages Colors"))),
                     ("noColorManagement", tl!("No Color Management")),
                 ],
                 240.0,

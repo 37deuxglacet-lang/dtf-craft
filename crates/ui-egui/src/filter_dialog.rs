@@ -348,7 +348,7 @@ pub(crate) fn remember(app: &mut PhotocraftApp, command: &str, fields: &Map<Stri
 }
 
 /// Schema-default values for one param of `command` (open and Alt+Reset share this).
-fn default_value(app: &PhotocraftApp, command: &str, p: &Param) -> Option<Value> {
+pub(crate) fn default_value(app: &PhotocraftApp, command: &str, p: &Param) -> Option<Value> {
     Some(match &p.kind {
         Kind::Range { default, .. } if command == "image.mode.indexedColor" && p.key == "colors" => json!(default.round().clamp(2.0, 256.0) as u32),
         Kind::Range { default, .. } => json!(default),
@@ -564,6 +564,13 @@ pub(crate) fn source_label(key: &str) -> String {
     // Photoshop's name for the localized colour matching (Replace Color, Color Range).
     if key == "localized" {
         return "Localized Color Clusters".into();
+    }
+    // DTF Halftone's modes: the semi-transparent pixels only, or the whole visual by lightness.
+    match key {
+        "semiTransparent" => return "Semi-Transparent Pixels Only".into(),
+        "darkGarment" => return "Whole Visual — Dark Garment".into(),
+        "lightGarment" => return "Whole Visual — Light Garment".into(),
+        _ => {}
     }
     // A name that already reads as text ("iPhone 14 Pro Max", "Web 1920") is not camelCase.
     if key.contains(' ') {

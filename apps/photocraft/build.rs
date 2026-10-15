@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Windows only: embed the app icon and version info (VERSIONINFO) into `photocraft.exe`.
 //!
 //! On every other target this does nothing. A missing resource compiler is a warning, so a
@@ -13,12 +15,12 @@ fn main() {
     }
     let mut res = winresource::WindowsResource::new();
     res.set_icon("../../assets/app-icon/photocraft.ico")
-        .set("ProductName", "PhotoCraft")
-        .set("FileDescription", "PhotoCraft image editor")
-        .set("CompanyName", "Learning Machines LLC")
-        .set("LegalCopyright", "Copyright (c) the PhotoCraft authors. MIT OR Apache-2.0.")
-        .set("OriginalFilename", "photocraft.exe")
-        .set("InternalName", "photocraft");
+        .set("ProductName", "DTF Craft")
+        .set("FileDescription", "DTF Craft — outils DTF, basé sur PhotoCraft")
+        .set("CompanyName", "Stéphane GLACET")
+        .set("LegalCopyright", "© Stéphane GLACET — basé sur PhotoCraft © the PhotoCraft authors (MIT OR Apache-2.0)")
+        .set("OriginalFilename", "DTF Craft.exe")
+        .set("InternalName", "dtfcraft");
     if let Err(e) = res.compile() {
         if std::env::var_os("PHOTOCRAFT_REQUIRE_WINRES").is_some() {
             panic!("embedding Windows resources failed: {e}");

@@ -198,6 +198,9 @@ pub struct DocState {
     pub path: Option<String>,
     /// An Affinity document (or its preview) must not acquire the native source as its Save path.
     pub source_read_only: bool,
+    /// Where Save As starts for a document without a path (DTF Craft's AI Upscale copy: the
+    /// original's folder and format, under the copy's name).
+    pub save_hint: Option<String>,
     /// Increments on every change; UIs re-render when it moves.
     pub revision: u64,
     pub saved_revision: u64,
@@ -246,6 +249,7 @@ impl DocState {
             layer_anchor: active_layer,
             path,
             source_read_only: false,
+            save_hint: None,
             revision: 1,
             saved_revision: 1,
             view_revision: 0,

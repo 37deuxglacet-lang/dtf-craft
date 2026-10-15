@@ -7,8 +7,13 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (46)
+## Modified (68)
 
+- `LICENSE-MIT`
+- `NOTICE`
+- `README.md`
+- `apps/photocraft-cli/build.rs`
+- `apps/photocraft/build.rs`
 - `apps/photocraft/src/app_dirs.rs`
 - `apps/photocraft/src/main.rs`
 - `assets/app-icon/README.md`
@@ -30,7 +35,14 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/engine/src/filters.rs`
 - `crates/engine/src/image_cmds.rs`
 - `crates/engine/src/lib.rs`
+- `crates/ui-egui/src/brand.rs`
+- `crates/ui-egui/src/canvas.rs`
+- `crates/ui-egui/src/credits_tests.rs`
+- `crates/ui-egui/src/dialogs.rs`
+- `crates/ui-egui/src/file_ui.rs`
 - `crates/ui-egui/src/filter_dialog.rs`
+- `crates/ui-egui/src/filter_preview_worker.rs`
+- `crates/ui-egui/src/gpu_status.rs`
 - `crates/ui-egui/src/i18n/cs.tsv`
 - `crates/ui-egui/src/i18n/de.tsv`
 - `crates/ui-egui/src/i18n/el.tsv`
@@ -41,6 +53,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/i18n/it.tsv`
 - `crates/ui-egui/src/i18n/ja.tsv`
 - `crates/ui-egui/src/i18n/ko.tsv`
+- `crates/ui-egui/src/i18n/live_tests.rs`
 - `crates/ui-egui/src/i18n/nl.tsv`
 - `crates/ui-egui/src/i18n/pl.tsv`
 - `crates/ui-egui/src/i18n/pt-br.tsv`
@@ -51,15 +64,25 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/i18n/vi.tsv`
 - `crates/ui-egui/src/i18n/zh-hans.tsv`
 - `crates/ui-egui/src/i18n/zh-hant.tsv`
+- `crates/ui-egui/src/kys_import.rs`
+- `crates/ui-egui/src/kys_import_tests.rs`
+- `crates/ui-egui/src/lib.rs`
+- `crates/ui-egui/src/links.rs`
 - `crates/ui-egui/src/menu_catalog.rs`
 - `crates/ui-egui/src/menus.rs`
 - `crates/ui-egui/src/native_menu.rs`
+- `crates/ui-egui/src/panels.rs`
+- `crates/ui-egui/src/prefs_ui.rs`
+- `crates/ui-egui/src/screen_picker.rs`
+- `crates/ui-egui/src/state.rs`
+- `crates/ui-egui/src/titlebar.rs`
 - `crates/ui-egui/src/view_cmds.rs`
 
-## Added (12)
+## Added (14)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
+- `README-PhotoCraft.md`
 - `assets/app-icon/dtfcraft-logo.png`
 - `assets/app-icon/dtfcraft-master.png`
 - `crates/algo/models/LICENSE`
@@ -70,6 +93,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/algo/src/dtf.rs`
 - `crates/algo/src/upscale.rs`
 - `crates/engine/src/dtf_cmds.rs`
+- `crates/ui-egui/src/dtf_panel.rs`
 
 ## Removed (7)
 
@@ -81,6 +105,6 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `.github/workflows/release.yml`
 - `.github/workflows/windows-arm64.yml`
 
-Added after this list was generated: `MODIFICATIONS.md`; `LICENSE-MIT` and `NOTICE` (DTF Craft
-copyright lines); `README.md` (replaced by the DTF Craft README; the original is kept as
-`README-PhotoCraft.md`); `.github/workflows/dtf-craft-windows.yml` (no binary in public releases).
+Notes: `LICENSE-MIT` and `NOTICE` carry the DTF Craft copyright lines; `README.md` is the DTF Craft
+README (the original is kept as `README-PhotoCraft.md`); the Windows workflow publishes no binary in
+public releases.

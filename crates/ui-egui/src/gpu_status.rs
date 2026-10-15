@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! GPU health in the shell (#243, #4): when the wgpu device is lost or reports an error, the
 //! GPU canvas is dropped and every document keeps drawing through the CPU compositor and egui
 //! textures for the rest of the session, with a recovery warning. Also runs the desktop app's
@@ -129,7 +131,7 @@ pub fn show_fallback(app: &mut PhotocraftApp, ctx: &egui::Context) {
         .anchor(egui::Align2::CENTER_CENTER, egui::Vec2::ZERO)
         .show(ctx, |ui| {
             ui.label(egui::RichText::new(tl!("GPU acceleration could not continue. Your documents are unchanged.")).color(t.warning));
-            ui.label(tl!("PhotoCraft is using the CPU image compositor. The window may still use your graphics adapter."));
+            ui.label(crate::brand::rebrand(tl!("PhotoCraft is using the CPU image compositor. The window may still use your graphics adapter.")));
             ui.collapsing(tl!("Details"), |ui| {
                 ui.label(&reason);
             });

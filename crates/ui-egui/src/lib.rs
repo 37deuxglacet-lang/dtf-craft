@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Photocraft's first UI shell, built on egui/eframe.
 //!
 //! This crate is deliberately thin. Every action goes through
@@ -204,6 +206,7 @@ pub mod theme;
 pub mod tiff_options_ui;
 mod tile_overlay;
 mod timeline_ui;
+mod dtf_panel;
 mod titlebar;
 pub use titlebar::{Caption, CaptionFamily, CaptionIcon, CaptionIcons, CaptionStyle, RenderIconFn};
 pub mod tone;
@@ -1334,7 +1337,10 @@ impl PhotocraftApp {
         // (including an unlocked transparent PNG) can keep its flat format; editable contents,
         // masks and layer appearance settings need a layered format even with just one layer.
         let flat = plain_raster(&st.doc).is_some();
-        let ext = st.path.as_deref().and_then(|p| std::path::Path::new(p).extension()).map(|e| e.to_string_lossy().to_ascii_lowercase());
+        // A document without a path may carry a hint (DTF Craft's upscaled copy): the original's
+        // folder and format under the copy's name, offered like a path of its own.
+        let target = st.path.clone().or_else(|| st.save_hint.clone());
+        let ext = target.as_deref().and_then(|p| std::path::Path::new(p).extension()).map(|e| e.to_string_lossy().to_ascii_lowercase());
         // An OpenRaster file only when it holds the whole document (#3806): else PSD is offered.
         let holds_ora = st.path.as_deref().is_some_and(|p| photocraft_engine::file_cmds::holds_at(&st.doc, p));
         let writable = ext.is_some_and(|e| {
@@ -1342,7 +1348,7 @@ impl PhotocraftApp {
                 || (e == "ora" && holds_ora)
                 || (flat && photocraft_codecs::from_extension(&e).is_some_and(|f| f.caps().write))
         });
-        let suggested = match &st.path {
+        let suggested = match &target {
             Some(p) if writable => p.clone(),
             p => {
                 let source = p.as_deref().unwrap_or(&st.doc.name);
@@ -1862,6 +1868,7 @@ impl eframe::App for PhotocraftApp {
         type_panels_ui::windows(self, &ctx);
         analysis_ui::windows(self, &ctx);
         timeline_ui::windows(self, &ctx);
+        dtf_panel::windows(self, &ctx);
         workspace_ui::windows(self, &ctx);
         palette::show(self, &ctx);
         dialogs::show(self, &ctx);

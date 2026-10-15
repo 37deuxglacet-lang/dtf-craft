@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Document canvas: display texture cache, view transform, tool input, extra document windows.
 //!
 //! Rendering is CPU (`photocraft-compose`) for now, uploaded into an egui texture. Brush strokes
@@ -1654,6 +1656,12 @@ fn gpu_budget(app: &mut PhotocraftApp, gpu: &crate::gpu_canvas::GpuCanvas, idx: 
 /// (`filter_preview_worker`); otherwise (web, tests, `PHOTOCRAFT_INLINE_JOBS`) it keeps the
 /// deterministic inline path (#1676), which also lets headless/CPU tests inspect previews
 /// without a GPU texture.
+/// What a live filter preview comes from: an open dialog, or the DTF Settings panel.
+struct Preview {
+    id: u64,
+    fields: serde_json::Map<String, serde_json::Value>,
+}
+
 pub(crate) fn ensure_filter_preview(app: &mut PhotocraftApp, idx: usize, ctx: &egui::Context) -> Option<(u32, u64, [u32; 2])> {
     if let Some(held) = committed_filter_preview(app, idx) {
         return held;
@@ -1665,10 +1673,17 @@ pub(crate) fn ensure_filter_preview(app: &mut PhotocraftApp, idx: usize, ctx: &e
     if crate::adjust_preview::on_layer(app, idx) {
         return None;
     }
-    let d = app.ui.dialogs.iter().find(|d| d.fields.contains_key("__filter"))?;
-    if d.fields.get("__preview").and_then(serde_json::Value::as_bool) != Some(true) {
-        return None;
-    }
+    // An open filter dialog previews; without one, the DTF Settings panel section being set.
+    let (dialog_id, fields) = match app.ui.dialogs.iter().find(|d| d.fields.contains_key("__filter")) {
+        Some(d) => {
+            if d.fields.get("__preview").and_then(serde_json::Value::as_bool) != Some(true) {
+                return None;
+            }
+            (d.id, d.fields.clone())
+        }
+        None => crate::dtf_panel::preview_source(app)?,
+    };
+    let d = Preview { id: dialog_id, fields };
     let cmd = d.fields.get("__command")?.as_str()?.to_string();
     // Previews edit what the command will: a targeted layer mask included (#780).
     let mut params = app.with_mask_target(&cmd, crate::filter_dialog::params_of(&d.fields));
@@ -2638,17 +2653,21 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     let open_label = crate::shortcuts::command_label(app, "Open…", "file.open");
     ui.scope_builder(egui::UiBuilder::new().max_rect(card), |ui| {
         ui.vertical_centered(|ui| {
+            // DTF Craft: the app icon and name, then "based on PhotoCraft · open source".
             ui.horizontal(|ui| {
-                let title = ui.painter().layout_no_wrap(tl!("PhotoCraft").into(), crate::theme::semibold(38.0), t.text);
-                let by = ui.painter().layout_no_wrap(tl!("open source").into(), egui::FontId::proportional(13.0), t.text_faint);
-                let total = title.size().x + by.size().x + 10.0;
+                let title = ui.painter().layout_no_wrap(crate::brand::APP_NAME.into(), crate::theme::semibold(38.0), t.text);
+                let mark = 46.0;
+                let total = mark + 12.0 + title.size().x;
                 ui.add_space(((card.width() - total) / 2.0).max(0.0));
-                let (r, _) = ui.allocate_exact_size(title.size(), Sense::hover());
-                ui.painter().galley(r.min, title, t.text);
-                let (r2, _) = ui.allocate_exact_size(egui::vec2(by.size().x + 10.0, r.height()), Sense::hover());
-                ui.painter().galley(egui::pos2(r2.left() + 10.0, r.bottom() - by.size().y - 8.0), by, t.text_faint);
+                let (m, _) = ui.allocate_exact_size(egui::vec2(mark, mark), Sense::hover());
+                crate::brand::paint_mark(ui, m);
+                ui.add_space(12.0);
+                let (r, _) = ui.allocate_exact_size(egui::vec2(title.size().x, mark), Sense::hover());
+                ui.painter().galley(egui::pos2(r.left(), r.center().y - title.size().y / 2.0), title, t.text);
             });
-            ui.add_space(6.0);
+            ui.add_space(2.0);
+            ui.label(egui::RichText::new(tl!("based on PhotoCraft · open source")).color(t.text_faint).size(13.0));
+            ui.add_space(8.0);
             ui.label(egui::RichText::new(tl!("Create a new document or open an existing file.")).color(t.text_dim).size(14.0));
             ui.add_space(22.0);
             ui.horizontal(|ui| {
@@ -2676,8 +2695,6 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                 home_recent(app, ui, &recent);
             }
             ui.add_space(26.0);
-            crate::links::discord_button(app, ui, 190.0);
-            ui.add_space(10.0);
             crate::links::link_row(app, ui);
         });
     });

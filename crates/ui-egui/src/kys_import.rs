@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Photoshop keyboard shortcut sets (`.kys`, Edit › Keyboard Shortcuts › Save Set) imported
 //! into Edit › Keyboard Shortcuts (#1163): the dialog's Import Shortcuts… button, File › Open
 //! and a drop on the window. Parsing and matching rows to commands are the engine's
@@ -58,7 +60,7 @@ pub fn import_text(app: &mut PhotocraftApp, file_name: &str, text: &str) -> Resu
     if !plan.unknown.is_empty() {
         let u = plan.unknown.len().to_string();
         message.push(' ');
-        message.push_str(&crate::i18n::fmt(tl!("{n} commands are not in PhotoCraft."), &[("n", &u)]));
+        message.push_str(&crate::brand::rebrand(&crate::i18n::fmt(tl!("{n} commands are not in PhotoCraft."), &[("n", &u)])));
     }
     f.insert("tab".into(), json!(0));
     f.insert("overrides".into(), json!(overrides));

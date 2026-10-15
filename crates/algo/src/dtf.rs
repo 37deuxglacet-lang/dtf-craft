@@ -36,7 +36,7 @@ pub enum HalftoneTarget {
 impl HalftoneTarget {
     pub fn from_id(s: &str) -> Option<Self> {
         Some(match s {
-            "alpha" => HalftoneTarget::Alpha,
+            "alpha" | "semiTransparent" => HalftoneTarget::Alpha,
             "darkGarment" => HalftoneTarget::DarkGarment,
             "lightGarment" => HalftoneTarget::LightGarment,
             _ => return None,

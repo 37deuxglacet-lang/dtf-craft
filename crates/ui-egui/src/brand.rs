@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! The PhotoCraft brand mark at the left of the title bar: the app icon (the kitsune,
 //! `assets/app-icon/`, see its README), where Photoshop shows its "Ps" tile. The PNG carries the
 //! icon's rounded corners; it is decoded once per context into a mipmapped texture, so it stays
@@ -5,6 +7,23 @@
 
 use egui::{Color32, Context, Id, Rect, TextureHandle, TextureOptions, Ui, pos2};
 use photocraft_codecs::{ChannelLayout, SampleType};
+
+/// DTF Craft: the product name shown in the window title, on the Home screen and in About.
+pub const APP_NAME: &str = "DTF Craft";
+/// The DTF Craft website and contact address (Home screen and About links).
+pub const WEBSITE: &str = "https://www.dtfcraft.fr";
+pub const CONTACT: &str = "mailto:contact@stephane-glacet.com";
+
+/// The title with no document open: "DTF Craft — based on PhotoCraft", in the UI language.
+pub fn home_title() -> String {
+    tl!("DTF Craft — based on PhotoCraft").to_owned()
+}
+
+/// A translated PhotoCraft message with the product name DTF Craft in it (the catalogues name
+/// PhotoCraft; DTF Craft keeps their translations).
+pub fn rebrand(text: &str) -> String {
+    text.replace("PhotoCraft", APP_NAME)
+}
 
 /// 128 px: sharp at 20 pt on a 3× display, and the mipmaps keep it clean at 1×.
 const ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png");

@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! One native preview at a time. The canvas submits the current request again after an old
 //! job finishes, so slider drags cannot queue copies of every intermediate document. While a
 //! slider moves, the running preview finishes, so the canvas keeps updating during the drag;
@@ -96,7 +98,8 @@ impl Worker {
 /// Stop and release previews of closed dialogs even when their canvas is no longer being drawn.
 pub(crate) fn discard_closed(app: &mut crate::PhotocraftApp) {
     let visible =
-        app.ui.dialogs.iter().any(|d| d.fields.contains_key("__filter") && d.fields.get("__preview").and_then(serde_json::Value::as_bool) == Some(true));
+        app.ui.dialogs.iter().any(|d| d.fields.contains_key("__filter") && d.fields.get("__preview").and_then(serde_json::Value::as_bool) == Some(true))
+            || crate::dtf_panel::preview_source(app).is_some();
     if !visible {
         if let Some(r) = &app.filter_preview_worker.running {
             r.job.cancel();
