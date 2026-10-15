@@ -1,3 +1,4 @@
+// DTF Craft — Copyright (c) 2026 Stéphane Glacet. Licensed under MIT OR Apache-2.0.
 //! DTF (direct-to-film) preparation filters (DTF Craft).
 //!
 //! DTF printers lay a white underbase under the colour inks and cannot print partial opacity:

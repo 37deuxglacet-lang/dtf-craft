@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! The macOS menu bar: the same menus as the in-window bar ([`crate::menus::menu_items`]), laid
 //! out the way a Mac app's are and handed to a platform [`Backend`] (the desktop app's muda one).
 //!

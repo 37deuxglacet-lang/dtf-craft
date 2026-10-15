@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Colour reduction for Image › Mode › Indexed Color and Bitmap: palette construction (exact,
 //! system, web, uniform, perceptual, selective, adaptive), forced colours, and dithering
 //! (none, Floyd–Steinberg diffusion, ordered pattern, noise), plus 1-bit conversion methods.

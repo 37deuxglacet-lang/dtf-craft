@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! The command registry. Ids follow Photoshop's menu structure (see the parity checklist).
 
 use photocraft_color::{BlendMode, Color, ColorMode, SampleType};

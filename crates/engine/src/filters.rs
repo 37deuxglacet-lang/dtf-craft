@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! `filter.*` commands (Photoshop's Filter menu) backed by `photocraft-algo`.
 //!
 //! Every command acts on the active pixel layer (or the cached pixels of a

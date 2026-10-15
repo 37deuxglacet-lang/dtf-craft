@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Filter dialogs generated from engine command parameter specs, with live on-canvas preview and an
 //! in-dialog preview window (#3769).
 //!

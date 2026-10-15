@@ -1,3 +1,4 @@
+// DTF Craft — Copyright (c) 2026 Stéphane Glacet. Licensed under MIT OR Apache-2.0.
 //! AI upscaling (DTF Craft): Real-ESRGAN's compact general model (`realesr-general-x4v3`,
 //! SRVGGNetCompact, BSD-3-Clause, see `models/README.md`), run on the CPU in safe Rust.
 //!
