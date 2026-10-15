@@ -845,7 +845,8 @@ mod tests {
     fn upscale_copy_takes_the_scale_in_its_name_and_the_original_folder() {
         let (name, hint) = upscale_copy_name("BOISERIE.png", Some("/films/BOISERIE.png"), 3.0);
         assert_eq!(name, "BOISERIE x3");
-        assert_eq!(hint.as_deref(), Some("/films/BOISERIE x3.png"));
+        // Compared as paths: Windows joins the name with `\`.
+        assert_eq!(hint.map(std::path::PathBuf::from), Some(std::path::Path::new("/films").join("BOISERIE x3.png")));
         assert_eq!(upscale_copy_name("Untitled-1", None, 2.0), ("Untitled-1 x2".to_string(), None));
     }
 
