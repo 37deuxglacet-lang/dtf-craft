@@ -3194,3 +3194,12 @@ curves	Smooth	Lisser
 	Semi-Transparent Pixels Only	Pixels semi-transparents seulement
 	Whole Visual — Dark Garment	Visuel entier — textile foncé
 	Whole Visual — Light Garment	Visuel entier — textile clair
+# DTF Craft (3)
+	Defringe	Supprimer les franges
+	Smart Sharpen	Netteté intelligente
+	Current size: {width} × {height} cm at {resolution} ppi	Taille actuelle : {width} × {height} cm à {resolution} ppp
+	Width (cm, 0 = proportional)	Largeur (cm, 0 = proportionnelle)
+	Height (cm, 0 = proportional)	Hauteur (cm, 0 = proportionnelle)
+	Conformity	Conformité
+	No Background	Sans fond
+	Fringe	Franges

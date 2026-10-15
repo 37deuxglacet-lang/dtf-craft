@@ -2782,3 +2782,16 @@ curves	Smooth	平滑
 	Semi-Transparent Pixels Only	仅半透明像素
 	Whole Visual — Dark Garment	整个图案 — 深色面料
 	Whole Visual — Light Garment	整个图案 — 浅色面料
+# DTF Craft (3)
+	Print Conformity	印刷规范化
+	Control Background	检查背景
+	Remove Semi-Transparent Pixels	移除半透明像素
+	Defringe	去边
+	Smart Sharpen	智能锐化
+	Current size: {width} × {height} cm at {resolution} ppi	当前尺寸：{width} × {height} 厘米，{resolution} ppi
+	Width (cm, 0 = proportional)	宽度（厘米，0 = 按比例）
+	Height (cm, 0 = proportional)	高度（厘米，0 = 按比例）
+	Conformity	规范化
+	No Background	无背景
+	Fringe	边缘
+	Sharpness	锐化

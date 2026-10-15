@@ -1318,7 +1318,7 @@ fn front(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Val
         "dtf.upscale" => dialog(app, json!({"scale": "2", "alpha": "model", "keepPrintSize": true}), json!({"scale": ["2", "3", "4"], "alpha": ["model", "smooth"]})),
         "dtf.conformity" => dialog(
             app,
-            json!({"height": 27, "resolution": 300, "resample": "bicubicAutomatic", "depth": "8", "trim": true, "layerName": "origin"}),
+            json!({"width": 0, "height": 27, "resolution": 300, "resample": "bicubicAutomatic", "depth": "8", "trim": true, "layerName": "origin", "__labels": {"width": tl!("Width (cm, 0 = proportional)"), "height": tl!("Height (cm, 0 = proportional)")}}),
             json!({"resample": ["bicubicAutomatic", "preserveDetails", "bicubic", "bicubicSmoother", "bicubicSharper", "lanczos", "bilinear", "nearest"], "depth": ["8", "16"]}),
         ),
         "file.scripts.imageProcessor" => dialog(

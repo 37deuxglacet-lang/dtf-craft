@@ -119,6 +119,8 @@ pub(crate) fn panel_alias(id: &str) -> Option<&'static str> {
         "tools" => "window.toggle.toolbar",
         "options" => "window.toggle.options",
         "brushSettings" | "brushes" => "window.toggle.brushSettings",
+        // DTF Craft: each DTF tool's tab, in the DTF group.
+        id if id.starts_with("dtf") => "window.toggle.dtf",
         _ => return None,
     })
 }
@@ -220,9 +222,6 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     }
     // Window > Timeline panel.
     if let Some(r) = crate::timeline_ui::menu(app, id, &params) {
-        return r;
-    }
-    if let Some(r) = crate::dtf_panel::menu(app, id, &params) {
         return r;
     }
     // Filter › Plug-ins (installed WebAssembly plug-ins, Install Plug-in…).
@@ -679,6 +678,7 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
                 "toolbar" => &mut p.toolbar,
                 "options" => &mut p.options_bar,
                 "brushSettings" => &mut p.brush_settings,
+                "dtf" => &mut p.dtf,
                 "dock" => &mut p.dock,
                 _ => return Err(format!("unknown panel in {t}")),
             };
@@ -732,7 +732,7 @@ pub fn is_enabled(app: &PhotocraftApp, id: &str) -> bool {
     if crate::analysis_ui::handles(id) {
         return true;
     }
-    if crate::preset_panels::handles(id) || crate::type_panels_ui::handles(id) || crate::timeline_ui::handles(id) || crate::dtf_panel::handles(id) {
+    if crate::preset_panels::handles(id) || crate::type_panels_ui::handles(id) || crate::timeline_ui::handles(id) {
         return true;
     }
     if let Some(e) = crate::view_cmds::is_enabled(app, id) {
@@ -826,9 +826,6 @@ fn checked(app: &PhotocraftApp, id: &str) -> Option<bool> {
     if let Some(c) = crate::timeline_ui::checked(app, id) {
         return Some(c);
     }
-    if let Some(c) = crate::dtf_panel::checked(app, id) {
-        return Some(c);
-    }
     if let Some(c) = crate::type_panels_ui::checked(app, id) {
         return Some(c);
     }
@@ -889,6 +886,7 @@ fn checked(app: &PhotocraftApp, id: &str) -> Option<bool> {
         "window.togglePanels" => p.toolbar || p.options_bar || p.dock,
         "window.toggle.options" => p.options_bar,
         "window.toggle.brushSettings" => p.brush_settings,
+        "window.toggle.dtf" => p.dtf,
         _ => return None,
     })
 }
@@ -952,7 +950,6 @@ pub fn is_live(id: &str) -> bool {
         || crate::preset_panels::handles(id)
         || crate::type_panels_ui::handles(id)
         || crate::timeline_ui::handles(id)
-        || crate::dtf_panel::handles(id)
 }
 
 /// Commands outside the catalogue that belong right after a catalogue item: `(id, after)`.
@@ -1551,6 +1548,8 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
         // Color includes Swatches; Navigator keeps the pixel canvas easy to inspect.
         "Pixel Art" => (true, true, true, false, false),
         "Motion" => (false, false, true, false, true),
+        // DTF Craft's Essentials: Layers and the DTF tools only.
+        _ if app.dtf_craft => (false, false, true, false, false),
         _ => (false, true, true, false, true),
     };
     p.navigator = nav;
@@ -1559,6 +1558,7 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
     p.history = history;
     p.properties = props;
     p.character = app.ui.workspace == "Graphic and Web";
+    p.dtf = app.dtf_craft;
     // Timeline is a floating panel, not a dock group. Showing it does not create or edit
     // a document timeline; changing away from Motion closes it just like its Close button.
     app.ui.timeline.open = app.ui.workspace == "Motion";

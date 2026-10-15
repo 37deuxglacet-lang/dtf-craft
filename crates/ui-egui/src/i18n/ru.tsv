@@ -3138,3 +3138,15 @@ curves	Smooth	Сгладить
 	Semi-Transparent Pixels Only	Только полупрозрачные пиксели
 	Whole Visual — Dark Garment	Весь макет — тёмная ткань
 	Whole Visual — Light Garment	Весь макет — светлая ткань
+# DTF Craft (3)
+	Print Conformity	Подготовка к печати
+	Control Background	Контрольный фон
+	Remove Semi-Transparent Pixels	Удалить полупрозрачные пиксели
+	Defringe	Убрать кайму
+	Smart Sharpen	Умная резкость
+	Current size: {width} × {height} cm at {resolution} ppi	Текущий размер: {width} × {height} см при {resolution} ppi
+	Width (cm, 0 = proportional)	Ширина (см, 0 = пропорционально)
+	Height (cm, 0 = proportional)	Высота (см, 0 = пропорционально)
+	Conformity	Подготовка
+	No Background	Без фона
+	Fringe	Кайма

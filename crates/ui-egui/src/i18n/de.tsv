@@ -3170,3 +3170,16 @@ curves	Smooth	Glätten
 	Semi-Transparent Pixels Only	Nur halbtransparente Pixel
 	Whole Visual — Dark Garment	Ganzes Motiv — dunkles Textil
 	Whole Visual — Light Garment	Ganzes Motiv — helles Textil
+# DTF Craft (3)
+	Print Conformity	Druckvorbereitung
+	Control Background	Kontrollhintergrund
+	Remove Semi-Transparent Pixels	Halbtransparente Pixel entfernen
+	Defringe	Randstörungen entfernen
+	Smart Sharpen	Intelligent scharfzeichnen
+	Current size: {width} × {height} cm at {resolution} ppi	Aktuelle Größe: {width} × {height} cm bei {resolution} ppi
+	Width (cm, 0 = proportional)	Breite (cm, 0 = proportional)
+	Height (cm, 0 = proportional)	Höhe (cm, 0 = proportional)
+	Conformity	Druckvorbereitung
+	No Background	Ohne Hintergrund
+	Fringe	Ränder
+	Sharpness	Schärfe

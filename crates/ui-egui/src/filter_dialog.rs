@@ -64,8 +64,9 @@ pub fn parse_spec(spec: &str) -> Vec<Param> {
         }
         if !in_str {
             match ch {
-                '[' | '{' => depth += 1,
-                ']' | '}' => depth -= 1,
+                // DTF Craft: a description in parentheses may hold commas too.
+                '[' | '{' | '(' => depth += 1,
+                ']' | '}' | ')' => depth -= 1,
                 _ => {}
             }
         }
@@ -103,7 +104,8 @@ pub fn parse_spec(spec: &str) -> Vec<Param> {
             };
             Kind::Choice { options, default }
         } else if let Some(rest) = v.strip_prefix("bool") {
-            Kind::Bool(rest.trim_start_matches('=').trim() == "true")
+            // The default is the first word: a description in parentheses may follow.
+            Kind::Bool(rest.trim_start_matches('=').split(|c: char| c.is_whitespace() || c == '(').next() == Some("true"))
         } else if v == "text" {
             Kind::Text
         } else if v == "color" {
@@ -116,7 +118,9 @@ pub fn parse_spec(spec: &str) -> Vec<Param> {
             Kind::Json
         } else if let Some(n) = v.strip_prefix("int[").and_then(|r| r.strip_suffix(']')).and_then(|n| n.parse().ok()) {
             Kind::Grid(n)
-        } else if let Some((range, default)) = v.split_once('=').map(|(a, b)| (a, b.trim())).or(Some((v, ""))) {
+        } else if let Some((range, default)) =
+            v.split_once('=').map(|(a, b)| (a, b.trim().split(|c: char| c.is_whitespace() || c == '(').next().unwrap_or(""))).or(Some((v, "")))
+        {
             if let Some((lo, hi)) = range.split_once("..") {
                 let min = lo.trim().parse().unwrap_or(0.0);
                 let max = hi.trim().parse().unwrap_or(100.0);
@@ -187,6 +191,12 @@ fn is_pixel_param(key: &str) -> bool {
 fn is_pixel_param_of(command: &str, key: &str) -> bool {
     is_pixel_param(key)
         && !matches!((command, key), ("filter.render.tree" | "filter.render.pictureFrame", "size") | ("filter.lensCorrection", "horizontal" | "vertical"))
+        && !is_cm_param(command, key)
+}
+
+/// DTF Craft: Print Conformity's width and height are print sizes in centimetres.
+fn is_cm_param(command: &str, key: &str) -> bool {
+    command == "dtf.conformity" && matches!(key, "width" | "height")
 }
 
 /// Filters whose features have a fixed size in document pixels that no dialog parameter scales:
@@ -680,7 +690,9 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
                 }
                 // Replace Color's Range only applies with Localized Color Clusters on, as in Photoshop.
                 let enabled = !(cmd == REPLACE_COLOR && p.key == "range") || f.get("localized").and_then(Value::as_bool) == Some(true);
-                let unit = if is_pixel_param_of(&cmd, &p.key) {
+                let unit = if is_cm_param(&cmd, &p.key) {
+                    "cm"
+                } else if is_pixel_param_of(&cmd, &p.key) {
                     "px"
                 } else if p.key == "angle" {
                     "°"

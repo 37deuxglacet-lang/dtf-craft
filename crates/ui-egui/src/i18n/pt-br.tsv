@@ -3961,3 +3961,13 @@ layerLabel	No Color	Sem cor
 	Semi-Transparent Pixels Only	Somente pixels semitransparentes
 	Whole Visual — Dark Garment	Arte inteira — tecido escuro
 	Whole Visual — Light Garment	Arte inteira — tecido claro
+# DTF Craft (3)
+	Print Conformity	Conformidade de impressão
+	Control Background	Fundo de controle
+	Remove Semi-Transparent Pixels	Remover pixels semitransparentes
+	Current size: {width} × {height} cm at {resolution} ppi	Tamanho atual: {width} × {height} cm a {resolution} ppi
+	Width (cm, 0 = proportional)	Largura (cm, 0 = proporcional)
+	Height (cm, 0 = proportional)	Altura (cm, 0 = proporcional)
+	Conformity	Conformidade
+	No Background	Sem fundo
+	Fringe	Franjas

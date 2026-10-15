@@ -3347,3 +3347,13 @@ curves	Smooth	매끄럽게
 	Semi-Transparent Pixels Only	반투명 픽셀만
 	Whole Visual — Dark Garment	전체 디자인 — 어두운 원단
 	Whole Visual — Light Garment	전체 디자인 — 밝은 원단
+# DTF Craft (3)
+	Print Conformity	인쇄용 맞춤
+	Control Background	확인용 배경
+	Remove Semi-Transparent Pixels	반투명 픽셀 제거
+	Current size: {width} × {height} cm at {resolution} ppi	현재 크기: {width} × {height} cm ({resolution} ppi)
+	Width (cm, 0 = proportional)	폭(cm, 0 = 비율 유지)
+	Height (cm, 0 = proportional)	높이(cm, 0 = 비율 유지)
+	Conformity	인쇄용
+	No Background	배경 없음
+	Fringe	가장자리

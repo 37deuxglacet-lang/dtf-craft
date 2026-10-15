@@ -2857,3 +2857,16 @@ curves	Smooth	Suavizar
 	Semi-Transparent Pixels Only	Solo píxeles semitransparentes
 	Whole Visual — Dark Garment	Diseño completo — prenda oscura
 	Whole Visual — Light Garment	Diseño completo — prenda clara
+# DTF Craft (3)
+	Print Conformity	Conformidad de impresión
+	Control Background	Fondo de control
+	Remove Semi-Transparent Pixels	Eliminar píxeles semitransparentes
+	Defringe	Eliminar halos
+	Smart Sharpen	Enfoque suavizado
+	Current size: {width} × {height} cm at {resolution} ppi	Tamaño actual: {width} × {height} cm a {resolution} ppp
+	Width (cm, 0 = proportional)	Anchura (cm, 0 = proporcional)
+	Height (cm, 0 = proportional)	Altura (cm, 0 = proporcional)
+	Conformity	Conformidad
+	No Background	Sin fondo
+	Fringe	Halos
+	Sharpness	Nitidez

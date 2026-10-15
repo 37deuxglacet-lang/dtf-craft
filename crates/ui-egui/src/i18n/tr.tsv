@@ -3903,3 +3903,13 @@ cameraData	Lens	Lens
 	Semi-Transparent Pixels Only	Yalnızca yarı saydam pikseller
 	Whole Visual — Dark Garment	Tüm tasarım — koyu kumaş
 	Whole Visual — Light Garment	Tüm tasarım — açık kumaş
+# DTF Craft (3)
+	Print Conformity	Baskıya uygunluk
+	Control Background	Kontrol arka planı
+	Remove Semi-Transparent Pixels	Yarı saydam pikselleri kaldır
+	Current size: {width} × {height} cm at {resolution} ppi	Geçerli boyut: {width} × {height} cm, {resolution} ppi
+	Width (cm, 0 = proportional)	Genişlik (cm, 0 = orantılı)
+	Height (cm, 0 = proportional)	Yükseklik (cm, 0 = orantılı)
+	Conformity	Uygunluk
+	No Background	Arka plansız
+	Fringe	Kenar

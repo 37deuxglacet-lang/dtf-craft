@@ -298,7 +298,23 @@ const BACKFILL: &str = "backfill";
 
 /// Print conformity: the artwork layer renamed, the document resized to a print height at a
 /// resolution, set to 8 or 16 bits and trimmed to its visible pixels.
+/// The pixel size for a print of `width_cm` × `height_cm` (0 = follows the other side) at `dpi`,
+/// keeping the proportions of `w` × `h`: with both sides, the largest size that fits inside them.
+/// `None` when neither side is given (the pixels stay, only the resolution changes).
+pub fn conformity_size(w: u32, h: u32, width_cm: f64, height_cm: f64, dpi: f64) -> Option<(u32, u32)> {
+    let (w, h) = (f64::from(w.max(1)), f64::from(h.max(1)));
+    let to_px = |cm: f64| cm / 2.54 * dpi;
+    let k = match (width_cm > 0.0, height_cm > 0.0) {
+        (false, false) => return None,
+        (true, false) => to_px(width_cm) / w,
+        (false, true) => to_px(height_cm) / h,
+        (true, true) => (to_px(width_cm) / w).min(to_px(height_cm) / h),
+    };
+    Some(((w * k).round().max(1.0) as u32, (h * k).round().max(1.0) as u32))
+}
+
 fn conformity(s: &mut Session, p: &Value) -> Result<Value> {
+    check_range(CONFORMITY, p, "width", 0.0, 500.0)?;
     check_range(CONFORMITY, p, "height", 0.0, 500.0)?;
     check_range(CONFORMITY, p, "resolution", 72.0, 1200.0)?;
     check_choice(CONFORMITY, p, "depth", &["8", "16"])?;
@@ -312,21 +328,18 @@ fn conformity(s: &mut Session, p: &Value) -> Result<Value> {
     if !name.is_empty() {
         s.execute("layer.setProps", json!({"name": name}))?;
     }
-    let dpi = num(p, "resolution", 300.0);
-    let height_cm = num(p, "height", 27.0);
-    let resample = text(p, "resample", "bicubicAutomatic");
-    if height_cm > 0.0 {
-        let px = (height_cm / 2.54 * dpi).round().max(1.0);
-        let d = &s.active().ok_or(EngineError::NoDocument)?.doc;
-        let w = (f64::from(d.size.width) * px / f64::from(d.size.height.max(1))).round().max(1.0);
-        s.execute("image.imageSize", json!({"width": w, "height": px, "resolution": dpi, "resample": resample}))?;
-    } else {
-        s.execute("image.imageSize", json!({"resolution": dpi, "resample": "none"}))?;
-    }
-    s.execute(if text(p, "depth", "8") == "16" { "image.mode.bits16" } else { "image.mode.bits8" }, json!({}))?;
+    // Transparent borders go first, so the width and height given are the visual's own.
     if p.get("trim").and_then(Value::as_bool).unwrap_or(true) {
         s.execute("image.trim", json!({"basedOn": "transparent"}))?;
     }
+    let dpi = num(p, "resolution", 300.0);
+    let resample = text(p, "resample", "bicubicAutomatic");
+    let d = &s.active().ok_or(EngineError::NoDocument)?.doc;
+    match conformity_size(d.size.width, d.size.height, num(p, "width", 0.0), num(p, "height", 27.0), dpi) {
+        Some((w, h)) => s.execute("image.imageSize", json!({"width": w, "height": h, "resolution": dpi, "resample": resample}))?,
+        None => s.execute("image.imageSize", json!({"resolution": dpi, "resample": "none"}))?,
+    };
+    s.execute(if text(p, "depth", "8") == "16" { "image.mode.bits16" } else { "image.mode.bits8" }, json!({}))?;
     let d = &s.active().ok_or(EngineError::NoDocument)?.doc;
     Ok(json!({"width": d.size.width, "height": d.size.height, "resolution": d.resolution_dpi}))
 }
@@ -403,7 +416,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "Print Conformity…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"height":0..500=27 (cm; 0 keeps the size),"resolution":72..1200=300,"resample":"bicubicAutomatic|preserveDetails|bicubic|bicubicSmoother|bicubicSharper|lanczos|bilinear|nearest"="bicubicAutomatic","depth":"8|16"="8","trim":bool=true,"layerName":str="origin"}"##,
+            params: r##"{"width":0..500=0 (cm; proportional when 0),"height":0..500=27 (cm; proportional when 0; both 0 keep the size),"resolution":72..1200=300,"resample":"bicubicAutomatic|preserveDetails|bicubic|bicubicSmoother|bicubicSharper|lanczos|bilinear|nearest"="bicubicAutomatic","depth":"8|16"="8","trim":bool=true,"layerName":str="origin"}"##,
             enabled: has_doc,
             run: conformity,
             journal: true,
@@ -662,6 +675,17 @@ mod tests {
         assert!(!d.doc.is_background(d.doc.layers[1].id));
         assert!(s.undo());
         assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+    }
+
+    #[test]
+    fn conformity_keeps_the_proportions() {
+        // 200 × 100 px at 300 ppi: 10 cm wide is 1181 px, the height follows.
+        assert_eq!(conformity_size(200, 100, 10.0, 0.0, 300.0), Some((1181, 591)));
+        assert_eq!(conformity_size(200, 100, 0.0, 10.0, 300.0), Some((2362, 1181)));
+        // Both sides: the largest size that fits inside 10 × 10 cm.
+        assert_eq!(conformity_size(200, 100, 10.0, 10.0, 300.0), Some((1181, 591)));
+        assert_eq!(conformity_size(100, 200, 10.0, 10.0, 300.0), Some((591, 1181)));
+        assert_eq!(conformity_size(200, 100, 0.0, 0.0, 300.0), None);
     }
 
     #[test]

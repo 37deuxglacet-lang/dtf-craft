@@ -3779,3 +3779,13 @@ navigator	Zoom	Zvětšení
 	Semi-Transparent Pixels Only	Pouze poloprůhledné pixely
 	Whole Visual — Dark Garment	Celý motiv — tmavá textilie
 	Whole Visual — Light Garment	Celý motiv — světlá textilie
+# DTF Craft (3)
+	Print Conformity	Příprava pro tisk
+	Control Background	Kontrolní pozadí
+	Remove Semi-Transparent Pixels	Odstranit poloprůhledné pixely
+	Current size: {width} × {height} cm at {resolution} ppi	Aktuální velikost: {width} × {height} cm při {resolution} ppi
+	Width (cm, 0 = proportional)	Šířka (cm, 0 = poměrně)
+	Height (cm, 0 = proportional)	Výška (cm, 0 = poměrně)
+	Conformity	Příprava
+	No Background	Bez pozadí
+	Fringe	Lemy

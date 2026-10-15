@@ -394,6 +394,9 @@ pub struct Panels {
     /// Window › Character / Paragraph: the Character | Paragraph dock group (#150).
     #[serde(default)]
     pub character: bool,
+    /// DTF Craft: the DTF tools dock group (shown by default, above Layers).
+    #[serde(default = "yes")]
+    pub dtf: bool,
     /// The toolbar's header chevron: two columns even when one fits (#1197).
     #[serde(default)]
     pub toolbar_double: bool,
@@ -430,6 +433,8 @@ impl Default for Panels {
             status_bar: true,
             brush_settings: false,
             character: false,
+            // DTF Craft shows it (with Layers only) through `dtf_panel::dtf_craft_startup`.
+            dtf: false,
             toolbar_double: false,
             dock: true,
             hidden_by_tab: None,
@@ -1033,6 +1038,9 @@ pub struct DockTabs {
     pub history: usize,
     /// Character | Paragraph.
     pub character: usize,
+    /// DTF Craft's tools.
+    #[serde(default)]
+    pub dtf: usize,
 }
 
 /// Color panel state.

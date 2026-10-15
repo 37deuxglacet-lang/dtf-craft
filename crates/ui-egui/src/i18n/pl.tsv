@@ -3770,3 +3770,13 @@ curves	Smooth	Wygładź
 	Semi-Transparent Pixels Only	Tylko piksele półprzezroczyste
 	Whole Visual — Dark Garment	Cały projekt — ciemna tkanina
 	Whole Visual — Light Garment	Cały projekt — jasna tkanina
+# DTF Craft (3)
+	Print Conformity	Przygotowanie do druku
+	Control Background	Tło kontrolne
+	Remove Semi-Transparent Pixels	Usuń półprzezroczyste piksele
+	Current size: {width} × {height} cm at {resolution} ppi	Obecny rozmiar: {width} × {height} cm przy {resolution} ppi
+	Width (cm, 0 = proportional)	Szerokość (cm, 0 = proporcjonalnie)
+	Height (cm, 0 = proportional)	Wysokość (cm, 0 = proporcjonalnie)
+	Conformity	Zgodność
+	No Background	Bez tła
+	Fringe	Obwódki

@@ -3161,3 +3161,15 @@ curves	Smooth	Haluskan
 	Semi-Transparent Pixels Only	Hanya piksel semi-transparan
 	Whole Visual — Dark Garment	Seluruh desain — kain gelap
 	Whole Visual — Light Garment	Seluruh desain — kain terang
+# DTF Craft (3)
+	Print Conformity	Kesesuaian cetak
+	Control Background	Latar kontrol
+	Remove Semi-Transparent Pixels	Hapus piksel semi-transparan
+	Defringe	Defringe
+	Smart Sharpen	Smart Sharpen
+	Current size: {width} × {height} cm at {resolution} ppi	Ukuran saat ini: {width} × {height} cm pada {resolution} ppi
+	Width (cm, 0 = proportional)	Lebar (cm, 0 = proporsional)
+	Height (cm, 0 = proportional)	Tinggi (cm, 0 = proporsional)
+	Conformity	Kesesuaian
+	No Background	Tanpa latar
+	Fringe	Tepi

@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Right-dock layout (#88): panel groups with fixed heights, like Photoshop's dock columns.
 //!
 //! A group's height never follows its content: content taller than the group scrolls inside
@@ -36,13 +38,15 @@ pub enum Group {
     Navigator,
     /// History | Actions | Layer Comps.
     History,
+    /// DTF Craft: one tab per DTF tool (see `dtf_panel`), above Layers by default.
+    Dtf,
     /// Layers | Channels | Paths.
     Layers,
 }
 
 impl Group {
     /// Photoshop Essentials order, top to bottom.
-    pub const ALL: [Group; 6] = [Group::Color, Group::Properties, Group::Character, Group::Navigator, Group::History, Group::Layers];
+    pub const ALL: [Group; 7] = [Group::Color, Group::Properties, Group::Character, Group::Navigator, Group::History, Group::Dtf, Group::Layers];
 
     pub fn key(self) -> &'static str {
         match self {
@@ -51,6 +55,7 @@ impl Group {
             Group::Character => "character",
             Group::Navigator => "navigator",
             Group::History => "history",
+            Group::Dtf => "dtf",
             Group::Layers => "layers",
         }
     }
@@ -64,6 +69,7 @@ impl Group {
             Group::Character => 270.0,
             Group::Navigator => 210.0,
             Group::History => 200.0,
+            Group::Dtf => 340.0,
             Group::Layers => 320.0,
         }
     }
@@ -77,6 +83,7 @@ impl Group {
             Group::Character => 160.0,
             Group::Navigator => 140.0,
             Group::History => 130.0,
+            Group::Dtf => 180.0,
             Group::Layers => 200.0,
         }
     }
@@ -107,6 +114,7 @@ impl Group {
             Group::Character => &["Character", "Paragraph"],
             Group::Navigator => &["Navigator", "Histogram", "Info"],
             Group::History => &["History", "Actions", "Layer Comps"],
+            Group::Dtf => &crate::dtf_panel::TABS,
             Group::Layers => &["Layers", "Channels", "Paths"],
         }
     }
@@ -124,6 +132,7 @@ impl Group {
             Group::Character => &mut tabs.character,
             Group::Navigator => &mut tabs.navigator,
             Group::History => &mut tabs.history,
+            Group::Dtf => &mut tabs.dtf,
             Group::Layers => &mut tabs.layers,
         }
     }
@@ -140,6 +149,7 @@ impl Group {
             Group::Character => panels.character,
             Group::Navigator => panels.navigator,
             Group::History => panels.history,
+            Group::Dtf => panels.dtf,
             Group::Layers => panels.layers,
         }
     }
@@ -151,6 +161,7 @@ impl Group {
             Group::Character => &mut panels.character,
             Group::Navigator => &mut panels.navigator,
             Group::History => &mut panels.history,
+            Group::Dtf => &mut panels.dtf,
             Group::Layers => &mut panels.layers,
         }
     }

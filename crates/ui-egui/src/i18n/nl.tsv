@@ -3931,3 +3931,13 @@ curves	Smooth	Vloeiend maken
 	Semi-Transparent Pixels Only	Alleen halfdoorzichtige pixels
 	Whole Visual — Dark Garment	Hele ontwerp — donker textiel
 	Whole Visual — Light Garment	Hele ontwerp — licht textiel
+# DTF Craft (3)
+	Print Conformity	Drukvoorbereiding
+	Control Background	Controleachtergrond
+	Remove Semi-Transparent Pixels	Halfdoorzichtige pixels verwijderen
+	Current size: {width} × {height} cm at {resolution} ppi	Huidige grootte: {width} × {height} cm bij {resolution} ppi
+	Width (cm, 0 = proportional)	Breedte (cm, 0 = proportioneel)
+	Height (cm, 0 = proportional)	Hoogte (cm, 0 = proportioneel)
+	Conformity	Drukklaar
+	No Background	Zonder achtergrond
+	Fringe	Randen

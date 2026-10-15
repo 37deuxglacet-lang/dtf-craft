@@ -399,6 +399,8 @@ fn main() -> eframe::Result {
             mac_window::disable_native_title_drag();
             // Long commands and file opens run as background jobs with progress and Cancel (#210).
             app.background_jobs = std::env::var_os("PHOTOCRAFT_INLINE_JOBS").is_none();
+            // DTF Craft: the DTF tools group and its default layout (Layers and the DTF tools).
+            photocraft_ui_egui::dtf_panel::dtf_craft_startup(&mut app);
             // Displays and their profiles (#569): wait briefly so the first frames already use
             // the right profile; a slower reading is applied when it arrives, and the shell reads
             // again when the displays may have changed.

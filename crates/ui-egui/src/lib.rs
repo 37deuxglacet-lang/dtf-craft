@@ -206,7 +206,7 @@ pub mod theme;
 pub mod tiff_options_ui;
 mod tile_overlay;
 mod timeline_ui;
-mod dtf_panel;
+pub mod dtf_panel;
 mod titlebar;
 pub use titlebar::{Caption, CaptionFamily, CaptionIcon, CaptionIcons, CaptionStyle, RenderIconFn};
 pub mod tone;
@@ -760,6 +760,9 @@ pub struct PhotocraftApp {
     /// `jobs_ui`). The desktop app turns it on; off (the default), everything runs inline as
     /// before, which tests and scripts rely on.
     pub background_jobs: bool,
+    /// DTF Craft (the desktop app, not embedders or tests): the DTF tools group and its
+    /// Essentials workspace (Layers and the DTF tools). See `dtf_panel::dtf_craft_startup`.
+    pub dtf_craft: bool,
     /// Background job bookkeeping: opening tabs, control replies waiting on a job.
     pub jobs: jobs_ui::JobsUi,
     #[cfg(all(debug_assertions, not(target_arch = "wasm32")))]
@@ -892,6 +895,7 @@ impl PhotocraftApp {
             allow_close: false,
             stylus: Default::default(),
             background_jobs: false,
+            dtf_craft: false,
             jobs: Default::default(),
             #[cfg(all(debug_assertions, not(target_arch = "wasm32")))]
             live_tokens: theme::live::LiveTokens::from_env(),
@@ -1868,7 +1872,6 @@ impl eframe::App for PhotocraftApp {
         type_panels_ui::windows(self, &ctx);
         analysis_ui::windows(self, &ctx);
         timeline_ui::windows(self, &ctx);
-        dtf_panel::windows(self, &ctx);
         workspace_ui::windows(self, &ctx);
         palette::show(self, &ctx);
         dialogs::show(self, &ctx);

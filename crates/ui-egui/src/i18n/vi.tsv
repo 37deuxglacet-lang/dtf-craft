@@ -3658,3 +3658,13 @@ curves	Smooth	Làm mượt
 	Semi-Transparent Pixels Only	Chỉ điểm ảnh bán trong suốt
 	Whole Visual — Dark Garment	Toàn bộ hình — vải tối màu
 	Whole Visual — Light Garment	Toàn bộ hình — vải sáng màu
+# DTF Craft (3)
+	Print Conformity	Chuẩn hóa in
+	Control Background	Nền kiểm tra
+	Remove Semi-Transparent Pixels	Xóa điểm ảnh bán trong suốt
+	Current size: {width} × {height} cm at {resolution} ppi	Kích thước hiện tại: {width} × {height} cm ở {resolution} ppi
+	Width (cm, 0 = proportional)	Chiều rộng (cm, 0 = theo tỉ lệ)
+	Height (cm, 0 = proportional)	Chiều cao (cm, 0 = theo tỉ lệ)
+	Conformity	Chuẩn hóa
+	No Background	Không nền
+	Fringe	Viền

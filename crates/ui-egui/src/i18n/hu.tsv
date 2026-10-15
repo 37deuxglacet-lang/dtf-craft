@@ -4092,3 +4092,13 @@ cameraRaw	Yellow	Sárga
 	Semi-Transparent Pixels Only	Csak félig átlátszó képpontok
 	Whole Visual — Dark Garment	Teljes minta — sötét textil
 	Whole Visual — Light Garment	Teljes minta — világos textil
+# DTF Craft (3)
+	Print Conformity	Nyomdai előkészítés
+	Control Background	Ellenőrző háttér
+	Remove Semi-Transparent Pixels	Félig átlátszó képpontok eltávolítása
+	Current size: {width} × {height} cm at {resolution} ppi	Jelenlegi méret: {width} × {height} cm, {resolution} ppi
+	Width (cm, 0 = proportional)	Szélesség (cm, 0 = arányos)
+	Height (cm, 0 = proportional)	Magasság (cm, 0 = arányos)
+	Conformity	Előkészítés
+	No Background	Háttér nélkül
+	Fringe	Szegély

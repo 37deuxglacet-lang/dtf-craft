@@ -4134,3 +4134,13 @@ navigator	Zoom	Zoom
 	Semi-Transparent Pixels Only	Solo pixel semitrasparenti
 	Whole Visual — Dark Garment	Intera grafica — tessuto scuro
 	Whole Visual — Light Garment	Intera grafica — tessuto chiaro
+# DTF Craft (3)
+	Print Conformity	Conformità di stampa
+	Control Background	Sfondo di controllo
+	Remove Semi-Transparent Pixels	Rimuovi pixel semitrasparenti
+	Current size: {width} × {height} cm at {resolution} ppi	Dimensione attuale: {width} × {height} cm a {resolution} ppi
+	Width (cm, 0 = proportional)	Larghezza (cm, 0 = proporzionale)
+	Height (cm, 0 = proportional)	Altezza (cm, 0 = proporzionale)
+	Conformity	Conformità
+	No Background	Senza sfondo
+	Fringe	Aloni

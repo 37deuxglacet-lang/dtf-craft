@@ -3871,3 +3871,13 @@ curves	Smooth	Згладити
 	Semi-Transparent Pixels Only	Лише напівпрозорі пікселі
 	Whole Visual — Dark Garment	Увесь макет — темна тканина
 	Whole Visual — Light Garment	Увесь макет — світла тканина
+# DTF Craft (3)
+	Print Conformity	Підготовка до друку
+	Control Background	Контрольний фон
+	Remove Semi-Transparent Pixels	Видалити напівпрозорі пікселі
+	Current size: {width} × {height} cm at {resolution} ppi	Поточний розмір: {width} × {height} см при {resolution} ppi
+	Width (cm, 0 = proportional)	Ширина (см, 0 = пропорційно)
+	Height (cm, 0 = proportional)	Висота (см, 0 = пропорційно)
+	Conformity	Підготовка
+	No Background	Без фону
+	Fringe	Облямівка

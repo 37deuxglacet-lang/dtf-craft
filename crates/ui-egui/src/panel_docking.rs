@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Application-owned panel IDs and commands around the shared docking layout.
 
 use crate::dock::Group;
@@ -25,6 +27,13 @@ const PANELS: &[(&str, &str, Group)] = &[
     ("layers", "Layers", Group::Layers),
     ("channels", "Channels", Group::Layers),
     ("paths", "Paths", Group::Layers),
+    ("dtfConformity", "Conformity", Group::Dtf),
+    ("dtfBackground", "Control Background", Group::Dtf),
+    ("dtfNoBackground", "No Background", Group::Dtf),
+    ("dtfTransparency", "Transparency", Group::Dtf),
+    ("dtfFringe", "Fringe", Group::Dtf),
+    ("dtfSharpness", "Sharpness", Group::Dtf),
+    ("dtfSaturation", "Saturation", Group::Dtf),
 ];
 #[derive(Clone, Default)]
 struct LegacyDrag {
@@ -79,6 +88,7 @@ fn legacy_layout(app: &PhotocraftApp, all: bool) -> Layout<String> {
             Group::Character => app.ui.dock_tabs.character,
             Group::Navigator => app.ui.dock_tabs.navigator,
             Group::History => app.ui.dock_tabs.history,
+            Group::Dtf => app.ui.dock_tabs.dtf,
             Group::Layers => app.ui.dock_tabs.layers,
         };
         let active = labels.get(selected).and_then(|label| normalize(label)).and_then(|id| panels.iter().position(|p| p == id)).unwrap_or(0);
@@ -791,6 +801,7 @@ pub(crate) fn prepare_legacy_update(
                 Group::Character => tabs.character,
                 Group::Navigator => tabs.navigator,
                 Group::History => tabs.history,
+                Group::Dtf => tabs.dtf,
                 Group::Layers => tabs.layers,
             };
             let id = group.tabs(pro).get(index).and_then(|label| normalize(label)).ok_or("dockTabs index is outside the panel group")?;

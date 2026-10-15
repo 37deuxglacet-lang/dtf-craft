@@ -23,13 +23,18 @@ produit officiel du projet PhotoCraft.
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 
-## Panneau Réglages DTF
+## Onglets DTF
 
-Fenêtre › Réglages DTF ouvre un panneau flottant avec une section repliable par outil
-(Conformité impression, Fond de contrôle, Suppression fond de contrôle, Pixels semi-transparents,
-Franges, Netteté intelligente, Saturation). Chaque section a ses réglages et un bouton
-« Appliquer » ; l'aperçu s'affiche sur l'image dès qu'un réglage bouge (sauf Conformité impression
-et Suppression fond de contrôle). Les réglages appliqués sont mémorisés.
+Chaque outil DTF a son onglet (Conformité, Fond de contrôle, Sans fond, Transparence, Franges,
+Netteté, Saturation), regroupés au-dessus de Calques. Ils se déplacent, se regroupent, se
+détachent et s'ancrent comme les autres panneaux ; Fenêtre › Conformité impression (et les autres
+outils) les affiche. Chaque onglet a ses réglages et « Appliquer » ; l'aperçu s'affiche sur l'image
+dès qu'un réglage bouge (sauf Conformité et Sans fond). Au démarrage, la colonne ne montre que les
+onglets DTF et Calques ; les autres panneaux sont dans le menu Fenêtre.
+
+Conformité impression : largeur et/ou hauteur en cm ; avec une seule valeur l'autre suit les
+proportions, avec les deux l'image tient dans le cadre largeur × hauteur. La transparence est
+rognée avant le redimensionnement.
 
 ## Agrandissement IA
 

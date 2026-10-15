@@ -3848,3 +3848,13 @@ curves	Smooth	スムーズ
 	Semi-Transparent Pixels Only	半透明ピクセルのみ
 	Whole Visual — Dark Garment	デザイン全体 — 濃色の生地
 	Whole Visual — Light Garment	デザイン全体 — 淡色の生地
+# DTF Craft (3)
+	Print Conformity	印刷用に整える
+	Control Background	確認用背景
+	Remove Semi-Transparent Pixels	半透明ピクセルを削除
+	Current size: {width} × {height} cm at {resolution} ppi	現在のサイズ: {width} × {height} cm({resolution} ppi)
+	Width (cm, 0 = proportional)	幅(cm、0 = 比率を保持)
+	Height (cm, 0 = proportional)	高さ(cm、0 = 比率を保持)
+	Conformity	印刷用
+	No Background	背景なし
+	Fringe	フリンジ

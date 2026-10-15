@@ -4246,3 +4246,13 @@ shape	Appearance	Izgled
 	Semi-Transparent Pixels Only	Samo poluprozirni pikseli
 	Whole Visual — Dark Garment	Ceo motiv — tamna tkanina
 	Whole Visual — Light Garment	Ceo motiv — svetla tkanina
+# DTF Craft (3)
+	Print Conformity	Priprema za štampu
+	Control Background	Kontrolna pozadina
+	Remove Semi-Transparent Pixels	Ukloni poluprozirne piksele
+	Current size: {width} × {height} cm at {resolution} ppi	Trenutna veličina: {width} × {height} cm pri {resolution} ppi
+	Width (cm, 0 = proportional)	Širina (cm, 0 = srazmerno)
+	Height (cm, 0 = proportional)	Visina (cm, 0 = srazmerno)
+	Conformity	Priprema
+	No Background	Bez pozadine
+	Fringe	Ivice

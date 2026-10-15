@@ -3870,3 +3870,13 @@ curves	Smooth	Εξομάλυνση
 	Semi-Transparent Pixels Only	Μόνο ημιδιαφανή εικονοστοιχεία
 	Whole Visual — Dark Garment	Ολόκληρο το σχέδιο — σκούρο ύφασμα
 	Whole Visual — Light Garment	Ολόκληρο το σχέδιο — ανοιχτόχρωμο ύφασμα
+# DTF Craft (3)
+	Print Conformity	Προετοιμασία εκτύπωσης
+	Control Background	Φόντο ελέγχου
+	Remove Semi-Transparent Pixels	Αφαίρεση ημιδιαφανών εικονοστοιχείων
+	Current size: {width} × {height} cm at {resolution} ppi	Τρέχον μέγεθος: {width} × {height} cm στα {resolution} ppi
+	Width (cm, 0 = proportional)	Πλάτος (cm, 0 = αναλογικά)
+	Height (cm, 0 = proportional)	Ύψος (cm, 0 = αναλογικά)
+	Conformity	Προετοιμασία
+	No Background	Χωρίς φόντο
+	Fringe	Περιθώρια
