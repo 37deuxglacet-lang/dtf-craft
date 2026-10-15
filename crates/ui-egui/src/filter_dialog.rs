@@ -111,7 +111,8 @@ pub fn parse_spec(spec: &str) -> Vec<Param> {
         } else if v == "color" {
             Kind::Color(None)
         } else if let Some(default) = v.strip_prefix("color=") {
-            Kind::Color(crate::color_picker_ui::parse_hex(default))
+            // The default is the first word: a description in parentheses may follow.
+            Kind::Color(crate::color_picker_ui::parse_hex(default.split(|c: char| c.is_whitespace() || c == '(').next().unwrap_or(default)))
         } else if v == "doc" {
             Kind::Document
         } else if v == "json" || v.starts_with("layer id") || v.starts_with('[') || v.starts_with('{') {
@@ -215,6 +216,8 @@ fn is_cm_param(command: &str, key: &str) -> bool {
 const FULL_RESOLUTION_PREVIEW: &[&str] = &[
     // The DTF halftone screen is sized from the document resolution: preview it at full size.
     "filter.dtf.halftone",
+    // Remove White Background's contour and minimum hole size are in document pixels.
+    "filter.dtf.removeWhiteBackground",
     "dtf.sharpen",
     "filter.distort.ripple",
     "filter.stylize.diffuse",
@@ -679,6 +682,14 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
         crate::select_mask_view::controls(ui, f);
     }
     for p in parse_spec(&spec) {
+        // DTF Craft: Remove White Background's colour only shows once detection on the edges is
+        // off, and the minimum hole size once interior holes are on.
+        if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE
+            && ((p.key == "color" && f.get("detectColor").and_then(Value::as_bool) != Some(false))
+                || (p.key == "minHoleSize" && f.get("interiorHoles").and_then(Value::as_bool) != Some(true)))
+        {
+            continue;
+        }
         match p.kind {
             Kind::Range { min, max, default } => {
                 let mut v = f.get(&p.key).and_then(Value::as_f64).unwrap_or(default as f64) as f32;
@@ -950,6 +961,10 @@ pub(crate) fn preview_document_for_target(
         crate::blur_pins::scale_for_proxy(&mut p, run_k);
     }
     s.execute(command, p).ok()?;
+    // DTF Craft: the cut-out previews on the dark control background, where a light halo shows.
+    if command == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        s.execute(photocraft_engine::dtf_cmds::CONTROL_BACKGROUND, json!({"color": "#231c1c"})).ok()?;
+    }
     s.active().map(|d| crate::proxy::proxy_document(&d.doc, reduce_k))
 }
 

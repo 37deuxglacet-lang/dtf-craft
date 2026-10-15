@@ -3941,3 +3941,10 @@ curves	Smooth	Vloeiend maken
 	Conformity	Drukklaar
 	No Background	Zonder achtergrond
 	Fringe	Randen
+# DTF Craft (4)
+	Remove White Background…	Witte achtergrond verwijderen…
+	Remove White Background	Witte achtergrond verwijderen
+	Detect Color	Achtergrondkleur detecteren
+	Remove Halo	Halo verwijderen
+	Interior Holes	Binnenste gaten
+	Min Hole Size	Min. gatgrootte (px)

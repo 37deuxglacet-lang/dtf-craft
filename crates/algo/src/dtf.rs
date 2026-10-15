@@ -17,7 +17,7 @@ use photocraft_geom::Rect;
 use serde::{Deserialize, Serialize};
 
 use crate::Ctx;
-use crate::fxutil::{rgba, xy};
+use crate::fxutil::{MAXC, native, ncol, rgba, xy};
 use crate::image::Image;
 use crate::quantize::{HalftoneShape, spot};
 
@@ -188,6 +188,369 @@ pub(crate) fn alpha_threshold(src: &Image, out: Rect, ctx: &Ctx, threshold: f32)
     res
 }
 
+// ---------------------------------------------------------------- Remove White Background
+
+/// Remove White Background settings (the filter's [`crate::FilterParams::DtfCutout`] fields).
+///
+/// The background is the plain colour the visual sits on (white for most files). It is removed
+/// from the image edges inwards, so the same colour inside the visual stays, and the contour
+/// pixels mixed with it are unmixed (see [`crate::color_to_alpha`]) so no light halo is left.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CutoutSpec {
+    /// The background colour (straight sRGB 0–1), or `None` to read it on the image edges.
+    pub color: Option<[f32; 3]>,
+    /// Largest channel difference (0–1) from the background colour still taken as background.
+    pub tolerance: f32,
+    /// Width in pixels of the contour band that is unmixed from the background (0 = none).
+    pub edge: f32,
+    /// Unmix the contour band from the background colour (otherwise it stays as it is).
+    pub decontaminate: bool,
+    /// Also remove background-coloured areas enclosed by the visual (inside an O, between
+    /// shapes) of at least `min_hole` pixels.
+    pub holes: bool,
+    pub min_hole: u32,
+}
+
+impl Default for CutoutSpec {
+    fn default() -> Self {
+        CutoutSpec { color: None, tolerance: 0.1, edge: 2.0, decontaminate: true, holes: false, min_hole: 100 }
+    }
+}
+
+/// What the cutout does to each pixel of the area it was prepared for.
+const KEEP: u8 = 0;
+const BACKGROUND: u8 = 1;
+const CONTOUR: u8 = 2;
+
+/// A cutout prepared once for the whole reference area (the flood fill needs every pixel), then
+/// applied tile by tile by [`CutoutPlan::apply`].
+#[derive(Clone, Debug)]
+pub struct CutoutPlan {
+    rect: Rect,
+    /// The background colour in the samples' own colour model (colour channels only).
+    key: Vec<f32>,
+    class: Vec<u8>,
+    /// For contour pixels: the colour of the nearest kept pixel of the visual (its own colour,
+    /// which the contour pixel is a mix of with the background).
+    inner: std::collections::HashMap<usize, [f32; MAXC]>,
+    tolerance: f32,
+    decontaminate: bool,
+}
+
+/// Largest channel difference between a pixel's colour channels and `key`.
+fn distance(colour: &[f32], key: &[f32]) -> f32 {
+    colour.iter().zip(key).map(|(p, k)| (p - k).abs()).fold(0.0, f32::max)
+}
+
+/// The background colour read on the image edges: the per-channel median of the opaque pixels
+/// of the outer ring. `None` when the ring has no opaque pixel (nothing to remove).
+fn edge_colour(src: &Image, cc: usize) -> Option<Vec<f32>> {
+    let n = src.ch;
+    let (w, h) = (src.rect.width() as usize, src.rect.height() as usize);
+    if w == 0 || h == 0 {
+        return None;
+    }
+    let mut samples: Vec<Vec<f32>> = vec![Vec::new(); cc];
+    let mut take = |i: usize| {
+        let Some(px) = src.data.get(i * n..i * n + n) else { return };
+        if px.get(n - 1).copied().unwrap_or(0.0) < 0.5 {
+            return;
+        }
+        for (c, s) in samples.iter_mut().enumerate() {
+            if let Some(v) = px.get(c).filter(|v| v.is_finite()) {
+                s.push(*v);
+            }
+        }
+    };
+    for x in 0..w {
+        take(x);
+        if h > 1 {
+            take((h - 1) * w + x);
+        }
+    }
+    for y in 1..h.saturating_sub(1) {
+        take(y * w);
+        if w > 1 {
+            take(y * w + w - 1);
+        }
+    }
+    let mut key = Vec::with_capacity(cc);
+    for mut s in samples {
+        if s.is_empty() {
+            return None;
+        }
+        s.sort_by(f32::total_cmp);
+        key.push(s[s.len() / 2]);
+    }
+    Some(key)
+}
+
+impl CutoutPlan {
+    /// Prepares the cutout of `src` (the whole reference area). `None` when cancelled.
+    pub fn prepare(src: &Image, ctx: &Ctx, spec: &CutoutSpec, ctl: &photocraft_raster::Interrupt) -> Option<CutoutPlan> {
+        let n = src.ch;
+        let (w, h) = (src.rect.width() as usize, src.rect.height() as usize);
+        let tolerance = if spec.tolerance.is_finite() { spec.tolerance.clamp(0.0, 1.0) } else { 0.1 };
+        let mut plan = CutoutPlan {
+            rect: src.rect,
+            key: Vec::new(),
+            class: Vec::new(),
+            inner: std::collections::HashMap::new(),
+            tolerance,
+            decontaminate: spec.decontaminate,
+        };
+        // Without alpha there is nowhere to put the transparency: the plan keeps every pixel.
+        if !ctx.alpha || n < 2 || w == 0 || h == 0 || src.data.len() < w * h * n {
+            return Some(plan);
+        }
+        let cc = ncol(ctx, n).min(MAXC);
+        let key = match spec.color {
+            Some(c) => native(ctx, [c[0], c[1], c[2], 1.0]).get(..cc).map(<[f32]>::to_vec),
+            None => edge_colour(src, cc),
+        };
+        let Some(key) = key else { return Some(plan) };
+        let is_background = |i: usize| -> bool {
+            let px = &src.data[i * n..i * n + n];
+            px[n - 1] <= 0.0 || distance(&px[..cc], &key) <= tolerance
+        };
+        let mut class = vec![KEEP; w * h];
+        // 1. The background reached from the image edges (4-connected flood fill).
+        let mut stack: Vec<usize> = Vec::new();
+        let seed = |i: usize, class: &mut Vec<u8>, stack: &mut Vec<usize>| {
+            if class[i] == KEEP && is_background(i) {
+                class[i] = BACKGROUND;
+                stack.push(i);
+            }
+        };
+        for x in 0..w {
+            seed(x, &mut class, &mut stack);
+            seed((h - 1) * w + x, &mut class, &mut stack);
+        }
+        for y in 0..h {
+            seed(y * w, &mut class, &mut stack);
+            seed(y * w + w - 1, &mut class, &mut stack);
+        }
+        let mut steps = 0usize;
+        while let Some(i) = stack.pop() {
+            steps += 1;
+            if steps % (1 << 20) == 0 && ctl.cancelled() {
+                return None;
+            }
+            let (x, y) = (i % w, i / w);
+            let mut visit = |j: usize| {
+                if class[j] == KEEP && is_background(j) {
+                    class[j] = BACKGROUND;
+                    stack.push(j);
+                }
+            };
+            if x > 0 {
+                visit(i - 1);
+            }
+            if x + 1 < w {
+                visit(i + 1);
+            }
+            if y > 0 {
+                visit(i - w);
+            }
+            if y + 1 < h {
+                visit(i + w);
+            }
+        }
+        // 2. Enclosed areas of the background colour, when asked, from a minimum size.
+        if spec.holes {
+            const SEEN: u8 = 3;
+            let mut region: Vec<usize> = Vec::new();
+            for start in 0..w * h {
+                if class[start] != KEEP || !is_background(start) {
+                    continue;
+                }
+                if ctl.cancelled() {
+                    return None;
+                }
+                region.clear();
+                class[start] = SEEN;
+                stack.push(start);
+                while let Some(i) = stack.pop() {
+                    region.push(i);
+                    let (x, y) = (i % w, i / w);
+                    let mut visit = |j: usize| {
+                        if class[j] == KEEP && is_background(j) {
+                            class[j] = SEEN;
+                            stack.push(j);
+                        }
+                    };
+                    if x > 0 {
+                        visit(i - 1);
+                    }
+                    if x + 1 < w {
+                        visit(i + 1);
+                    }
+                    if y > 0 {
+                        visit(i - w);
+                    }
+                    if y + 1 < h {
+                        visit(i + w);
+                    }
+                }
+                let to = if region.len() as u64 >= u64::from(spec.min_hole.max(1)) { BACKGROUND } else { SEEN };
+                for &i in &region {
+                    class[i] = to;
+                }
+            }
+            for c in class.iter_mut().filter(|c| **c == SEEN) {
+                *c = KEEP;
+            }
+        }
+        // 3. The contour: kept pixels within `edge` pixels of the removed background (8-connected
+        // distance, grown one ring at a time).
+        let rings = if spec.edge.is_finite() && spec.edge > 0.0 { spec.edge.ceil().min(64.0) as usize } else { 0 };
+        if rings > 0 {
+            let mut front: Vec<usize> = (0..w * h).filter(|&i| class[i] == BACKGROUND).collect();
+            for _ in 0..rings {
+                if ctl.cancelled() {
+                    return None;
+                }
+                let mut next = Vec::new();
+                for &i in &front {
+                    let (x, y) = ((i % w) as i64, (i / w) as i64);
+                    for dy in -1i64..=1 {
+                        for dx in -1i64..=1 {
+                            let (nx, ny) = (x + dx, y + dy);
+                            if (dx, dy) == (0, 0) || nx < 0 || ny < 0 || nx >= w as i64 || ny >= h as i64 {
+                                continue;
+                            }
+                            let j = ny as usize * w + nx as usize;
+                            if class[j] == KEEP {
+                                class[j] = CONTOUR;
+                                next.push(j);
+                            }
+                        }
+                    }
+                }
+                front = next;
+            }
+        }
+        // 4. Each contour pixel's visual colour: the nearest kept pixel's, carried outwards
+        // through the contour. A contour pixel no kept pixel reaches (a stroke thinner than the
+        // contour) has none and is unmixed from the background alone.
+        let mut inner = std::collections::HashMap::new();
+        if rings > 0 && spec.decontaminate {
+            let colour_of = |i: usize| {
+                let mut c = [0.0f32; MAXC];
+                c[..cc].copy_from_slice(&src.data[i * n..i * n + cc]);
+                c
+            };
+            let neighbours = |i: usize| {
+                let (x, y) = ((i % w) as i64, (i / w) as i64);
+                (-1i64..=1).flat_map(move |dy| (-1i64..=1).map(move |dx| (x + dx, y + dy))).filter_map(move |(nx, ny)| {
+                    (nx >= 0 && ny >= 0 && nx < w as i64 && ny < h as i64 && (nx, ny) != (x, y)).then(|| ny as usize * w + nx as usize)
+                })
+            };
+            let mut front: Vec<usize> = Vec::new();
+            for i in (0..w * h).filter(|&i| class[i] == CONTOUR) {
+                if let Some(j) = neighbours(i).find(|&j| class[j] == KEEP) {
+                    inner.insert(i, colour_of(j));
+                    front.push(i);
+                }
+            }
+            while !front.is_empty() {
+                if ctl.cancelled() {
+                    return None;
+                }
+                let mut next = Vec::new();
+                for &i in &front {
+                    let Some(c) = inner.get(&i).copied() else { continue };
+                    for j in neighbours(i) {
+                        if class[j] == CONTOUR && !inner.contains_key(&j) {
+                            inner.insert(j, c);
+                            next.push(j);
+                        }
+                    }
+                }
+                front = next;
+            }
+        }
+        plan.key = key;
+        plan.class = class;
+        plan.inner = inner;
+        Some(plan)
+    }
+
+    /// The cutout of `out` (inside the prepared area; pixels outside it are kept).
+    pub fn apply(&self, src: &Image, out: Rect, ctx: &Ctx) -> Vec<f32> {
+        let n = src.ch;
+        let mut res = src.crop(out);
+        if self.class.is_empty() || n < 2 {
+            return res;
+        }
+        let cc = ncol(ctx, n).min(MAXC).min(self.key.len());
+        let w = self.rect.width() as usize;
+        for (i, px) in res.chunks_exact_mut(n).enumerate() {
+            let (x, y) = xy(out, i);
+            if !self.rect.contains(x, y) {
+                continue;
+            }
+            let k = (y - self.rect.y0) as usize * w + (x - self.rect.x0) as usize;
+            match self.class.get(k).copied().unwrap_or(KEEP) {
+                BACKGROUND => {
+                    if let Some(a) = px.last_mut() {
+                        *a = 0.0;
+                    }
+                }
+                CONTOUR if self.decontaminate => {
+                    let Some((alpha, colour)) = px.split_last_mut() else { continue };
+                    let colour = &mut colour[..cc];
+                    let key = &self.key[..cc];
+                    *alpha *= match self.inner.get(&k) {
+                        Some(f) => unmix_towards(colour, key, &f[..cc], self.tolerance),
+                        None => crate::color_to_alpha::unmix(colour, key, self.tolerance, 1.0),
+                    };
+                }
+                _ => {}
+            }
+        }
+        res
+    }
+}
+
+/// Unmixes a contour pixel `p` taken as `a·F + (1 − a)·K` (`F` the visual's colour next to it,
+/// `K` the background): `a` is the projection of `p − K` on `F − K`, the colour becomes
+/// `K + (p − K) / a`. A pixel within `tolerance` of the background becomes transparent; one as
+/// far as `F` (or a visual of the background's own colour) stays as it is.
+fn unmix_towards(colour: &mut [f32], key: &[f32], inner: &[f32], tolerance: f32) -> f32 {
+    if distance(colour, key) <= tolerance {
+        colour.copy_from_slice(key);
+        return 0.0;
+    }
+    let (mut dot, mut len) = (0.0f32, 0.0f32);
+    for ((p, k), f) in colour.iter().zip(key).zip(inner) {
+        dot += (p - k) * (f - k);
+        len += (f - k) * (f - k);
+    }
+    let a = if len > 1e-6 { (dot / len).clamp(0.0, 1.0) } else { 1.0 };
+    if !a.is_finite() || a >= 1.0 {
+        return 1.0;
+    }
+    if a <= 0.0 {
+        colour.copy_from_slice(key);
+        return 0.0;
+    }
+    for (p, &k) in colour.iter_mut().zip(key) {
+        *p = (k + (*p - k) / a).clamp(0.0, 1.0);
+    }
+    a
+}
+
+/// The Remove White Background kernel for one call (prepares the cutout from `src`, which covers
+/// the reference area). [`crate::apply`] prepares it once for all its tiles instead.
+pub(crate) fn cutout(src: &Image, out: Rect, ctx: &Ctx, spec: &CutoutSpec) -> Vec<f32> {
+    match CutoutPlan::prepare(src, ctx, spec, &photocraft_raster::Interrupt::NONE) {
+        Some(plan) => plan.apply(src, out, ctx),
+        None => src.crop(out),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -287,8 +650,131 @@ mod tests {
         assert_eq!(whole, joined);
     }
 
+    /// 40 × 40 on a slightly noisy white (0.97–1): a black square ring from 10 to 30 enclosing a
+    /// white 10 × 10 hole, and one grey (0.7) contour pixel at (9, 20) against the background.
+    fn logo(bg: [f32; 3]) -> Image {
+        let r = Rect::new(0, 0, 40, 40);
+        let mut data = Vec::new();
+        for y in 0..40 {
+            for x in 0..40 {
+                let ring = (10..30).contains(&x) && (10..30).contains(&y) && !((15..25).contains(&x) && (15..25).contains(&y));
+                let hole = (15..25).contains(&x) && (15..25).contains(&y);
+                let c = if ring {
+                    [0.0; 3]
+                } else if hole {
+                    [1.0; 3]
+                } else if (x, y) == (9, 20) {
+                    [0.7; 3]
+                } else {
+                    let n = if (x + y) % 3 == 0 { 0.03 } else { 0.0 };
+                    [bg[0] - n, bg[1] - n, bg[2] - n]
+                };
+                data.extend_from_slice(&[c[0], c[1], c[2], 1.0]);
+            }
+        }
+        Image { rect: r, ch: 4, data }
+    }
+
+    fn cut(img: &Image, spec: CutoutSpec) -> Vec<f32> {
+        let ctx = Ctx { bounds: img.rect, mode: ColorMode::Rgb, alpha: true };
+        let plan = CutoutPlan::prepare(img, &ctx, &spec, &photocraft_raster::Interrupt::NONE).unwrap();
+        plan.apply(img, img.rect, &ctx)
+    }
+
+    fn alpha_at(v: &[f32], x: usize, y: usize) -> f32 {
+        v[(y * 40 + x) * 4 + 3]
+    }
+
+    #[test]
+    fn cutout_removes_the_outer_white_and_keeps_the_white_inside() {
+        let out = cut(&logo([1.0; 3]), CutoutSpec::default());
+        // The background, JPEG-like noise included, is gone.
+        for (x, y) in [(0, 0), (3, 7), (39, 39), (5, 35)] {
+            assert_eq!(alpha_at(&out, x, y), 0.0, "({x}, {y})");
+        }
+        // The visual stays, and so does the white enclosed by it (interior holes are off).
+        assert_eq!(alpha_at(&out, 12, 12), 1.0);
+        assert_eq!(alpha_at(&out, 20, 20), 1.0);
+        assert_eq!(&out[(20 * 40 + 20) * 4..(20 * 40 + 20) * 4 + 3], &[1.0, 1.0, 1.0]);
+    }
+
+    #[test]
+    fn cutout_unmixes_the_contour_from_the_background() {
+        let out = cut(&logo([1.0; 3]), CutoutSpec::default());
+        // 0.7 grey next to black on white = black at 30 % coverage.
+        let a = alpha_at(&out, 9, 20);
+        assert!((a - 0.3).abs() < 1e-4, "{a}");
+        let i = (20 * 40 + 9) * 4;
+        assert!(out[i..i + 3].iter().all(|v| *v < 1e-4), "the halo is black, not grey: {:?}", &out[i..i + 3]);
+        // Without decontamination the contour pixel is kept as it was.
+        let raw = cut(&logo([1.0; 3]), CutoutSpec { decontaminate: false, ..CutoutSpec::default() });
+        assert_eq!(alpha_at(&raw, 9, 20), 1.0);
+        assert_eq!(raw[i], 0.7);
+    }
+
+    #[test]
+    fn a_light_visual_on_white_keeps_its_opaque_edge() {
+        // Pale yellow (1, 1, 0.6) touching the white: its edge is no mix with the background.
+        let r = Rect::new(0, 0, 40, 40);
+        let mut data = Vec::new();
+        for y in 0..40 {
+            for x in 0..40 {
+                let inside = (10..30).contains(&x) && (10..30).contains(&y);
+                let blue = if inside { 0.6 } else if (x, y) == (9, 20) { 0.8 } else { 1.0 };
+                data.extend_from_slice(&[1.0, 1.0, blue, 1.0]);
+            }
+        }
+        let out = cut(&Image { rect: r, ch: 4, data }, CutoutSpec::default());
+        assert_eq!(alpha_at(&out, 10, 20), 1.0, "the yellow edge stays opaque");
+        assert_eq!(alpha_at(&out, 12, 20), 1.0);
+        // The antialiased pixel halfway to white is half yellow.
+        let a = alpha_at(&out, 9, 20);
+        assert!((a - 0.5).abs() < 1e-4, "{a}");
+        let i = (20 * 40 + 9) * 4;
+        assert!((out[i + 2] - 0.6).abs() < 1e-4, "its colour is the yellow's: {:?}", &out[i..i + 3]);
+        assert_eq!(alpha_at(&out, 0, 0), 0.0);
+    }
+
+    #[test]
+    fn cutout_holes_follow_their_minimum_size() {
+        let open = cut(&logo([1.0; 3]), CutoutSpec { holes: true, min_hole: 50, ..CutoutSpec::default() });
+        assert_eq!(alpha_at(&open, 20, 20), 0.0, "the 100 px hole is removed");
+        assert_eq!(alpha_at(&open, 12, 12), 1.0);
+        let kept = cut(&logo([1.0; 3]), CutoutSpec { holes: true, min_hole: 200, ..CutoutSpec::default() });
+        assert_eq!(alpha_at(&kept, 20, 20), 1.0, "smaller than the minimum: kept");
+    }
+
+    #[test]
+    fn cutout_reads_a_plain_background_of_any_colour_or_the_one_given() {
+        let green = logo([0.2, 0.8, 0.3]);
+        let out = cut(&green, CutoutSpec::default());
+        assert_eq!(alpha_at(&out, 0, 0), 0.0);
+        assert_eq!(alpha_at(&out, 12, 12), 1.0);
+        // Given as white, the green is no background: nothing is removed.
+        let white = cut(&green, CutoutSpec { color: Some([1.0; 3]), ..CutoutSpec::default() });
+        assert_eq!(alpha_at(&white, 0, 0), 1.0);
+    }
+
+    #[test]
+    fn cutout_is_the_same_whatever_the_tiling() {
+        use photocraft_color::{PixelFormat, SampleType};
+        let img = logo([1.0; 3]);
+        let mut s = photocraft_raster::Surface::new(PixelFormat::new(ColorMode::Rgb, SampleType::U8, true));
+        s.write_region(img.rect, &img.data);
+        let p = crate::FilterParams::DtfCutout { spec: CutoutSpec::default() };
+        let a = crate::apply_tiled(&s, &p, img.rect, img.rect, None, 256, None);
+        let b = crate::apply_tiled(&s, &p, img.rect, img.rect, None, 7, None);
+        assert_eq!(a.read_region(img.rect), b.read_region(img.rect));
+        assert_eq!(a.pixel(0, 0)[3], 0.0);
+        assert_eq!(a.pixel(12, 12)[3], 1.0);
+    }
+
     #[test]
     fn hostile_values_do_not_panic() {
+        let img = logo([1.0; 3]);
+        let _ = cut(&img, CutoutSpec { tolerance: f32::NAN, edge: f32::INFINITY, min_hole: 0, holes: true, ..CutoutSpec::default() });
+        let empty = Image { rect: Rect::EMPTY, ch: 4, data: vec![] };
+        let _ = cut(&empty, CutoutSpec::default());
         let spec = HalftoneSpec { cell: f32::NAN, angle: f32::INFINITY, gamma: -3.0, low: 2.0, high: -1.0, min_dot: f32::NAN, ..HalftoneSpec::default() };
         let src = ramp([0.5, 0.5, 0.5]);
         let _ = halftone(&src, src.rect, &ctx(), &spec);

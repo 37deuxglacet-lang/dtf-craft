@@ -633,6 +633,7 @@ pub static CATALOG: &[(&[&str], &str, Option<&str>, &str)] = &[
     (&["View", "Proof Setup"], "Color Blindness — Deuteranopia-type", None, "view.proofSetup.colorBlindnessDeuteranopia"),
     // ---- DTF (DTF Craft) ----
     (&["DTF"], "Print Conformity…", None, "dtf.conformity"),
+    (&["DTF"], "Remove White Background…", None, "filter.dtf.removeWhiteBackground"),
     (&["DTF"], "Control Background…", None, "dtf.controlBackground"),
     (&["DTF"], "Remove Control Background", None, "dtf.removeControlBackground"),
     (&["DTF"], "---", None, "---"),
@@ -765,6 +766,7 @@ pub static CATALOG: &[(&[&str], &str, Option<&str>, &str)] = &[
     (&["Window"], "Clone Source", None, "window.panel.cloneSource"),
     (&["Window"], "Color", Some("F6"), "window.panel.color"),
     (&["Window"], "Print Conformity", None, "window.panel.dtfConformity"),
+    (&["Window"], "Remove White Background", None, "window.panel.dtfCutout"),
     (&["Window"], "Control Background", None, "window.panel.dtfBackground"),
     (&["Window"], "Remove Control Background", None, "window.panel.dtfNoBackground"),
     (&["Window"], "Remove Semi-Transparent Pixels", None, "window.panel.dtfTransparency"),

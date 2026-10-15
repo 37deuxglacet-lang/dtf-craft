@@ -3881,3 +3881,10 @@ curves	Smooth	Згладити
 	Conformity	Підготовка
 	No Background	Без фону
 	Fringe	Облямівка
+# DTF Craft (4)
+	Remove White Background…	Видалити білий фон…
+	Remove White Background	Видалити білий фон
+	Detect Color	Визначити колір фону
+	Remove Halo	Прибрати ореол
+	Interior Holes	Внутрішні отвори
+	Min Hole Size	Мін. розмір отвору (пікс.)

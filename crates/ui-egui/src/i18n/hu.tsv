@@ -4102,3 +4102,10 @@ cameraRaw	Yellow	Sárga
 	Conformity	Előkészítés
 	No Background	Háttér nélkül
 	Fringe	Szegély
+# DTF Craft (4)
+	Remove White Background…	Fehér háttér eltávolítása…
+	Remove White Background	Fehér háttér eltávolítása
+	Detect Color	Háttérszín felismerése
+	Remove Halo	Fényudvar eltávolítása
+	Interior Holes	Belső lyukak
+	Min Hole Size	Min. lyukméret (px)

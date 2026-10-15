@@ -4,11 +4,13 @@
 //! * `filter.dtf.halftone`: DTF Halftone (see [`photocraft_algo::dtf`]): the screen is given in
 //!   lines per inch and converted to a cell size with the document resolution.
 //! * `filter.dtf.removeSemiTransparent`: alpha threshold, every pixel becomes opaque or clear.
+//! * `filter.dtf.removeWhiteBackground`: the plain (white) background removed from the edges
+//!   inwards on a copy of the layer, the contour unmixed from it (see [`photocraft_algo::dtf`]).
 //!
 //! Both run through [`crate::filters::run_filter`], so selections, smart objects (as smart
 //! filters), history and the schema dialog with live preview work as for every other filter.
 
-use photocraft_algo::dtf::{HalftoneSpec, HalftoneTarget};
+use photocraft_algo::dtf::{CutoutSpec, HalftoneSpec, HalftoneTarget};
 use photocraft_algo::FilterParams;
 use photocraft_algo::quantize::HalftoneShape;
 use serde_json::{Value, json};
@@ -18,6 +20,9 @@ use crate::{EngineError, Result, Session};
 
 pub const HALFTONE: &str = "filter.dtf.halftone";
 pub const REMOVE_SEMI_TRANSPARENT: &str = "filter.dtf.removeSemiTransparent";
+pub const REMOVE_WHITE: &str = "filter.dtf.removeWhiteBackground";
+/// Name of the copy Remove White Background cuts out (the source layer stays, hidden).
+pub const CUTOUT_LAYER: &str = "Sans fond";
 
 /// Cell size (pixels) the halftone uses when no document resolution was resolved.
 const FALLBACK_DPI: f64 = 300.0;
@@ -59,8 +64,31 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
             Some(FilterParams::DtfHalftone { spec })
         }
         REMOVE_SEMI_TRANSPARENT => Some(FilterParams::DtfAlphaThreshold { threshold: (num(p, "threshold", 62.0).clamp(1.0, 100.0) / 100.0) as f32 }),
+        REMOVE_WHITE => {
+            let detect = p.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
+            let color = if detect { None } else { Some(hex_rgb(text(p, "color", "#ffffff")).unwrap_or([1.0; 3])) };
+            let spec = CutoutSpec {
+                color,
+                tolerance: (num(p, "tolerance", 10.0).clamp(0.0, 100.0) / 100.0) as f32,
+                edge: num(p, "contour", 2.0).clamp(0.0, 10.0) as f32,
+                decontaminate: p.get("removeHalo").and_then(Value::as_bool).unwrap_or(true),
+                holes: p.get("interiorHoles").and_then(Value::as_bool).unwrap_or(false),
+                min_hole: num(p, "minHoleSize", 100.0).clamp(1.0, 1_000_000.0) as u32,
+            };
+            Some(FilterParams::DtfCutout { spec })
+        }
         _ => None,
     }
+}
+
+/// `#rrggbb` as straight sRGB 0–1.
+fn hex_rgb(hex: &str) -> Option<[f32; 3]> {
+    let h = hex.strip_prefix('#')?;
+    if h.len() != 6 || !h.chars().all(|c| c.is_ascii_hexdigit()) {
+        return None;
+    }
+    let v = |i: usize| u8::from_str_radix(&h[i..i + 2], 16).ok().map(|b| f32::from(b) / 255.0);
+    Some([v(0)?, v(2)?, v(4)?])
 }
 
 fn check_choice(cmd: &str, p: &Value, key: &str, allowed: &[&str]) -> Result<()> {
@@ -161,6 +189,37 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
 fn remove_semi(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(REMOVE_SEMI_TRANSPARENT, p, "threshold", 1.0, 100.0)?;
     crate::filters::run_filter(s, REMOVE_SEMI_TRANSPARENT, p)
+}
+
+/// Remove White Background: the source layer is copied (the copy "Sans fond" above it, the
+/// source hidden and untouched), then the background is removed from the copy's pixels.
+fn remove_white(s: &mut Session, p: &Value) -> Result<Value> {
+    check_range(REMOVE_WHITE, p, "tolerance", 0.0, 100.0)?;
+    check_range(REMOVE_WHITE, p, "contour", 0.0, 10.0)?;
+    check_range(REMOVE_WHITE, p, "minHoleSize", 1.0, 1_000_000.0)?;
+    if let Some(c) = p.get("color").filter(|v| !v.is_null())
+        && c.as_str().and_then(hex_rgb).is_none()
+    {
+        return Err(bad(REMOVE_WHITE, format!("`color` must be #rrggbb (got {c})")));
+    }
+    let st = s.active().ok_or(EngineError::NoDocument)?;
+    let source = st.active_layer.ok_or_else(|| EngineError::Other("select the layer to cut out".into()))?;
+    match st.doc.layer(source).map(|l| &l.content) {
+        Some(photocraft_doc::LayerContent::Raster(_) | photocraft_doc::LayerContent::Smart(_)) => {}
+        _ => return Err(EngineError::Other("Remove White Background works on a pixel layer: select the visual's layer".into())),
+    }
+    let copy = s.keeping_background(|s| crate::analysis_cmds::compound(s, "Remove White Background", |s| {
+        s.execute("layer.duplicate", json!({"layer": source.0, "name": CUTOUT_LAYER}))?;
+        let copy = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+        s.execute("layer.setProps", json!({"layer": source.0, "visible": false}))?;
+        s.execute("layer.select", json!({"layer": copy.0}))?;
+        Ok(copy)
+    }))?;
+    let mut p2 = if p.is_object() { p.clone() } else { json!({}) };
+    if let Value::Object(m) = &mut p2 {
+        m.insert("layer".into(), json!(copy.0));
+    }
+    crate::filters::run_filter(s, REMOVE_WHITE, &p2)
 }
 
 
@@ -505,6 +564,16 @@ pub fn specs() -> Vec<CommandSpec> {
             journal: true,
         },
         CommandSpec {
+            id: REMOVE_WHITE,
+            label: "Remove White Background…",
+            menu: &["DTF"],
+            shortcut: None,
+            params: r##"{"detectColor":bool=true (read the background colour on the image edges),"color":color=#ffffff (the background colour when it is not read),"tolerance":0..100=10 (% difference still taken as background; absorbs JPEG noise),"contour":0..10=2 (px of contour unmixed from the background),"removeHalo":bool=true (unmix the contour so no light halo is left),"interiorHoles":bool=false (also remove the background colour enclosed by the visual),"minHoleSize":1..1000000=100 (px; smaller enclosed areas stay)} Removes the plain background from the image edges inwards on a copy of the layer named "Sans fond"; the source layer is hidden, unchanged"##,
+            enabled: crate::filters::has_filterable_layer,
+            run: remove_white,
+            journal: true,
+        },
+        CommandSpec {
             id: REMOVE_SEMI_TRANSPARENT,
             label: "Remove Semi-Transparent Pixels…",
             menu: &["DTF"],
@@ -615,6 +684,52 @@ mod tests {
                 assert_eq!(format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2]), hex, "{mode}");
             }
         }
+    }
+
+    /// A white 30 × 20 picture (as a JPEG opens: a Background layer) with a black square.
+    fn session_with_logo() -> Session {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        s.edit("Logo", |doc, active| {
+            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+            for y in 5..15 {
+                for x in 10..20 {
+                    let c = if (13..17).contains(&x) && (8..12).contains(&y) { 1.0 } else { 0.0 };
+                    surf.write_pixel(x, y, &[c, c, c, 1.0]);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        s
+    }
+
+    #[test]
+    fn remove_white_cuts_out_a_copy_and_keeps_the_source() {
+        let mut s = session_with_logo();
+        let source = s.active().unwrap().active_layer.unwrap();
+        s.execute(REMOVE_WHITE, json!({})).unwrap();
+        let d = s.active().unwrap();
+        let copy = d.doc.layer(d.active_layer.unwrap()).unwrap();
+        assert_eq!(copy.name, CUTOUT_LAYER);
+        let surf = copy.surface().unwrap();
+        assert_eq!(surf.pixel(0, 0)[3], 0.0, "the white around is removed");
+        assert_eq!(surf.pixel(11, 6)[3], 1.0, "the visual stays");
+        assert_eq!(surf.pixel(15, 10)[3], 1.0, "the white inside stays (interior holes off)");
+        let src = d.doc.layer(source).unwrap();
+        assert!(!src.visible, "the source is hidden");
+        assert_eq!(src.surface().unwrap().pixel(0, 0)[3], 1.0, "and untouched");
+        // With interior holes, the white square inside goes too.
+        let mut s = session_with_logo();
+        s.execute(REMOVE_WHITE, json!({"interiorHoles": true, "minHoleSize": 4})).unwrap();
+        let d = s.active().unwrap();
+        assert_eq!(d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().pixel(15, 10)[3], 0.0);
+        // The copy and the cut-out undo back to the picture alone.
+        assert!(s.undo() && s.undo());
+        assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+        assert!(s.active().unwrap().doc.layers[0].visible);
+        assert!(s.execute(REMOVE_WHITE, json!({"color": "white"})).is_err());
+        assert!(s.execute(REMOVE_WHITE, json!({"tolerance": 300})).is_err());
     }
 
     #[test]

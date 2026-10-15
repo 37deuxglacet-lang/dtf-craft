@@ -3173,3 +3173,11 @@ curves	Smooth	Haluskan
 	Conformity	Kesesuaian
 	No Background	Tanpa latar
 	Fringe	Tepi
+# DTF Craft (4)
+	Remove White Background…	Hapus latar putih…
+	Remove White Background	Hapus latar putih
+	Cutout	Potongan
+	Detect Color	Deteksi warna latar
+	Remove Halo	Hapus halo
+	Interior Holes	Lubang dalam
+	Min Hole Size	Ukuran lubang min. (px)

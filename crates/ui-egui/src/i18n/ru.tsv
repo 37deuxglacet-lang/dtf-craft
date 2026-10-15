@@ -3150,3 +3150,11 @@ curves	Smooth	Сгладить
 	Conformity	Подготовка
 	No Background	Без фона
 	Fringe	Кайма
+# DTF Craft (4)
+	Remove White Background…	Удалить белый фон…
+	Remove White Background	Удалить белый фон
+	Cutout	Вырезание
+	Detect Color	Определить цвет фона
+	Remove Halo	Удалить ореол
+	Interior Holes	Внутренние отверстия
+	Min Hole Size	Мин. размер отверстия (пикс.)

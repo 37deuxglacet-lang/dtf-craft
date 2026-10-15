@@ -3357,3 +3357,10 @@ curves	Smooth	매끄럽게
 	Conformity	인쇄용
 	No Background	배경 없음
 	Fringe	가장자리
+# DTF Craft (4)
+	Remove White Background…	흰색 배경 제거…
+	Remove White Background	흰색 배경 제거
+	Detect Color	배경색 감지
+	Remove Halo	후광 제거
+	Interior Holes	내부 구멍
+	Min Hole Size	최소 구멍 크기 (px)

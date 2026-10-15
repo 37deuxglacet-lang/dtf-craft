@@ -19,6 +19,7 @@ Outils en cours de développement :
 
 - Halftone DTF
 - Agrandissement IA hors ligne (Real-ESRGAN)
+- Suppression du fond blanc (ou uni), sans liseré
 - Préparation impression : conformité, fond de contrôle, pixels transparents, suppression de
   frange, netteté, saturation
 

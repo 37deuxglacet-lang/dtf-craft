@@ -548,6 +548,11 @@ pub enum FilterParams {
     DtfAlphaThreshold {
         threshold: f32,
     },
+    /// Remove White Background: the plain background colour flood-filled to transparency from
+    /// the image edges, the contour unmixed from it (see [`dtf::CutoutPlan`]).
+    DtfCutout {
+        spec: dtf::CutoutSpec,
+    },
 
     // ---- Video ----
     /// Removes the even (or odd) lines and rebuilds them by interpolation (or duplication).
@@ -606,7 +611,7 @@ impl FilterParams {
     /// that can hold transparency, so callers turn the Background into a normal layer first and
     /// refuse a layer whose transparency is locked instead of putting the old alpha back.
     pub fn makes_transparency(&self) -> bool {
-        matches!(self, FilterParams::ColorToAlpha { .. } | FilterParams::DtfHalftone { .. } | FilterParams::DtfAlphaThreshold { .. })
+        matches!(self, FilterParams::ColorToAlpha { .. } | FilterParams::DtfHalftone { .. } | FilterParams::DtfAlphaThreshold { .. } | FilterParams::DtfCutout { .. })
     }
 
     /// Whether the filter moves pixels around the reference bounds (its
@@ -684,6 +689,7 @@ impl FilterParams {
             FilterParams::ColorToAlpha { .. } => "Color to Alpha",
             FilterParams::DtfHalftone { .. } => "DTF Halftone",
             FilterParams::DtfAlphaThreshold { .. } => "Remove Semi-Transparent Pixels",
+            FilterParams::DtfCutout { .. } => "Remove White Background",
             FilterParams::DeInterlace { .. } => "De-Interlace",
             FilterParams::NtscColors => "NTSC Colors",
             FilterParams::FilterGallery { effects } => match effects.as_slice() {
@@ -713,6 +719,8 @@ fn halo_ext(p: &FilterParams) -> Halo {
         FilterParams::Extrude { size, depth, .. } => r(stylize2::extrude_reach(*depth) + size.clamp(2.0, 255.0) * 3.0 + 1.0),
         FilterParams::OilPaint { stylization, scale, .. } => r(oil::reach(*stylization, *scale)),
         FilterParams::Tiles { .. } => Halo::Bounds,
+        // The flood fill reads the whole reference area.
+        FilterParams::DtfCutout { .. } => Halo::Bounds,
         FilterParams::TraceContour { .. } => r(1.0),
         FilterParams::Wind { method, .. } => r(stylize2::wind_reach(*method)),
         FilterParams::Displace { .. } | FilterParams::Shear { .. } | FilterParams::ZigZag { .. } | FilterParams::SpinBlur { .. } => Halo::Bounds,
@@ -926,6 +934,7 @@ pub fn kernel(params: &FilterParams, src: &Image, out: Rect, ctx: &Ctx) -> Vec<f
         }
         FilterParams::DtfHalftone { spec } => dtf::halftone(src, out, ctx, spec),
         FilterParams::DtfAlphaThreshold { threshold } => dtf::alpha_threshold(src, out, ctx, *threshold),
+        FilterParams::DtfCutout { spec } => dtf::cutout(src, out, ctx, spec),
         FilterParams::DeInterlace { eliminate_even, interpolate } => video::deinterlace(src, out, ctx, *eliminate_even, *interpolate),
         FilterParams::NtscColors => video::ntsc(src, out, ctx),
         FilterParams::FilterGallery { effects } => artistic_fx::run(effects, src, out, ctx),
@@ -1092,6 +1101,11 @@ fn apply_tiled_with_impl(
         }
     }
     let shared = (halo == Halo::Bounds).then(|| Image::read(surface, bounds.union(&area)));
+    // Remove White Background floods the whole area once; the tiles then read that plan.
+    let cutout = match (params, &shared) {
+        (FilterParams::DtfCutout { spec }, Some(img)) => Some(dtf::CutoutPlan::prepare(img, &ctx, spec, ctl)?),
+        _ => None,
+    };
     // Shape rasterization depends only on params, not on a tile's pixels.
     let shape = match params {
         FilterParams::ShapeBlur { radius, shape } => {
@@ -1142,6 +1156,7 @@ fn apply_tiled_with_impl(
             }
         };
         let Some(mut data) = (match (&shape, &radial) {
+            _ if cutout.is_some() => cutout.as_ref().map(|plan| plan.apply(src, *t, &ctx)),
             (Some(shape), _) => shape.checked_run(src, *t, &ctx),
             (None, Some(plan)) => match plan.filter(src, *t, &ctx, ctl) {
                 Some(data) => Some(data),

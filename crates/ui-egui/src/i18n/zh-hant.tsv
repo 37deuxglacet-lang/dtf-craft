@@ -2780,3 +2780,11 @@ curves	Smooth	平滑
 	No Background	無背景
 	Fringe	邊緣
 	Sharpness	銳利化
+# DTF Craft (4)
+	Remove White Background…	移除白色背景…
+	Remove White Background	移除白色背景
+	Cutout	去背
+	Detect Color	偵測背景色
+	Remove Halo	去除光暈
+	Interior Holes	內部孔洞
+	Min Hole Size	最小孔洞尺寸 (像素)

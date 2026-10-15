@@ -20,8 +20,9 @@ use crate::theme::Tokens;
 pub const PREVIEW_DIALOG: u64 = u64::MAX - 0x0D7F;
 
 /// The tools, top to bottom.
-pub const TOOLS: [&str; 7] = [
+pub const TOOLS: [&str; 8] = [
     "dtf.conformity",
+    "filter.dtf.removeWhiteBackground",
     "dtf.controlBackground",
     "dtf.removeControlBackground",
     "filter.dtf.removeSemiTransparent",
@@ -31,7 +32,7 @@ pub const TOOLS: [&str; 7] = [
 ];
 
 /// The tabs' labels (and dock panel names), in [`TOOLS`] order.
-pub const TABS: [&str; 7] = ["Conformity", "Control Background", "No Background", "Transparency", "Fringe", "Sharpness", "Saturation"];
+pub const TABS: [&str; 8] = ["Conformity", "Cutout", "Control Background", "No Background", "Transparency", "Fringe", "Sharpness", "Saturation"];
 
 /// Tools applied on Apply only: Print Conformity resizes the image, Remove Control Background
 /// has no setting.
@@ -56,7 +57,7 @@ fn title(command: &str) -> String {
 
 /// The layout version DTF Craft last set up (remembered with the preferences): raising it
 /// brings the DTF default layout back once, over a layout saved by an older version.
-const LAYOUT_VERSION: u64 = 2;
+const LAYOUT_VERSION: u64 = 3;
 const LAYOUT_PREF: &str = "dtfCraft.layoutVersion";
 
 /// DTF Craft's start: the DTF tools group, and on the first launch of this layout its Essentials
@@ -336,6 +337,41 @@ mod tests {
         assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_none());
     }
 
+    #[test]
+    fn the_cutout_previews_on_the_control_background() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.background_jobs = false;
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.session
+            .edit("Logo", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 5..15 {
+                    for x in 10..20 {
+                        surf.write_pixel(x, y, &[1.0, 0.0, 0.0, 1.0]);
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+        let ctx = egui::Context::default();
+        app.ui.panels.dtf = true;
+        let cmd = "filter.dtf.removeWhiteBackground";
+        app.ui.dtf_panel.fields.insert(cmd.into(), initial_fields(&app, cmd));
+        assert_eq!(app.ui.dtf_panel.fields[cmd].get("color"), Some(&json!("#ffffff")));
+        app.ui.dtf_panel.previewing = Some(cmd.into());
+        assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
+        let doc = app.filter_preview.as_ref().unwrap().result.as_ref().unwrap();
+        let names: Vec<String> = doc.walk().into_iter().map(|(_, _, l)| l.name.clone()).collect();
+        assert!(names.iter().any(|n| n == "backfill") && names.iter().any(|n| n == "Sans fond"), "{names:?}");
+        // On screen: the dark control colour where the white was, the visual where it is.
+        let rgb = photocraft_compose::flatten_to_surface(doc, photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false), None);
+        let hex = |x, y| rgb.pixel(x, y).iter().take(3).map(|v| format!("{:02x}", (v * 255.0).round() as u8)).collect::<String>();
+        assert_eq!(hex(0, 0), "231c1c");
+        assert_eq!(hex(15, 10), "ff0000");
+        // The document is untouched until Apply.
+        assert_eq!(app.session.active().unwrap().doc.layers.len(), 1);
+    }
+
     /// Screenshots for review (`DTF_VISUALS=<folder>`): the Home screen, the panel with a
     /// preview, and the layers DTF Halftone builds, in French.
     #[test]
@@ -353,7 +389,11 @@ mod tests {
             h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());
             h.run_steps(6);
             setup(h.state_mut());
-            h.run_steps(12);
+            // Previews compute off the UI thread: give them time to land.
+            for _ in 0..40 {
+                h.run_steps(1);
+                std::thread::sleep(std::time::Duration::from_millis(50));
+            }
             h.render().unwrap().save(dir.join(format!("{name}.png"))).unwrap();
         };
         shot(photocraft_engine::Session::new(), "accueil", &|_| {});
@@ -378,11 +418,39 @@ mod tests {
             app.ui.dock_tabs.dtf = 0;
         });
         shot(visual(), "apercu", &|app| {
-            app.ui.dock_tabs.dtf = 3;
+            app.ui.dock_tabs.dtf = 4;
             let mut f = initial_fields(app, "filter.dtf.removeSemiTransparent");
             f.insert("threshold".into(), json!(80));
             app.ui.dtf_panel.fields.insert("filter.dtf.removeSemiTransparent".into(), f);
             app.ui.dtf_panel.previewing = Some("filter.dtf.removeSemiTransparent".into());
+        });
+        let on_white = || {
+            let mut s = photocraft_engine::Session::new();
+            s.execute("file.new", json!({"width": 600, "height": 400, "resolution": 300, "background": "white"})).unwrap();
+            s.edit("Logo", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 0..400 {
+                    for x in 0..600 {
+                        let d = ((x as f32 - 300.0).powi(2) + (y as f32 - 200.0).powi(2)).sqrt();
+                        // A red disc with a soft (antialiased) edge and a white centre.
+                        let cover = (150.0 - d).clamp(0.0, 1.5) / 1.5;
+                        let centre = d < 50.0;
+                        let c = if centre { [1.0, 1.0, 1.0] } else { [1.0 - 0.15 * cover, 1.0 - 0.85 * cover, 1.0 - 0.85 * cover] };
+                        surf.write_pixel(x, y, &[c[0], c[1], c[2], 1.0]);
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+            s
+        };
+        shot(on_white(), "detourage", &|app| {
+            app.ui.dock_tabs.dtf = 1;
+            let cmd = "filter.dtf.removeWhiteBackground";
+            let mut f = initial_fields(app, cmd);
+            f.insert("tolerance".into(), json!(12));
+            app.ui.dtf_panel.fields.insert(cmd.into(), f);
+            app.ui.dtf_panel.previewing = Some(cmd.into());
         });
         let mut halftoned = visual();
         halftoned.execute("filter.dtf.halftone", json!({"mode": "semiTransparent", "frequency": 25})).unwrap();

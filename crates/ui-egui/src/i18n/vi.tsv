@@ -3668,3 +3668,10 @@ curves	Smooth	Làm mượt
 	Conformity	Chuẩn hóa
 	No Background	Không nền
 	Fringe	Viền
+# DTF Craft (4)
+	Remove White Background…	Xóa nền trắng…
+	Remove White Background	Xóa nền trắng
+	Detect Color	Nhận diện màu nền
+	Remove Halo	Xóa viền sáng
+	Interior Holes	Lỗ bên trong
+	Min Hole Size	Kích thước lỗ tối thiểu (px)

@@ -3858,3 +3858,10 @@ curves	Smooth	スムーズ
 	Conformity	印刷用
 	No Background	背景なし
 	Fringe	フリンジ
+# DTF Craft (4)
+	Remove White Background…	白背景を削除…
+	Remove White Background	白背景を削除
+	Detect Color	背景色を検出
+	Remove Halo	ハローを除去
+	Interior Holes	内側の穴
+	Min Hole Size	穴の最小サイズ (px)

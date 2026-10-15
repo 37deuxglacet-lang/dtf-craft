@@ -2870,3 +2870,11 @@ curves	Smooth	Suavizar
 	No Background	Sin fondo
 	Fringe	Halos
 	Sharpness	Nitidez
+# DTF Craft (4)
+	Remove White Background…	Eliminar fondo blanco…
+	Remove White Background	Eliminar fondo blanco
+	Cutout	Recorte
+	Detect Color	Detectar color de fondo
+	Remove Halo	Eliminar halo
+	Interior Holes	Huecos interiores
+	Min Hole Size	Tamaño mín. de hueco (px)

@@ -3780,3 +3780,10 @@ curves	Smooth	Wygładź
 	Conformity	Zgodność
 	No Background	Bez tła
 	Fringe	Obwódki
+# DTF Craft (4)
+	Remove White Background…	Usuń białe tło…
+	Remove White Background	Usuń białe tło
+	Detect Color	Wykryj kolor tła
+	Remove Halo	Usuń otoczkę
+	Interior Holes	Otwory wewnętrzne
+	Min Hole Size	Min. rozmiar otworu (px)

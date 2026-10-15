@@ -3880,3 +3880,10 @@ curves	Smooth	Εξομάλυνση
 	Conformity	Προετοιμασία
 	No Background	Χωρίς φόντο
 	Fringe	Περιθώρια
+# DTF Craft (4)
+	Remove White Background…	Αφαίρεση λευκού φόντου…
+	Remove White Background	Αφαίρεση λευκού φόντου
+	Detect Color	Εντοπισμός χρώματος φόντου
+	Remove Halo	Αφαίρεση άλω
+	Interior Holes	Εσωτερικές οπές
+	Min Hole Size	Ελάχ. μέγεθος οπής (px)

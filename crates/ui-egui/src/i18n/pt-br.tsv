@@ -3971,3 +3971,10 @@ layerLabel	No Color	Sem cor
 	Conformity	Conformidade
 	No Background	Sem fundo
 	Fringe	Franjas
+# DTF Craft (4)
+	Remove White Background…	Remover fundo branco…
+	Remove White Background	Remover fundo branco
+	Detect Color	Detectar cor de fundo
+	Remove Halo	Remover halo
+	Interior Holes	Furos internos
+	Min Hole Size	Tamanho mín. do furo (px)

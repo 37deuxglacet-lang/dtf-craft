@@ -3203,3 +3203,11 @@ curves	Smooth	Lisser
 	Conformity	Conformité
 	No Background	Sans fond
 	Fringe	Franges
+# DTF Craft (4)
+	Remove White Background…	Suppression fond blanc…
+	Remove White Background	Suppression fond blanc
+	Cutout	Détourage
+	Detect Color	Détecter la couleur du fond
+	Remove Halo	Supprimer le liseré
+	Interior Holes	Trous intérieurs
+	Min Hole Size	Taille min. des trous (px)

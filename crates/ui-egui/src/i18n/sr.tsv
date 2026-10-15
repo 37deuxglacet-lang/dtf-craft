@@ -4256,3 +4256,10 @@ shape	Appearance	Izgled
 	Conformity	Priprema
 	No Background	Bez pozadine
 	Fringe	Ivice
+# DTF Craft (4)
+	Remove White Background…	Уклони белу позадину…
+	Remove White Background	Уклони белу позадину
+	Detect Color	Препознај боју позадине
+	Remove Halo	Уклони ореол
+	Interior Holes	Унутрашње рупе
+	Min Hole Size	Мин. величина рупе (px)

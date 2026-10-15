@@ -3913,3 +3913,10 @@ cameraData	Lens	Lens
 	Conformity	Uygunluk
 	No Background	Arka plansız
 	Fringe	Kenar
+# DTF Craft (4)
+	Remove White Background…	Beyaz arka planı kaldır…
+	Remove White Background	Beyaz arka planı kaldır
+	Detect Color	Arka plan rengini algıla
+	Remove Halo	Haleyi kaldır
+	Interior Holes	İç boşluklar
+	Min Hole Size	Min. boşluk boyutu (px)

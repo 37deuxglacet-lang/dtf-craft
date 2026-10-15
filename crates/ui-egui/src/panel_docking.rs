@@ -28,6 +28,7 @@ const PANELS: &[(&str, &str, Group)] = &[
     ("channels", "Channels", Group::Layers),
     ("paths", "Paths", Group::Layers),
     ("dtfConformity", "Conformity", Group::Dtf),
+    ("dtfCutout", "Cutout", Group::Dtf),
     ("dtfBackground", "Control Background", Group::Dtf),
     ("dtfNoBackground", "No Background", Group::Dtf),
     ("dtfTransparency", "Transparency", Group::Dtf),

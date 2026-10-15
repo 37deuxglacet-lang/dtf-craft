@@ -3183,3 +3183,11 @@ curves	Smooth	Glätten
 	No Background	Ohne Hintergrund
 	Fringe	Ränder
 	Sharpness	Schärfe
+# DTF Craft (4)
+	Remove White Background…	Weißen Hintergrund entfernen…
+	Remove White Background	Weißen Hintergrund entfernen
+	Cutout	Freistellen
+	Detect Color	Hintergrundfarbe erkennen
+	Remove Halo	Lichtsaum entfernen
+	Interior Holes	Innere Löcher
+	Min Hole Size	Min. Lochgröße (px)

@@ -12,6 +12,7 @@ produit officiel du projet PhotoCraft.
 | Commande | Rôle |
 |---|---|
 | Conformité impression… | Calque « origin », hauteur d'impression (cm) à la résolution voulue, 8/16 bits, rognage de la transparence |
+| Suppression fond blanc… | Copie du calque « Sans fond » au-dessus de la source (masquée, intacte) ; le fond uni (couleur lue sur les bords, ou choisie) est supprimé depuis les bords, le blanc intérieur au visuel reste. Tolérance (bruit JPEG), contour décontaminé (pas de liseré clair), trous intérieurs en option (désactivés par défaut, taille minimale en px). Aperçu sur fond #231c1c |
 | Fond de contrôle… | Calque de remplissage « backfill » sous l'image, couleur du textile, avec aperçu |
 | Suppression fond de contrôle | Supprime les calques « backfill » |
 | Pixels transparents… | Supprime les pixels semi-transparents (seuil d'opacité, 62 % par défaut) |
@@ -25,7 +26,7 @@ Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans 
 
 ## Onglets DTF
 
-Chaque outil DTF a son onglet (Conformité, Fond de contrôle, Sans fond, Transparence, Franges,
+Chaque outil DTF a son onglet (Conformité, Détourage, Fond de contrôle, Sans fond, Transparence, Franges,
 Netteté, Saturation), regroupés au-dessus de Calques. Ils se déplacent, se regroupent, se
 détachent et s'ancrent comme les autres panneaux ; Fenêtre › Conformité impression (et les autres
 outils) les affiche. Chaque onglet a ses réglages et « Appliquer » ; l'aperçu s'affiche sur l'image

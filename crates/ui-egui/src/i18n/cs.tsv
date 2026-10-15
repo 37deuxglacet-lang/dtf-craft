@@ -3789,3 +3789,10 @@ navigator	Zoom	Zvětšení
 	Conformity	Příprava
 	No Background	Bez pozadí
 	Fringe	Lemy
+# DTF Craft (4)
+	Remove White Background…	Odstranit bílé pozadí…
+	Remove White Background	Odstranit bílé pozadí
+	Detect Color	Rozpoznat barvu pozadí
+	Remove Halo	Odstranit halo
+	Interior Holes	Vnitřní otvory
+	Min Hole Size	Min. velikost otvoru (px)
