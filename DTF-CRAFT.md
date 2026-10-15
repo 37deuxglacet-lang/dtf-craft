@@ -18,7 +18,7 @@ produit officiel du projet PhotoCraft.
 | Suppression frange… | Supprime les franges de couleur sur les bords |
 | Netteté optimisée… | Netteté optimisée avec aperçu |
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
-| Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » (calque « Halftone » tramé + « Fond de contrôle » #231c1c) au-dessus du calque source, qui est masqué et conservé intact |
+| Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
 | Agrandissement IA… | ×2, ×3 ou ×4 par le modèle Real-ESRGAN (hors ligne, sur le processeur), sur une copie nommée « nom x2 » : l'original n'est pas modifié |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.

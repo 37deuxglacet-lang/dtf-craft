@@ -86,7 +86,15 @@ fn check_range(cmd: &str, p: &Value, key: &str, lo: f64, hi: f64) -> Result<()> 
 pub const HALFTONE_GROUP: &str = "Halftone DTF";
 pub const HALFTONE_LAYER: &str = "Halftone";
 pub const HALFTONE_BACKGROUND: &str = "Fond de contrôle";
-pub const HALFTONE_BACKGROUND_COLOR: &str = "#231c1c";
+/// The control fill under the screened copy, by mode: none for the semi-transparent pixels (the
+/// film's own transparency), the dark control colour for a dark garment, white for a light one.
+pub fn halftone_background(mode: &str) -> Option<&'static str> {
+    match mode {
+        "darkGarment" => Some("#231c1c"),
+        "lightGarment" => Some("#ffffff"),
+        _ => None,
+    }
+}
 
 fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(HALFTONE, p, "frequency", 1.0, 300.0)?;
@@ -118,21 +126,26 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
         m.insert("mode".into(), json!(mode));
         m.insert("__cellPx".into(), json!(dpi / lpi));
     }
-    // The layers first, as one step: a copy of the visual named "Halftone" over a control fill,
-    // both in the "Halftone DTF" group above the source, which is hidden but left untouched.
+    let background = halftone_background(p2.get("mode").and_then(Value::as_str).unwrap_or("semiTransparent"));
+    // The layers first, as one step: a copy of the visual named "Halftone" (over a control fill
+    // for a garment), in the "Halftone DTF" group above the source, hidden but left untouched.
     let screened = s.keeping_background(|s| crate::analysis_cmds::compound(s, HALFTONE_GROUP, |s| {
         s.execute("layer.duplicate", json!({"layer": source.0, "name": HALFTONE_LAYER}))?;
         let copy = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
-        s.execute("layer.newFillLayer.solidColor", json!({"color": HALFTONE_BACKGROUND_COLOR}))?;
-        let fill = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
-        // A selection would become the fill's mask: the control background covers the canvas.
-        if s.active().and_then(|d| d.doc.layer(fill)).is_some_and(|l| l.mask.is_some()) {
-            s.execute("layer.layerMask.delete", json!({}))?;
+        if let Some(color) = background {
+            s.execute("layer.newFillLayer.solidColor", json!({"color": color}))?;
+            let fill = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+            // A selection would become the fill's mask: the control background covers the canvas.
+            if s.active().and_then(|d| d.doc.layer(fill)).is_some_and(|l| l.mask.is_some()) {
+                s.execute("layer.layerMask.delete", json!({}))?;
+            }
+            s.execute("layer.setProps", json!({"layer": fill.0, "name": HALFTONE_BACKGROUND}))?;
+            s.execute("layer.arrange.sendBackward", json!({"layer": fill.0}))?;
+            s.execute("layer.select", json!({"layer": copy.0}))?;
+            s.execute("layer.select", json!({"layer": fill.0, "mode": "add"}))?;
+        } else {
+            s.execute("layer.select", json!({"layer": copy.0}))?;
         }
-        s.execute("layer.setProps", json!({"layer": fill.0, "name": HALFTONE_BACKGROUND}))?;
-        s.execute("layer.arrange.sendBackward", json!({"layer": fill.0}))?;
-        s.execute("layer.select", json!({"layer": copy.0}))?;
-        s.execute("layer.select", json!({"layer": fill.0, "mode": "add"}))?;
         s.execute("layer.groupLayers", json!({"name": HALFTONE_GROUP}))?;
         s.execute("layer.setProps", json!({"layer": source.0, "visible": false}))?;
         s.execute("layer.select", json!({"layer": copy.0}))?;
@@ -486,7 +499,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "DTF Halftone…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone" over a "Fond de contrôle" fill (#231c1c); the source layer is hidden, unchanged"##,
+            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone", over a "Fond de contrôle" fill for a garment (#231c1c dark, #ffffff light; none for the semi-transparent pixels); the source layer is hidden, unchanged"##,
             enabled: crate::filters::has_filterable_layer,
             run: halftone,
             journal: true,
@@ -569,9 +582,10 @@ mod tests {
         s.execute(HALFTONE, json!({"mode": "semiTransparent", "frequency": 30})).unwrap();
         let d = s.active().unwrap();
         let names: Vec<String> = d.doc.walk().into_iter().map(|(_, _, l)| l.name.clone()).collect();
-        for want in [HALFTONE_GROUP, HALFTONE_LAYER, HALFTONE_BACKGROUND] {
+        for want in [HALFTONE_GROUP, HALFTONE_LAYER] {
             assert!(names.iter().any(|n| n == want), "{want} in {names:?}");
         }
+        assert!(!names.iter().any(|n| n == HALFTONE_BACKGROUND), "no control fill for the semi-transparent pixels: {names:?}");
         let src = d.doc.layer(source).unwrap();
         assert!(!src.visible, "the source is hidden");
         assert_eq!(d.doc.layer(d.active_layer.unwrap()).unwrap().name, HALFTONE_LAYER);
@@ -585,6 +599,22 @@ mod tests {
         assert!(s.undo() && s.undo());
         assert_eq!(s.active().unwrap().doc.layers.len(), 1);
         assert!(s.active().unwrap().doc.layers[0].visible);
+    }
+
+    #[test]
+    fn halftone_control_fill_follows_the_garment() {
+        for (mode, want) in [("darkGarment", Some("#231c1c")), ("lightGarment", Some("#ffffff")), ("semiTransparent", None)] {
+            let mut s = session_with_ramp();
+            s.execute(HALFTONE, json!({"mode": mode})).unwrap();
+            let d = s.active().unwrap();
+            let fill = d.doc.walk().into_iter().find(|(_, _, l)| l.name == HALFTONE_BACKGROUND).map(|(_, _, l)| l.clone());
+            assert_eq!(fill.is_some(), want.is_some(), "{mode}");
+            if let (Some(l), Some(hex)) = (fill, want) {
+                let photocraft_doc::LayerContent::Fill(photocraft_doc::Fill::Solid(c)) = &l.content else { panic!("{mode}: not a solid fill") };
+                let rgb = [0, 1, 2].map(|i| (c.c[i] * 255.0).round() as u8);
+                assert_eq!(format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2]), hex, "{mode}");
+            }
+        }
     }
 
     #[test]
