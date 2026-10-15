@@ -1,3 +1,21 @@
+DTF Craft
+Copyright (c) 2026 Stéphane Glacet.
+Licensed under the MIT License or the Apache License, Version 2.0, at your option
+(LICENSE-MIT, LICENSE-APACHE).
+
+DTF Craft is derived from PhotoCraft (https://github.com/storytold/photocraft), commit ed7df56.
+The files changed from that base are listed in MODIFICATIONS.md. DTF Craft is an independent
+project. It is not an official PhotoCraft or ArtCraft product.
+
+The DTF Craft name and logo (assets/app-icon/dtfcraft-*.png) belong to Stéphane Glacet and are not
+covered by the license above.
+
+DTF Craft bundles the weights of Real-ESRGAN's realesr-general-x4v3 model
+(crates/algo/models/realesr-general-x4v3.dtfsr), (c) 2021 Xintao Wang, BSD 3-Clause License.
+See crates/algo/models/LICENSE (shipped as LICENSE-Real-ESRGAN.txt).
+
+--------------------------------------------------------------------------------------------------
+
 PhotoCraft
 Copyright (c) 2026 ArtCraft Team and the PhotoCraft contributors.
 Licensed under the MIT License or the Apache License, Version 2.0, at your option

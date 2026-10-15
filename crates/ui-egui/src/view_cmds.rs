@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Shell-side View, Window and Type menu items: screen modes, Extras and the Show / Snap To
 //! toggles, zoom presets, view flipping, document arrangement (tiles, n-up, floating windows,
 //! Match Zoom/Location), panel shortcuts that pick the right dock tab, type UI preferences, and

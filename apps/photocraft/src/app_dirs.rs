@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Where the desktop app keeps its per-user data: preferences, brush presets, crash-recovery
 //! autosaves and the GPU startup marker all live under the one directory [`config_dir`] returns.
 //!

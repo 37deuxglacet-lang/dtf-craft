@@ -1,3 +1,4 @@
+// DTF Craft — Copyright (c) 2026 Stéphane Glacet. Licensed under MIT OR Apache-2.0.
 //! DTF menu (DTF Craft): preparation commands for direct-to-film printing.
 //!
 //! * `filter.dtf.halftone`: DTF Halftone (see [`photocraft_algo::dtf`]): the screen is given in

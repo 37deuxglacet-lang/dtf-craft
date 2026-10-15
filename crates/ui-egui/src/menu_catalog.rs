@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Photoshop menu structure (standard public command names) used to present the full, familiar
 //! menu tree, in order, with separators ("---"). Items whose id matches an engine or UI command are
 //! live; others render disabled until implemented. Generated from the recorded menu structure.
