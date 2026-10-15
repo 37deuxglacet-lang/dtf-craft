@@ -7,7 +7,7 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (68)
+## Modified (69)
 
 - `LICENSE-MIT`
 - `NOTICE`
@@ -34,6 +34,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/engine/src/commands.rs`
 - `crates/engine/src/filters.rs`
 - `crates/engine/src/image_cmds.rs`
+- `crates/engine/src/jobs.rs`
 - `crates/engine/src/lib.rs`
 - `crates/ui-egui/src/brand.rs`
 - `crates/ui-egui/src/canvas.rs`
@@ -78,7 +79,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/titlebar.rs`
 - `crates/ui-egui/src/view_cmds.rs`
 
-## Added (14)
+## Added (15)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -94,6 +95,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/algo/src/upscale.rs`
 - `crates/engine/src/dtf_cmds.rs`
 - `crates/ui-egui/src/dtf_panel.rs`
+- `crates/ui-egui/src/dtf_upscale_gpu_tests.rs`
 
 ## Removed (7)
 

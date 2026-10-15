@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Background jobs: long commands run on a worker thread, report progress and can be cancelled
 //! (#210).
 //!
@@ -586,6 +588,17 @@ impl Session {
     }
 
     /// The running job that locks the active document, if any.
+    /// Run `f`, commands a command runs before starting its own job (DTF Craft: the AI Upscale
+    /// copy, the DTF Halftone layers), keeping that command's background mode: each nested
+    /// `execute` ends by turning it off, which made the job that follows run inline, without its
+    /// progress dialog and freezing the window.
+    pub(crate) fn keeping_background<R>(&mut self, f: impl FnOnce(&mut Session) -> R) -> R {
+        let spawn = self.jobs.spawn;
+        let r = f(self);
+        self.jobs.spawn = spawn;
+        r
+    }
+
     pub fn active_job(&self) -> Option<JobInfo> {
         self.active().and_then(|st| self.job_on(st.doc.id))
     }

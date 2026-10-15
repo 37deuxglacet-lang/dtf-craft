@@ -120,7 +120,7 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     }
     // The layers first, as one step: a copy of the visual named "Halftone" over a control fill,
     // both in the "Halftone DTF" group above the source, which is hidden but left untouched.
-    let screened = crate::analysis_cmds::compound(s, HALFTONE_GROUP, |s| {
+    let screened = s.keeping_background(|s| crate::analysis_cmds::compound(s, HALFTONE_GROUP, |s| {
         s.execute("layer.duplicate", json!({"layer": source.0, "name": HALFTONE_LAYER}))?;
         let copy = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
         s.execute("layer.newFillLayer.solidColor", json!({"color": HALFTONE_BACKGROUND_COLOR}))?;
@@ -137,7 +137,7 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
         s.execute("layer.setProps", json!({"layer": source.0, "visible": false}))?;
         s.execute("layer.select", json!({"layer": copy.0}))?;
         Ok(copy)
-    })?;
+    }))?;
     // Then the screen on the copy (a background job in the app, like every filter).
     if let Value::Object(m) = &mut p2 {
         m.insert("layer".into(), json!(screened.0));
@@ -150,170 +150,6 @@ fn remove_semi(s: &mut Session, p: &Value) -> Result<Value> {
     crate::filters::run_filter(s, REMOVE_SEMI_TRANSPARENT, p)
 }
 
-
-// ---------------------------------------------------------------- gang sheet
-
-pub const GANG_SHEET: &str = "dtf.gangSheet";
-
-/// Largest sheet side the gang sheet builds, in pixels (about 4 m at 300 ppi per side).
-const MAX_SHEET_SIDE: f64 = 60_000.0;
-/// Most images (copies included) one gang sheet run places.
-const MAX_ITEMS: usize = 2_000;
-
-fn cm_to_px(cm: f64, dpi: f64) -> f64 {
-    cm / 2.54 * dpi
-}
-
-/// One image to place: its name and its pixels (straight RGBA rows of `w × h`).
-struct SheetItem {
-    name: String,
-    w: i64,
-    h: i64,
-    data: Vec<f32>,
-}
-
-/// Loads, trims and scales one file for a sheet at `dpi`.
-fn load_item(path: &str, dpi: f64, trim: bool, keep_size: bool, fmt: photocraft_color::PixelFormat) -> Result<SheetItem> {
-    let bytes = crate::file_cmds::read_file(path)?;
-    let doc = crate::file_cmds::import(&crate::file_cmds::file_name(path), &bytes)?;
-    let mut surf = crate::file_cmds::flattened(&doc, fmt);
-    let full = photocraft_geom::Rect::new(0, 0, doc.size.width as i32, doc.size.height as i32);
-    let mut rect = if trim { surf.content_bounds().intersect(&full) } else { full };
-    if rect.is_empty() {
-        return Err(bad(GANG_SHEET, format!("{}: the image is empty", crate::file_cmds::file_name(path))));
-    }
-    let src_dpi = f64::from(doc.resolution_dpi);
-    if keep_size && src_dpi.is_finite() && src_dpi > 0.0 && (src_dpi - dpi).abs() > 0.01 {
-        let k = dpi / src_dpi;
-        let (nw, nh) = (f64::from(rect.width()) * k, f64::from(rect.height()) * k);
-        if nw > MAX_SHEET_SIDE || nh > MAX_SHEET_SIDE {
-            return Err(bad(GANG_SHEET, format!("{}: too large at {dpi} ppi", crate::file_cmds::file_name(path))));
-        }
-        surf = photocraft_algo::resample::resize_surface(&surf, k, k, photocraft_algo::resample::Resample::BicubicAutomatic);
-        rect = photocraft_algo::resample::scaled_rect(rect, k, k);
-        if trim {
-            rect = surf.content_bounds().intersect(&rect);
-        }
-    }
-    if rect.is_empty() {
-        return Err(bad(GANG_SHEET, format!("{}: the image is empty", crate::file_cmds::file_name(path))));
-    }
-    Ok(SheetItem { name: crate::file_cmds::stem(path), w: i64::from(rect.width()), h: i64::from(rect.height()), data: surf.read_region(rect) })
-}
-
-/// The item's pixels turned 90° clockwise (`w × h` becomes `h × w`).
-fn rotate_cw(data: &[f32], w: usize, h: usize, ch: usize) -> Vec<f32> {
-    let mut out = vec![0.0f32; data.len()];
-    for y in 0..h {
-        for x in 0..w {
-            // (x, y) → (h − 1 − y, x) in a `h` wide image.
-            let (nx, ny) = (h - 1 - y, x);
-            let (si, di) = ((y * w + x) * ch, (ny * h + nx) * ch);
-            if let (Some(s), Some(d)) = (data.get(si..si + ch), out.get_mut(di..di + ch)) {
-                d.copy_from_slice(s);
-            }
-        }
-    }
-    out
-}
-
-fn gang_sheet(s: &mut Session, p: &Value) -> Result<Value> {
-    check_range(GANG_SHEET, p, "filmWidth", 1.0, 500.0)?;
-    check_range(GANG_SHEET, p, "sheetLength", 0.0, 2000.0)?;
-    check_range(GANG_SHEET, p, "resolution", 72.0, 1200.0)?;
-    check_range(GANG_SHEET, p, "spacing", 0.0, 100.0)?;
-    check_range(GANG_SHEET, p, "margin", 0.0, 100.0)?;
-    check_range(GANG_SHEET, p, "copies", 1.0, 999.0)?;
-    let paths: Vec<String> = match p.get("input").or_else(|| p.get("paths")) {
-        Some(Value::Array(a)) => a.iter().filter_map(Value::as_str).map(str::to_string).collect(),
-        Some(Value::String(dir)) if !dir.trim().is_empty() => crate::file_cmds::list_images(dir)?,
-        _ => return Err(bad(GANG_SHEET, "`input` must be a folder or a list of image files")),
-    };
-    if paths.is_empty() {
-        return Err(bad(GANG_SHEET, "no image files to place"));
-    }
-    let dpi = num(p, "resolution", 300.0);
-    let sheet_w = cm_to_px(num(p, "filmWidth", 56.0), dpi).round();
-    let length_cm = num(p, "sheetLength", 100.0);
-    let max_len = if length_cm > 0.0 { cm_to_px(length_cm, dpi).round() } else { 0.0 };
-    let gap = (num(p, "spacing", 5.0) / 25.4 * dpi).round() as i64;
-    let margin = (num(p, "margin", 5.0) / 25.4 * dpi).round() as i64;
-    let copies = num(p, "copies", 1.0).round().clamp(1.0, 999.0) as usize;
-    let rotate = p.get("rotate").and_then(Value::as_bool).unwrap_or(true);
-    let trim = p.get("trim").and_then(Value::as_bool).unwrap_or(true);
-    let keep_size = p.get("keepPrintSize").and_then(Value::as_bool).unwrap_or(true);
-    if sheet_w > MAX_SHEET_SIDE || max_len > MAX_SHEET_SIDE {
-        return Err(bad(GANG_SHEET, format!("the sheet is too large at {dpi} ppi (at most {MAX_SHEET_SIDE} px per side)")));
-    }
-    let inner_w = sheet_w as i64 - 2 * margin;
-    if inner_w <= 0 || (max_len > 0.0 && max_len as i64 - 2 * margin <= 0) {
-        return Err(bad(GANG_SHEET, "the margins leave no room on the sheet"));
-    }
-    if paths.len().saturating_mul(copies) > MAX_ITEMS {
-        return Err(bad(GANG_SHEET, format!("at most {MAX_ITEMS} images (copies included) per gang sheet")));
-    }
-    let fmt = photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::U8, true);
-    let ch = fmt.channels();
-    let mut items = Vec::new();
-    let mut errors = Vec::new();
-    for path in &paths {
-        match load_item(path, dpi, trim, keep_size, fmt) {
-            Ok(it) => items.push(it),
-            Err(e) => errors.push(json!({"file": path, "error": e.to_string()})),
-        }
-    }
-    // Copies share the pixels: placements refer to the item by index.
-    let mut slots: Vec<usize> = Vec::new();
-    for (i, _) in items.iter().enumerate() {
-        slots.extend(std::iter::repeat_n(i, copies));
-    }
-    let sizes: Vec<(i64, i64)> = slots.iter().filter_map(|i| items.get(*i)).map(|it| (it.w, it.h)).collect();
-    let inner_len = if max_len > 0.0 { max_len as i64 - 2 * margin } else { 0 };
-    let (sheets, rejected) = photocraft_algo::dtf::pack(&sizes, inner_w, inner_len, gap, rotate);
-    for r in &rejected {
-        if let Some(it) = slots.get(*r).and_then(|i| items.get(*i)) {
-            errors.push(json!({"file": it.name, "error": "larger than the sheet"}));
-        }
-    }
-    if sheets.is_empty() {
-        return Err(bad(GANG_SHEET, "nothing could be placed on the sheet"));
-    }
-    let width_cm = num(p, "filmWidth", 56.0);
-    let mut out = Vec::new();
-    let total = sheets.len();
-    for (n, sheet) in sheets.iter().enumerate() {
-        let h = (sheet.length + 2 * margin).max(1);
-        let size = photocraft_doc::Size::new(sheet_w as u32, h as u32);
-        let name = if total > 1 { format!("Gang sheet {} of {total}", n + 1) } else { "Gang sheet".to_string() };
-        let mut doc = photocraft_doc::Document::new(name.clone(), size, photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::U8);
-        doc.resolution_dpi = dpi as f32;
-        doc.layers.clear();
-        let mut count: std::collections::HashMap<usize, usize> = std::collections::HashMap::new();
-        for pl in &sheet.placements {
-            let Some(item) = slots.get(pl.item).and_then(|i| items.get(*i)) else { continue };
-            let (w, hh, data) = if pl.rotated {
-                (item.h, item.w, rotate_cw(&item.data, item.w as usize, item.h as usize, ch))
-            } else {
-                (item.w, item.h, item.data.clone())
-            };
-            let (x, y) = ((pl.x + margin) as i32, (pl.y + margin) as i32);
-            let mut surf = photocraft_raster::Surface::new(fmt);
-            surf.write_region(photocraft_geom::Rect::new(x, y, x + w as i32, y + hh as i32), &data);
-            let k = count.entry(slots.get(pl.item).copied().unwrap_or(0)).or_insert(0);
-            *k += 1;
-            let label = if *k > 1 { format!("{} {}", item.name, k) } else { item.name.clone() };
-            doc.layers.push(photocraft_doc::Layer::new(label, photocraft_doc::LayerContent::Raster(surf)));
-        }
-        let placed = doc.layers.len();
-        let length_cm = f64::from(size.height) / dpi * 2.54;
-        let index = s.add_document(doc, None);
-        if let Some(d) = s.active_mut() {
-            d.active_layer = d.doc.layers.last().map(|l| l.id);
-        }
-        out.push(json!({"document": index, "name": name, "widthCm": width_cm, "lengthCm": (length_cm * 10.0).round() / 10.0, "images": placed}));
-    }
-    Ok(json!({"sheets": out, "errors": errors}))
-}
 
 // ---------------------------------------------------------------- AI upscale
 
@@ -413,7 +249,7 @@ fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
     // The original is never touched: the network enlarges a copy named "<name> x2" (x3, x4),
     // whose Save As starts in the original's folder and format.
     let (name, hint) = upscale_copy_name(&st.doc.name, st.path.as_deref(), scale);
-    s.execute("image.duplicate", json!({"name": name}))?;
+    s.keeping_background(|s| s.execute("image.duplicate", json!({"name": name})))?;
     if let Some(copy) = s.active_mut() {
         copy.save_hint = hint;
     }
@@ -633,16 +469,6 @@ pub fn specs() -> Vec<CommandSpec> {
             journal: true,
         },
         CommandSpec {
-            id: GANG_SHEET,
-            label: "Gang Sheet…",
-            menu: &["DTF"],
-            shortcut: None,
-            params: r##"{"input":folder|[paths],"filmWidth":1..500=56 (cm),"sheetLength":0..2000=100 (cm per sheet; 0 = one sheet as long as needed),"resolution":72..1200=300,"spacing":0..100=5 (mm between images),"margin":0..100=5 (mm),"copies":1..999=1 (of each image),"rotate":bool=true,"trim":bool=true (crop transparent borders),"keepPrintSize":bool=true (scale each file from its own resolution)} → {sheets:[{document,name,widthCm,lengthCm,images}], errors}"##,
-            enabled: crate::commands::always,
-            run: gang_sheet,
-            journal: true,
-        },
-        CommandSpec {
             id: HALFTONE,
             label: "DTF Halftone…",
             menu: &["DTF"],
@@ -760,39 +586,7 @@ mod tests {
     }
 
 
-    #[test]
-    fn gang_sheet_places_copies_on_a_new_document() {
-        let dir = std::env::temp_dir().join(format!("dtf-gang-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).unwrap();
-        // Two small images saved through the engine (300 ppi, 2 × 1 cm and 1 × 1 cm).
-        let mut s = Session::new();
-        for (name, w, h) in [("a", 236, 118), ("b", 118, 118)] {
-            s.execute("file.new", json!({"width": w, "height": h, "resolution": 300, "background": "#ff0000"})).unwrap();
-            s.execute("file.saveACopy", json!({"path": dir.join(format!("{name}.png")).to_string_lossy()})).unwrap();
-        }
-        let r = s
-            .execute(GANG_SHEET, json!({"input": dir.to_string_lossy(), "filmWidth": 10, "sheetLength": 0, "copies": 3, "spacing": 2, "margin": 2}))
-            .unwrap();
-        assert_eq!(r["errors"], json!([]), "{r}");
-        assert_eq!(r["sheets"].as_array().unwrap().len(), 1);
-        assert_eq!(r["sheets"][0]["images"], 6);
-        let d = s.active().unwrap();
-        assert_eq!(d.doc.layers.len(), 6);
-        assert_eq!(d.doc.size.width, 1181, "10 cm at 300 ppi");
-        assert!((d.doc.resolution_dpi - 300.0).abs() < 0.01);
-        std::fs::remove_dir_all(&dir).ok();
-        assert!(s.execute(GANG_SHEET, json!({"input": []})).is_err());
-        assert!(s.execute(GANG_SHEET, json!({"input": "/nonexistent/x", "filmWidth": 0})).is_err());
-    }
 
-    #[test]
-    fn rotation_turns_pixels_clockwise() {
-        // 2 × 1 image: [A B] → rotated 1 × 2: [A] over [B]? Clockwise: top = A, bottom = B.
-        let data = vec![1.0, 2.0];
-        assert_eq!(rotate_cw(&data, 2, 1, 1), vec![1.0, 2.0]);
-        // 2 × 2: [1 2 / 3 4] → [3 1 / 4 2].
-        assert_eq!(rotate_cw(&[1.0, 2.0, 3.0, 4.0], 2, 2, 1), vec![3.0, 1.0, 4.0, 2.0]);
-    }
 
 
     #[test]
@@ -827,6 +621,35 @@ mod tests {
         assert!(s.execute(UPSCALE, json!({"scale": "5"})).is_err());
     }
 
+
+    /// Started as in the app (`Session::start`), the enlargement and the screen run as background
+    /// jobs after their copy and layers, so the progress dialog shows and the window stays live.
+    #[test]
+    fn upscale_and_halftone_run_as_background_jobs() {
+        use crate::jobs::Started;
+        let wait = |s: &mut Session| {
+            let t = std::time::Instant::now();
+            while !s.jobs().is_empty() {
+                s.poll_jobs();
+                assert!(t.elapsed().as_secs() < 120, "the job did not finish");
+                std::thread::sleep(std::time::Duration::from_millis(5));
+            }
+        };
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 24, "height": 16, "resolution": 72, "background": "white"})).unwrap();
+        let r = s.start(UPSCALE, json!({"scale": "2"})).unwrap();
+        assert!(matches!(r, Started::Job(_)), "AI Upscale ran inline");
+        assert_eq!(s.documents().len(), 2);
+        let copy = s.active().unwrap().doc.id;
+        assert!(s.job_on(copy).is_some(), "the job runs on the copy");
+        wait(&mut s);
+        assert_eq!(s.active().unwrap().doc.size.width, 48);
+        let mut s = session_with_ramp();
+        let r = s.start(HALFTONE, json!({"frequency": 30})).unwrap();
+        assert!(matches!(r, Started::Job(_)), "DTF Halftone ran inline");
+        wait(&mut s);
+        assert!(alphas(&s).iter().all(|v| *v == 0.0 || *v == 1.0));
+    }
 
     #[test]
     fn control_background_goes_under_a_background_layer_picture() {

@@ -20,7 +20,6 @@ produit officiel du projet PhotoCraft.
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » (calque « Halftone » tramé + « Fond de contrôle » #231c1c) au-dessus du calque source, qui est masqué et conservé intact |
 | Agrandissement IA… | ×2, ×3 ou ×4 par le modèle Real-ESRGAN (hors ligne, sur le processeur), sur une copie nommée « nom x2 » : l'original n'est pas modifié |
-| Gang sheet… | Place automatiquement les images d'un dossier sur une laize (largeur en cm, copies, espacement, rotation) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 

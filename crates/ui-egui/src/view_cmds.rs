@@ -586,7 +586,6 @@ fn wraps(id: &str) -> bool {
             | "file.automate.conditionalModeChange"
             | "file.automate.batch"
             | "file.scripts.imageProcessor"
-            | "dtf.gangSheet"
             | "dtf.upscale"
             | "dtf.conformity"
             | "file.scripts.loadFilesIntoStack"
@@ -1321,11 +1320,6 @@ fn front(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Val
             app,
             json!({"height": 27, "resolution": 300, "resample": "bicubicAutomatic", "depth": "8", "trim": true, "layerName": "origin"}),
             json!({"resample": ["bicubicAutomatic", "preserveDetails", "bicubic", "bicubicSmoother", "bicubicSharper", "lanczos", "bilinear", "nearest"], "depth": ["8", "16"]}),
-        ),
-        "dtf.gangSheet" => dialog(
-            app,
-            json!({"input": dir, "filmWidth": 56, "sheetLength": 100, "resolution": 300, "spacing": 5, "margin": 5, "copies": 1, "rotate": true, "trim": true, "keepPrintSize": true}),
-            json!({}),
         ),
         "file.scripts.imageProcessor" => dialog(
             app,

@@ -18,7 +18,6 @@ ligne, sur le poste de l'atelier. La version 1.0 est prévue le 2 novembre 2026,
 Outils en cours de développement :
 
 - Halftone DTF
-- Gang sheet
 - Agrandissement IA hors ligne (Real-ESRGAN)
 - Préparation impression : conformité, fond de contrôle, pixels transparents, suppression de
   frange, netteté, saturation
