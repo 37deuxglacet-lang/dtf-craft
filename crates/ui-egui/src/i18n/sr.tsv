@@ -4270,3 +4270,39 @@ shape	Appearance	Izgled
 	Remove Fringe	Ukloni ivice
 	Show Background	Prikaži pozadinu
 	Delete Background	Obriši pozadinu
+# DTF Craft (6) — Color Analyzer
+	Visual	Motiv
+	Eyedropper: on	Pipeta: uključena
+	Click the visual to add a colour	Kliknite na motiv da dodate boju
+	original {code}	izvorna {code}
+	Add Code	Dodaj kod
+	Merge Close Shades	Spoji bliske nijanse
+	Higher merges more shades into fewer colours.	Veća vrednost spaja više nijansi u manje boja.
+	Analyze Again	Analiziraj ponovo
+	Variants	Varijante
+	Horizontal Axis	Horizontalna osa
+	Vertical Axis	Vertikalna osa
+	Step	Korak
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Svetlina i zasićenost: % ; nijansa: stepeni ; crvena, zelena, plava: % od 255.
+	Block Size	Veličina bloka
+	Sheet	Tabak
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, providna pozadina
+	Too narrow for one block of variants	Preusko za jedan blok varijanti
+	Selected Patch	Izabrano polje
+	centre of the block	sredina bloka
+	patch	polje
+	Use as Centre	Koristi kao sredinu
+	Copy Code	Kopiraj kod
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Koristi kao sredinu: ovo polje postaje nova sredina svoje boje, za finiji drugi tabak (smanjite korak).
+	Click a patch on the sheet.	Kliknite na polje tabaka.
+	Copy the Codes	Kopiraj kodove
+	Copied	Kopirano
+	Export PNG…	Izvezi PNG…
+	No colour found: the image is empty or transparent	Nije pronađena boja: slika je prazna ili providna
+	No colour on the sheet	Nema boja na tabaku
+	Not a colour code (#A43B2F)	Nije kod boje (#A43B2F)
+	Open a document first	Prvo otvorite dokument
+	Select a patch first	Prvo izaberite polje
+	The sheet takes at most 32 colours	Tabak prima najviše 32 boje
+	Transparent here: pick a coloured spot	Ovde je providno: kliknite na obojeno mesto
+	the document was closed	dokument je zatvoren

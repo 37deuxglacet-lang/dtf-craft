@@ -3188,3 +3188,39 @@ curves	Smooth	Haluskan
 	Remove Fringe	Hapus pinggiran
 	Show Background	Tampilkan latar
 	Delete Background	Hapus latar
+# DTF Craft (6) — Color Analyzer
+	Visual	Desain
+	Eyedropper: on	Pipet: aktif
+	Click the visual to add a colour	Klik desain untuk menambahkan warna
+	original {code}	asli {code}
+	Add Code	Tambah Kode
+	Merge Close Shades	Gabungkan Rona Mirip
+	Higher merges more shades into fewer colours.	Nilai lebih tinggi menggabungkan lebih banyak rona menjadi lebih sedikit warna.
+	Analyze Again	Analisis Ulang
+	Variants	Varian
+	Horizontal Axis	Sumbu Horizontal
+	Vertical Axis	Sumbu Vertikal
+	Step	Langkah
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Kecerahan dan saturasi: % ; rona: derajat ; merah, hijau, biru: % dari 255.
+	Block Size	Ukuran Blok
+	Sheet	Lembar
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, latar transparan
+	Too narrow for one block of variants	Terlalu sempit untuk satu blok varian
+	Selected Patch	Kotak Terpilih
+	centre of the block	tengah blok
+	patch	kotak
+	Use as Centre	Jadikan Tengah
+	Copy Code	Salin Kode
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Jadikan Tengah: kotak ini menjadi tengah baru warnanya, untuk lembar kedua yang lebih halus (kecilkan langkah).
+	Click a patch on the sheet.	Klik sebuah kotak pada lembar.
+	Copy the Codes	Salin Kode-kode
+	Copied	Disalin
+	Export PNG…	Ekspor PNG…
+	No colour found: the image is empty or transparent	Tidak ada warna: gambar kosong atau transparan
+	No colour on the sheet	Tidak ada warna pada lembar
+	Not a colour code (#A43B2F)	Bukan kode warna (#A43B2F)
+	Open a document first	Buka dokumen terlebih dahulu
+	Select a patch first	Pilih kotak terlebih dahulu
+	The sheet takes at most 32 colours	Lembar menampung paling banyak 32 warna
+	Transparent here: pick a coloured spot	Transparan di sini: klik area berwarna
+	the document was closed	dokumen telah ditutup

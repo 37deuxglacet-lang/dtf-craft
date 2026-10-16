@@ -3371,3 +3371,39 @@ curves	Smooth	매끄럽게
 	Remove Fringe	가장자리 제거
 	Show Background	배경 표시
 	Delete Background	배경 삭제
+# DTF Craft (6) — Color Analyzer
+	Visual	디자인
+	Eyedropper: on	스포이드: 켜짐
+	Click the visual to add a colour	디자인을 클릭해 색상 추가
+	original {code}	원래 색상 {code}
+	Add Code	코드 추가
+	Merge Close Shades	비슷한 색조 병합
+	Higher merges more shades into fewer colours.	값이 클수록 더 많은 색조가 더 적은 색상으로 합쳐집니다.
+	Analyze Again	다시 분석
+	Variants	변형
+	Horizontal Axis	가로 축
+	Vertical Axis	세로 축
+	Step	단계
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	명도와 채도: % ; 색조: 도 ; 빨강, 초록, 파랑: 255의 %.
+	Block Size	블록 크기
+	Sheet	시트
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, 투명 배경
+	Too narrow for one block of variants	변형 블록 하나를 넣기에 너무 좁음
+	Selected Patch	선택한 칸
+	centre of the block	블록 중앙
+	patch	칸
+	Use as Centre	중심으로 사용
+	Copy Code	코드 복사
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	중심으로 사용: 이 칸이 해당 색상의 새 중심이 되어 더 세밀한 두 번째 시트를 만듭니다(단계를 줄이세요).
+	Click a patch on the sheet.	시트의 칸을 클릭하세요.
+	Copy the Codes	코드 모두 복사
+	Copied	복사됨
+	Export PNG…	PNG 내보내기…
+	No colour found: the image is empty or transparent	색상을 찾지 못함: 이미지가 비어 있거나 투명함
+	No colour on the sheet	시트에 색상 없음
+	Not a colour code (#A43B2F)	색상 코드가 아님 (#A43B2F)
+	Open a document first	먼저 문서를 여세요
+	Select a patch first	먼저 칸을 선택하세요
+	The sheet takes at most 32 colours	시트에는 최대 32가지 색상
+	Transparent here: pick a coloured spot	투명한 곳: 색이 있는 곳을 클릭하세요
+	the document was closed	문서가 닫혔습니다

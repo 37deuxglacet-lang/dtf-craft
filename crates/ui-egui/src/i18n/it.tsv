@@ -4158,3 +4158,39 @@ navigator	Zoom	Zoom
 	Remove Fringe	Rimuovi frange
 	Show Background	Mostra sfondo
 	Delete Background	Elimina sfondo
+# DTF Craft (6) — Color Analyzer
+	Visual	Grafica
+	Eyedropper: on	Contagocce: attivo
+	Click the visual to add a colour	Fai clic sulla grafica per aggiungere un colore
+	original {code}	originale {code}
+	Add Code	Aggiungi codice
+	Merge Close Shades	Unisci tonalità vicine
+	Higher merges more shades into fewer colours.	Un valore più alto unisce più tonalità in meno colori.
+	Analyze Again	Analizza di nuovo
+	Variants	Varianti
+	Horizontal Axis	Asse orizzontale
+	Vertical Axis	Asse verticale
+	Step	Passo
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Luminosità e saturazione: % ; tinta: gradi ; rosso, verde, blu: % di 255.
+	Block Size	Dimensione blocco
+	Sheet	Foglio
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, sfondo trasparente
+	Too narrow for one block of variants	Troppo stretto per un blocco di varianti
+	Selected Patch	Casella selezionata
+	centre of the block	centro del blocco
+	patch	casella
+	Use as Centre	Usa come centro
+	Copy Code	Copia codice
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Usa come centro: questa casella diventa il nuovo centro del suo colore, per un secondo foglio più fine (riduci il passo).
+	Click a patch on the sheet.	Fai clic su una casella del foglio.
+	Copy the Codes	Copia i codici
+	Copied	Copiato
+	Export PNG…	Esporta PNG…
+	No colour found: the image is empty or transparent	Nessun colore trovato: l'immagine è vuota o trasparente
+	No colour on the sheet	Nessun colore sul foglio
+	Not a colour code (#A43B2F)	Codice colore non valido (#A43B2F)
+	Open a document first	Apri prima un documento
+	Select a patch first	Seleziona prima una casella
+	The sheet takes at most 32 colours	Il foglio accetta al massimo 32 colori
+	Transparent here: pick a coloured spot	Zona trasparente: fai clic su una zona colorata
+	the document was closed	il documento è stato chiuso

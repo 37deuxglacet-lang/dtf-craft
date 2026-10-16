@@ -3894,3 +3894,39 @@ curves	Smooth	Εξομάλυνση
 	Remove Fringe	Αφαίρεση περιγράμματος
 	Show Background	Εμφάνιση φόντου
 	Delete Background	Διαγραφή φόντου
+# DTF Craft (6) — Color Analyzer
+	Visual	Γραφικό
+	Eyedropper: on	Σταγονόμετρο: ενεργό
+	Click the visual to add a colour	Κάντε κλικ στο γραφικό για να προσθέσετε χρώμα
+	original {code}	αρχικό {code}
+	Add Code	Προσθήκη κωδικού
+	Merge Close Shades	Συγχώνευση κοντινών αποχρώσεων
+	Higher merges more shades into fewer colours.	Μεγαλύτερη τιμή συγχωνεύει περισσότερες αποχρώσεις σε λιγότερα χρώματα.
+	Analyze Again	Νέα ανάλυση
+	Variants	Παραλλαγές
+	Horizontal Axis	Οριζόντιος άξονας
+	Vertical Axis	Κάθετος άξονας
+	Step	Βήμα
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Φωτεινότητα και κορεσμός: % ; απόχρωση: μοίρες ; κόκκινο, πράσινο, μπλε: % του 255.
+	Block Size	Μέγεθος μπλοκ
+	Sheet	Φύλλο
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, διαφανές φόντο
+	Too narrow for one block of variants	Πολύ στενό για ένα μπλοκ παραλλαγών
+	Selected Patch	Επιλεγμένο τετράγωνο
+	centre of the block	κέντρο του μπλοκ
+	patch	τετράγωνο
+	Use as Centre	Χρήση ως κέντρο
+	Copy Code	Αντιγραφή κωδικού
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Χρήση ως κέντρο: αυτό το τετράγωνο γίνεται το νέο κέντρο του χρώματός του, για ένα πιο λεπτό δεύτερο φύλλο (μειώστε το βήμα).
+	Click a patch on the sheet.	Κάντε κλικ σε ένα τετράγωνο του φύλλου.
+	Copy the Codes	Αντιγραφή κωδικών
+	Copied	Αντιγράφηκε
+	Export PNG…	Εξαγωγή PNG…
+	No colour found: the image is empty or transparent	Δεν βρέθηκε χρώμα: η εικόνα είναι κενή ή διαφανής
+	No colour on the sheet	Κανένα χρώμα στο φύλλο
+	Not a colour code (#A43B2F)	Μη έγκυρος κωδικός χρώματος (#A43B2F)
+	Open a document first	Ανοίξτε πρώτα ένα έγγραφο
+	Select a patch first	Επιλέξτε πρώτα ένα τετράγωνο
+	The sheet takes at most 32 colours	Το φύλλο δέχεται έως 32 χρώματα
+	Transparent here: pick a coloured spot	Διαφανές σημείο: κάντε κλικ σε χρωματιστό σημείο
+	the document was closed	το έγγραφο έκλεισε

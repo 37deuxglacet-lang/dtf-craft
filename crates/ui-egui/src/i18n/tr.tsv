@@ -3927,3 +3927,39 @@ cameraData	Lens	Lens
 	Remove Fringe	Saçakları kaldır
 	Show Background	Arka planı göster
 	Delete Background	Arka planı sil
+# DTF Craft (6) — Color Analyzer
+	Visual	Tasarım
+	Eyedropper: on	Damlalık: açık
+	Click the visual to add a colour	Renk eklemek için tasarıma tıklayın
+	original {code}	özgün {code}
+	Add Code	Kod Ekle
+	Merge Close Shades	Yakın Tonları Birleştir
+	Higher merges more shades into fewer colours.	Daha yüksek değer daha çok tonu daha az renkte birleştirir.
+	Analyze Again	Yeniden Analiz Et
+	Variants	Varyantlar
+	Horizontal Axis	Yatay Eksen
+	Vertical Axis	Dikey Eksen
+	Step	Adım
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Açıklık ve doygunluk: % ; ton: derece ; kırmızı, yeşil, mavi: 255'in %'si.
+	Block Size	Blok Boyutu
+	Sheet	Sayfa
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, saydam arka plan
+	Too narrow for one block of variants	Bir varyant bloğu için fazla dar
+	Selected Patch	Seçili Kare
+	centre of the block	bloğun ortası
+	patch	kare
+	Use as Centre	Orta Olarak Kullan
+	Copy Code	Kodu Kopyala
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Orta Olarak Kullan: bu kare, daha ince ikinci bir sayfa için renginin yeni ortası olur (adımı küçültün).
+	Click a patch on the sheet.	Sayfada bir kareye tıklayın.
+	Copy the Codes	Kodları Kopyala
+	Copied	Kopyalandı
+	Export PNG…	PNG Olarak Dışa Aktar…
+	No colour found: the image is empty or transparent	Renk bulunamadı: görüntü boş veya saydam
+	No colour on the sheet	Sayfada renk yok
+	Not a colour code (#A43B2F)	Renk kodu değil (#A43B2F)
+	Open a document first	Önce bir belge açın
+	Select a patch first	Önce bir kare seçin
+	The sheet takes at most 32 colours	Sayfa en fazla 32 renk alır
+	Transparent here: pick a coloured spot	Burası saydam: renkli bir yere tıklayın
+	the document was closed	belge kapatıldı

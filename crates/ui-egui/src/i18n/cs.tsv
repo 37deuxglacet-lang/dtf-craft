@@ -3803,3 +3803,39 @@ navigator	Zoom	Zvětšení
 	Remove Fringe	Odstranit lemy
 	Show Background	Zobrazit pozadí
 	Delete Background	Smazat pozadí
+# DTF Craft (6) — Color Analyzer
+	Visual	Motiv
+	Eyedropper: on	Kapátko: zapnuto
+	Click the visual to add a colour	Kliknutím na motiv přidáte barvu
+	original {code}	původní {code}
+	Add Code	Přidat kód
+	Merge Close Shades	Sloučit blízké odstíny
+	Higher merges more shades into fewer colours.	Vyšší hodnota sloučí více odstínů do méně barev.
+	Analyze Again	Analyzovat znovu
+	Variants	Varianty
+	Horizontal Axis	Vodorovná osa
+	Vertical Axis	Svislá osa
+	Step	Krok
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Světlost a sytost: % ; odstín: stupně ; červená, zelená, modrá: % z 255.
+	Block Size	Velikost bloku
+	Sheet	Arch
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, průhledné pozadí
+	Too narrow for one block of variants	Příliš úzký pro jeden blok variant
+	Selected Patch	Vybrané pole
+	centre of the block	střed bloku
+	patch	pole
+	Use as Centre	Použít jako střed
+	Copy Code	Kopírovat kód
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Použít jako střed: toto pole se stane novým středem své barvy pro jemnější druhý arch (zmenšete krok).
+	Click a patch on the sheet.	Klikněte na pole archu.
+	Copy the Codes	Kopírovat kódy
+	Copied	Zkopírováno
+	Export PNG…	Exportovat PNG…
+	No colour found: the image is empty or transparent	Nenalezena žádná barva: obraz je prázdný nebo průhledný
+	No colour on the sheet	Na archu není žádná barva
+	Not a colour code (#A43B2F)	Neplatný kód barvy (#A43B2F)
+	Open a document first	Nejprve otevřete dokument
+	Select a patch first	Nejprve vyberte pole
+	The sheet takes at most 32 colours	Arch pojme nejvýše 32 barev
+	Transparent here: pick a coloured spot	Zde je průhlednost: klikněte na barevné místo
+	the document was closed	dokument byl zavřen

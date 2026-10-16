@@ -3165,3 +3165,39 @@ curves	Smooth	Сгладить
 	Remove Fringe	Удалить кайму
 	Show Background	Показать фон
 	Delete Background	Удалить фон
+# DTF Craft (6) — Color Analyzer
+	Visual	Макет
+	Eyedropper: on	Пипетка: вкл.
+	Click the visual to add a colour	Щёлкните по макету, чтобы добавить цвет
+	original {code}	исходный {code}
+	Add Code	Добавить код
+	Merge Close Shades	Объединять близкие оттенки
+	Higher merges more shades into fewer colours.	Чем выше значение, тем больше оттенков сливается в меньшее число цветов.
+	Analyze Again	Повторить анализ
+	Variants	Варианты
+	Horizontal Axis	Горизонтальная ось
+	Vertical Axis	Вертикальная ось
+	Step	Шаг
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Яркость и насыщенность: % ; тон: градусы ; красный, зелёный, синий: % от 255.
+	Block Size	Размер блока
+	Sheet	Лист
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} см, sRGB, 300 ppi, прозрачный фон
+	Too narrow for one block of variants	Слишком узко для блока вариантов
+	Selected Patch	Выбранная ячейка
+	centre of the block	центр блока
+	patch	ячейка
+	Use as Centre	Сделать центром
+	Copy Code	Копировать код
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Сделать центром: эта ячейка становится новым центром своего цвета для более точного второго листа (уменьшите шаг).
+	Click a patch on the sheet.	Щёлкните по ячейке листа.
+	Copy the Codes	Копировать коды
+	Copied	Скопировано
+	Export PNG…	Экспорт PNG…
+	No colour found: the image is empty or transparent	Цвета не найдены: изображение пустое или прозрачное
+	No colour on the sheet	На листе нет цветов
+	Not a colour code (#A43B2F)	Неверный код цвета (#A43B2F)
+	Open a document first	Сначала откройте документ
+	Select a patch first	Сначала выберите ячейку
+	The sheet takes at most 32 colours	На листе не более 32 цветов
+	Transparent here: pick a coloured spot	Здесь прозрачно: щёлкните по цветному участку
+	the document was closed	документ был закрыт

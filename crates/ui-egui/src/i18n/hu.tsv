@@ -4116,3 +4116,39 @@ cameraRaw	Yellow	Sárga
 	Remove Fringe	Szegély eltávolítása
 	Show Background	Háttér megjelenítése
 	Delete Background	Háttér törlése
+# DTF Craft (6) — Color Analyzer
+	Visual	Grafika
+	Eyedropper: on	Pipetta: be
+	Click the visual to add a colour	Kattintson a grafikára egy szín hozzáadásához
+	original {code}	eredeti {code}
+	Add Code	Kód hozzáadása
+	Merge Close Shades	Közeli árnyalatok összevonása
+	Higher merges more shades into fewer colours.	Magasabb érték több árnyalatot von össze kevesebb színné.
+	Analyze Again	Újraelemzés
+	Variants	Változatok
+	Horizontal Axis	Vízszintes tengely
+	Vertical Axis	Függőleges tengely
+	Step	Lépés
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Világosság és telítettség: % ; színárnyalat: fok ; vörös, zöld, kék: 255 %-a.
+	Block Size	Blokkméret
+	Sheet	Ív
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, átlátszó háttér
+	Too narrow for one block of variants	Túl keskeny egy változatblokkhoz
+	Selected Patch	Kijelölt mező
+	centre of the block	a blokk közepe
+	patch	mező
+	Use as Centre	Legyen a közép
+	Copy Code	Kód másolása
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Legyen a közép: ez a mező lesz a színe új közepe egy finomabb második ívhez (csökkentse a lépést).
+	Click a patch on the sheet.	Kattintson az ív egy mezőjére.
+	Copy the Codes	Kódok másolása
+	Copied	Másolva
+	Export PNG…	PNG exportálása…
+	No colour found: the image is empty or transparent	Nem található szín: a kép üres vagy átlátszó
+	No colour on the sheet	Nincs szín az íven
+	Not a colour code (#A43B2F)	Nem színkód (#A43B2F)
+	Open a document first	Előbb nyisson meg egy dokumentumot
+	Select a patch first	Előbb jelöljön ki egy mezőt
+	The sheet takes at most 32 colours	Az ív legfeljebb 32 színt fogad
+	Transparent here: pick a coloured spot	Itt átlátszó: kattintson egy színes helyre
+	the document was closed	a dokumentum bezárult

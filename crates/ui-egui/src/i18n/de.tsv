@@ -3198,3 +3198,39 @@ curves	Smooth	Glätten
 	Remove Fringe	Farbsaum entfernen
 	Show Background	Hintergrund zeigen
 	Delete Background	Hintergrund löschen
+# DTF Craft (6) — Color Analyzer
+	Visual	Motiv
+	Eyedropper: on	Pipette: an
+	Click the visual to add a colour	Klicken Sie auf das Motiv, um eine Farbe hinzuzufügen
+	original {code}	Original {code}
+	Add Code	Code hinzufügen
+	Merge Close Shades	Ähnliche Töne zusammenfassen
+	Higher merges more shades into fewer colours.	Höher fasst mehr Töne zu weniger Farben zusammen.
+	Analyze Again	Erneut analysieren
+	Variants	Varianten
+	Horizontal Axis	Horizontale Achse
+	Vertical Axis	Vertikale Achse
+	Step	Schritt
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Helligkeit und Sättigung: % ; Farbton: Grad ; Rot, Grün, Blau: % von 255.
+	Block Size	Blockgröße
+	Sheet	Bogen
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, transparenter Hintergrund
+	Too narrow for one block of variants	Zu schmal für einen Variantenblock
+	Selected Patch	Ausgewähltes Feld
+	centre of the block	Mitte des Blocks
+	patch	Feld
+	Use as Centre	Als Mitte verwenden
+	Copy Code	Code kopieren
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Als Mitte verwenden: Dieses Feld wird die neue Mitte seiner Farbe, für einen feineren zweiten Bogen (Schritt verringern).
+	Click a patch on the sheet.	Klicken Sie auf ein Feld des Bogens.
+	Copy the Codes	Codes kopieren
+	Copied	Kopiert
+	Export PNG…	PNG exportieren…
+	No colour found: the image is empty or transparent	Keine Farbe gefunden: Das Bild ist leer oder transparent
+	No colour on the sheet	Keine Farbe auf dem Bogen
+	Not a colour code (#A43B2F)	Kein Farbcode (#A43B2F)
+	Open a document first	Öffnen Sie zuerst ein Dokument
+	Select a patch first	Wählen Sie zuerst ein Feld
+	The sheet takes at most 32 colours	Der Bogen nimmt höchstens 32 Farben auf
+	Transparent here: pick a coloured spot	Hier transparent: Klicken Sie auf eine farbige Stelle
+	the document was closed	Das Dokument wurde geschlossen

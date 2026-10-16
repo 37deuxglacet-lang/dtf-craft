@@ -3682,3 +3682,39 @@ curves	Smooth	Làm mượt
 	Remove Fringe	Xóa viền
 	Show Background	Hiện nền
 	Delete Background	Xóa nền
+# DTF Craft (6) — Color Analyzer
+	Visual	Thiết kế
+	Eyedropper: on	Ống hút màu: bật
+	Click the visual to add a colour	Nhấp vào thiết kế để thêm màu
+	original {code}	gốc {code}
+	Add Code	Thêm mã
+	Merge Close Shades	Gộp sắc độ gần nhau
+	Higher merges more shades into fewer colours.	Giá trị cao hơn gộp nhiều sắc độ thành ít màu hơn.
+	Analyze Again	Phân tích lại
+	Variants	Biến thể
+	Horizontal Axis	Trục ngang
+	Vertical Axis	Trục dọc
+	Step	Bước
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Độ sáng và độ bão hòa: % ; sắc độ: độ ; đỏ, lục, lam: % của 255.
+	Block Size	Kích thước khối
+	Sheet	Tờ
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, nền trong suốt
+	Too narrow for one block of variants	Quá hẹp cho một khối biến thể
+	Selected Patch	Ô đã chọn
+	centre of the block	tâm khối
+	patch	ô
+	Use as Centre	Dùng làm tâm
+	Copy Code	Sao chép mã
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Dùng làm tâm: ô này trở thành tâm mới của màu đó, cho tờ thứ hai chi tiết hơn (giảm bước).
+	Click a patch on the sheet.	Nhấp vào một ô trên tờ.
+	Copy the Codes	Sao chép các mã
+	Copied	Đã sao chép
+	Export PNG…	Xuất PNG…
+	No colour found: the image is empty or transparent	Không tìm thấy màu: ảnh trống hoặc trong suốt
+	No colour on the sheet	Không có màu trên tờ
+	Not a colour code (#A43B2F)	Không phải mã màu (#A43B2F)
+	Open a document first	Hãy mở một tài liệu trước
+	Select a patch first	Hãy chọn một ô trước
+	The sheet takes at most 32 colours	Tờ chứa tối đa 32 màu
+	Transparent here: pick a coloured spot	Chỗ này trong suốt: hãy nhấp vào vùng có màu
+	the document was closed	tài liệu đã bị đóng

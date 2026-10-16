@@ -3794,3 +3794,39 @@ curves	Smooth	Wygładź
 	Remove Fringe	Usuń obwódki
 	Show Background	Pokaż tło
 	Delete Background	Usuń tło
+# DTF Craft (6) — Color Analyzer
+	Visual	Grafika
+	Eyedropper: on	Kroplomierz: wł.
+	Click the visual to add a colour	Kliknij grafikę, aby dodać kolor
+	original {code}	oryginał {code}
+	Add Code	Dodaj kod
+	Merge Close Shades	Łącz zbliżone odcienie
+	Higher merges more shades into fewer colours.	Wyższa wartość łączy więcej odcieni w mniej kolorów.
+	Analyze Again	Analizuj ponownie
+	Variants	Warianty
+	Horizontal Axis	Oś pozioma
+	Vertical Axis	Oś pionowa
+	Step	Krok
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Jasność i nasycenie: % ; barwa: stopnie ; czerwony, zielony, niebieski: % z 255.
+	Block Size	Rozmiar bloku
+	Sheet	Arkusz
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, przezroczyste tło
+	Too narrow for one block of variants	Za wąski na jeden blok wariantów
+	Selected Patch	Wybrane pole
+	centre of the block	środek bloku
+	patch	pole
+	Use as Centre	Użyj jako środka
+	Copy Code	Kopiuj kod
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Użyj jako środka: to pole staje się nowym środkiem swojego koloru, dla dokładniejszego drugiego arkusza (zmniejsz krok).
+	Click a patch on the sheet.	Kliknij pole na arkuszu.
+	Copy the Codes	Kopiuj kody
+	Copied	Skopiowano
+	Export PNG…	Eksportuj PNG…
+	No colour found: the image is empty or transparent	Nie znaleziono koloru: obraz jest pusty lub przezroczysty
+	No colour on the sheet	Brak koloru na arkuszu
+	Not a colour code (#A43B2F)	To nie jest kod koloru (#A43B2F)
+	Open a document first	Najpierw otwórz dokument
+	Select a patch first	Najpierw wybierz pole
+	The sheet takes at most 32 colours	Arkusz mieści najwyżej 32 kolory
+	Transparent here: pick a coloured spot	Tu jest przezroczystość: kliknij kolorowe miejsce
+	the document was closed	dokument został zamknięty

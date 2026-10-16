@@ -2810,3 +2810,39 @@ curves	Smooth	平滑
 	Remove Fringe	去除边缘
 	Show Background	显示背景
 	Delete Background	删除背景
+# DTF Craft (6) — Color Analyzer
+	Visual	图案
+	Eyedropper: on	吸管：开
+	Click the visual to add a colour	点击图案以添加颜色
+	original {code}	原色 {code}
+	Add Code	添加代码
+	Merge Close Shades	合并相近色调
+	Higher merges more shades into fewer colours.	数值越高，越多色调合并为更少的颜色。
+	Analyze Again	重新分析
+	Variants	变体
+	Horizontal Axis	水平轴
+	Vertical Axis	垂直轴
+	Step	步长
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	明度和饱和度：% ；色相：度 ；红、绿、蓝：255 的 %。
+	Block Size	色块组大小
+	Sheet	样张
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm，sRGB，300 ppi，透明背景
+	Too narrow for one block of variants	太窄，放不下一组变体
+	Selected Patch	选中的色块
+	centre of the block	色块组中心
+	patch	色块
+	Use as Centre	设为中心
+	Copy Code	复制代码
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	设为中心：该色块成为其颜色的新中心，用于更精细的第二张样张（减小步长）。
+	Click a patch on the sheet.	点击样张上的色块。
+	Copy the Codes	复制全部代码
+	Copied	已复制
+	Export PNG…	导出 PNG…
+	No colour found: the image is empty or transparent	未找到颜色：图像为空或透明
+	No colour on the sheet	样张上没有颜色
+	Not a colour code (#A43B2F)	不是颜色代码 (#A43B2F)
+	Open a document first	请先打开文档
+	Select a patch first	请先选择色块
+	The sheet takes at most 32 colours	样张最多容纳 32 种颜色
+	Transparent here: pick a coloured spot	此处透明：请点击有颜色的区域
+	the document was closed	文档已关闭

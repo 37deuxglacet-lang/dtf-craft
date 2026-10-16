@@ -3985,3 +3985,39 @@ layerLabel	No Color	Sem cor
 	Remove Fringe	Remover franjas
 	Show Background	Mostrar fundo
 	Delete Background	Excluir fundo
+# DTF Craft (6) — Color Analyzer
+	Visual	Arte
+	Eyedropper: on	Conta-gotas: ativo
+	Click the visual to add a colour	Clique na arte para adicionar uma cor
+	original {code}	original {code}
+	Add Code	Adicionar código
+	Merge Close Shades	Mesclar tons próximos
+	Higher merges more shades into fewer colours.	Valores mais altos agrupam mais tons em menos cores.
+	Analyze Again	Analisar novamente
+	Variants	Variantes
+	Horizontal Axis	Eixo horizontal
+	Vertical Axis	Eixo vertical
+	Step	Passo
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Luminosidade e saturação: % ; matiz: graus ; vermelho, verde, azul: % de 255.
+	Block Size	Tamanho do bloco
+	Sheet	Folha
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, fundo transparente
+	Too narrow for one block of variants	Estreita demais para um bloco de variantes
+	Selected Patch	Quadrado selecionado
+	centre of the block	centro do bloco
+	patch	quadrado
+	Use as Centre	Usar como centro
+	Copy Code	Copiar código
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Usar como centro: este quadrado passa a ser o novo centro da sua cor, para uma segunda folha mais fina (reduza o passo).
+	Click a patch on the sheet.	Clique em um quadrado da folha.
+	Copy the Codes	Copiar os códigos
+	Copied	Copiado
+	Export PNG…	Exportar PNG…
+	No colour found: the image is empty or transparent	Nenhuma cor encontrada: a imagem está vazia ou transparente
+	No colour on the sheet	Nenhuma cor na folha
+	Not a colour code (#A43B2F)	Não é um código de cor (#A43B2F)
+	Open a document first	Abra um documento primeiro
+	Select a patch first	Selecione um quadrado primeiro
+	The sheet takes at most 32 colours	A folha aceita no máximo 32 cores
+	Transparent here: pick a coloured spot	Área transparente: clique em uma área colorida
+	the document was closed	o documento foi fechado

@@ -2885,3 +2885,39 @@ curves	Smooth	Suavizar
 	Remove Fringe	Eliminar halos
 	Show Background	Mostrar fondo
 	Delete Background	Eliminar fondo
+# DTF Craft (6) — Color Analyzer
+	Visual	Diseño
+	Eyedropper: on	Cuentagotas: activo
+	Click the visual to add a colour	Haga clic en el diseño para añadir un color
+	original {code}	original {code}
+	Add Code	Añadir código
+	Merge Close Shades	Fusionar tonos cercanos
+	Higher merges more shades into fewer colours.	Un valor más alto agrupa más tonos en menos colores.
+	Analyze Again	Analizar de nuevo
+	Variants	Variantes
+	Horizontal Axis	Eje horizontal
+	Vertical Axis	Eje vertical
+	Step	Paso
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Luminosidad y saturación: % ; tono: grados ; rojo, verde, azul: % de 255.
+	Block Size	Tamaño del bloque
+	Sheet	Hoja
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppp, fondo transparente
+	Too narrow for one block of variants	Demasiado estrecha para un bloque de variantes
+	Selected Patch	Casilla seleccionada
+	centre of the block	centro del bloque
+	patch	casilla
+	Use as Centre	Usar como centro
+	Copy Code	Copiar código
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Usar como centro: esta casilla pasa a ser el nuevo centro de su color, para una segunda hoja más fina (reduzca el paso).
+	Click a patch on the sheet.	Haga clic en una casilla de la hoja.
+	Copy the Codes	Copiar los códigos
+	Copied	Copiado
+	Export PNG…	Exportar PNG…
+	No colour found: the image is empty or transparent	No se encontró ningún color: la imagen está vacía o es transparente
+	No colour on the sheet	Ningún color en la hoja
+	Not a colour code (#A43B2F)	No es un código de color (#A43B2F)
+	Open a document first	Abra primero un documento
+	Select a patch first	Seleccione primero una casilla
+	The sheet takes at most 32 colours	La hoja admite como máximo 32 colores
+	Transparent here: pick a coloured spot	Zona transparente: haga clic en una zona con color
+	the document was closed	el documento se cerró

@@ -3872,3 +3872,39 @@ curves	Smooth	スムーズ
 	Remove Fringe	フリンジを削除
 	Show Background	背景を表示
 	Delete Background	背景を削除
+# DTF Craft (6) — Color Analyzer
+	Visual	ビジュアル
+	Eyedropper: on	スポイト: オン
+	Click the visual to add a colour	ビジュアルをクリックして色を追加
+	original {code}	元の色 {code}
+	Add Code	コードを追加
+	Merge Close Shades	近い色を統合
+	Higher merges more shades into fewer colours.	値を大きくすると、より多くの色合いが少ない色にまとめられます。
+	Analyze Again	再分析
+	Variants	バリエーション
+	Horizontal Axis	横軸
+	Vertical Axis	縦軸
+	Step	ステップ
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	明度と彩度: % ; 色相: 度 ; R、G、B: 255 に対する %。
+	Block Size	ブロックサイズ
+	Sheet	シート
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm、sRGB、300 ppi、透明な背景
+	Too narrow for one block of variants	バリエーションブロックには幅が足りません
+	Selected Patch	選択したパッチ
+	centre of the block	ブロックの中心
+	patch	パッチ
+	Use as Centre	中心にする
+	Copy Code	コードをコピー
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	中心にする: このパッチをその色の新しい中心にし、より細かい 2 枚目のシートを作ります (ステップを小さくします)。
+	Click a patch on the sheet.	シートのパッチをクリックしてください。
+	Copy the Codes	コードをすべてコピー
+	Copied	コピーしました
+	Export PNG…	PNG を書き出し…
+	No colour found: the image is empty or transparent	色が見つかりません: 画像が空か透明です
+	No colour on the sheet	シートに色がありません
+	Not a colour code (#A43B2F)	カラーコードではありません (#A43B2F)
+	Open a document first	先にドキュメントを開いてください
+	Select a patch first	先にパッチを選択してください
+	The sheet takes at most 32 colours	シートに置ける色は 32 色までです
+	Transparent here: pick a coloured spot	透明な部分です: 色のある場所をクリックしてください
+	the document was closed	ドキュメントが閉じられました

@@ -3955,3 +3955,39 @@ curves	Smooth	Vloeiend maken
 	Remove Fringe	Randen verwijderen
 	Show Background	Achtergrond tonen
 	Delete Background	Achtergrond verwijderen
+# DTF Craft (6) — Color Analyzer
+	Visual	Ontwerp
+	Eyedropper: on	Pipet: aan
+	Click the visual to add a colour	Klik op het ontwerp om een kleur toe te voegen
+	original {code}	origineel {code}
+	Add Code	Code toevoegen
+	Merge Close Shades	Verwante tinten samenvoegen
+	Higher merges more shades into fewer colours.	Hoger voegt meer tinten samen tot minder kleuren.
+	Analyze Again	Opnieuw analyseren
+	Variants	Varianten
+	Horizontal Axis	Horizontale as
+	Vertical Axis	Verticale as
+	Step	Stap
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Lichtheid en verzadiging: % ; tint: graden ; rood, groen, blauw: % van 255.
+	Block Size	Blokgrootte
+	Sheet	Vel
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppi, transparante achtergrond
+	Too narrow for one block of variants	Te smal voor één blok varianten
+	Selected Patch	Geselecteerd vakje
+	centre of the block	midden van het blok
+	patch	vakje
+	Use as Centre	Als midden gebruiken
+	Copy Code	Code kopiëren
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Als midden gebruiken: dit vakje wordt het nieuwe midden van zijn kleur, voor een fijner tweede vel (verklein de stap).
+	Click a patch on the sheet.	Klik op een vakje van het vel.
+	Copy the Codes	Codes kopiëren
+	Copied	Gekopieerd
+	Export PNG…	PNG exporteren…
+	No colour found: the image is empty or transparent	Geen kleur gevonden: de afbeelding is leeg of transparant
+	No colour on the sheet	Geen kleur op het vel
+	Not a colour code (#A43B2F)	Geen kleurcode (#A43B2F)
+	Open a document first	Open eerst een document
+	Select a patch first	Selecteer eerst een vakje
+	The sheet takes at most 32 colours	Het vel bevat hoogstens 32 kleuren
+	Transparent here: pick a coloured spot	Hier transparant: klik op een gekleurde plek
+	the document was closed	het document is gesloten

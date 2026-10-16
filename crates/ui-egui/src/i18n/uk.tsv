@@ -3895,3 +3895,39 @@ curves	Smooth	Згладити
 	Remove Fringe	Видалити облямівку
 	Show Background	Показати фон
 	Delete Background	Видалити фон
+# DTF Craft (6) — Color Analyzer
+	Visual	Макет
+	Eyedropper: on	Піпетка: увімк.
+	Click the visual to add a colour	Клацніть на макет, щоб додати колір
+	original {code}	вихідний {code}
+	Add Code	Додати код
+	Merge Close Shades	Об'єднувати близькі відтінки
+	Higher merges more shades into fewer colours.	Що вище значення, то більше відтінків зливається в меншу кількість кольорів.
+	Analyze Again	Аналізувати знову
+	Variants	Варіанти
+	Horizontal Axis	Горизонтальна вісь
+	Vertical Axis	Вертикальна вісь
+	Step	Крок
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Яскравість і насиченість: % ; тон: градуси ; червоний, зелений, синій: % від 255.
+	Block Size	Розмір блоку
+	Sheet	Аркуш
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} см, sRGB, 300 ppi, прозоре тло
+	Too narrow for one block of variants	Надто вузько для блоку варіантів
+	Selected Patch	Вибрана клітинка
+	centre of the block	центр блоку
+	patch	клітинка
+	Use as Centre	Зробити центром
+	Copy Code	Копіювати код
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Зробити центром: ця клітинка стає новим центром свого кольору для точнішого другого аркуша (зменште крок).
+	Click a patch on the sheet.	Клацніть на клітинку аркуша.
+	Copy the Codes	Копіювати коди
+	Copied	Скопійовано
+	Export PNG…	Експорт PNG…
+	No colour found: the image is empty or transparent	Кольорів не знайдено: зображення порожнє або прозоре
+	No colour on the sheet	На аркуші немає кольорів
+	Not a colour code (#A43B2F)	Неправильний код кольору (#A43B2F)
+	Open a document first	Спершу відкрийте документ
+	Select a patch first	Спершу виберіть клітинку
+	The sheet takes at most 32 colours	На аркуші щонайбільше 32 кольори
+	Transparent here: pick a coloured spot	Тут прозоро: клацніть на кольорову ділянку
+	the document was closed	документ закрито
