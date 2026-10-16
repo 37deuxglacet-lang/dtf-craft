@@ -3175,6 +3175,8 @@ curves	Smooth	Lisser
 	Control Background	Fond de contrôle
 	Remove Control Background	Suppression fond de contrôle
 	AI Upscale…	Agrandissement IA…
+	Color Analyzer…	Analyseur couleurs…
+	Color Analyzer	Analyseur couleurs
 	AI Upscale	Agrandissement IA
 	Saturation…	Saturation…
 	Layer name	Nom du calque
@@ -3216,3 +3218,39 @@ curves	Smooth	Lisser
 	Remove Fringe	Supprimer franges
 	Show Background	Afficher le fond
 	Delete Background	Supprimer le fond
+# DTF Craft (6) — Color Analyzer
+	Visual	Visuel
+	Eyedropper: on	Pipette : active
+	Click the visual to add a colour	Cliquez sur le visuel pour ajouter une couleur
+	original {code}	origine {code}
+	Add Code	Ajouter le code
+	Merge Close Shades	Fusion des teintes
+	Higher merges more shades into fewer colours.	Plus la valeur est haute, plus les teintes proches sont regroupées.
+	Analyze Again	Analyser à nouveau
+	Variants	Variantes
+	Horizontal Axis	Axe horizontal
+	Vertical Axis	Axe vertical
+	Step	Pas
+	Lightness and saturation: % ; hue: degrees ; red, green, blue: % of 255.	Luminosité et saturation : % ; teinte : degrés ; rouge, vert, bleu : % de 255.
+	Block Size	Taille du bloc
+	Sheet	Planche
+	{w} × {h} cm, sRGB, 300 ppi, transparent background	{w} × {h} cm, sRGB, 300 ppp, fond transparent
+	Too narrow for one block of variants	Trop étroite pour un bloc de variantes
+	Selected Patch	Case sélectionnée
+	centre of the block	centre du bloc
+	patch	case
+	Use as Centre	Prendre comme centre
+	Copy Code	Copier le code
+	Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).	Prendre comme centre : cette case devient le nouveau centre de sa couleur, pour une seconde planche plus fine (réduisez le pas).
+	Click a patch on the sheet.	Cliquez sur une case de la planche.
+	Copy the Codes	Copier les codes
+	Copied	Copié
+	Export PNG…	Exporter en PNG…
+	No colour found: the image is empty or transparent	Aucune couleur trouvée : l'image est vide ou transparente
+	No colour on the sheet	Aucune couleur sur la planche
+	Not a colour code (#A43B2F)	Code couleur invalide (#A43B2F)
+	Open a document first	Ouvrez d'abord un document
+	Select a patch first	Sélectionnez d'abord une case
+	The sheet takes at most 32 colours	La planche accepte 32 couleurs au maximum
+	Transparent here: pick a coloured spot	Zone transparente : cliquez sur une zone colorée
+	the document was closed	le document a été fermé

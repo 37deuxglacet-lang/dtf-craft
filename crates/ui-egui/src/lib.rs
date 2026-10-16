@@ -121,6 +121,7 @@ mod layer_transfer;
 pub mod layer_tree_ui;
 mod layout_keys;
 pub mod links;
+pub mod color_analyzer_ui;
 pub mod liquify_ui;
 pub mod magnetic_lasso_ui;
 mod mask_props_ui;
@@ -684,6 +685,8 @@ pub struct PhotocraftApp {
     pub(crate) raw_redevelop: Option<camera_raw_ui::Redevelop>,
     /// Filter › Adaptive Wide Angle dialog (wide_angle_ui).
     pub(crate) wide_angle: Option<wide_angle_ui::WideAngleDialog>,
+    /// DTF › Color Analyzer dialog (color_analyzer_ui, DTF Craft).
+    pub(crate) color_analyzer: Option<color_analyzer_ui::ColorAnalyzerDialog>,
     /// ⌘Z history of each open parameter dialog (edit_history).
     pub(crate) dialog_edits: edit_history::DialogEdits,
     /// The filter a "Rasterize?" prompt answered for, run after the dialog closes, where the
@@ -876,6 +879,7 @@ impl PhotocraftApp {
             pending_raw_open: None,
             raw_redevelop: None,
             wide_angle: None,
+            color_analyzer: None,
             dialog_edits: Default::default(),
             pending_after_prompt: None,
             tone_hist: None,
@@ -1883,6 +1887,7 @@ impl eframe::App for PhotocraftApp {
         distort_ui::show(self, &ctx);
         camera_raw_ui::show(self, &ctx);
         wide_angle_ui::show(self, &ctx);
+        color_analyzer_ui::show(self, &ctx);
         canvas::extra_windows(self, &ctx);
         notices::show(self, &ctx);
         gpu_status::show_fallback(self, &ctx);
