@@ -3163,3 +3163,27 @@ curves	Smooth	Сгладить
 	Remove Fringe	Удалить кайму
 	Show Background	Показать фон
 	Delete Background	Удалить фон
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Монтажный лист
+	Visuals	Макеты
+	Add PNG Files…	Добавить файлы PNG…
+	Add Open Document	Добавить открытый документ
+	Add PNG files or the open document.	Добавьте файлы PNG или открытый документ.
+	Sheet	Лист
+	Film Width	Ширина плёнки
+	Max Length	Макс. длина
+	Allow Rotation	Разрешить поворот
+	Auto Build	Авторасклад
+	Selected Visual	Выбранный макет
+	Rotate 90°	Повернуть на 90°
+	Length used: {length} cm	Использованная длина: {length} см
+	{n} not placed	Не размещено: {n}
+	{n} too close or overlapping	Слишком близко или перекрываются: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Перетащите макет, чтобы переместить его. Стрелки: 1 мм (Shift: 1 см). Delete убирает его с листа.
+	Export PNG…	Экспорт в PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Макеты ближе поля к другому макету или краю: {n}. Всё равно экспортировать?
+	Too close to another visual	Слишком близко к другому макету
+	No room to turn this visual	Нет места, чтобы повернуть этот макет
+	Open a document first	Сначала откройте документ
+	the document was closed	документ был закрыт
+	{dpi} ppi	{dpi} ppi

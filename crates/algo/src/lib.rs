@@ -30,6 +30,7 @@ pub mod content_aware;
 mod denoise;
 pub mod dff;
 pub mod dtf;
+pub mod gang_sheet;
 pub mod direct;
 mod distort;
 mod distort2;

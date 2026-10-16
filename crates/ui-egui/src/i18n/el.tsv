@@ -3892,3 +3892,27 @@ curves	Smooth	Εξομάλυνση
 	Remove Fringe	Αφαίρεση περιγράμματος
 	Show Background	Εμφάνιση φόντου
 	Delete Background	Διαγραφή φόντου
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Συγκεντρωτικό φύλλο
+	Visuals	Σχέδια
+	Add PNG Files…	Προσθήκη αρχείων PNG…
+	Add Open Document	Προσθήκη ανοιχτού εγγράφου
+	Add PNG files or the open document.	Προσθέστε αρχεία PNG ή το ανοιχτό έγγραφο.
+	Sheet	Φύλλο
+	Film Width	Πλάτος φιλμ
+	Max Length	Μέγ. μήκος
+	Allow Rotation	Να επιτρέπεται η περιστροφή
+	Auto Build	Αυτόματη διάταξη
+	Selected Visual	Επιλεγμένο σχέδιο
+	Rotate 90°	Περιστροφή 90°
+	Length used: {length} cm	Μήκος σε χρήση: {length} cm
+	{n} not placed	Δεν τοποθετήθηκαν: {n}
+	{n} too close or overlapping	Πολύ κοντά ή επικαλύπτονται: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Σύρετε ένα σχέδιο για να το μετακινήσετε. Βέλη: 1 mm (Shift: 1 cm). Το Delete το αφαιρεί από το φύλλο.
+	Export PNG…	Εξαγωγή PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Σχέδια πιο κοντά από το περιθώριο σε άλλο σχέδιο ή σε άκρη: {n}. Εξαγωγή παρ' όλα αυτά;
+	Too close to another visual	Πολύ κοντά σε άλλο σχέδιο
+	No room to turn this visual	Δεν υπάρχει χώρος για περιστροφή αυτού του σχεδίου
+	Open a document first	Ανοίξτε πρώτα ένα έγγραφο
+	the document was closed	το έγγραφο έκλεισε
+	{dpi} ppi	{dpi} ppi

@@ -3801,3 +3801,27 @@ navigator	Zoom	Zvětšení
 	Remove Fringe	Odstranit lemy
 	Show Background	Zobrazit pozadí
 	Delete Background	Smazat pozadí
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Sdružený arch
+	Visuals	Motivy
+	Add PNG Files…	Přidat soubory PNG…
+	Add Open Document	Přidat otevřený dokument
+	Add PNG files or the open document.	Přidejte soubory PNG nebo otevřený dokument.
+	Sheet	Arch
+	Film Width	Šířka fólie
+	Max Length	Max. délka
+	Allow Rotation	Povolit otáčení
+	Auto Build	Automaticky rozmístit
+	Selected Visual	Vybraný motiv
+	Rotate 90°	Otočit o 90°
+	Length used: {length} cm	Využitá délka: {length} cm
+	{n} not placed	Neumístěno: {n}
+	{n} too close or overlapping	Příliš blízko nebo přes sebe: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Motiv přesunete tažením. Šipky: 1 mm (Shift: 1 cm). Delete jej odebere z archu.
+	Export PNG…	Exportovat PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motivy blíže než okraj k jinému motivu nebo k hraně: {n}. Přesto exportovat?
+	Too close to another visual	Příliš blízko jinému motivu
+	No room to turn this visual	Není místo na otočení tohoto motivu
+	Open a document first	Nejprve otevřete dokument
+	the document was closed	dokument byl zavřen
+	{dpi} ppi	{dpi} ppi

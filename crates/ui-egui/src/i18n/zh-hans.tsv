@@ -2808,3 +2808,28 @@ curves	Smooth	平滑
 	Remove Fringe	去除边缘
 	Show Background	显示背景
 	Delete Background	删除背景
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	拼版
+	Visuals	图案
+	Add PNG Files…	添加 PNG 文件…
+	Add Open Document	添加打开的文档
+	Add PNG files or the open document.	添加 PNG 文件或打开的文档。
+	Sheet	版面
+	Film Width	膜宽
+	Max Length	最大长度
+	Allow Rotation	允许旋转
+	Auto Build	自动排版
+	Selected Visual	所选图案
+	Rotate 90°	旋转 90°
+	Length used: {length} cm	已用长度：{length} cm
+	{n} not placed	未放置：{n}
+	{n} too close or overlapping	过近或重叠：{n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	拖动图案可移动。方向键：1 mm（Shift：1 cm）。Delete 将其从版面移除。
+	Export PNG…	导出 PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	与其他图案或边缘的距离小于边距的图案：{n}。仍要导出吗？
+	Too close to another visual	与其他图案距离过近
+	No room to turn this visual	没有空间旋转此图案
+	Open a document first	请先打开文档
+	the document was closed	文档已关闭
+	Duplicate	复制
+	{dpi} ppi	{dpi} ppi

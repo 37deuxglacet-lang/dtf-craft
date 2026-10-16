@@ -3216,3 +3216,26 @@ curves	Smooth	Lisser
 	Remove Fringe	Supprimer franges
 	Show Background	Afficher le fond
 	Delete Background	Supprimer le fond
+# DTF Craft (6) — Gang Sheet
+	Visuals	Visuels
+	Add PNG Files…	Ajouter des PNG…
+	Add Open Document	Ajouter le document ouvert
+	Add PNG files or the open document.	Ajoutez des fichiers PNG ou le document ouvert.
+	Sheet	Planche
+	Film Width	Laize
+	Max Length	Longueur max
+	Allow Rotation	Autoriser la rotation
+	Auto Build	Construction auto
+	Selected Visual	Visuel sélectionné
+	Rotate 90°	Pivoter 90°
+	Length used: {length} cm	Longueur utilisée : {length} cm
+	{n} not placed	Non placés : {n}
+	{n} too close or overlapping	Trop proches ou en chevauchement : {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Faites glisser un visuel pour le déplacer. Flèches : 1 mm (Maj : 1 cm). Suppr le retire de la planche.
+	Export PNG…	Exporter en PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Visuels à moins de la marge d'un autre visuel ou d'un bord : {n}. Exporter quand même ?
+	Too close to another visual	Trop proche d'un autre visuel
+	No room to turn this visual	Pas de place pour pivoter ce visuel
+	Open a document first	Ouvrez d'abord un document
+	the document was closed	le document a été fermé
+	{dpi} ppi	{dpi} ppp

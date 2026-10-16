@@ -4114,3 +4114,27 @@ cameraRaw	Yellow	Sárga
 	Remove Fringe	Szegély eltávolítása
 	Show Background	Háttér megjelenítése
 	Delete Background	Háttér törlése
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Gyűjtőlap
+	Visuals	Motívumok
+	Add PNG Files…	PNG-fájlok hozzáadása…
+	Add Open Document	Megnyitott dokumentum hozzáadása
+	Add PNG files or the open document.	Adjon hozzá PNG-fájlokat vagy a megnyitott dokumentumot.
+	Sheet	Lap
+	Film Width	Fóliaszélesség
+	Max Length	Max. hossz
+	Allow Rotation	Forgatás engedélyezése
+	Auto Build	Automatikus elrendezés
+	Selected Visual	Kijelölt motívum
+	Rotate 90°	Forgatás 90°-kal
+	Length used: {length} cm	Felhasznált hossz: {length} cm
+	{n} not placed	Nincs elhelyezve: {n}
+	{n} too close or overlapping	Túl közel vagy átfedésben: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Húzzon egy motívumot az áthelyezéséhez. Nyilak: 1 mm (Shift: 1 cm). A Delete leveszi a lapról.
+	Export PNG…	Exportálás PNG-be…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	A margónál közelebb egy másik motívumhoz vagy szélhez: {n}. Exportálja mégis?
+	Too close to another visual	Túl közel egy másik motívumhoz
+	No room to turn this visual	Nincs hely a motívum elforgatásához
+	Open a document first	Először nyisson meg egy dokumentumot
+	the document was closed	a dokumentumot bezárták
+	{dpi} ppi	{dpi} ppi
