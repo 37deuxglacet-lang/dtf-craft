@@ -13,7 +13,8 @@
 //! Control channel: `ui.menu.invoke {"id":"dtf.colorAnalyzer","params":{"ui":{"set":{"maxColors":n,
 //! "merge":d,"axisX":axis,"axisY":axis,"step":v,"grid":n,"width":cm},"reanalyze":true,
 //! "pick":{"x":px,"y":px},"add":"#rrggbb","color":{"index":i,"hex":"#rrggbb","include":bool},
-//! "remove":i,"reset":i,"select":{"color":i,"cell":n},"recenter":true,"export":path,"cancel":true}}}`;
+//! "remove":i,"reset":i,"select":{"color":i,"cell":n},"recenter":true,"zoom":1..8,"export":path,
+//! "cancel":true}}}`;
 //! without `ui`, the params go to the command itself.
 
 use std::sync::Mutex;
@@ -102,8 +103,9 @@ pub struct ColorAnalyzerDialog {
     picking: bool,
     /// The code typed in the "add" field.
     add_text: String,
-    /// Vertical scroll of the sheet preview (screen points).
-    scroll: f32,
+    /// Scroll of the sheet preview (screen points) and its zoom (1 = the blocks fit the width).
+    scroll: egui::Vec2,
+    zoom: f32,
     pub status: String,
 }
 
@@ -154,7 +156,8 @@ impl ColorAnalyzerDialog {
             selected: None,
             picking: false,
             add_text: String::new(),
-            scroll: 0.0,
+            scroll: egui::Vec2::ZERO,
+            zoom: 1.0,
             status: String::new(),
         };
         d.reanalyze();
@@ -456,6 +459,9 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         let cell = sel.get("cell").and_then(Value::as_u64).map(|v| v as usize).filter(|n| (1..=d.prefs.grid * d.prefs.grid).contains(n));
         d.selected = row.zip(cell);
     }
+    if let Some(z) = ui.get("zoom").and_then(Value::as_f64).filter(|z| z.is_finite()) {
+        d.zoom = (z as f32).clamp(1.0, 8.0);
+    }
     if ui.get("recenter").and_then(Value::as_bool) == Some(true) && !d.recenter() {
         return Err(tl!("Select a patch first").to_string());
     }
@@ -566,6 +572,7 @@ fn colors_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t: 
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(12.0, 10.0))));
     panel.spacing_mut().item_spacing.y = 6.0;
     let w = rect.width() - 24.0;
+    panel.set_max_width(w);
     widgets::section_label(&mut panel, tl!("Visual"));
     // The visual, fitted; with the eyedropper on, a click adds the colour under the pointer.
     let (area, resp) = panel.allocate_exact_size(vec2(w, VISUAL_H), Sense::click());
@@ -588,14 +595,12 @@ fn colors_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t: 
         let (x, y) = (((p.x - img.left()) / k) as i64, ((p.y - img.top()) / k) as i64);
         d.pick(x, y);
     }
-    panel.horizontal(|ui| {
-        let label = if d.picking { tl!("Eyedropper: on") } else { tl!("Eyedropper") };
-        let r = if d.picking { widgets::primary_button(ui, label, 120.0) } else { widgets::secondary_button(ui, label, 120.0) };
-        if r.clicked() {
-            d.picking = !d.picking;
-        }
-        ui.label(egui::RichText::new(tl!("Click the visual to add a colour")).color(t.text_faint).size(11.0));
-    });
+    let label = if d.picking { tl!("Eyedropper: on") } else { tl!("Eyedropper") };
+    let r = if d.picking { widgets::primary_button(&mut panel, label, 120.0) } else { widgets::secondary_button(&mut panel, label, 120.0) };
+    if r.clicked() {
+        d.picking = !d.picking;
+    }
+    panel.add(egui::Label::new(egui::RichText::new(tl!("Click the visual to add a colour")).color(t.text_faint).size(11.0)).wrap());
     widgets::hairline(&mut panel);
     widgets::section_label(&mut panel, tl!("Colors"));
     let mut remove = None;
@@ -632,8 +637,8 @@ fn colors_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t: 
                                 ui.label(egui::RichText::new(cmd::share_text(s)).color(t.text_dim).size(11.5));
                             }
                         });
-                        ui.horizontal(|ui| {
-                            if r.center != r.original {
+                        if r.center != r.original {
+                            ui.horizontal(|ui| {
                                 let (o, _) = ui.allocate_exact_size(vec2(12.0, 12.0), Sense::hover());
                                 ui.painter().rect_filled(o, 2.0, color32(r.original));
                                 ui.label(
@@ -641,11 +646,13 @@ fn colors_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t: 
                                         .color(t.text_faint)
                                         .size(11.0),
                                 );
-                                if widgets::secondary_button(ui, tl!("Restore"), 60.0).clicked() {
-                                    reset = Some(i);
-                                }
+                            });
+                        }
+                        ui.horizontal(|ui| {
+                            if r.center != r.original && widgets::secondary_button(ui, tl!("Restore"), 54.0).clicked() {
+                                reset = Some(i);
                             }
-                            if widgets::secondary_button(ui, tl!("Remove"), 60.0).clicked() {
+                            if widgets::secondary_button(ui, tl!("Remove"), 54.0).clicked() {
                                 remove = Some(i);
                             }
                         });
@@ -783,6 +790,20 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t
     if widgets::secondary_button(&mut panel, tl!("Copy the Codes"), 140.0).clicked() {
         act.copy = Some(d.table());
     }
+    widgets::hairline(&mut panel);
+    panel.horizontal_wrapped(|ui| {
+        ui.label(egui::RichText::new(tl!("Zoom")).color(t.text_dim));
+        if widgets::secondary_button(ui, "−", 28.0).clicked() {
+            d.zoom = (d.zoom / 1.25).max(1.0);
+        }
+        if widgets::secondary_button(ui, tl!("Fit on Screen"), 90.0).clicked() {
+            d.zoom = 1.0;
+            d.scroll = egui::Vec2::ZERO;
+        }
+        if widgets::secondary_button(ui, "+", 28.0).clicked() {
+            d.zoom = (d.zoom * 1.25).min(8.0);
+        }
+    });
 }
 
 /// Which patch (row index, patch number) is at `p`, for the sheet drawn from `origin` at `s`
@@ -812,15 +833,32 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, view: ERect, t: &T
         return;
     }
     let (bw, bh) = (b.width as f32, b.height(included.len()) as f32);
-    let s = ((view.width() - 24.0) / bw).max(0.05);
-    let size = vec2(bw * s, bh * s);
+    // Fit: the blocks in use across the view (a short list leaves the sheet's right side empty).
+    let used = included.len().min(b.columns()) as f64;
+    let content_w = (2.0 * ca::BOARD_MARGIN + used * b.block_size().0 + (used - 1.0).max(0.0) * ca::BLOCK_GAP).min(b.width) as f32;
+    let fit = ((view.width() - 24.0) / content_w).max(0.05);
     let resp = ui.interact(view, ui.id().with("color-analyzer-sheet"), Sense::click());
+    // Ctrl + wheel (or a pinch) zooms about the pointer; the wheel scrolls.
     if resp.hovered() {
-        d.scroll += ui.input(|i| i.smooth_scroll_delta.y);
+        let (zoom_delta, scroll) = ui.input(|i| (i.zoom_delta(), i.smooth_scroll_delta));
+        if (zoom_delta - 1.0).abs() > 1e-4 {
+            let old = fit * d.zoom;
+            d.zoom = (d.zoom * zoom_delta).clamp(1.0, 8.0);
+            if let Some(p) = resp.hover_pos() {
+                let k = fit * d.zoom / old;
+                let o = view.min + vec2(12.0, 12.0) + d.scroll;
+                d.scroll = (p - (p - o) * k) - view.min - vec2(12.0, 12.0);
+            }
+        } else {
+            d.scroll += scroll;
+        }
     }
-    let max_scroll = (size.y + 24.0 - view.height()).max(0.0);
-    d.scroll = d.scroll.clamp(-max_scroll, 0.0);
-    let origin = pos2(view.center().x - size.x / 2.0, view.top() + 12.0 + d.scroll);
+    let s = fit * d.zoom;
+    let size = vec2(bw * s, bh * s);
+    let avail = view.size() - vec2(24.0, 24.0);
+    let clamp_axis = |off: f32, content: f32, room: f32| if content <= room { 0.0 } else { off.clamp(room - content, 0.0) };
+    d.scroll = vec2(clamp_axis(d.scroll.x, size.x, avail.x), clamp_axis(d.scroll.y, size.y, avail.y));
+    let origin = view.min + vec2(12.0, 12.0) + d.scroll;
     let to = |x: f64, y: f64| pos2(origin.x + x as f32 * s, origin.y + y as f32 * s);
     let sheet = ERect::from_min_size(origin, size);
     widgets::checker(&painter, sheet, 8.0);
@@ -834,7 +872,8 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, view: ERect, t: &T
         painter.text(
             to(m, m + 13.0),
             Align2::LEFT_BOTTOM,
-            format!("{} : {} ({}) · {} : {} ({})", tl!("Horizontal"), axis_name(d.prefs.x), d.prefs.step, tl!("Vertical"), axis_name(d.prefs.y), d.prefs.step),
+            // As printed: in French.
+            format!("Horizontal : {} (pas {}) · Vertical : {} (pas {})", d.prefs.x.name_fr(), d.prefs.step, d.prefs.y.name_fr(), d.prefs.step),
             mm_font(3.2),
             ink,
         );
@@ -852,13 +891,7 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, view: ERect, t: &T
         let o = b.block_origin(k);
         let Some(r) = d.rows.get(*row) else { continue };
         if 3.0 * s >= 6.0 {
-            painter.text(
-                to(o.0, o.1 + 4.5),
-                Align2::LEFT_BOTTOM,
-                format!("{} {} — {}", tl!("Color").to_uppercase(), row + 1, ca::hex(r.center)),
-                mm_font(3.2),
-                ink,
-            );
+            painter.text(to(o.0, o.1 + 4.5), Align2::LEFT_BOTTOM, format!("COULEUR {} — {}", row + 1, ca::hex(r.center)), mm_font(3.2), ink);
         }
         for c in d.cells(*row) {
             let (x, y, side) = b.patch_rect(o, c.col, c.row);
