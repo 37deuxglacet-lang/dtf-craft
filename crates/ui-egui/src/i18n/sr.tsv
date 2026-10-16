@@ -4338,3 +4338,26 @@ shape	Appearance	Izgled
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = neprimetna razlika · 2 do 5 = vidljivo izbliza · iznad 5 = druga nijansa.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Boje prikazane u sRGB: rezultat štampe zavisi od štampača, mastila i podloge.
 	Sheet made with DTF Craft	List napravljen u DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Zbirni list
+	Visuals	Motivi
+	Add PNG Files…	Dodaj PNG datoteke…
+	Add Open Document	Dodaj otvoreni dokument
+	Add PNG files or the open document.	Dodajte PNG datoteke ili otvoreni dokument.
+	Sheet	List
+	Film Width	Širina folije
+	Max Length	Maks. dužina
+	Allow Rotation	Dozvoli rotaciju
+	Auto Build	Automatski raspored
+	Selected Visual	Izabrani motiv
+	Rotate 90°	Rotiraj 90°
+	Length used: {length} cm	Iskorišćena dužina: {length} cm
+	{n} not placed	Nije postavljeno: {n}
+	{n} too close or overlapping	Preblizu ili preklapanje: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Prevucite motiv da ga pomerite. Strelice: 1 mm (Shift: 1 cm). Delete ga uklanja sa lista.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motivi bliži od margine drugom motivu ili ivici: {n}. Ipak izvesti?
+	Too close to another visual	Preblizu drugom motivu
+	No room to turn this visual	Nema mesta za rotiranje ovog motiva
+	Open a document first	Prvo otvorite dokument
+	the document was closed	dokument je zatvoren
+	{dpi} ppi	{dpi} ppi

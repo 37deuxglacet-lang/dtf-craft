@@ -4023,3 +4023,26 @@ curves	Smooth	Vloeiend maken
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: tot 2 = onzichtbaar verschil · 2 tot 5 = van dichtbij zichtbaar · boven 5 = andere tint.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Kleuren weergegeven in sRGB: het drukresultaat hangt af van printer, inkt en drager.
 	Sheet made with DTF Craft	Blad gemaakt met DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Verzamelvel
+	Visuals	Ontwerpen
+	Add PNG Files…	PNG-bestanden toevoegen…
+	Add Open Document	Geopend document toevoegen
+	Add PNG files or the open document.	Voeg PNG-bestanden of het geopende document toe.
+	Sheet	Vel
+	Film Width	Filmbreedte
+	Max Length	Max. lengte
+	Allow Rotation	Draaien toestaan
+	Auto Build	Automatisch indelen
+	Selected Visual	Geselecteerd ontwerp
+	Rotate 90°	90° draaien
+	Length used: {length} cm	Gebruikte lengte: {length} cm
+	{n} not placed	Niet geplaatst: {n}
+	{n} too close or overlapping	Te dichtbij of overlappend: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Sleep een ontwerp om het te verplaatsen. Pijlen: 1 mm (Shift: 1 cm). Delete haalt het van het vel.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Ontwerpen dichter dan de marge bij een ander ontwerp of een rand: {n}. Toch exporteren?
+	Too close to another visual	Te dicht bij een ander ontwerp
+	No room to turn this visual	Geen ruimte om dit ontwerp te draaien
+	Open a document first	Open eerst een document
+	the document was closed	het document is gesloten
+	{dpi} ppi	{dpi} ppi

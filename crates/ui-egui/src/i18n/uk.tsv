@@ -3965,3 +3965,26 @@ curves	Smooth	Згладити
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: до 2 = непомітна різниця · 2–5 = видно зблизька · понад 5 = інший відтінок.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Кольори показано в sRGB: результат друку залежить від принтера, чорнил і матеріалу.
 	Sheet made with DTF Craft	Картку створено в DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Монтажний аркуш
+	Visuals	Макети
+	Add PNG Files…	Додати файли PNG…
+	Add Open Document	Додати відкритий документ
+	Add PNG files or the open document.	Додайте файли PNG або відкритий документ.
+	Sheet	Аркуш
+	Film Width	Ширина плівки
+	Max Length	Макс. довжина
+	Allow Rotation	Дозволити поворот
+	Auto Build	Авторозкладка
+	Selected Visual	Вибраний макет
+	Rotate 90°	Повернути на 90°
+	Length used: {length} cm	Використана довжина: {length} см
+	{n} not placed	Не розміщено: {n}
+	{n} too close or overlapping	Занадто близько або перекриваються: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Перетягніть макет, щоб перемістити його. Стрілки: 1 мм (Shift: 1 см). Delete прибирає його з аркуша.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Макети ближче за поле до іншого макета або краю: {n}. Все одно експортувати?
+	Too close to another visual	Занадто близько до іншого макета
+	No room to turn this visual	Немає місця, щоб повернути цей макет
+	Open a document first	Спершу відкрийте документ
+	the document was closed	документ було закрито
+	{dpi} ppi	{dpi} ppi

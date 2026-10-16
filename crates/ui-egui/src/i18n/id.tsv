@@ -3260,3 +3260,26 @@ curves	Smooth	Haluskan
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: hingga 2 = selisih tak terlihat · 2 sampai 5 = terlihat dari dekat · di atas 5 = rona lain.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Warna ditampilkan dalam sRGB: hasil cetak bergantung pada printer, tinta, dan media.
 	Sheet made with DTF Craft	Lembar dibuat dengan DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Lembar gabungan
+	Visuals	Desain
+	Add PNG Files…	Tambah file PNG…
+	Add Open Document	Tambah dokumen yang terbuka
+	Add PNG files or the open document.	Tambahkan file PNG atau dokumen yang terbuka.
+	Sheet	Lembar
+	Film Width	Lebar film
+	Max Length	Panjang maks.
+	Allow Rotation	Izinkan rotasi
+	Auto Build	Susun otomatis
+	Selected Visual	Desain terpilih
+	Rotate 90°	Putar 90°
+	Length used: {length} cm	Panjang terpakai: {length} cm
+	{n} not placed	Belum ditempatkan: {n}
+	{n} too close or overlapping	Terlalu dekat atau bertumpuk: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Seret desain untuk memindahkannya. Panah: 1 mm (Shift: 1 cm). Delete melepasnya dari lembar.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Desain yang lebih dekat dari margin ke desain lain atau ke tepi: {n}. Tetap ekspor?
+	Too close to another visual	Terlalu dekat dengan desain lain
+	No room to turn this visual	Tidak ada ruang untuk memutar desain ini
+	Open a document first	Buka dokumen terlebih dahulu
+	the document was closed	dokumen telah ditutup
+	{dpi} ppi	{dpi} ppi

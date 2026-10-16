@@ -3443,3 +3443,26 @@ curves	Smooth	매끄럽게
 	Sheet made with DTF Craft	DTF Craft로 만든 시트
 	RGB	RGB
 	Color Profile	색상 프로파일
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	갱 시트
+	Visuals	디자인
+	Add PNG Files…	PNG 파일 추가…
+	Add Open Document	열린 문서 추가
+	Add PNG files or the open document.	PNG 파일이나 열린 문서를 추가하세요.
+	Sheet	시트
+	Film Width	필름 폭
+	Max Length	최대 길이
+	Allow Rotation	회전 허용
+	Auto Build	자동 배치
+	Selected Visual	선택한 디자인
+	Rotate 90°	90° 회전
+	Length used: {length} cm	사용 길이: {length} cm
+	{n} not placed	배치 안 됨: {n}
+	{n} too close or overlapping	너무 가깝거나 겹침: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	디자인을 드래그해 옮깁니다. 화살표: 1 mm (Shift: 1 cm). Delete는 시트에서 뺍니다.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	다른 디자인이나 가장자리와의 간격이 여백보다 좁은 디자인: {n}. 그래도 내보낼까요?
+	Too close to another visual	다른 디자인과 너무 가깝습니다
+	No room to turn this visual	이 디자인을 회전할 공간이 없습니다
+	Open a document first	먼저 문서를 여세요
+	the document was closed	문서가 닫혔습니다
+	{dpi} ppi	{dpi} ppi

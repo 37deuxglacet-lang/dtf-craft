@@ -3942,3 +3942,26 @@ curves	Smooth	スムーズ
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000：2 まで = 識別できない差 · 2〜5 = 近くで見える · 5 超 = 別の色合い。
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	色は sRGB で表示：印刷結果はプリンター、インク、素材によって異なります。
 	Sheet made with DTF Craft	DTF Craft で作成したシート
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	ギャングシート
+	Visuals	デザイン
+	Add PNG Files…	PNG ファイルを追加…
+	Add Open Document	開いているドキュメントを追加
+	Add PNG files or the open document.	PNG ファイルまたは開いているドキュメントを追加してください。
+	Sheet	シート
+	Film Width	フィルム幅
+	Max Length	最大長
+	Allow Rotation	回転を許可
+	Auto Build	自動配置
+	Selected Visual	選択中のデザイン
+	Rotate 90°	90° 回転
+	Length used: {length} cm	使用長: {length} cm
+	{n} not placed	未配置: {n}
+	{n} too close or overlapping	近すぎる・重なり: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	デザインをドラッグして移動します。矢印キー: 1 mm（Shift: 1 cm）。Delete でシートから外します。
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	他のデザインまたは端との間隔がマージン未満のデザイン: {n}。このまま書き出しますか？
+	Too close to another visual	他のデザインに近すぎます
+	No room to turn this visual	このデザインを回転する余地がありません
+	Open a document first	先にドキュメントを開いてください
+	the document was closed	ドキュメントが閉じられました
+	{dpi} ppi	{dpi} ppi
