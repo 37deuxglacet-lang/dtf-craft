@@ -2883,3 +2883,28 @@ curves	Smooth	Suavizar
 	Remove Fringe	Eliminar halos
 	Show Background	Mostrar fondo
 	Delete Background	Eliminar fondo
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Hoja de impresión (gang sheet)
+	Visuals	Diseños
+	Add PNG Files…	Añadir archivos PNG…
+	Add Open Document	Añadir el documento abierto
+	Add PNG files or the open document.	Añada archivos PNG o el documento abierto.
+	Sheet	Hoja
+	Film Width	Ancho del film
+	Max Length	Longitud máx.
+	Allow Rotation	Permitir rotación
+	Auto Build	Montaje automático
+	Selected Visual	Diseño seleccionado
+	Rotate 90°	Girar 90°
+	Length used: {length} cm	Longitud usada: {length} cm
+	{n} not placed	Sin colocar: {n}
+	{n} too close or overlapping	Demasiado cerca o superpuestos: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Arrastre un diseño para moverlo. Flechas: 1 mm (Mayús: 1 cm). Supr lo quita de la hoja.
+	Export PNG…	Exportar PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Diseños más cerca que el margen de otro diseño o de un borde: {n}. ¿Exportar de todos modos?
+	Too close to another visual	Demasiado cerca de otro diseño
+	No room to turn this visual	No hay espacio para girar este diseño
+	Open a document first	Abra primero un documento
+	the document was closed	el documento se cerró
+	Duplicate	Duplicar
+	{dpi} ppi	{dpi} ppi

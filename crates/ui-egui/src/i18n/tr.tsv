@@ -3925,3 +3925,27 @@ cameraData	Lens	Lens
 	Remove Fringe	Saçakları kaldır
 	Show Background	Arka planı göster
 	Delete Background	Arka planı sil
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Toplu baskı sayfası
+	Visuals	Tasarımlar
+	Add PNG Files…	PNG dosyası ekle…
+	Add Open Document	Açık belgeyi ekle
+	Add PNG files or the open document.	PNG dosyaları veya açık belgeyi ekleyin.
+	Sheet	Sayfa
+	Film Width	Film genişliği
+	Max Length	Maks. uzunluk
+	Allow Rotation	Döndürmeye izin ver
+	Auto Build	Otomatik yerleşim
+	Selected Visual	Seçili tasarım
+	Rotate 90°	90° döndür
+	Length used: {length} cm	Kullanılan uzunluk: {length} cm
+	{n} not placed	Yerleştirilemeyen: {n}
+	{n} too close or overlapping	Çok yakın veya çakışan: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Taşımak için bir tasarımı sürükleyin. Oklar: 1 mm (Shift: 1 cm). Delete onu sayfadan kaldırır.
+	Export PNG…	PNG olarak dışa aktar…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Başka bir tasarıma veya kenara kenar boşluğundan daha yakın tasarım: {n}. Yine de dışa aktarılsın mı?
+	Too close to another visual	Başka bir tasarıma çok yakın
+	No room to turn this visual	Bu tasarımı döndürmek için yer yok
+	Open a document first	Önce bir belge açın
+	the document was closed	belge kapatıldı
+	{dpi} ppi	{dpi} ppi

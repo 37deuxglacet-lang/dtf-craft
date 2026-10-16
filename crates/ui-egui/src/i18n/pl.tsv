@@ -3792,3 +3792,27 @@ curves	Smooth	Wygładź
 	Remove Fringe	Usuń obwódki
 	Show Background	Pokaż tło
 	Delete Background	Usuń tło
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Arkusz zbiorczy
+	Visuals	Grafiki
+	Add PNG Files…	Dodaj pliki PNG…
+	Add Open Document	Dodaj otwarty dokument
+	Add PNG files or the open document.	Dodaj pliki PNG lub otwarty dokument.
+	Sheet	Arkusz
+	Film Width	Szerokość folii
+	Max Length	Maks. długość
+	Allow Rotation	Zezwalaj na obrót
+	Auto Build	Rozmieść automatycznie
+	Selected Visual	Zaznaczona grafika
+	Rotate 90°	Obróć o 90°
+	Length used: {length} cm	Użyta długość: {length} cm
+	{n} not placed	Nieumieszczone: {n}
+	{n} too close or overlapping	Za blisko lub nachodzące: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Przeciągnij grafikę, aby ją przesunąć. Strzałki: 1 mm (Shift: 1 cm). Delete usuwa ją z arkusza.
+	Export PNG…	Eksportuj PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Grafiki bliżej niż margines od innej grafiki lub krawędzi: {n}. Eksportować mimo to?
+	Too close to another visual	Za blisko innej grafiki
+	No room to turn this visual	Brak miejsca na obrót tej grafiki
+	Open a document first	Najpierw otwórz dokument
+	the document was closed	dokument został zamknięty
+	{dpi} ppi	{dpi} ppi

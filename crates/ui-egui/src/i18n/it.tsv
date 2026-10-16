@@ -4156,3 +4156,27 @@ navigator	Zoom	Zoom
 	Remove Fringe	Rimuovi frange
 	Show Background	Mostra sfondo
 	Delete Background	Elimina sfondo
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Foglio di stampa (gang sheet)
+	Visuals	Grafiche
+	Add PNG Files…	Aggiungi file PNG…
+	Add Open Document	Aggiungi il documento aperto
+	Add PNG files or the open document.	Aggiungi file PNG o il documento aperto.
+	Sheet	Foglio
+	Film Width	Larghezza pellicola
+	Max Length	Lunghezza max
+	Allow Rotation	Consenti rotazione
+	Auto Build	Disposizione automatica
+	Selected Visual	Grafica selezionata
+	Rotate 90°	Ruota di 90°
+	Length used: {length} cm	Lunghezza usata: {length} cm
+	{n} not placed	Non posizionate: {n}
+	{n} too close or overlapping	Troppo vicine o sovrapposte: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Trascina una grafica per spostarla. Frecce: 1 mm (Maiusc: 1 cm). Canc la toglie dal foglio.
+	Export PNG…	Esporta PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Grafiche più vicine del margine a un'altra grafica o a un bordo: {n}. Esportare comunque?
+	Too close to another visual	Troppo vicina a un'altra grafica
+	No room to turn this visual	Non c'è spazio per ruotare questa grafica
+	Open a document first	Apri prima un documento
+	the document was closed	il documento è stato chiuso
+	{dpi} ppi	{dpi} ppi

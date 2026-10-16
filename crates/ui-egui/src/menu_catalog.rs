@@ -644,6 +644,8 @@ pub static CATALOG: &[(&[&str], &str, Option<&str>, &str)] = &[
     (&["DTF"], "---", None, "---"),
     (&["DTF"], "DTF Halftone…", None, "filter.dtf.halftone"),
     (&["DTF"], "AI Upscale…", None, "dtf.upscale"),
+    (&["DTF"], "---", None, "---"),
+    (&["DTF"], "Gang Sheet…", None, "dtf.gangSheet"),
     (&["View"], "Proof Colors", Some("Cmd+Y"), "view.proofColors"),
     (&["View"], "Gamut Warning", Some("Cmd+Shift+Y"), "view.gamutWarning"),
     (&["View"], "---", None, "---"),

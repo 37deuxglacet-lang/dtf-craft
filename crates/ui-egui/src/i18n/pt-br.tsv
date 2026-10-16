@@ -3983,3 +3983,27 @@ layerLabel	No Color	Sem cor
 	Remove Fringe	Remover franjas
 	Show Background	Mostrar fundo
 	Delete Background	Excluir fundo
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Folha de impressão (gang sheet)
+	Visuals	Artes
+	Add PNG Files…	Adicionar arquivos PNG…
+	Add Open Document	Adicionar o documento aberto
+	Add PNG files or the open document.	Adicione arquivos PNG ou o documento aberto.
+	Sheet	Folha
+	Film Width	Largura do filme
+	Max Length	Comprimento máx.
+	Allow Rotation	Permitir rotação
+	Auto Build	Montagem automática
+	Selected Visual	Arte selecionada
+	Rotate 90°	Girar 90°
+	Length used: {length} cm	Comprimento usado: {length} cm
+	{n} not placed	Não posicionadas: {n}
+	{n} too close or overlapping	Muito próximas ou sobrepostas: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Arraste uma arte para movê-la. Setas: 1 mm (Shift: 1 cm). Delete a tira da folha.
+	Export PNG…	Exportar PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Artes mais próximas que a margem de outra arte ou de uma borda: {n}. Exportar mesmo assim?
+	Too close to another visual	Muito próxima de outra arte
+	No room to turn this visual	Sem espaço para girar esta arte
+	Open a document first	Abra um documento primeiro
+	the document was closed	o documento foi fechado
+	{dpi} ppi	{dpi} ppi

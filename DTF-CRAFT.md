@@ -21,6 +21,7 @@ produit officiel du projet PhotoCraft.
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
 | Agrandissement IA… | ×2, ×3 ou ×4 par le modèle Real-ESRGAN (hors ligne, sur le processeur), sur une copie nommée « nom x2 » : l'original n'est pas modifié |
+| Gang sheet… | Fenêtre plein écran : visuels placés sur la laize, contrôle de la résolution et des marges, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 
@@ -41,6 +42,38 @@ sont pas (menu Fenêtre). L'accueil donne le lien du projet GitHub de DTF Craft.
 Conformité impression : largeur et/ou hauteur en cm ; avec une seule valeur l'autre suit les
 proportions, avec les deux l'image tient dans le cadre largeur × hauteur. La transparence est
 rognée avant le redimensionnement.
+
+## Gang sheet
+
+DTF › Gang sheet… ouvre une fenêtre plein écran (Échap ou Annuler la referme).
+
+- Visuels (colonne de gauche) : « Ajouter des PNG… » (plusieurs fichiers à la fois, ou glissés sur
+  la fenêtre) ou « Ajouter le document ouvert » (aplati). Chaque visuel est rogné à ses pixels
+  visibles. Sa largeur d'impression est réglée en cm, la hauteur suit (proportions verrouillées) ;
+  au départ, c'est la taille enregistrée dans le fichier. Le nombre de copies place ou retire des
+  exemplaires sur la planche.
+- Résolution : la résolution d'impression de chaque visuel s'affiche en couleur, dans la liste et
+  sur la planche : vert ≥ 300 ppp, jaune ≥ 250, orange ≥ 200, rouge en dessous.
+- Planche (colonne de droite) : laize (56 cm par défaut), longueur max (100 cm au plus), marge
+  autour des visuels (5 mm par défaut), rotation autorisée ou non pour la construction auto.
+  La marge est la distance minimale entre deux visuels et entre un visuel et le bord du film.
+  Ces réglages sont repris à l'ouverture suivante.
+- Construction auto : tous les exemplaires sont replacés (algorithme MaxRects, les plus grands
+  d'abord, la planche la plus courte possible). Ce qui ne tient pas sur la planche est signalé
+  « non placé ».
+- Placement manuel : glisser un visuel le déplace au millimètre ; il reste sur le film, marge
+  comprise. Lâché à moins de la marge d'un autre visuel, il revient à la dernière position
+  correcte. Flèches : 1 mm (Maj : 1 cm) ; Suppr retire le visuel ; Pivoter 90°, Dupliquer et
+  Supprimer agissent sur le visuel sélectionné. Molette : défilement ; Ctrl + molette : zoom.
+- Les visuels trop proches ou qui débordent sont en rouge ; l'export le signale et demande
+  confirmation.
+- Exporter en PNG… : la planche est rendue à 300 ppp, à la laize et à la longueur utilisée,
+  chaque visuel sur son propre calque ; elle est enregistrée en PNG (résolution inscrite dans le
+  fichier) et ouverte comme nouveau document.
+
+La commande `dtf.gangSheet` fait le même travail sans fenêtre (actions, ligne de commande) : avec
+`sources` seulement, elle construit la planche elle-même ; avec `placements`, elle reprend la mise
+en place donnée.
 
 ## Agrandissement IA
 

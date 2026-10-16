@@ -22,6 +22,8 @@ Outils en cours de développement :
 - Suppression du fond blanc (ou uni), sans liseré
 - Préparation impression : conformité, fond de contrôle, pixels transparents, suppression de
   frange, netteté, saturation
+- Gang sheet : placement des visuels sur la laize, contrôle de la résolution et des marges, export
+  PNG 300 dpi
 
 Le détail du menu DTF est dans [DTF-CRAFT.md](DTF-CRAFT.md).
 

@@ -3196,3 +3196,28 @@ curves	Smooth	Glätten
 	Remove Fringe	Farbsaum entfernen
 	Show Background	Hintergrund zeigen
 	Delete Background	Hintergrund löschen
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Sammelbogen
+	Visuals	Motive
+	Add PNG Files…	PNG-Dateien hinzufügen…
+	Add Open Document	Geöffnetes Dokument hinzufügen
+	Add PNG files or the open document.	Fügen Sie PNG-Dateien oder das geöffnete Dokument hinzu.
+	Sheet	Bogen
+	Film Width	Folienbreite
+	Max Length	Max. Länge
+	Allow Rotation	Drehen erlauben
+	Auto Build	Automatisch anordnen
+	Selected Visual	Ausgewähltes Motiv
+	Rotate 90°	90° drehen
+	Length used: {length} cm	Genutzte Länge: {length} cm
+	{n} not placed	Nicht platziert: {n}
+	{n} too close or overlapping	Zu nah oder überlappend: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Ziehen Sie ein Motiv, um es zu verschieben. Pfeiltasten: 1 mm (Umschalt: 1 cm). Entf nimmt es vom Bogen.
+	Export PNG…	Als PNG exportieren…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motive näher als der Rand an einem anderen Motiv oder einer Kante: {n}. Trotzdem exportieren?
+	Too close to another visual	Zu nah an einem anderen Motiv
+	No room to turn this visual	Kein Platz, um dieses Motiv zu drehen
+	Open a document first	Öffnen Sie zuerst ein Dokument
+	the document was closed	das Dokument wurde geschlossen
+	Duplicate	Duplizieren
+	{dpi} ppi	{dpi} ppi

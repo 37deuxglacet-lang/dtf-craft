@@ -3680,3 +3680,27 @@ curves	Smooth	Làm mượt
 	Remove Fringe	Xóa viền
 	Show Background	Hiện nền
 	Delete Background	Xóa nền
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Trang ghép in
+	Visuals	Hình in
+	Add PNG Files…	Thêm tệp PNG…
+	Add Open Document	Thêm tài liệu đang mở
+	Add PNG files or the open document.	Thêm tệp PNG hoặc tài liệu đang mở.
+	Sheet	Trang
+	Film Width	Khổ phim
+	Max Length	Chiều dài tối đa
+	Allow Rotation	Cho phép xoay
+	Auto Build	Xếp tự động
+	Selected Visual	Hình đang chọn
+	Rotate 90°	Xoay 90°
+	Length used: {length} cm	Chiều dài đã dùng: {length} cm
+	{n} not placed	Chưa đặt được: {n}
+	{n} too close or overlapping	Quá gần hoặc chồng lên nhau: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Kéo một hình để di chuyển. Phím mũi tên: 1 mm (Shift: 1 cm). Delete gỡ hình khỏi trang.
+	Export PNG…	Xuất PNG…
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Hình gần hình khác hoặc mép hơn lề cho phép: {n}. Vẫn xuất?
+	Too close to another visual	Quá gần một hình khác
+	No room to turn this visual	Không đủ chỗ để xoay hình này
+	Open a document first	Hãy mở một tài liệu trước
+	the document was closed	tài liệu đã bị đóng
+	{dpi} ppi	{dpi} ppi
