@@ -879,9 +879,10 @@ mod tests {
     fn app_with_two_colours() -> PhotocraftApp {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         app.run("file.new", json!({"width": 200, "height": 100, "resolution": 300, "background": "transparent"})).unwrap();
-        app.run("select.rect", json!({"x": 0, "y": 0, "width": 100, "height": 100})).unwrap();
+        // Red larger than blue, so red comes first.
+        app.run("select.rect", json!({"x": 0, "y": 0, "width": 120, "height": 100})).unwrap();
         app.run("edit.fill", json!({"color": "#c03020"})).unwrap();
-        app.run("select.rect", json!({"x": 100, "y": 0, "width": 100, "height": 100})).unwrap();
+        app.run("select.rect", json!({"x": 120, "y": 0, "width": 80, "height": 100})).unwrap();
         app.run("edit.fill", json!({"color": "#2040c0"})).unwrap();
         app.run("select.deselect", json!({})).unwrap();
         app
