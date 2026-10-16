@@ -2878,3 +2878,8 @@ curves	Smooth	Suavizar
 	Remove Halo	Eliminar halo
 	Interior Holes	Huecos interiores
 	Min Hole Size	Tamaño mín. de hueco (px)
+# DTF Craft (5)
+	Transparent Pixels	Píxeles transparentes
+	Remove Fringe	Eliminar halos
+	Show Background	Mostrar fondo
+	Delete Background	Eliminar fondo

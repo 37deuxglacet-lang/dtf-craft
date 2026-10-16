@@ -30,9 +30,8 @@ const PANELS: &[(&str, &str, Group)] = &[
     ("dtfConformity", "Conformity", Group::Dtf),
     ("dtfCutout", "Cutout", Group::Dtf),
     ("dtfBackground", "Control Background", Group::Dtf),
-    ("dtfNoBackground", "No Background", Group::Dtf),
-    ("dtfTransparency", "Transparency", Group::Dtf),
-    ("dtfFringe", "Fringe", Group::Dtf),
+    ("dtfTransparency", "Transparent Pixels", Group::Dtf),
+    ("dtfFringe", "Remove Fringe", Group::Dtf),
     ("dtfSharpness", "Sharpness", Group::Dtf),
     ("dtfSaturation", "Saturation", Group::Dtf),
 ];
@@ -962,6 +961,17 @@ pub(crate) fn sync_visibility(app: &mut PhotocraftApp) {
                 *group.tab_mut(&mut app.ui.dock_tabs) = selected;
             }
         }
+    }
+}
+
+/// Is DTF tool tab `tab` (indexing `dtf_panel::TABS`) on screen: the active tab of its group,
+/// in a customized layout or in the default dock?
+pub(crate) fn dtf_tab_shown(app: &PhotocraftApp, tab: usize) -> bool {
+    let Some(label) = crate::dtf_panel::TABS.get(tab) else { return false };
+    let Some(id) = normalize(label) else { return false };
+    match &app.ui.docking {
+        Some(layout) => panel_active(layout, id),
+        None => app.ui.panels.dtf && app.ui.dock_tabs.dtf == tab,
     }
 }
 

@@ -13,6 +13,8 @@ pub const APP_NAME: &str = "DTF Craft";
 /// The DTF Craft website and contact address (Home screen and About links).
 pub const WEBSITE: &str = "https://www.dtfcraft.fr";
 pub const CONTACT: &str = "mailto:contact@stephane-glacet.com";
+/// DTF Craft's GitHub project (Home screen and About links).
+pub const GITHUB: &str = "https://github.com/37deuxglacet-lang/dtf-craft";
 
 /// The title with no document open: "DTF Craft — based on PhotoCraft", in the UI language.
 pub fn home_title() -> String {

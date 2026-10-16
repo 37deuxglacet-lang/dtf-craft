@@ -3364,3 +3364,8 @@ curves	Smooth	매끄럽게
 	Remove Halo	후광 제거
 	Interior Holes	내부 구멍
 	Min Hole Size	최소 구멍 크기 (px)
+# DTF Craft (5)
+	Transparent Pixels	투명 픽셀
+	Remove Fringe	가장자리 제거
+	Show Background	배경 표시
+	Delete Background	배경 삭제

@@ -3211,3 +3211,8 @@ curves	Smooth	Lisser
 	Remove Halo	Supprimer le liseré
 	Interior Holes	Trous intérieurs
 	Min Hole Size	Taille min. des trous (px)
+# DTF Craft (5)
+	Transparent Pixels	Pixels transparents
+	Remove Fringe	Supprimer franges
+	Show Background	Afficher le fond
+	Delete Background	Supprimer le fond

@@ -4263,3 +4263,8 @@ shape	Appearance	Izgled
 	Remove Halo	Уклони ореол
 	Interior Holes	Унутрашње рупе
 	Min Hole Size	Мин. величина рупе (px)
+# DTF Craft (5)
+	Transparent Pixels	Providni pikseli
+	Remove Fringe	Ukloni ivice
+	Show Background	Prikaži pozadinu
+	Delete Background	Obriši pozadinu

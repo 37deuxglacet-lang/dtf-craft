@@ -34,13 +34,13 @@ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
     json!({"url": url})
 }
 
-/// "Website · Contact · PhotoCraft website · GitHub" as links, centred: DTF Craft's own site and
-/// contact first, then PhotoCraft's, which DTF Craft is based on. Clicks route through [`open`]
+/// "Website · Contact · GitHub · PhotoCraft website" as links, centred: DTF Craft's own site,
+/// contact and GitHub project first, then PhotoCraft's site, which DTF Craft is based on. Clicks route through [`open`]
 /// (the platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable
 /// `ctx.open_url`.
 pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     let t = crate::theme::Tokens::get(ui.ctx());
-    let links = [(tl!("Website"), crate::brand::WEBSITE), (tl!("Contact"), crate::brand::CONTACT), (tl!("PhotoCraft website"), APP_PAGE), (tl!("GitHub"), GITHUB)];
+    let links = [(tl!("Website"), crate::brand::WEBSITE), (tl!("Contact"), crate::brand::CONTACT), (tl!("GitHub"), crate::brand::GITHUB), (tl!("PhotoCraft website"), APP_PAGE)];
     let font = egui::FontId::proportional(12.5);
     let sep = "  ·  ";
     let width: f32 = links.iter().map(|(l, _)| ui.painter().layout_no_wrap((*l).into(), font.clone(), t.text).size().x).sum::<f32>()

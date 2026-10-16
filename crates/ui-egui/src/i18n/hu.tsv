@@ -4109,3 +4109,8 @@ cameraRaw	Yellow	Sárga
 	Remove Halo	Fényudvar eltávolítása
 	Interior Holes	Belső lyukak
 	Min Hole Size	Min. lyukméret (px)
+# DTF Craft (5)
+	Transparent Pixels	Átlátszó képpontok
+	Remove Fringe	Szegély eltávolítása
+	Show Background	Háttér megjelenítése
+	Delete Background	Háttér törlése

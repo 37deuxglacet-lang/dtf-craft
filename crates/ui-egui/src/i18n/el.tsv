@@ -3887,3 +3887,8 @@ curves	Smooth	Εξομάλυνση
 	Remove Halo	Αφαίρεση άλω
 	Interior Holes	Εσωτερικές οπές
 	Min Hole Size	Ελάχ. μέγεθος οπής (px)
+# DTF Craft (5)
+	Transparent Pixels	Διαφανή εικονοστοιχεία
+	Remove Fringe	Αφαίρεση περιγράμματος
+	Show Background	Εμφάνιση φόντου
+	Delete Background	Διαγραφή φόντου

@@ -3191,3 +3191,8 @@ curves	Smooth	Glätten
 	Remove Halo	Lichtsaum entfernen
 	Interior Holes	Innere Löcher
 	Min Hole Size	Min. Lochgröße (px)
+# DTF Craft (5)
+	Transparent Pixels	Transparente Pixel
+	Remove Fringe	Farbsaum entfernen
+	Show Background	Hintergrund zeigen
+	Delete Background	Hintergrund löschen

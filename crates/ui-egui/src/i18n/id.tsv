@@ -3181,3 +3181,8 @@ curves	Smooth	Haluskan
 	Remove Halo	Hapus halo
 	Interior Holes	Lubang dalam
 	Min Hole Size	Ukuran lubang min. (px)
+# DTF Craft (5)
+	Transparent Pixels	Piksel transparan
+	Remove Fringe	Hapus pinggiran
+	Show Background	Tampilkan latar
+	Delete Background	Hapus latar

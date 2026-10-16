@@ -638,7 +638,7 @@ pub fn title_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                     let ui = &mut group_ui;
                     ui.spacing_mut().item_spacing.x = 6.0;
                     let mut ws = app.ui.workspace.clone();
-                    let opts = [
+                    let mut opts = vec![
                         // Keys stay English (`apply_workspace` matches them); the dropdown
                         // shows the labels in the UI language.
                         ("Essentials".to_string(), tl!("Essentials")),
@@ -648,6 +648,10 @@ pub fn title_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                         ("Pixel Art".to_string(), tl!("Pixel Art")),
                         ("Motion".to_string(), tl!("Motion")),
                     ];
+                    // DTF Craft's own workspace comes first.
+                    if app.dtf_craft {
+                        opts.insert(0, ("DTF".to_string(), tl!("DTF")));
+                    }
                     // A narrow bar drops what is also in a menu, Discord first (below), then
                     // the theme toggle (Preferences), then search (Edit › Search), and narrows
                     // the switcher (Window › Workspace) before anything runs over.

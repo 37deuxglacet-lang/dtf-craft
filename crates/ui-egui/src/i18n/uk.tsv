@@ -3888,3 +3888,8 @@ curves	Smooth	Згладити
 	Remove Halo	Прибрати ореол
 	Interior Holes	Внутрішні отвори
 	Min Hole Size	Мін. розмір отвору (пікс.)
+# DTF Craft (5)
+	Transparent Pixels	Прозорі пікселі
+	Remove Fringe	Видалити облямівку
+	Show Background	Показати фон
+	Delete Background	Видалити фон

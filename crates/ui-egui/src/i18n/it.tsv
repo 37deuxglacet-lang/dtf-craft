@@ -4151,3 +4151,8 @@ navigator	Zoom	Zoom
 	Remove Halo	Rimuovi alone
 	Interior Holes	Fori interni
 	Min Hole Size	Dimensione min. foro (px)
+# DTF Craft (5)
+	Transparent Pixels	Pixel trasparenti
+	Remove Fringe	Rimuovi frange
+	Show Background	Mostra sfondo
+	Delete Background	Elimina sfondo

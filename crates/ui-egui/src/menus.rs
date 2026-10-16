@@ -138,6 +138,7 @@ fn proof_preset(id: &str) -> Option<&'static str> {
 fn workspace_name(id: &str) -> Option<&'static str> {
     Some(match id.strip_prefix("window.workspace.")? {
         "essentials" | "resetWorkspace" => "",
+        "dtf" => "DTF",
         "photography" => "Photography",
         "painting" => "Painting",
         "graphicAndWeb" => "Graphic and Web",
@@ -1559,6 +1560,20 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
     p.properties = props;
     p.character = app.ui.workspace == "Graphic and Web";
     p.dtf = app.dtf_craft;
+    if app.dtf_craft {
+        // DTF Craft keeps Channels and Paths out of the right column (Window menu only).
+        let pro = matches!(app.ui.theme, crate::theme::ThemeKind::Pro | crate::theme::ThemeKind::ProMedium);
+        for (index, name) in crate::dock::Group::Layers.tabs(pro).iter().enumerate() {
+            if matches!(*name, "Channels" | "Paths") {
+                app.ui.dock.hide_tab(crate::dock::Group::Layers, index, pro);
+            }
+        }
+        // The DTF workspace: the DTF tools and Layers in groups of three tabs at most.
+        if app.ui.workspace == "DTF" {
+            app.ui.docking = Some(crate::dtf_panel::dtf_layout());
+            crate::panel_docking::sync_visibility(app);
+        }
+    }
     // Timeline is a floating panel, not a dock group. Showing it does not create or edit
     // a document timeline; changing away from Motion closes it just like its Close button.
     app.ui.timeline.open = app.ui.workspace == "Motion";

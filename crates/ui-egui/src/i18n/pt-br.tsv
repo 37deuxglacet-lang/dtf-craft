@@ -3978,3 +3978,8 @@ layerLabel	No Color	Sem cor
 	Remove Halo	Remover halo
 	Interior Holes	Furos internos
 	Min Hole Size	Tamanho mín. do furo (px)
+# DTF Craft (5)
+	Transparent Pixels	Pixels transparentes
+	Remove Fringe	Remover franjas
+	Show Background	Mostrar fundo
+	Delete Background	Excluir fundo

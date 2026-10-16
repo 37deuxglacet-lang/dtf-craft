@@ -3948,3 +3948,8 @@ curves	Smooth	Vloeiend maken
 	Remove Halo	Halo verwijderen
 	Interior Holes	Binnenste gaten
 	Min Hole Size	Min. gatgrootte (px)
+# DTF Craft (5)
+	Transparent Pixels	Transparante pixels
+	Remove Fringe	Randen verwijderen
+	Show Background	Achtergrond tonen
+	Delete Background	Achtergrond verwijderen

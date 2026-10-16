@@ -3796,3 +3796,8 @@ navigator	Zoom	Zvětšení
 	Remove Halo	Odstranit halo
 	Interior Holes	Vnitřní otvory
 	Min Hole Size	Min. velikost otvoru (px)
+# DTF Craft (5)
+	Transparent Pixels	Průhledné pixely
+	Remove Fringe	Odstranit lemy
+	Show Background	Zobrazit pozadí
+	Delete Background	Smazat pozadí

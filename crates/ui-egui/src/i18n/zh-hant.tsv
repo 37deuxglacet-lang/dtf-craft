@@ -2788,3 +2788,8 @@ curves	Smooth	平滑
 	Remove Halo	去除光暈
 	Interior Holes	內部孔洞
 	Min Hole Size	最小孔洞尺寸 (像素)
+# DTF Craft (5)
+	Transparent Pixels	透明像素
+	Remove Fringe	去除邊緣
+	Show Background	顯示背景
+	Delete Background	刪除背景

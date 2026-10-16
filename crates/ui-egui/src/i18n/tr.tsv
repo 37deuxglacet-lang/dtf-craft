@@ -3920,3 +3920,8 @@ cameraData	Lens	Lens
 	Remove Halo	Haleyi kaldır
 	Interior Holes	İç boşluklar
 	Min Hole Size	Min. boşluk boyutu (px)
+# DTF Craft (5)
+	Transparent Pixels	Saydam pikseller
+	Remove Fringe	Saçakları kaldır
+	Show Background	Arka planı göster
+	Delete Background	Arka planı sil

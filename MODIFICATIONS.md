@@ -7,7 +7,7 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (72)
+## Modified (73)
 
 - `LICENSE-MIT`
 - `NOTICE`
@@ -81,6 +81,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/state.rs`
 - `crates/ui-egui/src/titlebar.rs`
 - `crates/ui-egui/src/view_cmds.rs`
+- `crates/ui-egui/src/workspace_ui.rs`
 
 ## Added (15)
 

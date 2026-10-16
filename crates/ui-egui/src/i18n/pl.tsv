@@ -3787,3 +3787,8 @@ curves	Smooth	Wygładź
 	Remove Halo	Usuń otoczkę
 	Interior Holes	Otwory wewnętrzne
 	Min Hole Size	Min. rozmiar otworu (px)
+# DTF Craft (5)
+	Transparent Pixels	Piksele przezroczyste
+	Remove Fringe	Usuń obwódki
+	Show Background	Pokaż tło
+	Delete Background	Usuń tło

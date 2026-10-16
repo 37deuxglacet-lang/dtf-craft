@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Shell-only Window and View items: Window › Workspace › New / Delete / Lock Workspace (saved
 //! in the preferences), Window › Modifier Keys (sticky Shift/⌘/⌥ for touch and pen users),
 //! View › Pixel Aspect Ratio › Custom Pixel Aspect Ratio…, View › Show › Show Extras Options…
@@ -98,7 +100,7 @@ fn open(app: &mut PhotocraftApp, kind: &str, f: Value) -> Result<Value, String> 
 }
 
 /// Built-in workspace names (Window › Workspace presets).
-const PRESETS: [&str; 6] = ["Essentials", "Photography", "Painting", "Pixel Art", "Graphic and Web", "Motion"];
+const PRESETS: [&str; 7] = ["DTF", "Essentials", "Photography", "Painting", "Pixel Art", "Graphic and Web", "Motion"];
 
 /// Run a shell command, or open its dialog. `None` when `id` isn't ours.
 pub fn menu(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Value, String>> {

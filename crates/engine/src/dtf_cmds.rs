@@ -417,6 +417,7 @@ fn conformity(s: &mut Session, p: &Value) -> Result<Value> {
 }
 
 /// A solid colour fill named "backfill" under everything, to judge the artwork on the garment colour.
+/// It replaces a control background already there (a new colour is one undo step).
 fn control_background(s: &mut Session, p: &Value) -> Result<Value> {
     let color = text(p, "color", "#231c1c").to_string();
     if !(color.len() == 7 && color.starts_with('#') && color[1..].chars().all(|c| c.is_ascii_hexdigit())) {
@@ -424,6 +425,10 @@ fn control_background(s: &mut Session, p: &Value) -> Result<Value> {
     }
     let previous = s.active().and_then(|d| d.active_layer);
     crate::analysis_cmds::compound(s, "Control Background", |s| {
+        let old: Vec<u64> = s.active().ok_or(EngineError::NoDocument)?.doc.walk().into_iter().filter(|(_, _, l)| l.name == BACKFILL).map(|(_, _, l)| l.id.0).collect();
+        for id in old {
+            s.execute("layer.delete", json!({"layer": id}))?;
+        }
         // Nothing goes under a Background layer (a JPEG's picture): it becomes a normal layer first.
         let doc = &s.active().ok_or(EngineError::NoDocument)?.doc;
         if let Some(bg) = doc.layers.first().map(|l| l.id).filter(|id| doc.is_background(*id)) {
@@ -819,6 +824,20 @@ mod tests {
         assert_eq!(d.doc.layers[0].name, BACKFILL, "the fill is at the bottom");
         assert!(!d.doc.is_background(d.doc.layers[1].id));
         assert!(s.undo());
+        assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+    }
+
+    /// A second control background (another colour) replaces the first: one "backfill" only.
+    #[test]
+    fn control_background_replaces_the_previous_one() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 30, "height": 20, "background": "transparent"})).unwrap();
+        s.execute(CONTROL_BACKGROUND, json!({"color": "#231c1c"})).unwrap();
+        s.execute(CONTROL_BACKGROUND, json!({"color": "#ffffff"})).unwrap();
+        let d = s.active().unwrap();
+        let fills = d.doc.walk().into_iter().filter(|(_, _, l)| l.name == BACKFILL).count();
+        assert_eq!((fills, d.doc.layers.len()), (1, 2));
+        s.execute(REMOVE_CONTROL_BACKGROUND, json!({})).unwrap();
         assert_eq!(s.active().unwrap().doc.layers.len(), 1);
     }
 

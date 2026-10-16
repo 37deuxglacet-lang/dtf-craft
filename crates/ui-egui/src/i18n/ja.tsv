@@ -3865,3 +3865,8 @@ curves	Smooth	スムーズ
 	Remove Halo	ハローを除去
 	Interior Holes	内側の穴
 	Min Hole Size	穴の最小サイズ (px)
+# DTF Craft (5)
+	Transparent Pixels	透明ピクセル
+	Remove Fringe	フリンジを削除
+	Show Background	背景を表示
+	Delete Background	背景を削除

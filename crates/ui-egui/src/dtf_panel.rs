@@ -19,12 +19,12 @@ use crate::theme::Tokens;
 /// The preview key's dialog id for the panel (no dialog id is that large).
 pub const PREVIEW_DIALOG: u64 = u64::MAX - 0x0D7F;
 
-/// The tools, top to bottom.
-pub const TOOLS: [&str; 8] = [
+/// The tools, top to bottom. Control Background's tab also removes it
+/// (`dtf.removeControlBackground`).
+pub const TOOLS: [&str; 7] = [
     "dtf.conformity",
     "filter.dtf.removeWhiteBackground",
     "dtf.controlBackground",
-    "dtf.removeControlBackground",
     "filter.dtf.removeSemiTransparent",
     "dtf.defringe",
     "dtf.sharpen",
@@ -32,11 +32,10 @@ pub const TOOLS: [&str; 8] = [
 ];
 
 /// The tabs' labels (and dock panel names), in [`TOOLS`] order.
-pub const TABS: [&str; 8] = ["Conformity", "Cutout", "Control Background", "No Background", "Transparency", "Fringe", "Sharpness", "Saturation"];
+pub const TABS: [&str; 7] = ["Conformity", "Cutout", "Control Background", "Transparent Pixels", "Remove Fringe", "Sharpness", "Saturation"];
 
-/// Tools applied on Apply only: Print Conformity resizes the image, Remove Control Background
-/// has no setting.
-const WITHOUT_PREVIEW: [&str; 2] = ["dtf.conformity", "dtf.removeControlBackground"];
+/// Tools applied on Apply only: Print Conformity resizes the image.
+const WITHOUT_PREVIEW: [&str; 1] = ["dtf.conformity"];
 
 /// The DTF tabs' state. The settings live in `fields` while the app runs and are saved with the
 /// dialogs' remembered values when applied.
@@ -57,16 +56,37 @@ fn title(command: &str) -> String {
 
 /// The layout version DTF Craft last set up (remembered with the preferences): raising it
 /// brings the DTF default layout back once, over a layout saved by an older version.
-const LAYOUT_VERSION: u64 = 3;
+const LAYOUT_VERSION: u64 = 4;
 const LAYOUT_PREF: &str = "dtfCraft.layoutVersion";
 
-/// DTF Craft's start: the DTF tools group, and on the first launch of this layout its Essentials
-/// workspace (Layers and the DTF tools above it, every other panel in the Window menu).
+/// The DTF workspace (Window › Workspace › DTF): the DTF tools and Layers in the right column,
+/// three tabs at most per group; every other panel (Channels and Paths included) in the Window menu.
+pub(crate) fn dtf_layout() -> craft_ui::docking::Layout<String> {
+    use craft_ui::docking::{Layout, Node};
+    use craft_ui::layout::{SplitAxis, SplitSize};
+    let tabs = |panels: &[&str]| Node::Tabs { panels: panels.iter().map(|p| p.to_string()).collect(), active: 0 };
+    let split = |height: f32, first: Node<String>, second: Node<String>| Node::Split {
+        axis: SplitAxis::Vertical,
+        size: SplitSize::FixedFirst(height),
+        first: Box::new(first),
+        second: Box::new(second),
+    };
+    Layout {
+        root: Some(split(
+            300.0,
+            tabs(&["dtfBackground", "dtfSharpness", "dtfSaturation"]),
+            split(210.0, tabs(&["dtfTransparency", "dtfFringe"]), tabs(&["layers", "dtfConformity", "dtfCutout"])),
+        )),
+        floating: Vec::new(),
+    }
+}
+
+/// DTF Craft's start: the DTF tools, and on the first launch of this layout the DTF workspace.
 pub fn dtf_craft_startup(app: &mut PhotocraftApp) {
     app.dtf_craft = true;
     let seen = app.session.prefs().dialogs.get(LAYOUT_PREF).and_then(Value::as_u64).unwrap_or(0);
     if seen < LAYOUT_VERSION {
-        app.ui.workspace = "Essentials".into();
+        app.ui.workspace = "DTF".into();
         crate::menus::apply_workspace(app);
         app.session.prefs.edit(|prefs| prefs.dialogs.insert(LAYOUT_PREF.into(), json!(LAYOUT_VERSION)));
     }
@@ -101,6 +121,11 @@ pub(crate) fn preview_source(app: &PhotocraftApp) -> Option<(u64, Map<String, Va
         return None;
     }
     let cmd = app.ui.dtf_panel.previewing.as_ref()?;
+    // Only while the tool's tab is on screen (several DTF tabs can be, in separate groups).
+    let tab = TOOLS.iter().position(|t| t == cmd)?;
+    if !crate::panel_docking::dtf_tab_shown(app, tab) {
+        return None;
+    }
     let f = app.ui.dtf_panel.fields.get(cmd)?;
     Some((PREVIEW_DIALOG, f.clone()))
 }
@@ -185,10 +210,8 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         let f = initial_fields(app, cmd);
         app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
     }
-    // A preview belongs to the tab that shows it: another tab takes it away.
-    if app.ui.dtf_panel.previewing.as_deref().is_some_and(|p| TOOLS.contains(&p) && p != cmd) {
-        stop_preview(app);
-    }
+    // The preview stays with the tool whose setting moved last, while its tab is on screen
+    // (`preview_source`): drawing another DTF tab, in another group, leaves it be.
     let have_doc = app.session.active().is_some();
     let enabled = have_doc && app.session.is_enabled(cmd);
     let note = if cmd == "dtf.conformity" { current_size_note(app) } else { None };
@@ -198,7 +221,9 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         Some(n) => f.insert("__note".into(), json!(n)),
         None => f.remove("__note"),
     };
-    let (mut apply_it, mut cancel) = (false, false);
+    let (mut apply_it, mut cancel, mut remove_bg) = (false, false, false);
+    let has_backfill =
+        cmd == "dtf.controlBackground" && app.session.active().is_some_and(|st| st.doc.walk().into_iter().any(|(_, _, l)| l.name == "backfill"));
     ui.add_space(4.0);
     if !have_doc {
         ui.weak(tl!("Open a document to use the DTF settings."));
@@ -208,15 +233,25 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     let before = f.clone();
     if cmd == "dtf.controlBackground" {
         color_row(ui, &mut f);
-    } else if cmd != "dtf.removeControlBackground" {
+    } else {
         crate::filter_dialog::body(ui, &mut f);
     }
     let changed = f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v));
     ui.add_space(6.0);
     ui.horizontal(|ui| {
-        ui.add_enabled_ui(enabled, |ui| {
-            apply_it = crate::widgets::primary_button(ui, tl!("Apply"), 110.0).clicked();
-        });
+        if cmd == "dtf.controlBackground" {
+            // Show (or recolour) the control background, and remove it, from the same tab.
+            ui.add_enabled_ui(enabled, |ui| {
+                apply_it = crate::widgets::primary_button(ui, tl!("Show Background"), 130.0).clicked();
+            });
+            ui.add_enabled_ui(have_doc && has_backfill, |ui| {
+                remove_bg = crate::widgets::secondary_button(ui, tl!("Delete Background"), 130.0).clicked();
+            });
+        } else {
+            ui.add_enabled_ui(enabled, |ui| {
+                apply_it = crate::widgets::primary_button(ui, tl!("Apply"), 110.0).clicked();
+            });
+        }
         if previewing {
             cancel = crate::widgets::secondary_button(ui, tl!("Cancel"), 110.0).clicked();
         }
@@ -227,6 +262,13 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     }
     if apply_it {
         apply(app, cmd);
+    } else if remove_bg {
+        if app.ui.dtf_panel.previewing.as_deref() == Some(cmd) {
+            stop_preview(app);
+        }
+        if let Err(error) = app.run("dtf.removeControlBackground", json!({})) {
+            crate::notices::error(app, error);
+        }
     } else if cancel {
         stop_preview(app);
     }
@@ -246,26 +288,47 @@ mod tests {
     }
 
     #[test]
-    fn the_dtf_tools_open_beside_layers_and_a_preview_stops_with_them() {
+    fn dtf_craft_opens_on_the_dtf_workspace_and_a_preview_stops_with_its_tab() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         let ctx = egui::Context::default();
         dtf_craft_startup(&mut app);
-        // DTF Craft opens on Layers and the DTF group above it, nothing else.
+        assert_eq!(app.ui.workspace, "DTF");
+        let layout = app.ui.docking.clone().expect("the DTF workspace's layout");
+        assert_eq!(layout, dtf_layout());
+        assert!(crate::panel_docking::valid(&layout));
+        // Groups of three tabs at most; Channels and Paths stay out of the right column.
+        let mut pending: Vec<_> = layout.root.iter().collect();
+        let mut groups = Vec::new();
+        while let Some(node) = pending.pop() {
+            match node {
+                craft_ui::docking::Node::Split { first, second, .. } => pending.extend([first.as_ref(), second.as_ref()]),
+                craft_ui::docking::Node::Tabs { panels, .. } => groups.push(panels.clone()),
+                _ => {}
+            }
+        }
+        assert_eq!(groups.len(), 3);
+        assert!(groups.iter().all(|g| g.len() <= 3), "{groups:?}");
+        let all: Vec<&String> = groups.iter().flatten().collect();
+        assert_eq!(all.len(), TOOLS.len() + 1, "every DTF tool and Layers: {all:?}");
+        assert!(!all.iter().any(|p| *p == "channels" || *p == "paths"));
         let p = &app.ui.panels;
         assert!(p.dtf && p.layers && !p.color && !p.properties && !p.history && !p.navigator);
-        let order = app.ui.dock.order();
-        let at = |g| order.iter().position(|x| *x == g).unwrap();
-        assert!(at(crate::dock::Group::Dtf) < at(crate::dock::Group::Layers), "DTF above Layers: {order:?}");
-        assert_eq!(crate::dock::Group::Dtf.tabs(false).len(), TOOLS.len());
+        // Essentials keeps Channels and Paths out too.
+        crate::menus::invoke(&mut app, &ctx, "window.workspace.essentials", json!({})).unwrap();
+        let shown: Vec<&str> = app.ui.dock.visible_tabs(crate::dock::Group::Layers, false).into_iter().map(|(_, n)| n).collect();
+        assert_eq!(shown, ["Layers"]);
+        crate::menus::invoke(&mut app, &ctx, "window.workspace.dtf", json!({})).unwrap();
+        assert_eq!(app.ui.docking, Some(dtf_layout()));
+        // A preview shows while its tool's tab is the active one of its group.
+        app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
         app.ui.dtf_panel.fields.insert("dtf.saturation".into(), initial_fields(&app, "dtf.saturation"));
         app.ui.dtf_panel.previewing = Some("dtf.saturation".into());
+        assert!(preview_source(&app).is_none(), "Saturation is behind Control Background");
+        app.run("window.panel.activate", json!({"panel": "Saturation"})).unwrap();
         assert_eq!(preview_source(&app).map(|p| p.0), Some(PREVIEW_DIALOG));
-        // Window › Saturation (each DTF tool has its entry) hides and shows the group.
+        // Window › Saturation closes its tab, and the preview with it.
         crate::menus::invoke(&mut app, &ctx, "window.panel.dtfSaturation", json!({})).unwrap();
-        assert!(!app.ui.panels.dtf);
         assert!(preview_source(&app).is_none());
-        crate::menus::invoke(&mut app, &ctx, "window.panel.dtfSaturation", json!({})).unwrap();
-        assert!(app.ui.panels.dtf);
     }
 
     /// The DTF specs carry descriptions in parentheses (with commas): their keys and defaults
@@ -319,6 +382,8 @@ mod tests {
         let ctx = egui::Context::default();
         app.ui.panels.dtf = true;
         let cmd = "filter.dtf.removeSemiTransparent";
+        // The tool's tab is the one on screen.
+        app.ui.dock_tabs.dtf = TOOLS.iter().position(|c| *c == cmd).unwrap();
         let mut f = initial_fields(&app, cmd);
         f.insert("threshold".into(), json!(50));
         app.ui.dtf_panel.fields.insert(cmd.into(), f);
@@ -357,6 +422,8 @@ mod tests {
         app.ui.panels.dtf = true;
         let cmd = "filter.dtf.removeWhiteBackground";
         app.ui.dtf_panel.fields.insert(cmd.into(), initial_fields(&app, cmd));
+        // The tool's tab is the one on screen.
+        app.ui.dock_tabs.dtf = TOOLS.iter().position(|c| *c == cmd).unwrap();
         assert_eq!(app.ui.dtf_panel.fields[cmd].get("color"), Some(&json!("#ffffff")));
         app.ui.dtf_panel.previewing = Some(cmd.into());
         assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
@@ -372,6 +439,36 @@ mod tests {
         assert_eq!(app.session.active().unwrap().doc.layers.len(), 1);
     }
 
+    /// The DTF tools spread over several tab groups (the DTF workspace): drawing one tool's tab
+    /// keeps the preview another tool's setting started.
+    #[test]
+    fn a_preview_survives_other_dtf_tabs_on_screen() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.ui.panels.dtf = true;
+        let cutout = TOOLS.iter().position(|c| *c == "filter.dtf.removeWhiteBackground").unwrap();
+        let saturation = TOOLS.iter().position(|c| *c == "dtf.saturation").unwrap();
+        app.ui.dtf_panel.fields.insert(TOOLS[cutout].into(), initial_fields(&app, TOOLS[cutout]));
+        app.ui.dtf_panel.previewing = Some(TOOLS[cutout].into());
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(300.0, 900.0)).build_ui_state(
+            move |ui, app: &mut PhotocraftApp| {
+                // The app's fonts are set up before the first frame draws a tab.
+                let ready = egui::Id::new("dtf-test-fonts");
+                if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
+                    PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
+                    ui.ctx().data_mut(|d| d.insert_temp(ready, true));
+                    return;
+                }
+                tool_body(app, ui, cutout);
+                tool_body(app, ui, saturation);
+            },
+            app,
+        );
+        h.run_steps(4);
+        let app = h.state();
+        assert_eq!(app.ui.dtf_panel.previewing.as_deref(), Some(TOOLS[cutout]));
+    }
+
     /// Screenshots for review (`DTF_VISUALS=<folder>`): the Home screen, the panel with a
     /// preview, and the layers DTF Halftone builds, in French.
     #[test]
@@ -383,6 +480,10 @@ mod tests {
             let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
                 let mut app = PhotocraftApp::new(session, crate::Services::default());
+                // The canvas draws previews on the GPU, as in the app.
+                if let Some(rs) = cc.wgpu_render_state.as_ref() {
+                    app.set_wgpu(rs.clone());
+                }
                 dtf_craft_startup(&mut app);
                 app
             });
@@ -414,11 +515,9 @@ mod tests {
             s.execute("layer.setProps", json!({"name": "origin"})).unwrap();
             s
         };
-        shot(visual(), "panneau", &|app| {
-            app.ui.dock_tabs.dtf = 0;
-        });
+        shot(visual(), "panneau", &|_| {});
         shot(visual(), "apercu", &|app| {
-            app.ui.dock_tabs.dtf = 4;
+            app.run("window.panel.activate", json!({"panel": "Transparent Pixels"})).unwrap();
             let mut f = initial_fields(app, "filter.dtf.removeSemiTransparent");
             f.insert("threshold".into(), json!(80));
             app.ui.dtf_panel.fields.insert("filter.dtf.removeSemiTransparent".into(), f);
@@ -445,7 +544,7 @@ mod tests {
             s
         };
         shot(on_white(), "detourage", &|app| {
-            app.ui.dock_tabs.dtf = 1;
+            app.run("window.panel.activate", json!({"panel": "Cutout"})).unwrap();
             let cmd = "filter.dtf.removeWhiteBackground";
             let mut f = initial_fields(app, cmd);
             f.insert("tolerance".into(), json!(12));

@@ -3675,3 +3675,8 @@ curves	Smooth	Làm mượt
 	Remove Halo	Xóa viền sáng
 	Interior Holes	Lỗ bên trong
 	Min Hole Size	Kích thước lỗ tối thiểu (px)
+# DTF Craft (5)
+	Transparent Pixels	Điểm ảnh trong suốt
+	Remove Fringe	Xóa viền
+	Show Background	Hiện nền
+	Delete Background	Xóa nền
