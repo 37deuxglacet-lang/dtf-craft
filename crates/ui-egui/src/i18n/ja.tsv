@@ -3870,3 +3870,10 @@ curves	Smooth	スムーズ
 	Remove Fringe	フリンジを削除
 	Show Background	背景を表示
 	Delete Background	背景を削除
+# DTF Craft (6)
+	Layer Name	レイヤー名
+	Preview Background	プレビューの背景
+	Add Holes (Magic Wand)	穴を追加（自動選択）
+	Show Before	変更前を表示
+	Click an enclosed area to make it transparent.	閉じた領域をクリックして透明にします。
+	Interior Hole	内側の穴

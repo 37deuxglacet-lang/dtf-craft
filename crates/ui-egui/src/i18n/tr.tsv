@@ -3925,3 +3925,10 @@ cameraData	Lens	Lens
 	Remove Fringe	Saçakları kaldır
 	Show Background	Arka planı göster
 	Delete Background	Arka planı sil
+# DTF Craft (6)
+	Layer Name	Katman adı
+	Preview Background	Önizleme arka planı
+	Add Holes (Magic Wand)	Delik ekle (sihirli değnek)
+	Show Before	Öncesini göster
+	Click an enclosed area to make it transparent.	Saydam yapmak için kapalı bir alana tıklayın.
+	Interior Hole	İç delik

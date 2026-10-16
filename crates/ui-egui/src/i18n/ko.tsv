@@ -3369,3 +3369,10 @@ curves	Smooth	매끄럽게
 	Remove Fringe	가장자리 제거
 	Show Background	배경 표시
 	Delete Background	배경 삭제
+# DTF Craft (6)
+	Layer Name	레이어 이름
+	Preview Background	미리 보기 배경
+	Add Holes (Magic Wand)	구멍 추가(자동 선택)
+	Show Before	이전 표시
+	Click an enclosed area to make it transparent.	닫힌 영역을 클릭하여 투명하게 만듭니다.
+	Interior Hole	내부 구멍

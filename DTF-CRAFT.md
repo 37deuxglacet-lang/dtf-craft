@@ -38,9 +38,18 @@ droite en trois groupes de trois onglets au plus — Fond de contrôle, Netteté
 Pixels transparents, Supprimer franges ; Calques, Conformité, Détourage. Canaux et Tracés n'y
 sont pas (menu Fenêtre). L'accueil donne le lien du projet GitHub de DTF Craft.
 
-Conformité impression : largeur et/ou hauteur en cm ; avec une seule valeur l'autre suit les
-proportions, avec les deux l'image tient dans le cadre largeur × hauteur. La transparence est
-rognée avant le redimensionnement.
+Conformité impression : l'onglet part de la taille actuelle du visuel (rogné si « Rogner la
+transparence » est coché) et de la résolution du document ; changer la largeur met à jour la
+hauteur, et inversement. La transparence est rognée avant le redimensionnement, en laissant
+2 px transparents autour du visuel. Le calque est renommé « origin » (champ Nom du calque).
+
+Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès
+que l'onglet est ouvert ou cliqué ; « Afficher l'avant » montre l'image d'origine pour comparer.
+
+Détourage : « Fond d'aperçu » choisit la couleur sur laquelle l'aperçu s'affiche (celle du Fond
+de contrôle par défaut) ; « Ajouter des trous (baguette magique) » active la baguette : chaque clic
+dans une zone fermée du calque « Sans fond » la rend transparente (tolérance du Détourage, une
+annulation par clic).
 
 ## Agrandissement IA
 

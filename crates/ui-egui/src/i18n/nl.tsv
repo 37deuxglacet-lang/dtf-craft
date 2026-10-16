@@ -3953,3 +3953,10 @@ curves	Smooth	Vloeiend maken
 	Remove Fringe	Randen verwijderen
 	Show Background	Achtergrond tonen
 	Delete Background	Achtergrond verwijderen
+# DTF Craft (6)
+	Layer Name	Laagnaam
+	Preview Background	Voorbeeldachtergrond
+	Add Holes (Magic Wand)	Gaten toevoegen (toverstaf)
+	Show Before	Voor tonen
+	Click an enclosed area to make it transparent.	Klik in een gesloten gebied om het transparant te maken.
+	Interior Hole	Binnengat

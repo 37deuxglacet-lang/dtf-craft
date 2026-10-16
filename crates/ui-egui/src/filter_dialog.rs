@@ -106,7 +106,8 @@ pub fn parse_spec(spec: &str) -> Vec<Param> {
         } else if let Some(rest) = v.strip_prefix("bool") {
             // The default is the first word: a description in parentheses may follow.
             Kind::Bool(rest.trim_start_matches('=').split(|c: char| c.is_whitespace() || c == '(').next() == Some("true"))
-        } else if v == "text" {
+        } else if v == "text" || v.starts_with("text=") {
+            // DTF Craft: `text="origin"` gives a default (`text_default`).
             Kind::Text
         } else if v == "color" {
             Kind::Color(None)
@@ -371,7 +372,7 @@ pub(crate) fn default_value(app: &PhotocraftApp, command: &str, p: &Param) -> Op
         }
         Kind::Bool(default) => json!(default),
         Kind::Int { default } => json!(default),
-        Kind::Text => json!(""),
+        Kind::Text => json!(text_default(command, &p.key).unwrap_or_default()),
         Kind::Document => json!(-1),
         // Identity kernel: 1 in the centre.
         Kind::Grid(n) => json!((0..*n).map(|i| i64::from(i == *n / 2)).collect::<Vec<_>>()),
@@ -387,6 +388,13 @@ pub(crate) fn default_value(app: &PhotocraftApp, command: &str, p: &Param) -> Op
         Kind::Json if p.key == "background" => json!(app.session.tools.background),
         Kind::Json => return None,
     })
+}
+
+/// A text param's default in its command's spec: `"key":text="value"` (DTF Craft).
+fn text_default(command: &str, key: &str) -> Option<String> {
+    let spec = photocraft_engine::commands::find(command)?.params;
+    let rest = spec.split(&format!("\"{key}\":text=\"")).nth(1)?;
+    rest.split('"').next().map(str::to_string)
 }
 
 /// Command-specific open defaults (ruler straighten, warp from layer, …), not remembered prefs.
@@ -960,10 +968,13 @@ pub(crate) fn preview_document_for_target(
     if command.starts_with("filter.blurGallery.") {
         crate::blur_pins::scale_for_proxy(&mut p, run_k);
     }
+    // DTF Craft: the cut-out previews on a control background (the panel's colour, dark by
+    // default, where a light halo shows); the command itself doesn't take that colour.
+    let preview_color = p.as_object_mut().and_then(|o| o.remove("previewColor")).and_then(|v| v.as_str().map(str::to_string));
     s.execute(command, p).ok()?;
-    // DTF Craft: the cut-out previews on the dark control background, where a light halo shows.
     if command == photocraft_engine::dtf_cmds::REMOVE_WHITE {
-        s.execute(photocraft_engine::dtf_cmds::CONTROL_BACKGROUND, json!({"color": "#231c1c"})).ok()?;
+        let color = preview_color.unwrap_or_else(|| crate::dtf_panel::PREVIEW_COLOR.to_string());
+        s.execute(photocraft_engine::dtf_cmds::CONTROL_BACKGROUND, json!({"color": color})).ok()?;
     }
     s.active().map(|d| crate::proxy::proxy_document(&d.doc, reduce_k))
 }
@@ -1021,6 +1032,15 @@ pub struct FilterPreviewKey {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_text_param_reads_its_default_from_the_spec() {
+        let app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let spec = parse_spec(photocraft_engine::commands::find("dtf.conformity").unwrap().params);
+        let name = spec.iter().find(|p| p.key == "layerName").expect("layerName");
+        assert_eq!(name.kind, Kind::Text);
+        assert_eq!(default_value(&app, "dtf.conformity", name), Some(json!("origin")));
+    }
 
     /// Preset names such as "iPhone 14 Pro Max" (the artboard dialog's choices) are text, not
     /// camelCase keys: they used to read "I Phone 14  Pro  Max".

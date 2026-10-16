@@ -364,6 +364,10 @@ pub const REMOVE_CONTROL_BACKGROUND: &str = "dtf.removeControlBackground";
 pub const DEFRINGE: &str = "dtf.defringe";
 pub const SHARPEN: &str = "dtf.sharpen";
 pub const SATURATION: &str = "dtf.saturation";
+/// Clicks an interior hole into the cut-out (Remove White Background tab's magic wand).
+pub const REMOVE_HOLE: &str = "dtf.removeHole";
+/// The transparent margin, in px, Print Conformity leaves around a trimmed visual.
+pub const TRIM_MARGIN: u32 = 2;
 
 /// Name of the control background fill layer (as the BRODERIE Photoshop actions call it).
 const BACKFILL: &str = "backfill";
@@ -401,7 +405,8 @@ fn conformity(s: &mut Session, p: &Value) -> Result<Value> {
         s.execute("layer.setProps", json!({"name": name}))?;
     }
     // Transparent borders go first, so the width and height given are the visual's own.
-    if p.get("trim").and_then(Value::as_bool).unwrap_or(true) {
+    let trim = p.get("trim").and_then(Value::as_bool).unwrap_or(true);
+    if trim {
         s.execute("image.trim", json!({"basedOn": "transparent"}))?;
     }
     let dpi = num(p, "resolution", 300.0);
@@ -411,6 +416,11 @@ fn conformity(s: &mut Session, p: &Value) -> Result<Value> {
         Some((w, h)) => s.execute("image.imageSize", json!({"width": w, "height": h, "resolution": dpi, "resample": resample}))?,
         None => s.execute("image.imageSize", json!({"resolution": dpi, "resample": "none"}))?,
     };
+    // A trimmed visual keeps a thin transparent margin: its edge never touches the canvas edge.
+    if trim {
+        let m = f64::from(2 * TRIM_MARGIN);
+        s.execute("image.canvasSize", json!({"width": m, "height": m, "relative": true, "anchor": "center", "extensionColor": "transparent"}))?;
+    }
     s.execute(if text(p, "depth", "8") == "16" { "image.mode.bits16" } else { "image.mode.bits8" }, json!({}))?;
     let d = &s.active().ok_or(EngineError::NoDocument)?.doc;
     Ok(json!({"width": d.size.width, "height": d.size.height, "resolution": d.resolution_dpi}))
@@ -454,6 +464,34 @@ fn control_background(s: &mut Session, p: &Value) -> Result<Value> {
     })
 }
 
+/// One interior hole in the cut-out: the area the magic wand picks at (x, y) on the active layer
+/// becomes transparent, in one undo step; the selection is left as it was.
+fn remove_hole(s: &mut Session, p: &Value) -> Result<Value> {
+    check_range(REMOVE_HOLE, p, "tolerance", 0.0, 255.0)?;
+    let st = s.active().ok_or(EngineError::NoDocument)?;
+    let layer = st.active_layer.ok_or_else(|| EngineError::Other("select the cut-out layer".into()))?;
+    if !matches!(st.doc.layer(layer).map(|l| &l.content), Some(photocraft_doc::LayerContent::Raster(_))) {
+        return Err(EngineError::Other("the active layer has no pixels to cut".into()));
+    }
+    let kept = st.doc.selection.clone();
+    let (x, y) = (num(p, "x", 0.0).floor(), num(p, "y", 0.0).floor());
+    crate::analysis_cmds::compound(s, "Interior Hole", |s| {
+        let picked = s.execute(
+            "select.magicWand",
+            json!({"x": x, "y": y, "tolerance": num(p, "tolerance", 26.0), "contiguous": true, "antiAlias": true, "sampleAllLayers": false, "mode": "replace"}),
+        )?;
+        if picked.get("selected").and_then(Value::as_bool) != Some(true) {
+            return Err(EngineError::Other("no area at this point".into()));
+        }
+        s.execute("edit.clear", json!({}))?;
+        s.edit("Interior Hole", |doc, _| {
+            doc.selection = kept;
+            Ok(())
+        })?;
+        Ok(json!({"x": x, "y": y}))
+    })
+}
+
 /// Deletes every layer named "backfill".
 fn remove_control_background(s: &mut Session, _: &Value) -> Result<Value> {
     let ids: Vec<u64> = s.active().ok_or(EngineError::NoDocument)?.doc.walk().into_iter().filter(|(_, _, l)| l.name == BACKFILL).map(|(_, _, l)| l.id.0).collect();
@@ -493,7 +531,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "Print Conformity…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"width":0..500=0 (cm; proportional when 0),"height":0..500=27 (cm; proportional when 0; both 0 keep the size),"resolution":72..1200=300,"resample":"bicubicAutomatic|preserveDetails|bicubic|bicubicSmoother|bicubicSharper|lanczos|bilinear|nearest"="bicubicAutomatic","depth":"8|16"="8","trim":bool=true,"layerName":str="origin"}"##,
+            params: r##"{"width":0..500=0 (cm; proportional when 0),"height":0..500=27 (cm; proportional when 0; both 0 keep the size),"resolution":72..1200=300,"resample":"bicubicAutomatic|preserveDetails|bicubic|bicubicSmoother|bicubicSharper|lanczos|bilinear|nearest"="bicubicAutomatic","depth":"8|16"="8","trim":bool=true (crop the transparency, leaving 2 px around the visual),"layerName":text="origin"}"##,
             enabled: has_doc,
             run: conformity,
             journal: true,
@@ -576,6 +614,16 @@ pub fn specs() -> Vec<CommandSpec> {
             params: r##"{"detectColor":bool=true (read the background colour on the image edges),"color":color=#ffffff (the background colour when it is not read),"tolerance":0..100=10 (% difference still taken as background; absorbs JPEG noise),"contour":0..10=2 (px of contour unmixed from the background),"removeHalo":bool=true (unmix the contour so no light halo is left),"interiorHoles":bool=false (also remove the background colour enclosed by the visual),"minHoleSize":1..1000000=100 (px; smaller enclosed areas stay)} Removes the plain background from the image edges inwards on a copy of the layer named "Sans fond"; the source layer is hidden, unchanged"##,
             enabled: crate::filters::has_filterable_layer,
             run: remove_white,
+            journal: true,
+        },
+        CommandSpec {
+            id: REMOVE_HOLE,
+            label: "Interior Hole",
+            menu: &[],
+            shortcut: None,
+            params: r##"{"x":px,"y":px,"tolerance":0..255=26} (the magic wand's contiguous area at x, y on the active layer becomes transparent; the selection is kept)"##,
+            enabled: crate::filters::has_filterable_layer,
+            run: remove_hole,
             journal: true,
         },
         CommandSpec {
@@ -825,6 +873,44 @@ mod tests {
         assert!(!d.doc.is_background(d.doc.layers[1].id));
         assert!(s.undo());
         assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+    }
+
+    /// A trimmed visual gets 2 px of transparency on every side, after the resize.
+    #[test]
+    fn conformity_leaves_a_transparent_margin_around_a_trimmed_visual() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 100, "height": 100, "resolution": 300, "background": "transparent"})).unwrap();
+        s.execute("select.rect", json!({"x": 20, "y": 30, "width": 40, "height": 20})).unwrap();
+        s.execute("edit.fill", json!({"color": "#ff0000"})).unwrap();
+        s.execute("select.deselect", json!({})).unwrap();
+        // 40 px wide at 300 ppi stays 40 px: 40 / 300 * 2.54 cm.
+        s.execute(CONFORMITY, json!({"width": 40.0 / 300.0 * 2.54, "height": 0, "resolution": 300})).unwrap();
+        let d = s.active().unwrap();
+        assert_eq!((d.doc.size.width, d.doc.size.height), (44, 24));
+        let px = photocraft_compose::flatten(&d.doc);
+        let alpha = |x: usize, y: usize| px.px[y * 44 + x][3];
+        assert_eq!((alpha(0, 0), alpha(1, 12), alpha(2, 12), alpha(41, 12), alpha(42, 12)), (0.0, 0.0, 1.0, 1.0, 0.0));
+        assert_eq!(d.doc.layers[0].name, "origin");
+    }
+
+    #[test]
+    fn a_click_with_the_hole_wand_clears_one_enclosed_area_and_keeps_the_selection() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
+        s.execute("select.rect", json!({"x": 0, "y": 0, "width": 30, "height": 30})).unwrap();
+        s.execute("edit.fill", json!({"color": "#ff0000"})).unwrap();
+        s.execute("select.rect", json!({"x": 10, "y": 10, "width": 10, "height": 10})).unwrap();
+        s.execute("edit.fill", json!({"color": "#ffffff"})).unwrap();
+        s.execute("select.rect", json!({"x": 0, "y": 0, "width": 5, "height": 5})).unwrap();
+        s.execute(REMOVE_HOLE, json!({"x": 15, "y": 15})).unwrap();
+        let d = s.active().unwrap();
+        let layer = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap();
+        assert_eq!(layer.pixel(15, 15)[3], 0.0, "the white square is a hole");
+        assert_eq!(layer.pixel(2, 2)[3], 1.0, "the red frame stays");
+        assert!(d.doc.selection.is_some(), "the selection is kept");
+        assert!(s.undo());
+        let d = s.active().unwrap();
+        assert_eq!(d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().pixel(15, 15)[3], 1.0, "one undo step");
     }
 
     /// A second control background (another colour) replaces the first: one "backfill" only.

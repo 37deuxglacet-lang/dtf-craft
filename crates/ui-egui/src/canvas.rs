@@ -5157,6 +5157,8 @@ pub fn tool_event(app: &mut PhotocraftApp, ev: ToolEvent, mods: egui::Modifiers)
                     crate::retouch_ui::set_source(app, x, y);
                     return;
                 }
+                // DTF Craft: the Remove White Background tab's wand clicks interior holes.
+                Tool::MagicWand if crate::dtf_panel::hole_wand_click(app, x, y) => return,
                 Tool::MagicWand => {
                     let o = app.ui.tool_options.clone();
                     let mode = selection_mode(app, mods);

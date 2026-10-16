@@ -37,6 +37,13 @@ pub const TABS: [&str; 7] = ["Conformity", "Cutout", "Control Background", "Tran
 /// Tools applied on Apply only: Print Conformity resizes the image.
 const WITHOUT_PREVIEW: [&str; 1] = ["dtf.conformity"];
 
+/// The retouching tabs: their preview starts as soon as the tab is opened (or clicked), and
+/// "Show Before" hides it to compare.
+const RETOUCH: [&str; 4] = ["dtf.sharpen", "dtf.saturation", "filter.dtf.removeSemiTransparent", "dtf.defringe"];
+
+/// The Remove White Background preview's control colour, when none was picked.
+pub const PREVIEW_COLOR: &str = "#231c1c";
+
 /// The DTF tabs' state. The settings live in `fields` while the app runs and are saved with the
 /// dialogs' remembered values when applied.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -46,6 +53,21 @@ pub struct DtfPanelUi {
     /// The section whose settings are previewed on the canvas.
     #[serde(skip)]
     pub previewing: Option<String>,
+    /// Print Conformity's sizes were read from this document state: (document, revision, trim).
+    #[serde(skip)]
+    conformity_source: Option<(photocraft_doc::DocId, u64, bool)>,
+    /// The visual Print Conformity resizes, in px (trimmed when Trim is on).
+    #[serde(skip)]
+    visual_px: Option<(u32, u32)>,
+    /// The pass each tool's tab was last drawn in (a tab shown again opens its preview).
+    #[serde(skip)]
+    drawn: BTreeMap<String, u64>,
+    /// The first pass a DTF tab was drawn in (the tabs on screen at start don't preview).
+    #[serde(skip)]
+    first_pass: Option<u64>,
+    /// The interior-hole magic wand is on: the tool it replaced, given back when it goes off.
+    #[serde(skip)]
+    pub hole_wand: Option<crate::state::Tool>,
 }
 
 /// The section title: the tool's DTF menu label without its "…".
@@ -105,10 +127,18 @@ fn initial_fields(app: &PhotocraftApp, command: &str) -> Map<String, Value> {
         }
     }
     if let Some(Value::Object(saved)) = app.session.prefs().dialogs.get(command) {
+        // A remembered value of another type (a name saved as a number) is left out.
+        let same_kind = |a: &Value, b: &Value| std::mem::discriminant(a) == std::mem::discriminant(b) || (a.is_number() && b.is_number());
         for p in &params {
-            if let Some(v) = saved.get(&p.key) {
+            if let Some(v) = saved.get(&p.key)
+                && f.get(&p.key).is_none_or(|d| same_kind(d, v))
+            {
                 f.insert(p.key.clone(), v.clone());
             }
+        }
+        // Remove White Background's preview colour is the panel's own setting.
+        if let Some(c) = saved.get("previewColor").filter(|v| v.is_string()) {
+            f.insert("previewColor".into(), c.clone());
         }
     }
     f
@@ -127,6 +157,10 @@ pub(crate) fn preview_source(app: &PhotocraftApp) -> Option<(u64, Map<String, Va
         return None;
     }
     let f = app.ui.dtf_panel.fields.get(cmd)?;
+    // "Show Before": the canvas shows the image as it is.
+    if f.get("__before").and_then(Value::as_bool) == Some(true) {
+        return None;
+    }
     Some((PREVIEW_DIALOG, f.clone()))
 }
 
@@ -141,7 +175,12 @@ pub(crate) fn stop_preview(app: &mut PhotocraftApp) {
 /// Run a section's tool on the active document with its settings.
 fn apply(app: &mut PhotocraftApp, command: &str) {
     let Some(f) = app.ui.dtf_panel.fields.get(command).cloned() else { return };
-    let params = app.with_mask_target(command, crate::filter_dialog::params_of(&f));
+    let mut params = app.with_mask_target(command, crate::filter_dialog::params_of(&f));
+    if command == "dtf.conformity" {
+        conformity_params(app, &f, &mut params);
+    }
+    // The preview colour is the panel's: the command doesn't take it.
+    let preview_color = params.as_object_mut().and_then(|o| o.remove("previewColor"));
     let previewed = app.ui.dtf_panel.previewing.as_deref() == Some(command);
     app.ui.dtf_panel.previewing = None;
     let result = app.run(command, params.clone());
@@ -162,7 +201,10 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
             if let Value::Object(saved) = params
                 && !saved.is_empty()
             {
-                let saved: Map<String, Value> = saved.into_iter().filter(|(k, _)| k != "layer" && k != "channel").collect();
+                let mut saved: Map<String, Value> = saved.into_iter().filter(|(k, _)| k != "layer" && k != "channel").collect();
+                if let Some(c) = preview_color {
+                    saved.insert("previewColor".into(), c);
+                }
                 app.session.prefs.edit(|prefs| prefs.dialogs.insert(command.into(), Value::Object(saved)));
             }
         }
@@ -170,15 +212,16 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
     }
 }
 
-/// The Control Background colour row: a swatch with egui's colour picker and the hex value.
-fn color_row(ui: &mut egui::Ui, f: &mut Map<String, Value>) -> bool {
+/// A colour row (Control Background's colour, the cut-out's preview colour): a swatch with egui's
+/// colour picker and the hex value, stored as `#rrggbb` under `key`.
+fn color_row(ui: &mut egui::Ui, f: &mut Map<String, Value>, key: &str, label: &str) -> bool {
     let t = Tokens::get(ui.ctx());
-    let hex = f.get("color").and_then(Value::as_str).unwrap_or("#231c1c").to_string();
+    let hex = f.get(key).and_then(Value::as_str).unwrap_or(PREVIEW_COLOR).to_string();
     let rgb = crate::color_picker_ui::parse_hex(&hex).unwrap_or([0.137, 0.11, 0.11]);
     let mut bytes = rgb.map(|v| (v.clamp(0.0, 1.0) * 255.0).round() as u8);
     let mut changed = false;
     ui.horizontal(|ui| {
-        ui.label(RichText::new(crate::filter_dialog::label("color")).color(t.text_dim));
+        ui.label(RichText::new(label).color(t.text_dim));
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             if egui::color_picker::color_edit_button_srgb(ui, &mut bytes).changed() {
                 changed = true;
@@ -187,9 +230,148 @@ fn color_row(ui: &mut egui::Ui, f: &mut Map<String, Value>) -> bool {
         });
     });
     if changed {
-        f.insert("color".into(), json!(format!("#{:02x}{:02x}{:02x}", bytes[0], bytes[1], bytes[2])));
+        f.insert(key.into(), json!(format!("#{:02x}{:02x}{:02x}", bytes[0], bytes[1], bytes[2])));
     }
     changed
+}
+
+/// Print Conformity's visual, in px: the document, or its non-transparent bounds when Trim is on
+/// (as `image.trim` finds them).
+fn visual_size(doc: &photocraft_doc::Document, trim: bool) -> (u32, u32) {
+    let (w, h) = (doc.size.width, doc.size.height);
+    if !trim {
+        return (w, h);
+    }
+    let buf = photocraft_compose::flatten(doc);
+    let (mut x0, mut y0, mut x1, mut y1) = (u32::MAX, u32::MAX, 0, 0);
+    for (i, q) in buf.px.iter().enumerate() {
+        if q[3] > 0.0 {
+            let (x, y) = ((i % w as usize) as u32, (i / w as usize) as u32);
+            (x0, y0, x1, y1) = (x0.min(x), y0.min(y), x1.max(x + 1), y1.max(y + 1));
+        }
+    }
+    if x1 <= x0 || y1 <= y0 { (w, h) } else { (x1 - x0, y1 - y0) }
+}
+
+fn cm(px: u32, dpi: f64) -> f64 {
+    f64::from(px) / dpi.max(1.0) * 2.54
+}
+
+fn round1(v: f64) -> f64 {
+    (v * 10.0).round() / 10.0
+}
+
+/// Print Conformity starts from the visual as it is: its size in cm and the document's ppi. Read
+/// again whenever the document changes; Trim switched keeps the size last typed.
+fn sync_conformity(app: &mut PhotocraftApp, f: &mut Map<String, Value>) {
+    let Some(st) = app.session.active() else { return };
+    let trim = f.get("trim").and_then(Value::as_bool).unwrap_or(true);
+    let key = (st.doc.id, st.revision, trim);
+    let panel = &app.ui.dtf_panel;
+    if panel.conformity_source == Some(key) {
+        return;
+    }
+    let same_doc = panel.conformity_source.is_some_and(|(d, r, _)| d == key.0 && r == key.1);
+    let (w, h) = visual_size(&st.doc, trim);
+    let dpi = f64::from(st.doc.resolution_dpi).max(1.0);
+    if same_doc && f.contains_key("__lastDim") {
+        // Trim switched: the size typed stays, the other side follows the new visual.
+        let (wc, hc) = (f.get("width").and_then(Value::as_f64).unwrap_or(0.0), f.get("height").and_then(Value::as_f64).unwrap_or(0.0));
+        if f.get("__lastDim").and_then(Value::as_str) == Some("height") {
+            f.insert("width".into(), json!(round1(hc * f64::from(w) / f64::from(h.max(1)))));
+        } else {
+            f.insert("height".into(), json!(round1(wc * f64::from(h) / f64::from(w.max(1)))));
+        }
+    } else {
+        f.insert("width".into(), json!(round1(cm(w, dpi))));
+        f.insert("height".into(), json!(round1(cm(h, dpi))));
+        f.insert("resolution".into(), json!(dpi.round()));
+        f.remove("__lastDim");
+    }
+    let panel = &mut app.ui.dtf_panel;
+    panel.conformity_source = Some(key);
+    panel.visual_px = Some((w, h));
+}
+
+/// Width and height stay in proportion: the side changed sets the other.
+fn link_dimensions(app: &PhotocraftApp, before: &Map<String, Value>, f: &mut Map<String, Value>) {
+    let Some((w, h)) = app.ui.dtf_panel.visual_px else { return };
+    let get = |m: &Map<String, Value>, k: &str| m.get(k).and_then(Value::as_f64).unwrap_or(0.0);
+    let (bw, bh, nw, nh) = (get(before, "width"), get(before, "height"), get(f, "width"), get(f, "height"));
+    let ratio = f64::from(h) / f64::from(w.max(1));
+    if (nw - bw).abs() > 1e-9 {
+        f.insert("height".into(), json!(round1(nw * ratio)));
+        f.insert("__lastDim".into(), json!("width"));
+    } else if (nh - bh).abs() > 1e-9 {
+        f.insert("width".into(), json!(round1(nh / ratio)));
+        f.insert("__lastDim".into(), json!("height"));
+    }
+}
+
+/// Print Conformity's command: the side typed last (the other follows the proportions); sizes left
+/// as read keep the pixels (a new ppi alone keeps the print size).
+fn conformity_params(app: &PhotocraftApp, f: &Map<String, Value>, params: &mut Value) {
+    let Some(o) = params.as_object_mut() else { return };
+    let last = f.get("__lastDim").and_then(Value::as_str);
+    match last {
+        Some("height") => {
+            o.insert("width".into(), json!(0));
+        }
+        Some(_) => {
+            o.insert("height".into(), json!(0));
+        }
+        None => {
+            let doc_dpi = app.session.active().map_or(300.0, |st| f64::from(st.doc.resolution_dpi));
+            let dpi = f.get("resolution").and_then(Value::as_f64).unwrap_or(doc_dpi);
+            match app.ui.dtf_panel.visual_px {
+                // The same ppi: no resampling at all.
+                _ if (dpi - doc_dpi).abs() < 0.5 => {
+                    o.insert("width".into(), json!(0));
+                    o.insert("height".into(), json!(0));
+                }
+                // A new ppi: the exact print size the visual has now.
+                Some((w, _)) => {
+                    o.insert("width".into(), json!(cm(w, doc_dpi)));
+                    o.insert("height".into(), json!(0));
+                }
+                None => {}
+            }
+        }
+    }
+}
+
+/// Turn the interior-hole magic wand on or off (Remove White Background tab). On, the Magic Wand
+/// tool is active and a click on the canvas clears the area it picks (`dtf.removeHole`).
+pub(crate) fn set_hole_wand(app: &mut PhotocraftApp, on: bool) {
+    match (on, app.ui.dtf_panel.hole_wand) {
+        (true, None) => {
+            app.ui.dtf_panel.hole_wand = Some(app.ui.tool);
+            app.ui.tool = crate::state::Tool::MagicWand;
+            app.ui.status = tl!("Click an enclosed area to make it transparent.").into();
+        }
+        (false, Some(previous)) => {
+            app.ui.dtf_panel.hole_wand = None;
+            if app.ui.tool == crate::state::Tool::MagicWand {
+                app.ui.tool = previous;
+            }
+        }
+        _ => {}
+    }
+}
+
+/// A canvas click while the interior-hole wand is on: clears the area at (x, y) with the cut-out
+/// tolerance. `false` when the wand is off (the Magic Wand selects as usual).
+pub(crate) fn hole_wand_click(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
+    if app.ui.dtf_panel.hole_wand.is_none() || app.ui.tool != crate::state::Tool::MagicWand {
+        return false;
+    }
+    // The cut-out's tolerance (% of the colour range) as the wand's 0–255.
+    let pct = app.ui.dtf_panel.fields.get(photocraft_engine::dtf_cmds::REMOVE_WHITE).and_then(|f| f.get("tolerance")).and_then(Value::as_f64).unwrap_or(10.0);
+    let tolerance = (pct * 2.55).round().clamp(0.0, 255.0);
+    if let Err(error) = app.run(photocraft_engine::dtf_cmds::REMOVE_HOLE, json!({"x": x.floor(), "y": y.floor(), "tolerance": tolerance})) {
+        crate::notices::error(app, error);
+    }
+    true
 }
 
 /// Print Conformity's note: the active document's print size now, in cm at its resolution.
@@ -214,9 +396,23 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     // (`preview_source`): drawing another DTF tab, in another group, leaves it be.
     let have_doc = app.session.active().is_some();
     let enabled = have_doc && app.session.is_enabled(cmd);
+    let retouch = RETOUCH.contains(&cmd);
+    // A retouching tab opened (shown again after a pass without it) or clicked previews at once.
+    let pass = ui.ctx().cumulative_pass_nr();
+    let first = *app.ui.dtf_panel.first_pass.get_or_insert(pass);
+    let last = app.ui.dtf_panel.drawn.insert(cmd.to_string(), pass);
+    let opened = pass > first + 1 && last.is_none_or(|l| l + 1 < pass);
+    let area = ui.max_rect().intersect(ui.clip_rect());
+    let clicked = ui.input(|i| i.pointer.primary_pressed() && i.pointer.interact_pos().is_some_and(|p| area.contains(p)));
+    if retouch && enabled && (opened || clicked) {
+        app.ui.dtf_panel.previewing = Some(cmd.to_string());
+    }
     let note = if cmd == "dtf.conformity" { current_size_note(app) } else { None };
-    let previewing = app.ui.dtf_panel.previewing.as_deref() == Some(cmd);
     let Some(mut f) = app.ui.dtf_panel.fields.remove(cmd) else { return };
+    if cmd == "dtf.conformity" {
+        sync_conformity(app, &mut f);
+    }
+    let previewing = app.ui.dtf_panel.previewing.as_deref() == Some(cmd);
     match note {
         Some(n) => f.insert("__note".into(), json!(n)),
         None => f.remove("__note"),
@@ -232,9 +428,30 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     ui.spacing_mut().item_spacing.y = 4.0;
     let before = f.clone();
     if cmd == "dtf.controlBackground" {
-        color_row(ui, &mut f);
+        color_row(ui, &mut f, "color", &crate::filter_dialog::label("color"));
     } else {
         crate::filter_dialog::body(ui, &mut f);
+    }
+    if cmd == "dtf.conformity" {
+        link_dimensions(app, &before, &mut f);
+    }
+    let mut wand = app.ui.dtf_panel.hole_wand.is_some();
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        // The control colour the cut-out previews on (the garment's).
+        if !f.contains_key("previewColor") {
+            let control = app.ui.dtf_panel.fields.get("dtf.controlBackground").and_then(|c| c.get("color")).cloned();
+            f.insert("previewColor".into(), control.unwrap_or_else(|| json!(PREVIEW_COLOR)));
+        }
+        color_row(ui, &mut f, "previewColor", tl!("Preview Background"));
+        // Interior holes by hand: each click with the wand clears the enclosed area it picks.
+        ui.add_enabled_ui(have_doc, |ui| {
+            crate::widgets::checkbox(ui, &mut wand, tl!("Add Holes (Magic Wand)"));
+        });
+    }
+    if retouch {
+        let mut show_before = f.get("__before").and_then(Value::as_bool).unwrap_or(false);
+        crate::widgets::checkbox(ui, &mut show_before, tl!("Show Before"));
+        f.insert("__before".into(), json!(show_before));
     }
     let changed = f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v));
     ui.add_space(6.0);
@@ -257,6 +474,9 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         }
     });
     app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE && wand != app.ui.dtf_panel.hole_wand.is_some() {
+        set_hole_wand(app, wand);
+    }
     if changed && enabled && !WITHOUT_PREVIEW.contains(&cmd) {
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
     }
@@ -469,6 +689,140 @@ mod tests {
         assert_eq!(app.ui.dtf_panel.previewing.as_deref(), Some(TOOLS[cutout]));
     }
 
+    /// A harness drawing DTF tabs with the app's fonts (set up on the first pass).
+    fn tabs_harness(app: PhotocraftApp, draw: impl FnMut(&mut egui::Ui, &mut PhotocraftApp) + 'static) -> egui_kittest::Harness<'static, PhotocraftApp> {
+        let mut draw = draw;
+        egui_kittest::Harness::builder().with_size(vec2(320.0, 900.0)).build_ui_state(
+            move |ui, app: &mut PhotocraftApp| {
+                let ready = egui::Id::new("dtf-test-fonts");
+                if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
+                    PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
+                    ui.ctx().data_mut(|d| d.insert_temp(ready, true));
+                    return;
+                }
+                draw(ui, app);
+            },
+            app,
+        )
+    }
+
+    fn tab_of(cmd: &str) -> usize {
+        TOOLS.iter().position(|c| *c == cmd).unwrap()
+    }
+
+    /// Print Conformity: the layer name reads "origin" (a remembered 0 is dropped), the sizes
+    /// start from the trimmed visual at the document's ppi, and the other side follows.
+    #[test]
+    fn conformity_starts_from_the_visual_and_keeps_its_proportions() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.session.prefs.edit(|p| p.dialogs.insert("dtf.conformity".into(), json!({"layerName": 0, "width": 0, "height": 27, "resolution": 300})));
+        app.run("file.new", json!({"width": 600, "height": 600, "resolution": 150, "background": "transparent"})).unwrap();
+        app.run("select.rect", json!({"x": 100, "y": 200, "width": 300, "height": 150})).unwrap();
+        app.run("edit.fill", json!({"color": "#ff0000"})).unwrap();
+        app.run("select.deselect", json!({})).unwrap();
+        let cmd = "dtf.conformity";
+        let mut f = initial_fields(&app, cmd);
+        assert_eq!(f.get("layerName"), Some(&json!("origin")));
+        sync_conformity(&mut app, &mut f);
+        // 300 × 150 px at 150 ppi: 5.08 × 2.54 cm.
+        assert_eq!((f.get("width"), f.get("height"), f.get("resolution")), (Some(&json!(5.1)), Some(&json!(2.5)), Some(&json!(150.0))));
+        // Applying as read only crops (no resampling): 300 × 150 plus the 2 px margin.
+        let mut params = crate::filter_dialog::params_of(&f);
+        conformity_params(&app, &f, &mut params);
+        assert_eq!((params["width"].clone(), params["height"].clone()), (json!(0), json!(0)));
+        // A new width sets the height.
+        let before = f.clone();
+        f.insert("width".into(), json!(10.0));
+        link_dimensions(&app, &before, &mut f);
+        assert_eq!(f.get("height"), Some(&json!(5.0)));
+        let mut params = crate::filter_dialog::params_of(&f);
+        conformity_params(&app, &f, &mut params);
+        assert_eq!((params["width"].clone(), params["height"].clone()), (json!(10.0), json!(0)));
+        app.ui.dtf_panel.fields.insert(cmd.into(), f);
+        apply(&mut app, cmd);
+        let d = &app.session.active().unwrap().doc;
+        // 10 cm at 150 ppi = 591 px (+ 4), proportions kept.
+        assert_eq!((d.size.width, d.size.height), (595, 299));
+        assert_eq!(d.layers[0].name, "origin");
+        // The new document state is read again: its size now.
+        let mut f = app.ui.dtf_panel.fields.remove(cmd).unwrap();
+        sync_conformity(&mut app, &mut f);
+        assert_eq!(f.get("width"), Some(&json!(10.0)));
+    }
+
+    /// The interior-hole wand: on, a canvas click with the Magic Wand clears the enclosed area;
+    /// off, the previous tool comes back.
+    #[test]
+    fn the_hole_wand_clicks_interior_holes() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
+        app.run("select.rect", json!({"x": 0, "y": 0, "width": 30, "height": 30})).unwrap();
+        app.run("edit.fill", json!({"color": "#ff0000"})).unwrap();
+        app.run("select.rect", json!({"x": 10, "y": 10, "width": 10, "height": 10})).unwrap();
+        app.run("edit.fill", json!({"color": "#ffffff"})).unwrap();
+        app.run("select.deselect", json!({})).unwrap();
+        app.ui.tool = crate::state::Tool::Brush;
+        assert!(!hole_wand_click(&mut app, 15.0, 15.0), "off: the wand selects as usual");
+        set_hole_wand(&mut app, true);
+        assert_eq!(app.ui.tool, crate::state::Tool::MagicWand);
+        assert!(hole_wand_click(&mut app, 15.0, 15.0));
+        let st = app.session.active().unwrap();
+        let layer = st.doc.layer(st.active_layer.unwrap()).unwrap().surface().unwrap();
+        assert_eq!((layer.pixel(15, 15)[3], layer.pixel(2, 2)[3]), (0.0, 1.0));
+        set_hole_wand(&mut app, false);
+        assert_eq!(app.ui.tool, crate::state::Tool::Brush);
+    }
+
+    /// The cut-out previews on the colour picked in its tab.
+    #[test]
+    fn the_cutout_previews_on_the_colour_picked() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.background_jobs = false;
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.ui.panels.dtf = true;
+        let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+        app.ui.dock_tabs.dtf = tab_of(cmd);
+        let mut f = initial_fields(&app, cmd);
+        f.insert("previewColor".into(), json!("#0000ff"));
+        app.ui.dtf_panel.fields.insert(cmd.into(), f);
+        app.ui.dtf_panel.previewing = Some(cmd.into());
+        let ctx = egui::Context::default();
+        assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
+        let doc = app.filter_preview.as_ref().unwrap().result.as_ref().unwrap();
+        let rgb = photocraft_compose::flatten_to_surface(doc, photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false), None);
+        assert_eq!(rgb.pixel(0, 0)[..3], [0.0, 0.0, 1.0]);
+        // Apply doesn't hand the preview colour to the command, and remembers it.
+        apply(&mut app, cmd);
+        assert_eq!(app.session.prefs().dialogs.get(cmd).and_then(|v| v.get("previewColor").cloned()), Some(json!("#0000ff")));
+        assert_eq!(initial_fields(&app, cmd).get("previewColor"), Some(&json!("#0000ff")));
+    }
+
+    /// A retouching tab previews as soon as it is opened; "Show Before" shows the image as it is.
+    #[test]
+    fn a_retouching_tab_previews_when_opened_and_shows_before_on_demand() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.ui.panels.dtf = true;
+        let sat = tab_of("dtf.saturation");
+        let shown = std::rc::Rc::new(std::cell::Cell::new(false));
+        let on = shown.clone();
+        let mut h = tabs_harness(app, move |ui, app| {
+            tool_body(app, ui, tab_of("dtf.controlBackground"));
+            if on.get() {
+                tool_body(app, ui, sat);
+            }
+        });
+        h.run_steps(4);
+        assert_eq!(h.state().ui.dtf_panel.previewing, None, "nothing previews on its own");
+        shown.set(true);
+        h.state_mut().ui.dock_tabs.dtf = sat;
+        h.run_steps(2);
+        assert_eq!(h.state().ui.dtf_panel.previewing.as_deref(), Some("dtf.saturation"), "opening the tab previews");
+        assert!(preview_source(h.state()).is_some());
+        h.state_mut().ui.dtf_panel.fields.get_mut("dtf.saturation").unwrap().insert("__before".into(), json!(true));
+        assert!(preview_source(h.state()).is_none(), "Show Before: the image as it is");
+    }
+
     /// Screenshots for review (`DTF_VISUALS=<folder>`): the Home screen, the panel with a
     /// preview, and the layers DTF Halftone builds, in French.
     #[test]
@@ -550,6 +904,17 @@ mod tests {
             f.insert("tolerance".into(), json!(12));
             app.ui.dtf_panel.fields.insert(cmd.into(), f);
             app.ui.dtf_panel.previewing = Some(cmd.into());
+        });
+        shot(visual(), "conformite", &|app| {
+            app.run("window.panel.activate", json!({"panel": "Conformity"})).unwrap();
+        });
+        // Saturation opened: its preview shows without moving the slider.
+        shot(visual(), "saturation", &|app| {
+            let mut f = initial_fields(app, "dtf.saturation");
+            f.insert("saturation".into(), json!(-100));
+            app.ui.dtf_panel.fields.insert("dtf.saturation".into(), f);
+            app.ui.dtf_panel.first_pass = Some(0);
+            app.run("window.panel.activate", json!({"panel": "Saturation"})).unwrap();
         });
         let mut halftoned = visual();
         halftoned.execute("filter.dtf.halftone", json!({"mode": "semiTransparent", "frequency": 25})).unwrap();

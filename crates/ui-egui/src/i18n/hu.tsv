@@ -4114,3 +4114,10 @@ cameraRaw	Yellow	Sárga
 	Remove Fringe	Szegély eltávolítása
 	Show Background	Háttér megjelenítése
 	Delete Background	Háttér törlése
+# DTF Craft (6)
+	Layer Name	Réteg neve
+	Preview Background	Előnézet háttere
+	Add Holes (Magic Wand)	Lyukak hozzáadása (varázspálca)
+	Show Before	Előtte nézet
+	Click an enclosed area to make it transparent.	Kattintson egy zárt területre, hogy átlátszó legyen.
+	Interior Hole	Belső lyuk
