@@ -89,8 +89,8 @@ impl Visual {
 
 /// The visible pixels of `surf` (alpha above zero) within `full`.
 fn alpha_bounds(surf: &Surface, full: Rect) -> Rect {
-    let w = full.width().max(0) as usize;
-    if w == 0 || full.height() <= 0 {
+    let w = full.width() as usize;
+    if w == 0 || full.height() == 0 {
         return Rect::EMPTY;
     }
     let mut out = Rect::EMPTY;
@@ -125,8 +125,8 @@ pub fn load_document(doc: &Document, name: &str) -> Result<Visual> {
     Ok(Visual {
         name: name.to_string(),
         pixels: surf.translated(-r.x0, -r.y0, r),
-        width: r.width() as u32,
-        height: r.height() as u32,
+        width: r.width(),
+        height: r.height(),
         dpi: f64::from(doc.resolution_dpi),
     })
 }
@@ -426,14 +426,14 @@ mod tests {
         assert!((st.doc.resolution_dpi - 300.0).abs() < 0.01);
         assert_eq!(st.doc.layers[1].name, "a 2");
         // Every layer is a visual at its print size: 10 cm = 1181 px wide (or high, turned).
-        let sizes: Vec<(i32, i32)> = st
+        let sizes: Vec<(i64, i64)> = st
             .doc
             .layers
             .iter()
             .map(|l| match &l.content {
                 LayerContent::Raster(px) => {
                     let b = px.content_bounds();
-                    (b.width(), b.height())
+                    (i64::from(b.width()), i64::from(b.height()))
                 }
                 _ => (0, 0),
             })
