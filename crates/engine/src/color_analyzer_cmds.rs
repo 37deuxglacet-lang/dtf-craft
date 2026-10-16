@@ -300,7 +300,8 @@ pub fn render(s: &Session, v: &Visual, entries: &[Entry], set: &Settings, date: 
         }
     };
     let mut lines: Vec<Line> = Vec::new();
-    let mut line = |x: f64, y: f64, text: String, pt: f64, center: bool, bold: bool| lines.push(Line { x: px(x) as f64, y: px(y) as f64, text, pt, center, bold });
+    let mut line =
+        |x: f64, y: f64, text: String, pt: f64, center: bool, bold: bool| lines.push(Line { x: px(x) as f64, y: px(y) as f64, text, pt, center, bold });
     // Header.
     let m = ca::BOARD_MARGIN;
     line(m, m + 6.0, format!("ANALYSEUR COULEURS — {}", v.name), TITLE_PT, false, true);
@@ -353,7 +354,9 @@ pub fn render(s: &Session, v: &Visual, entries: &[Entry], set: &Settings, date: 
             fill(x0, y0, x1, y1, c.rgb);
             if c.is_center() {
                 // A black frame just outside the patch.
-                for (a0, b0, a1, b1) in [(x0 - ring, y0 - ring, x1 + ring, y0), (x0 - ring, y1, x1 + ring, y1 + ring), (x0 - ring, y0, x0, y1), (x1, y0, x1 + ring, y1)] {
+                for (a0, b0, a1, b1) in
+                    [(x0 - ring, y0 - ring, x1 + ring, y0), (x0 - ring, y1, x1 + ring, y1 + ring), (x0 - ring, y0, x0, y1), (x1, y0, x1 + ring, y1)]
+                {
                     fill(a0, b0, a1, b1, [0, 0, 0]);
                 }
             }
@@ -407,7 +410,7 @@ pub fn settings(p: &Value) -> Result<Settings> {
     check_range(p, "width", 10.0, 300.0)?;
     check_range(p, "resolution", 72.0, 1200.0)?;
     let grid = num(p, "grid", DEFAULT_GRID as f64).round() as usize;
-    if grid % 2 == 0 {
+    if grid.is_multiple_of(2) {
         return Err(bad("`grid` must be 3, 5 or 7"));
     }
     let d = Board::default();
@@ -421,7 +424,13 @@ pub fn settings(p: &Value) -> Result<Settings> {
     if x == y {
         return Err(bad("`axisX` and `axisY` must differ"));
     }
-    Ok(Settings { x, y, step: num(p, "step", DEFAULT_STEP), board: Board { width: num(p, "width", d.width / 10.0) * 10.0, patch, pitch, grid }, resolution: num(p, "resolution", DEFAULT_RESOLUTION) })
+    Ok(Settings {
+        x,
+        y,
+        step: num(p, "step", DEFAULT_STEP),
+        board: Board { width: num(p, "width", d.width / 10.0) * 10.0, patch, pitch, grid },
+        resolution: num(p, "resolution", DEFAULT_RESOLUTION),
+    })
 }
 
 fn color_analyzer_cmd(s: &mut Session, p: &Value) -> Result<Value> {
@@ -629,4 +638,3 @@ mod tests {
         assert_eq!(step_text(2.5, Axis::Lightness), "2,5 %");
     }
 }
-

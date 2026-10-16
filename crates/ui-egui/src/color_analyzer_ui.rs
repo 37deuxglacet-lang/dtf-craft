@@ -249,7 +249,11 @@ impl ColorAnalyzerDialog {
         let mut out = String::new();
         for (i, r) in self.rows.iter().enumerate() {
             let share = r.share.map(|s| format!("  ({})", cmd::share_text(s))).unwrap_or_default();
-            let line = if r.center == r.original { format!("{} {} : {}{share}", tl!("Color"), i + 1, ca::hex(r.center)) } else { format!("{} {} : {} → {}{share}", tl!("Color"), i + 1, ca::hex(r.original), ca::hex(r.center)) };
+            let line = if r.center == r.original {
+                format!("{} {} : {}{share}", tl!("Color"), i + 1, ca::hex(r.center))
+            } else {
+                format!("{} {} : {} → {}{share}", tl!("Color"), i + 1, ca::hex(r.original), ca::hex(r.center))
+            };
             out.push_str(&line);
             out.push('\n');
         }
@@ -411,7 +415,9 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         d.reanalyze();
     }
     if let Some(pk) = ui.get("pick") {
-        let (Some(x), Some(y)) = (pk.get("x").and_then(Value::as_i64), pk.get("y").and_then(Value::as_i64)) else { return Err("`pick` needs x and y (pixels)".into()) };
+        let (Some(x), Some(y)) = (pk.get("x").and_then(Value::as_i64), pk.get("y").and_then(Value::as_i64)) else {
+            return Err("`pick` needs x and y (pixels)".into());
+        };
         if !d.pick(x, y) {
             return Err(d.status.clone());
         }
@@ -594,52 +600,60 @@ fn colors_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t: 
     widgets::section_label(&mut panel, tl!("Colors"));
     let mut remove = None;
     let mut reset = None;
-    egui::ScrollArea::vertical().id_salt("color-analyzer-rows").auto_shrink([false, false]).max_height((rect.bottom() - panel.cursor().top() - 70.0).max(80.0)).show(&mut panel, |ui| {
-        for (i, r) in d.rows.iter_mut().enumerate() {
-            ui.horizontal(|ui| {
-                widgets::checkbox(ui, &mut r.include, "");
-                let (sw, _) = ui.allocate_exact_size(vec2(26.0, 26.0), Sense::hover());
-                ui.painter().rect_filled(sw, 3.0, color32(r.center));
-                ui.painter().rect_stroke(sw, 3.0, Stroke::new(1.0, t.separator), StrokeKind::Inside);
-                ui.vertical(|ui| {
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(format!("{}", i + 1)).color(t.text_dim));
-                        let id = ui.id().with(("ca-hex", i));
-                        let resp = widgets::text_field_ex(ui, id, &mut r.text, "#A43B2F", 84.0, true, Some(7));
-                        let parsed = ca::parse_hex(&r.text);
-                        if resp.changed()
-                            && let Some(rgb) = parsed
-                        {
-                            r.center = rgb;
-                        }
-                        if resp.lost_focus() {
-                            r.text = ca::hex(r.center);
-                        }
-                        if parsed.is_none() {
-                            ui.label(egui::RichText::new("!").color(t.danger));
-                        }
-                        if let Some(s) = r.share {
-                            ui.label(egui::RichText::new(cmd::share_text(s)).color(t.text_dim).size(11.5));
-                        }
-                    });
-                    ui.horizontal(|ui| {
-                        if r.center != r.original {
-                            let (o, _) = ui.allocate_exact_size(vec2(12.0, 12.0), Sense::hover());
-                            ui.painter().rect_filled(o, 2.0, color32(r.original));
-                            ui.label(egui::RichText::new(crate::i18n::fmt(tl!("original {code}"), &[("code", &ca::hex(r.original))])).color(t.text_faint).size(11.0));
-                            if widgets::secondary_button(ui, tl!("Restore"), 60.0).clicked() {
-                                reset = Some(i);
+    egui::ScrollArea::vertical()
+        .id_salt("color-analyzer-rows")
+        .auto_shrink([false, false])
+        .max_height((rect.bottom() - panel.cursor().top() - 70.0).max(80.0))
+        .show(&mut panel, |ui| {
+            for (i, r) in d.rows.iter_mut().enumerate() {
+                ui.horizontal(|ui| {
+                    widgets::checkbox(ui, &mut r.include, "");
+                    let (sw, _) = ui.allocate_exact_size(vec2(26.0, 26.0), Sense::hover());
+                    ui.painter().rect_filled(sw, 3.0, color32(r.center));
+                    ui.painter().rect_stroke(sw, 3.0, Stroke::new(1.0, t.separator), StrokeKind::Inside);
+                    ui.vertical(|ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new(format!("{}", i + 1)).color(t.text_dim));
+                            let id = ui.id().with(("ca-hex", i));
+                            let resp = widgets::text_field_ex(ui, id, &mut r.text, "#A43B2F", 84.0, true, Some(7));
+                            let parsed = ca::parse_hex(&r.text);
+                            if resp.changed()
+                                && let Some(rgb) = parsed
+                            {
+                                r.center = rgb;
                             }
-                        }
-                        if widgets::secondary_button(ui, tl!("Remove"), 60.0).clicked() {
-                            remove = Some(i);
-                        }
+                            if resp.lost_focus() {
+                                r.text = ca::hex(r.center);
+                            }
+                            if parsed.is_none() {
+                                ui.label(egui::RichText::new("!").color(t.danger));
+                            }
+                            if let Some(s) = r.share {
+                                ui.label(egui::RichText::new(cmd::share_text(s)).color(t.text_dim).size(11.5));
+                            }
+                        });
+                        ui.horizontal(|ui| {
+                            if r.center != r.original {
+                                let (o, _) = ui.allocate_exact_size(vec2(12.0, 12.0), Sense::hover());
+                                ui.painter().rect_filled(o, 2.0, color32(r.original));
+                                ui.label(
+                                    egui::RichText::new(crate::i18n::fmt(tl!("original {code}"), &[("code", &ca::hex(r.original))]))
+                                        .color(t.text_faint)
+                                        .size(11.0),
+                                );
+                                if widgets::secondary_button(ui, tl!("Restore"), 60.0).clicked() {
+                                    reset = Some(i);
+                                }
+                            }
+                            if widgets::secondary_button(ui, tl!("Remove"), 60.0).clicked() {
+                                remove = Some(i);
+                            }
+                        });
                     });
                 });
-            });
-            widgets::hairline(ui);
-        }
-    });
+                widgets::hairline(ui);
+            }
+        });
     if let Some(i) = reset
         && let Some(r) = d.rows.get_mut(i)
     {
@@ -728,9 +742,12 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t
     let b = d.board();
     let fits = b.fits();
     panel.label(
-        egui::RichText::new(crate::i18n::fmt(tl!("{w} × {h} cm, sRGB, 300 ppi, transparent background"), &[("w", &widgets::fmt_num_prec(b.width / 10.0, 1)), ("h", &widgets::fmt_num_prec(b.height(n.max(1)) / 10.0, 1))]))
-            .color(t.text_dim)
-            .size(11.5),
+        egui::RichText::new(crate::i18n::fmt(
+            tl!("{w} × {h} cm, sRGB, 300 ppi, transparent background"),
+            &[("w", &widgets::fmt_num_prec(b.width / 10.0, 1)), ("h", &widgets::fmt_num_prec(b.height(n.max(1)) / 10.0, 1))],
+        ))
+        .color(t.text_dim)
+        .size(11.5),
     );
     if !fits {
         panel.label(egui::RichText::new(tl!("Too narrow for one block of variants")).color(t.danger));
@@ -752,7 +769,11 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, rect: ERect, t
                     act.copy = Some(ca::hex(c.rgb));
                 }
             });
-            panel.label(egui::RichText::new(tl!("Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step).")).color(t.text_faint).size(11.0));
+            panel.label(
+                egui::RichText::new(tl!("Use as Centre: this patch becomes its colour's new centre, for a finer second sheet (lower the step)."))
+                    .color(t.text_faint)
+                    .size(11.0),
+            );
         }
         None => {
             panel.label(egui::RichText::new(tl!("Click a patch on the sheet.")).color(t.text_faint));
@@ -831,7 +852,13 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, view: ERect, t: &T
         let o = b.block_origin(k);
         let Some(r) = d.rows.get(*row) else { continue };
         if 3.0 * s >= 6.0 {
-            painter.text(to(o.0, o.1 + 4.5), Align2::LEFT_BOTTOM, format!("{} {} — {}", tl!("Color").to_uppercase(), row + 1, ca::hex(r.center)), mm_font(3.2), ink);
+            painter.text(
+                to(o.0, o.1 + 4.5),
+                Align2::LEFT_BOTTOM,
+                format!("{} {} — {}", tl!("Color").to_uppercase(), row + 1, ca::hex(r.center)),
+                mm_font(3.2),
+                ink,
+            );
         }
         for c in d.cells(*row) {
             let (x, y, side) = b.patch_rect(o, c.col, c.row);
@@ -858,7 +885,8 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut ColorAnalyzerDialog, view: ERect, t: &T
     if let Some((row, n)) = hovered
         && let Some(c) = d.cells(row).into_iter().find(|c| c.number == n)
     {
-        let offsets = if c.is_center() { String::new() } else { format!(" · {}", ca::offset_label(d.prefs.x, d.prefs.y, f64::from(d.prefs.step), c.dx, c.dy)) };
+        let offsets =
+            if c.is_center() { String::new() } else { format!(" · {}", ca::offset_label(d.prefs.x, d.prefs.y, f64::from(d.prefs.step), c.dx, c.dy)) };
         resp.clone().on_hover_text(format!("{} {} · {} {} · {}{offsets}", tl!("Color"), row + 1, tl!("patch"), n, ca::hex(c.rgb)));
     }
     if resp.clicked()

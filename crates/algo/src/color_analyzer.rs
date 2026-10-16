@@ -80,7 +80,7 @@ pub fn extract(rgba: &[u8], width: usize, height: usize, max_colors: usize, merg
             ([s[0] as f64 / n, s[1] as f64 / n, s[2] as f64 / n], *c)
         })
         .collect();
-    buckets.sort_by(|a, b| b.1.cmp(&a.1));
+    buckets.sort_by_key(|b| std::cmp::Reverse(b.1));
     let floor = (total as f64 * MIN_SHARE).ceil() as u64;
     let mut palette: Vec<[f64; 3]> = Vec::new();
     for (c, n) in &buckets {
