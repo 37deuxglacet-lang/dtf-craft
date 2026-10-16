@@ -160,10 +160,10 @@ impl Sheet {
             if w <= 0 || h <= 0 {
                 continue;
             }
-            if let Some(p) = place(&mut free, w.saturating_add(m), h.saturating_add(m), allow_rotate) {
-                if let Some(slot) = out.get_mut(i) {
-                    *slot = Some(Spot { x: p.0 + m, y: p.1 + m, rotated: p.2 });
-                }
+            if let Some(p) = place(&mut free, w.saturating_add(m), h.saturating_add(m), allow_rotate)
+                && let Some(slot) = out.get_mut(i)
+            {
+                *slot = Some(Spot { x: p.0 + m, y: p.1 + m, rotated: p.2 });
             }
         }
         out

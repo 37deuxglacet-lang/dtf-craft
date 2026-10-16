@@ -13,7 +13,7 @@
 //! Control channel: `ui.menu.invoke {"id":"dtf.gangSheet","params":{"ui":{"addFiles":[path…],
 //! "addDocument":true, "set":{"filmWidth":cm,"maxLength":cm,"margin":mm,"rotate":bool},
 //! "source":{"index":i,"widthCm":cm,"quantity":n}, "removeSource":i, "auto":true,
-//! "move":{"index":i,"x":cm,"y":cm}, "rotate":i, "duplicate":i, "delete":i, "export":path,
+//! "move":{"index":i,"x":cm,"y":cm}, "select":i, "rotate":i, "duplicate":i, "delete":i, "export":path,
 //! "cancel":true}}}`; without `ui`, the params go to the command itself.
 
 use std::sync::Mutex;
@@ -31,7 +31,7 @@ use crate::theme::Tokens;
 use crate::widgets;
 
 const LEFT_W: f32 = 330.0;
-const RIGHT_W: f32 = 270.0;
+const RIGHT_W: f32 = 300.0;
 const RULER: f32 = 22.0;
 const FOOTER_H: f32 = 48.0;
 /// Longest side of a visual's preview texture.
@@ -63,9 +63,8 @@ pub(crate) enum Origin {
 pub struct Source {
     origin: Origin,
     pub name: String,
-    /// Its visible pixels (cropped) and the resolution its file records.
+    /// Its visible pixels (cropped).
     pub px: (u32, u32),
-    dpi: f64,
     /// Print width (layout units); the height follows.
     pub width: i64,
     /// Copies wanted on the sheet.
@@ -264,7 +263,7 @@ impl GangSheetDialog {
     pub(crate) fn add_visual(&mut self, origin: Origin, v: &Visual) {
         let sheet = self.sheet();
         let width = v.natural_width(&sheet);
-        self.sources.push(Source { origin, name: v.name.clone(), px: (v.width, v.height), dpi: v.dpi, width, quantity: 1, preview: Some(preview_image(v)), tex: None });
+        self.sources.push(Source { origin, name: v.name.clone(), px: (v.width, v.height), width, quantity: 1, preview: Some(preview_image(v)), tex: None });
         let s = self.sources.len() - 1;
         self.fill(Some(s));
         if self.copies(s) == 0 {
@@ -458,8 +457,8 @@ pub fn add_document(app: &mut PhotocraftApp) -> Result<(), String> {
 }
 
 /// Files dropped on the window while the dialog is open go onto the sheet.
-pub fn drop_files(app: &mut PhotocraftApp, files: &[egui::DroppedFile]) {
-    let paths: Vec<String> = files.iter().filter_map(|f| f.path.as_ref()).map(|p| p.to_string_lossy().into_owned()).collect();
+pub fn drop_files(app: &mut PhotocraftApp, files: &[egui::DroppedFileHandle]) {
+    let paths: Vec<String> = files.iter().map(|f| f.path()).filter(|p| p.is_absolute()).map(|p| p.to_string_lossy().into_owned()).collect();
     add_files(app, &paths);
 }
 
@@ -597,6 +596,9 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
     }
     if let Some(i) = ui.get("delete").and_then(Value::as_u64) {
         d.delete(i as usize);
+    }
+    if let Some(i) = ui.get("select") {
+        d.selected = i.as_u64().map(|v| v as usize).filter(|i| *i < d.placed.len());
     }
     Ok(d.describe())
 }
@@ -783,14 +785,14 @@ fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &To
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(12.0, 10.0))));
     panel.spacing_mut().item_spacing.y = 6.0;
     widgets::section_label(&mut panel, tl!("Visuals"));
-    panel.horizontal(|ui| {
-        if widgets::primary_button(ui, tl!("Add PNG Files…"), 140.0).clicked() {
-            act.add_files = true;
-        }
-        if ui.add_enabled_ui(has_doc, |ui| widgets::secondary_button(ui, tl!("Add Open Document"), 140.0)).inner.clicked() {
-            act.add_document = true;
-        }
-    });
+    // One button per row: translations run long.
+    let w = rect.width() - 24.0;
+    if widgets::primary_button(&mut panel, tl!("Add PNG Files…"), w).clicked() {
+        act.add_files = true;
+    }
+    if panel.add_enabled_ui(has_doc, |ui| widgets::secondary_button(ui, tl!("Add Open Document"), w)).inner.clicked() {
+        act.add_document = true;
+    }
     widgets::hairline(&mut panel);
     if d.sources.is_empty() {
         panel.label(egui::RichText::new(tl!("Add PNG files or the open document.")).color(t.text_faint));
@@ -879,7 +881,7 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &T
     });
     widgets::checkbox(&mut panel, &mut film.rotate, tl!("Allow Rotation"));
     d.set_film(film);
-    panel.horizontal(|ui| {
+    panel.horizontal_wrapped(|ui| {
         if widgets::primary_button(ui, tl!("Auto Build"), 110.0).clicked() {
             d.auto_build();
             d.status.clear();
@@ -900,7 +902,7 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &T
             let name = d.placed.get(i).and_then(|p| d.sources.get(p.source)).map_or(String::new(), |s| s.name.clone());
             widgets::elided_label(&mut panel, &name, RIGHT_W - 30.0);
             panel.label(egui::RichText::new(format!("{} × {} cm  ·  X {} · Y {} cm", cm_text(r.w), cm_text(r.h), cm_text(r.x), cm_text(r.y))).color(t.text_dim).size(11.5));
-            panel.horizontal(|ui| {
+            panel.horizontal_wrapped(|ui| {
                 if widgets::secondary_button(ui, tl!("Rotate 90°"), 80.0).clicked() && !d.rotate(i) {
                     d.status = tl!("No room to turn this visual").to_string();
                 }
@@ -934,7 +936,7 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &T
         panel.label(egui::RichText::new(format!("●  {sign} {}", ppi_text(dpi))).color(level_color(level)).size(11.5));
     }
     widgets::hairline(&mut panel);
-    panel.horizontal(|ui| {
+    panel.horizontal_wrapped(|ui| {
         ui.label(egui::RichText::new(tl!("Zoom")).color(t.text_dim));
         if widgets::secondary_button(ui, "−", 28.0).clicked() {
             d.zoom = (d.zoom / 1.25).max(1.0);
@@ -1202,8 +1204,9 @@ mod tests {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         let ctx = egui::Context::default();
         app.run("file.new", json!({"width": 400, "height": 200, "resolution": 300})).unwrap();
+        crate::theme::install_fonts(&ctx);
         invoke(&mut app, &ctx, json!({"addDocument": true, "source": {"index": 0, "quantity": 3}}));
-        let _ = ctx.run_ui(Default::default(), |ui| show(&mut app, ui.ctx()));
+        ctx.run_ui(Default::default(), |ui| show(&mut app, ui.ctx())).textures_delta.clear();
         assert!(app.gang_sheet.as_ref().is_some_and(|d| d.sources[0].tex.is_some()));
     }
 }
