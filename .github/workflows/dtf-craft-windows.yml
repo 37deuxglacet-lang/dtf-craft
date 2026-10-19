@@ -55,13 +55,18 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          Get-FileHash -Algorithm SHA256 "dtf-craft-windows-x64/DTF Craft.exe", "dtf-craft-windows-x64/dtfcraft-cli.exe", "dtf-craft-windows-x64.zip" | Format-List Path, Hash
+          # Results as annotations (readable through the API, beside the run).
+          foreach ($f in "dtf-craft-windows-x64/DTF Craft.exe", "dtf-craft-windows-x64/dtfcraft-cli.exe", "dtf-craft-windows-x64.zip") {
+            $h = (Get-FileHash -Algorithm SHA256 $f).Hash
+            Write-Host "::notice title=SHA-256::$f $h"
+          }
           $mp = "$env:ProgramFiles\Windows Defender\MpCmdRun.exe"
-          & $mp -SignatureUpdate
-          & $mp -Scan -ScanType 3 -File "$PWD\dtf-craft-windows-x64" -DisableRemediation
-          Write-Host "Defender exit code: $LASTEXITCODE (0 = nothing found, 2 = threat found)"
-          & $mp -Scan -ScanType 3 -File "$PWD\dtf-craft-windows-x64.zip" -DisableRemediation
-          Write-Host "Defender exit code (zip): $LASTEXITCODE"
+          $u = (& $mp -SignatureUpdate 2>&1 | Out-String).Trim() -replace "`r?`n", " | "
+          Write-Host "::notice title=Defender update::$u"
+          foreach ($t in "$PWD\dtf-craft-windows-x64", "$PWD\dtf-craft-windows-x64.zip") {
+            $r = (& $mp -Scan -ScanType 3 -File $t -DisableRemediation 2>&1 | Out-String).Trim() -replace "`r?`n", " | "
+            Write-Host "::notice title=Defender scan (exit $LASTEXITCODE)::$t $r"
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: dtf-craft-windows-x64
