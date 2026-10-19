@@ -51,6 +51,17 @@ jobs:
           Copy-Item crates/algo/models/LICENSE "$out/LICENSE-Real-ESRGAN.txt"
           Copy-Item DTF-CRAFT.md "$out/LISEZ-MOI.md"
           Compress-Archive -Path "$out/*" -DestinationPath "$out.zip" -Force
+      - name: Check (SHA-256, Microsoft Defender)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Get-FileHash -Algorithm SHA256 "dtf-craft-windows-x64/DTF Craft.exe", "dtf-craft-windows-x64/dtfcraft-cli.exe", "dtf-craft-windows-x64.zip" | Format-List Path, Hash
+          $mp = "$env:ProgramFiles\Windows Defender\MpCmdRun.exe"
+          & $mp -SignatureUpdate
+          & $mp -Scan -ScanType 3 -File "$PWD\dtf-craft-windows-x64" -DisableRemediation
+          Write-Host "Defender exit code: $LASTEXITCODE (0 = nothing found, 2 = threat found)"
+          & $mp -Scan -ScanType 3 -File "$PWD\dtf-craft-windows-x64.zip" -DisableRemediation
+          Write-Host "Defender exit code (zip): $LASTEXITCODE"
       - uses: actions/upload-artifact@v4
         with:
           name: dtf-craft-windows-x64
