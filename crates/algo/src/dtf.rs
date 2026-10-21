@@ -244,13 +244,37 @@ fn distance(colour: &[f32], key: &[f32]) -> f32 {
 }
 
 /// The background colour read on the image edges: the per-channel median of the opaque pixels
-/// of the outer ring. `None` when the ring has no opaque pixel (nothing to remove).
+/// of the outer ring. A transparent margin around the image (Print Conformity leaves 2 px) has
+/// none: the ring of the opaque pixels' bounds is read instead. `None` when the image has no
+/// opaque pixel (nothing to remove).
 fn edge_colour(src: &Image, cc: usize) -> Option<Vec<f32>> {
     let n = src.ch;
     let (w, h) = (src.rect.width() as usize, src.rect.height() as usize);
     if w == 0 || h == 0 {
         return None;
     }
+    if let Some(key) = ring_colour(src, cc, (0, 0, w, h)) {
+        return Some(key);
+    }
+    let opaque = |i: usize| src.data.get(i * n + n - 1).is_some_and(|a| *a >= 0.5);
+    let (mut x0, mut y0, mut x1, mut y1) = (w, h, 0, 0);
+    for y in 0..h {
+        for x in 0..w {
+            if opaque(y * w + x) {
+                (x0, y0, x1, y1) = (x0.min(x), y0.min(y), x1.max(x + 1), y1.max(y + 1));
+            }
+        }
+    }
+    if x1 <= x0 || y1 <= y0 {
+        return None;
+    }
+    ring_colour(src, cc, (x0, y0, x1, y1))
+}
+
+/// The per-channel median of the opaque pixels on the border of `(x0, y0, x1, y1)`.
+fn ring_colour(src: &Image, cc: usize, (x0, y0, x1, y1): (usize, usize, usize, usize)) -> Option<Vec<f32>> {
+    let n = src.ch;
+    let w = src.rect.width() as usize;
     let mut samples: Vec<Vec<f32>> = vec![Vec::new(); cc];
     let mut take = |i: usize| {
         let Some(px) = src.data.get(i * n..i * n + n) else { return };
@@ -263,16 +287,16 @@ fn edge_colour(src: &Image, cc: usize) -> Option<Vec<f32>> {
             }
         }
     };
-    for x in 0..w {
-        take(x);
-        if h > 1 {
-            take((h - 1) * w + x);
+    for x in x0..x1 {
+        take(y0 * w + x);
+        if y1 - y0 > 1 {
+            take((y1 - 1) * w + x);
         }
     }
-    for y in 1..h.saturating_sub(1) {
-        take(y * w);
-        if w > 1 {
-            take(y * w + w - 1);
+    for y in y0 + 1..y1.saturating_sub(1) {
+        take(y * w + x0);
+        if x1 - x0 > 1 {
+            take(y * w + x1 - 1);
         }
     }
     let mut key = Vec::with_capacity(cc);

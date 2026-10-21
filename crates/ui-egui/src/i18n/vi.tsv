@@ -3691,3 +3691,6 @@ curves	Smooth	Làm mượt
 	DTF Craft — Beta Version	DTF Craft — phiên bản beta
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Đây là phiên bản beta của DTF Craft để thử nghiệm: một số công cụ vẫn có thể thay đổi hoặc có lỗi.
 	Release planned for November 2, 2026.	Dự kiến phát hành ngày 2 tháng 11 năm 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) ở {resolution} ppi
+	AI Upscale	Phóng to bằng AI

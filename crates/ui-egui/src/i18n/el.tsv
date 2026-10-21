@@ -3903,3 +3903,6 @@ curves	Smooth	Εξομάλυνση
 	DTF Craft — Beta Version	DTF Craft — έκδοση beta
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Αυτή είναι μια έκδοση beta του DTF Craft για δοκιμές: ορισμένα εργαλεία μπορεί ακόμη να αλλάξουν ή να έχουν σφάλματα.
 	Release planned for November 2, 2026.	Η κυκλοφορία προγραμματίζεται για τις 2 Νοεμβρίου 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) στα {resolution} ppi
+	AI Upscale	Μεγέθυνση ΤΝ

@@ -3964,3 +3964,6 @@ curves	Smooth	Vloeiend maken
 	DTF Craft — Beta Version	DTF Craft — bètaversie
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Dit is een bètaversie van DTF Craft om te testen: sommige gereedschappen kunnen nog veranderen of fouten bevatten.
 	Release planned for November 2, 2026.	Release gepland op 2 november 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) bij {resolution} ppi
+	AI Upscale	AI-vergroting

@@ -2804,3 +2804,6 @@ curves	Smooth	平滑
 	DTF Craft — Beta Version	DTF Craft — 測試版
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	這是用於測試的 DTF Craft 測試版：部分工具仍可能變更或存在錯誤。
 	Release planned for November 2, 2026.	預計於 2026 年 11 月 2 日發布。
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}：{width} × {height} 公分（{pxw} × {pxh} 像素），{resolution} ppi
+	AI Upscale	AI 放大

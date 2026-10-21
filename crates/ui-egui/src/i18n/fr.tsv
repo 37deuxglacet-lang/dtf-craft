@@ -3227,3 +3227,5 @@ curves	Smooth	Lisser
 	DTF Craft — Beta Version	DTF Craft — version bêta
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Ceci est une version bêta de DTF Craft, destinée aux tests : certains outils peuvent encore évoluer ou comporter des bugs.
 	Release planned for November 2, 2026.	Mise en ligne prévue le 2 novembre 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale} : {width} × {height} cm ({pxw} × {pxh} px) à {resolution} ppp

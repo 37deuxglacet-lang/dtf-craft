@@ -3812,3 +3812,6 @@ navigator	Zoom	Zvětšení
 	DTF Craft — Beta Version	DTF Craft — beta verze
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Toto je beta verze DTF Craft určená k testování: některé nástroje se ještě mohou změnit nebo obsahovat chyby.
 	Release planned for November 2, 2026.	Vydání plánováno na 2. listopadu 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) při {resolution} ppi
+	AI Upscale	Zvětšení AI

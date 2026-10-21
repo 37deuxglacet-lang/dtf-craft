@@ -4279,3 +4279,6 @@ shape	Appearance	Izgled
 	DTF Craft — Beta Version	DTF Craft — beta verzija
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Ovo je beta verzija programa DTF Craft za testiranje: neki alati se još mogu promeniti ili sadržati greške.
 	Release planned for November 2, 2026.	Objavljivanje planirano za 2. novembar 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) pri {resolution} ppi
+	AI Upscale	AI uvećanje

@@ -3197,3 +3197,6 @@ curves	Smooth	Haluskan
 	DTF Craft — Beta Version	DTF Craft — versi beta
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Ini adalah versi beta DTF Craft untuk pengujian: beberapa alat masih dapat berubah atau mengandung bug.
 	Release planned for November 2, 2026.	Rilis direncanakan pada 2 November 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) pada {resolution} ppi
+	AI Upscale	Perbesar dengan AI

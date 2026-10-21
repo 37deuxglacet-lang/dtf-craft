@@ -310,6 +310,9 @@ fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
     };
     let alpha_model = text(p, "alpha", "model") == "model";
     let keep_print = p.get("keepPrintSize").and_then(Value::as_bool).unwrap_or(true);
+    // A resolution given sets the copy's ppi (Print Conformity's ×2/×3/×4 buttons): no resampling.
+    check_range(UPSCALE, p, "resolution", 72.0, 1200.0)?;
+    let resolution = p.get("resolution").and_then(Value::as_f64);
     let model = photocraft_algo::upscale::SrModel::bundled().map_err(|e| EngineError::Other(format!("AI model: {e}")))?;
     let st = s.active().ok_or(EngineError::NoDocument)?;
     if !matches!(st.doc.mode, photocraft_color::ColorMode::Rgb | photocraft_color::ColorMode::Grayscale) {
@@ -339,7 +342,9 @@ fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
                 })
                 .collect();
             crate::image_cmds::resample_doc(doc, nw, nh, photocraft_algo::resample::Resample::BicubicSmoother);
-            if keep_print {
+            if let Some(dpi) = resolution {
+                doc.resolution_dpi = dpi as f32;
+            } else if keep_print {
                 doc.resolution_dpi = (f64::from(doc.resolution_dpi) * scale).clamp(1.0, 10_000.0) as f32;
             }
             let n = originals.len().max(1);
@@ -591,7 +596,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "AI Upscale…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"scale":"2|3|4"="2","alpha":"model|smooth"="model" (edges of the transparency through the network, or smoothly enlarged),"keepPrintSize":bool=true (raise the resolution so the print size stays)} → {width,height,layers,resolution}. Real-ESRGAN general ×4 model on the CPU; raster layers are enlarged by the network, other layers resampled"##,
+            params: r##"{"scale":"2|3|4"="2","alpha":"model|smooth"="model" (edges of the transparency through the network, or smoothly enlarged),"keepPrintSize":bool=true (raise the resolution so the print size stays),"resolution":json (optional ppi of the copy, 72–1200; overrides keepPrintSize)} → {width,height,layers,resolution}. Real-ESRGAN general ×4 model on the CPU; raster layers are enlarged by the network, other layers resampled"##,
             enabled: has_doc,
             run: upscale,
             journal: true,
@@ -800,6 +805,18 @@ mod tests {
 
 
 
+    /// A resolution given (Print Conformity's buttons) sets the copy's ppi, whatever keepPrintSize.
+    #[test]
+    fn ai_upscale_takes_the_resolution_given() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 24, "height": 16, "resolution": 72, "background": "white"})).unwrap();
+        s.execute(UPSCALE, json!({"scale": "3", "resolution": 300})).unwrap();
+        let d = s.active().unwrap();
+        assert_eq!((d.doc.size.width, d.doc.size.height), (72, 48));
+        assert!((d.doc.resolution_dpi - 300.0).abs() < 0.01);
+        assert!(s.execute(UPSCALE, json!({"scale": "2", "resolution": 5000})).is_err());
+    }
+
     #[test]
     fn ai_upscale_doubles_the_document_and_keeps_print_size() {
         let mut s = Session::new();
@@ -873,6 +890,23 @@ mod tests {
         assert!(!d.doc.is_background(d.doc.layers[1].id));
         assert!(s.undo());
         assert_eq!(s.active().unwrap().doc.layers.len(), 1);
+    }
+
+    /// After Print Conformity (2 px of transparency around the visual), Remove White Background
+    /// still reads the background colour and removes it.
+    #[test]
+    fn the_cutout_works_after_conformity() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 60, "height": 40, "resolution": 300, "background": "white"})).unwrap();
+        s.execute("select.rect", json!({"x": 20, "y": 10, "width": 20, "height": 20})).unwrap();
+        s.execute("edit.fill", json!({"color": "#ff0000"})).unwrap();
+        s.execute("select.deselect", json!({})).unwrap();
+        s.execute(CONFORMITY, json!({"width": 0, "height": 0, "resolution": 300})).unwrap();
+        s.execute(REMOVE_WHITE, json!({})).unwrap();
+        let d = s.active().unwrap();
+        let surf = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap();
+        assert_eq!(surf.pixel(5, 5)[3], 0.0, "the white background is removed");
+        assert_eq!(surf.pixel(30, 20)[3], 1.0, "the visual stays");
     }
 
     /// A trimmed visual gets 2 px of transparency on every side, after the resize.

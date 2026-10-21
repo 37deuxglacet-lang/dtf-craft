@@ -3380,3 +3380,6 @@ curves	Smooth	매끄럽게
 	DTF Craft — Beta Version	DTF Craft — 베타 버전
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	테스트용 DTF Craft 베타 버전입니다. 일부 도구는 아직 변경되거나 버그가 있을 수 있습니다.
 	Release planned for November 2, 2026.	2026년 11월 2일 출시 예정입니다.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
+	AI Upscale	AI 업스케일

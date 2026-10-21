@@ -3936,3 +3936,6 @@ cameraData	Lens	Lens
 	DTF Craft — Beta Version	DTF Craft — beta sürümü
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Bu, test amaçlı bir DTF Craft beta sürümüdür: bazı araçlar hâlâ değişebilir veya hata içerebilir.
 	Release planned for November 2, 2026.	Yayın tarihi 2 Kasım 2026 olarak planlanıyor.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
+	AI Upscale	Yapay zekâ ile büyütme

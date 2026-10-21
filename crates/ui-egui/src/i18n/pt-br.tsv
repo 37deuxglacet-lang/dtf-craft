@@ -3994,3 +3994,6 @@ layerLabel	No Color	Sem cor
 	DTF Craft — Beta Version	DTF Craft — versão beta
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Esta é uma versão beta do DTF Craft, para testes: algumas ferramentas ainda podem mudar ou conter erros.
 	Release planned for November 2, 2026.	Lançamento previsto para 2 de novembro de 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) a {resolution} ppp
+	AI Upscale	Ampliação com IA

@@ -2894,3 +2894,6 @@ curves	Smooth	Suavizar
 	DTF Craft — Beta Version	DTF Craft — versión beta
 	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Esta es una versión beta de DTF Craft para pruebas: algunas herramientas aún pueden cambiar o contener errores.
 	Release planned for November 2, 2026.	Lanzamiento previsto el 2 de noviembre de 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) a {resolution} ppp
+	AI Upscale	Ampliación con IA

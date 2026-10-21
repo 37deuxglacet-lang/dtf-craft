@@ -40,7 +40,9 @@ sont pas (menu Fenêtre). L'accueil donne le lien du projet GitHub de DTF Craft.
 
 Conformité impression : l'onglet part de la taille actuelle du visuel (rogné si « Rogner la
 transparence » est coché) et de la résolution du document ; changer la largeur met à jour la
-hauteur, et inversement. La transparence est rognée avant le redimensionnement, en laissant
+hauteur, et inversement ; changer la résolution recalcule la taille en cm sans rééchantillonner les
+pixels. Les boutons ×2, ×3, ×4 lancent l'Agrandissement IA à la résolution de l'onglet et
+indiquent la taille obtenue (cm et px). La transparence est rognée avant le redimensionnement, en laissant
 2 px transparents autour du visuel. Le calque est renommé « origin » (champ Nom du calque).
 
 Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès

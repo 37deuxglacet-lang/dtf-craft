@@ -207,7 +207,7 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
     let Some(f) = app.ui.dtf_panel.fields.get(command).cloned() else { return };
     let mut params = app.with_mask_target(command, crate::filter_dialog::params_of(&f));
     if command == "dtf.conformity" {
-        conformity_params(app, &f, &mut params);
+        conformity_params(&f, &mut params);
     }
     // The preview colour is the panel's: the command doesn't take it.
     let preview_color = params.as_object_mut().and_then(|o| o.remove("previewColor"));
@@ -323,13 +323,19 @@ fn sync_conformity(app: &mut PhotocraftApp, f: &mut Map<String, Value>) {
     panel.visual_px = Some((w, h));
 }
 
-/// Width and height stay in proportion: the side changed sets the other.
+/// Width and height stay in proportion: the side changed sets the other. A new resolution keeps
+/// the pixels: the print size in cm follows it.
 fn link_dimensions(app: &PhotocraftApp, before: &Map<String, Value>, f: &mut Map<String, Value>) {
     let Some((w, h)) = app.ui.dtf_panel.visual_px else { return };
     let get = |m: &Map<String, Value>, k: &str| m.get(k).and_then(Value::as_f64).unwrap_or(0.0);
     let (bw, bh, nw, nh) = (get(before, "width"), get(before, "height"), get(f, "width"), get(f, "height"));
     let ratio = f64::from(h) / f64::from(w.max(1));
-    if (nw - bw).abs() > 1e-9 {
+    let dpi = get(f, "resolution");
+    if (dpi - get(before, "resolution")).abs() > 1e-9 && dpi > 0.0 {
+        f.insert("width".into(), json!(round1(cm(w, dpi))));
+        f.insert("height".into(), json!(round1(cm(h, dpi))));
+        f.remove("__lastDim");
+    } else if (nw - bw).abs() > 1e-9 {
         f.insert("height".into(), json!(round1(nw * ratio)));
         f.insert("__lastDim".into(), json!("width"));
     } else if (nh - bh).abs() > 1e-9 {
@@ -339,11 +345,10 @@ fn link_dimensions(app: &PhotocraftApp, before: &Map<String, Value>, f: &mut Map
 }
 
 /// Print Conformity's command: the side typed last (the other follows the proportions); sizes left
-/// as read keep the pixels (a new ppi alone keeps the print size).
-fn conformity_params(app: &PhotocraftApp, f: &Map<String, Value>, params: &mut Value) {
+/// as read keep the pixels, a new ppi included (only the print size changes).
+fn conformity_params(f: &Map<String, Value>, params: &mut Value) {
     let Some(o) = params.as_object_mut() else { return };
-    let last = f.get("__lastDim").and_then(Value::as_str);
-    match last {
+    match f.get("__lastDim").and_then(Value::as_str) {
         Some("height") => {
             o.insert("width".into(), json!(0));
         }
@@ -351,22 +356,44 @@ fn conformity_params(app: &PhotocraftApp, f: &Map<String, Value>, params: &mut V
             o.insert("height".into(), json!(0));
         }
         None => {
-            let doc_dpi = app.session.active().map_or(300.0, |st| f64::from(st.doc.resolution_dpi));
-            let dpi = f.get("resolution").and_then(Value::as_f64).unwrap_or(doc_dpi);
-            match app.ui.dtf_panel.visual_px {
-                // The same ppi: no resampling at all.
-                _ if (dpi - doc_dpi).abs() < 0.5 => {
-                    o.insert("width".into(), json!(0));
-                    o.insert("height".into(), json!(0));
-                }
-                // A new ppi: the exact print size the visual has now.
-                Some((w, _)) => {
-                    o.insert("width".into(), json!(cm(w, doc_dpi)));
-                    o.insert("height".into(), json!(0));
-                }
-                None => {}
-            }
+            o.insert("width".into(), json!(0));
+            o.insert("height".into(), json!(0));
         }
+    }
+}
+
+/// Print Conformity's AI Upscale buttons: ×2, ×3, ×4 of the document, each with the size it gives
+/// at the tab's resolution. A click enlarges a copy (`dtf.upscale`) at that resolution.
+fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, Value>) {
+    let Some(st) = app.session.active() else { return };
+    let (w, h) = (st.doc.size.width, st.doc.size.height);
+    let dpi = f.get("resolution").and_then(Value::as_f64).unwrap_or(f64::from(st.doc.resolution_dpi)).clamp(72.0, 1200.0);
+    let enabled = app.session.is_enabled(photocraft_engine::dtf_cmds::UPSCALE) && app.session.job_on(st.doc.id).is_none();
+    let t = Tokens::get(ui.ctx());
+    ui.add_space(8.0);
+    ui.label(RichText::new(tl!("AI Upscale")).color(t.text_dim));
+    let mut run = None;
+    for k in [2u32, 3, 4] {
+        let (pw, ph) = (w * k, h * k);
+        let text = crate::i18n::fmt(
+            tl!("×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi"),
+            &[
+                ("scale", &k.to_string()),
+                ("width", &format!("{:.1}", cm(pw, dpi))),
+                ("height", &format!("{:.1}", cm(ph, dpi))),
+                ("pxw", &pw.to_string()),
+                ("pxh", &ph.to_string()),
+                ("resolution", &format!("{dpi:.0}")),
+            ],
+        );
+        if ui.add_enabled(enabled, egui::Button::new(text)).clicked() {
+            run = Some(k);
+        }
+    }
+    if let Some(k) = run
+        && let Err(error) = app.run(photocraft_engine::dtf_cmds::UPSCALE, json!({"scale": k.to_string(), "resolution": dpi.round()}))
+    {
+        crate::notices::error(app, error);
     }
 }
 
@@ -464,6 +491,9 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     }
     if cmd == "dtf.conformity" {
         link_dimensions(app, &before, &mut f);
+        if have_doc {
+            upscale_buttons(app, ui, &f);
+        }
     }
     let mut wand = app.ui.dtf_panel.hole_wand.is_some();
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
@@ -758,15 +788,26 @@ mod tests {
         assert_eq!((f.get("width"), f.get("height"), f.get("resolution")), (Some(&json!(5.1)), Some(&json!(2.5)), Some(&json!(150.0))));
         // Applying as read only crops (no resampling): 300 × 150 plus the 2 px margin.
         let mut params = crate::filter_dialog::params_of(&f);
-        conformity_params(&app, &f, &mut params);
+        conformity_params(&f, &mut params);
         assert_eq!((params["width"].clone(), params["height"].clone()), (json!(0), json!(0)));
+        // A new resolution keeps the pixels: the cm follow, nothing is resampled.
+        let before = f.clone();
+        f.insert("resolution".into(), json!(300.0));
+        link_dimensions(&app, &before, &mut f);
+        assert_eq!((f.get("width"), f.get("height")), (Some(&json!(2.5)), Some(&json!(1.3))));
+        let mut params = crate::filter_dialog::params_of(&f);
+        conformity_params(&f, &mut params);
+        assert_eq!((params["width"].clone(), params["height"].clone(), params["resolution"].clone()), (json!(0), json!(0), json!(300.0)));
+        let before = f.clone();
+        f.insert("resolution".into(), json!(150.0));
+        link_dimensions(&app, &before, &mut f);
         // A new width sets the height.
         let before = f.clone();
         f.insert("width".into(), json!(10.0));
         link_dimensions(&app, &before, &mut f);
         assert_eq!(f.get("height"), Some(&json!(5.0)));
         let mut params = crate::filter_dialog::params_of(&f);
-        conformity_params(&app, &f, &mut params);
+        conformity_params(&f, &mut params);
         assert_eq!((params["width"].clone(), params["height"].clone()), (json!(10.0), json!(0)));
         app.ui.dtf_panel.fields.insert(cmd.into(), f);
         apply(&mut app, cmd);
