@@ -3907,3 +3907,6 @@ curves	Smooth	Згладити
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} см ({pxw} × {pxh} пікс.) при {resolution} ppi
 	AI Upscale	Збільшення ШІ
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Додати отвори (чарівна гумка)
+	Eraser Tolerance	Допуск гумки

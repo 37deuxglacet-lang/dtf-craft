@@ -3815,3 +3815,6 @@ navigator	Zoom	Zvětšení
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) při {resolution} ppi
 	AI Upscale	Zvětšení AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Přidat otvory (kouzelná guma)
+	Eraser Tolerance	Tolerance gumy

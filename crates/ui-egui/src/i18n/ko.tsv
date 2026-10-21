@@ -3383,3 +3383,6 @@ curves	Smooth	매끄럽게
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
 	AI Upscale	AI 업스케일
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	구멍 추가(자동 지우개)
+	Eraser Tolerance	지우개 허용치

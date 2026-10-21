@@ -4282,3 +4282,6 @@ shape	Appearance	Izgled
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) pri {resolution} ppi
 	AI Upscale	AI uvećanje
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Dodaj rupe (čarobna gumica)
+	Eraser Tolerance	Tolerancija gumice

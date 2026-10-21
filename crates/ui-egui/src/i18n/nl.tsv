@@ -3967,3 +3967,6 @@ curves	Smooth	Vloeiend maken
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) bij {resolution} ppi
 	AI Upscale	AI-vergroting
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Gaten toevoegen (toverwisser)
+	Eraser Tolerance	Tolerantie van de gum

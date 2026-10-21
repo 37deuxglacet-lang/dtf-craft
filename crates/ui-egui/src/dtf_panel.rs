@@ -87,9 +87,9 @@ pub struct DtfPanelUi {
     /// The first pass a DTF tab was drawn in (the tabs on screen at start don't preview).
     #[serde(skip)]
     first_pass: Option<u64>,
-    /// The interior-hole magic wand is on: the tool it replaced, given back when it goes off.
+    /// The interior-hole Magic Eraser is on: the tool it replaced, given back when it goes off.
     #[serde(skip)]
-    pub hole_wand: Option<crate::state::Tool>,
+    pub hole_eraser: Option<crate::state::Tool>,
     /// The beta notice is on screen (shown at every start of DTF Craft until OK).
     #[serde(skip)]
     pub beta_notice: bool,
@@ -424,38 +424,25 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     }
 }
 
-/// Turn the interior-hole magic wand on or off (Remove White Background tab). On, the Magic Wand
-/// tool is active and a click on the canvas clears the area it picks (`dtf.removeHole`).
-pub(crate) fn set_hole_wand(app: &mut PhotocraftApp, on: bool) {
-    match (on, app.ui.dtf_panel.hole_wand) {
+/// Turn the interior-hole Magic Eraser on or off (Remove White Background tab). On, the Magic
+/// Eraser tool is active, contiguous: a click on the canvas erases the enclosed area it reaches,
+/// with the tolerance set in the tab (the tool's own). Off, the previous tool comes back.
+pub(crate) fn set_hole_eraser(app: &mut PhotocraftApp, on: bool) {
+    match (on, app.ui.dtf_panel.hole_eraser) {
         (true, None) => {
-            app.ui.dtf_panel.hole_wand = Some(app.ui.tool);
-            app.ui.tool = crate::state::Tool::MagicWand;
+            app.ui.dtf_panel.hole_eraser = Some(app.ui.tool);
+            app.ui.tool = crate::state::Tool::MagicEraser;
+            app.ui.tool_options.contiguous = true;
             app.ui.status = tl!("Click an enclosed area to make it transparent.").into();
         }
         (false, Some(previous)) => {
-            app.ui.dtf_panel.hole_wand = None;
-            if app.ui.tool == crate::state::Tool::MagicWand {
+            app.ui.dtf_panel.hole_eraser = None;
+            if app.ui.tool == crate::state::Tool::MagicEraser {
                 app.ui.tool = previous;
             }
         }
         _ => {}
     }
-}
-
-/// A canvas click while the interior-hole wand is on: clears the area at (x, y) with the cut-out
-/// tolerance. `false` when the wand is off (the Magic Wand selects as usual).
-pub(crate) fn hole_wand_click(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
-    if app.ui.dtf_panel.hole_wand.is_none() || app.ui.tool != crate::state::Tool::MagicWand {
-        return false;
-    }
-    // The cut-out's tolerance (% of the colour range) as the wand's 0–255.
-    let pct = app.ui.dtf_panel.fields.get(photocraft_engine::dtf_cmds::REMOVE_WHITE).and_then(|f| f.get("tolerance")).and_then(Value::as_f64).unwrap_or(10.0);
-    let tolerance = (pct * 2.55).round().clamp(0.0, 255.0);
-    if let Err(error) = app.run(photocraft_engine::dtf_cmds::REMOVE_HOLE, json!({"x": x.floor(), "y": y.floor(), "tolerance": tolerance})) {
-        crate::notices::error(app, error);
-    }
-    true
 }
 
 /// Print Conformity's note: the active document's print size now, in cm at its resolution.
@@ -536,7 +523,7 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             upscale_buttons(app, ui, &f);
         }
     }
-    let mut wand = app.ui.dtf_panel.hole_wand.is_some();
+    let mut eraser = app.ui.dtf_panel.hole_eraser.is_some();
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
         // The control colour the cut-out previews on (the garment's).
         let top = ui.cursor().top();
@@ -546,10 +533,17 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             set_last_color(app, &hex);
         }
         crate::dtf_help::tip_over(ui, cmd, "previewColor", top);
-        // Interior holes by hand: each click with the wand clears the enclosed area it picks.
+        // Interior holes by hand: each click with the Magic Eraser erases the enclosed area.
         ui.add_enabled_ui(have_doc, |ui| {
-            help(crate::widgets::checkbox(ui, &mut wand, tl!("Add Holes (Magic Wand)")), cmd, "holeWand");
+            help(crate::widgets::checkbox(ui, &mut eraser, tl!("Add Holes (Magic Eraser)")), cmd, "holeEraser");
         });
+        if eraser {
+            let top = ui.cursor().top();
+            let mut tolerance = app.ui.tool_options.tolerance;
+            crate::widgets::slider_row(ui, tl!("Eraser Tolerance"), &mut tolerance, 0.0..=255.0, "", None);
+            app.ui.tool_options.tolerance = tolerance.round();
+            crate::dtf_help::tip_over(ui, cmd, "eraserTolerance", top);
+        }
     }
     if retouch {
         let mut show_before = f.get("__before").and_then(Value::as_bool).unwrap_or(false);
@@ -577,8 +571,8 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         }
     });
     app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
-    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE && wand != app.ui.dtf_panel.hole_wand.is_some() {
-        set_hole_wand(app, wand);
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE && eraser != app.ui.dtf_panel.hole_eraser.is_some() {
+        set_hole_eraser(app, eraser);
     }
     if changed && enabled && !WITHOUT_PREVIEW.contains(&cmd) {
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
@@ -864,10 +858,10 @@ mod tests {
         assert_eq!(f.get("width"), Some(&json!(10.0)));
     }
 
-    /// The interior-hole wand: on, a canvas click with the Magic Wand clears the enclosed area;
+    /// The interior holes: on, the Magic Eraser (contiguous) erases the enclosed area clicked;
     /// off, the previous tool comes back.
     #[test]
-    fn the_hole_wand_clicks_interior_holes() {
+    fn the_hole_eraser_erases_interior_holes() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.run("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
         app.run("select.rect", json!({"x": 0, "y": 0, "width": 30, "height": 30})).unwrap();
@@ -876,14 +870,15 @@ mod tests {
         app.run("edit.fill", json!({"color": "#ffffff"})).unwrap();
         app.run("select.deselect", json!({})).unwrap();
         app.ui.tool = crate::state::Tool::Brush;
-        assert!(!hole_wand_click(&mut app, 15.0, 15.0), "off: the wand selects as usual");
-        set_hole_wand(&mut app, true);
-        assert_eq!(app.ui.tool, crate::state::Tool::MagicWand);
-        assert!(hole_wand_click(&mut app, 15.0, 15.0));
+        app.ui.tool_options.contiguous = false;
+        set_hole_eraser(&mut app, true);
+        assert_eq!(app.ui.tool, crate::state::Tool::MagicEraser);
+        assert!(app.ui.tool_options.contiguous, "only the enclosed area clicked");
+        assert!(crate::eraser_ui::click(&mut app, crate::state::Tool::MagicEraser, 15.0, 15.0));
         let st = app.session.active().unwrap();
         let layer = st.doc.layer(st.active_layer.unwrap()).unwrap().surface().unwrap();
         assert_eq!((layer.pixel(15, 15)[3], layer.pixel(2, 2)[3]), (0.0, 1.0));
-        set_hole_wand(&mut app, false);
+        set_hole_eraser(&mut app, false);
         assert_eq!(app.ui.tool, crate::state::Tool::Brush);
     }
 

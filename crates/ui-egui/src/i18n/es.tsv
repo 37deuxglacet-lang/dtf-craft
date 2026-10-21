@@ -2897,3 +2897,6 @@ curves	Smooth	Suavizar
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) a {resolution} ppp
 	AI Upscale	Ampliación con IA
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Añadir huecos (borrador mágico)
+	Eraser Tolerance	Tolerancia del borrador

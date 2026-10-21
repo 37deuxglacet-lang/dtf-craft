@@ -3236,3 +3236,6 @@ curves	Smooth	Lisser
 	Bicubic Sharper	Bicubique plus net
 	Lanczos	Lanczos
 	Nearest	Au plus proche
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Ajouter des trous (gomme magique)
+	Eraser Tolerance	Tolérance de la gomme

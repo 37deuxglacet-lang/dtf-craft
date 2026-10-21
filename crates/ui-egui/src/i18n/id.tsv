@@ -3200,3 +3200,6 @@ curves	Smooth	Haluskan
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) pada {resolution} ppi
 	AI Upscale	Perbesar dengan AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Tambah lubang (penghapus ajaib)
+	Eraser Tolerance	Toleransi penghapus

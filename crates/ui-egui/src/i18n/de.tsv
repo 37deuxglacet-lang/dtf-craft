@@ -3210,3 +3210,6 @@ curves	Smooth	Glätten
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) bei {resolution} ppi
 	AI Upscale	KI-Vergrößerung
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Löcher hinzufügen (Magischer Radiergummi)
+	Eraser Tolerance	Radiergummi-Toleranz

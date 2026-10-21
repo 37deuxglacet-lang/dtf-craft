@@ -3939,3 +3939,6 @@ cameraData	Lens	Lens
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
 	AI Upscale	Yapay zekâ ile büyütme
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Delik ekle (sihirli silgi)
+	Eraser Tolerance	Silgi toleransı

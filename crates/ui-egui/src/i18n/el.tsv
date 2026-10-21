@@ -3906,3 +3906,6 @@ curves	Smooth	Εξομάλυνση
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) στα {resolution} ppi
 	AI Upscale	Μεγέθυνση ΤΝ
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Προσθήκη οπών (μαγική γόμα)
+	Eraser Tolerance	Ανοχή γόμας

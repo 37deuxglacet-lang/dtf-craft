@@ -4170,3 +4170,6 @@ navigator	Zoom	Zoom
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) a {resolution} ppi
 	AI Upscale	Ingrandimento IA
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Aggiungi fori (gomma magica)
+	Eraser Tolerance	Tolleranza della gomma

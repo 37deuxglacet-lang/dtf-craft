@@ -3997,3 +3997,6 @@ layerLabel	No Color	Sem cor
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) a {resolution} ppp
 	AI Upscale	Ampliação com IA
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Adicionar furos (borracha mágica)
+	Eraser Tolerance	Tolerância da borracha

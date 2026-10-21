@@ -51,9 +51,9 @@ Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'ape
 que l'onglet est ouvert ou cliqué ; « Afficher l'avant » montre l'image d'origine pour comparer.
 
 Détourage : l'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée
-(Fond de contrôle ou « Fond d'aperçu ») ; « Ajouter des trous (baguette magique) » active la baguette : chaque clic
-dans une zone fermée du calque « Sans fond » la rend transparente (tolérance du Détourage, une
-annulation par clic).
+(Fond de contrôle ou « Fond d'aperçu ») ; « Ajouter des trous (gomme magique) » active la gomme magique (en mode contigu), avec sa tolérance
+réglable dans l'onglet : chaque clic dans une zone fermée du calque « Sans fond » l'efface (une
+annulation par clic) ; décocher rend l'outil précédent.
 
 ## Agrandissement IA
 

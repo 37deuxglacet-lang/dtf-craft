@@ -27,7 +27,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
         "filter.dtf.removeWhiteBackground" => Sheet {
             what: "Supprimer un fond uni, souvent blanc, en partant des bords vers l'intérieur. Le travail se fait sur une copie « Sans fond » du calque ; l'original est masqué et intact. Le blanc à l'intérieur du visuel est conservé.",
             when: "Fichier client sur fond blanc ou uni (JPEG, capture, logo exporté sans transparence), à la place de la gomme magique.",
-            advice: "Tolérance 10 %, contour 2 px, « Supprimer le liseré » coché. L'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée (Fond de contrôle ou Fond d'aperçu). Retirez les zones fermées restantes à la baguette magique.",
+            advice: "Tolérance 10 %, contour 2 px, « Supprimer le liseré » coché. L'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée (Fond de contrôle ou Fond d'aperçu). Effacez les zones fermées restantes à la gomme magique (« Ajouter des trous »), en réglant sa tolérance.",
         },
         "dtf.controlBackground" => Sheet {
             what: "Placer sous l'image un calque de couleur unie nommé « backfill », de la couleur du textile, pour juger le rendu : liserés, pixels clairs, contraste.",
@@ -65,7 +65,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
 
 /// The tooltip of a setting (`key` as in the command's spec), or of a tab's own control
 /// (`apply`, `cancel`, `showBefore`, `showBackground`, `deleteBackground`, `previewColor`,
-/// `holeWand`, `upscale`).
+/// `holeEraser`, `eraserTolerance`, `upscale`).
 pub fn tip(command: &str, key: &str) -> Option<&'static str> {
     Some(match (command, key) {
         (_, "apply") => "Applique l'outil au calque actif. Annulable avec Édition › Annuler.",
@@ -87,7 +87,8 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("filter.dtf.removeWhiteBackground", "interiorHoles") => "Supprime aussi le fond enfermé dans le visuel (intérieur d'un O, d'un anneau).",
         ("filter.dtf.removeWhiteBackground", "minHoleSize") => "Les zones fermées plus petites que cette surface, en pixels, sont gardées.",
         ("filter.dtf.removeWhiteBackground", "previewColor") => "Couleur sur laquelle l'aperçu s'affiche : la dernière couleur utilisée, ici ou dans Fond de contrôle. Sert seulement à l'aperçu.",
-        ("filter.dtf.removeWhiteBackground", "holeWand") => "Cochée : chaque clic dans une zone fermée du calque « Sans fond » la rend transparente. Un clic = une annulation.",
+        ("filter.dtf.removeWhiteBackground", "holeEraser") => "Cochée : la gomme magique est active ; chaque clic dans une zone fermée du calque « Sans fond » l'efface. Un clic = une annulation. Décochée : l'outil précédent revient.",
+        ("filter.dtf.removeWhiteBackground", "eraserTolerance") => "Écart de couleur effacé autour du point cliqué (0–255). Plus haut : la gomme mord davantage sur les couleurs proches.",
         ("dtf.controlBackground", "color") => "Couleur du textile. Cliquez sur la pastille pour la choisir.",
         ("dtf.controlBackground", "showBackground") => "Ajoute le fond sous tous les calques ; un fond déjà présent est remplacé.",
         ("dtf.controlBackground", "deleteBackground") => "Retire le calque « backfill ». À faire avant l'export.",

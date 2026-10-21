@@ -3177,3 +3177,6 @@ curves	Smooth	Сгладить
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} см ({pxw} × {pxh} пикс.) при {resolution} ppi
 	AI Upscale	Увеличение ИИ
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Добавить отверстия (волшебный ластик)
+	Eraser Tolerance	Допуск ластика

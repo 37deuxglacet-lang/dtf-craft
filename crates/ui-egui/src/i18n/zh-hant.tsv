@@ -2807,3 +2807,6 @@ curves	Smooth	平滑
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}：{width} × {height} 公分（{pxw} × {pxh} 像素），{resolution} ppi
 	AI Upscale	AI 放大
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	新增孔洞（魔術橡皮擦）
+	Eraser Tolerance	橡皮擦容許度

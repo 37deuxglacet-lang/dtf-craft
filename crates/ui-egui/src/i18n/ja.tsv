@@ -3884,3 +3884,6 @@ curves	Smooth	スムーズ
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}：{width} × {height} cm（{pxw} × {pxh} px）、{resolution} ppi
 	AI Upscale	AI アップスケール
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	穴を追加（マジック消しゴム）
+	Eraser Tolerance	消しゴムの許容値

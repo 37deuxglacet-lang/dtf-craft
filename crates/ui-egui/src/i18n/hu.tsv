@@ -4128,3 +4128,6 @@ cameraRaw	Yellow	Sárga
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
 	AI Upscale	MI-nagyítás
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Lyukak hozzáadása (varázsradír)
+	Eraser Tolerance	Radír tűrése

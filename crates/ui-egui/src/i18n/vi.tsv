@@ -3694,3 +3694,6 @@ curves	Smooth	Làm mượt
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) ở {resolution} ppi
 	AI Upscale	Phóng to bằng AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Thêm lỗ (tẩy thần)
+	Eraser Tolerance	Dung sai của tẩy

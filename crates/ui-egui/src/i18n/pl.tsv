@@ -3806,3 +3806,6 @@ curves	Smooth	Wygładź
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) przy {resolution} ppi
 	AI Upscale	Powiększanie AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Dodaj otwory (magiczna gumka)
+	Eraser Tolerance	Tolerancja gumki
