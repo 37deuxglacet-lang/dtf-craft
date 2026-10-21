@@ -3229,3 +3229,10 @@ curves	Smooth	Lisser
 	Release planned for November 2, 2026.	Mise en ligne prévue le 2 novembre 2026.
 # DTF Craft (8)
 	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale} : {width} × {height} cm ({pxw} × {pxh} px) à {resolution} ppp
+# DTF Craft (9)
+	Reduce Noise	Réduire le bruit
+	Bicubic Automatic	Bicubique automatique
+	Bicubic Smoother	Bicubique plus lisse
+	Bicubic Sharper	Bicubique plus net
+	Lanczos	Lanczos
+	Nearest	Au plus proche

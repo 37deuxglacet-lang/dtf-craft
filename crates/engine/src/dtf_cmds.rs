@@ -594,7 +594,8 @@ pub fn specs() -> Vec<CommandSpec> {
         CommandSpec {
             id: UPSCALE,
             label: "AI Upscale…",
-            menu: &["DTF"],
+            // Run from Print Conformity's ×2/×3/×4 buttons, not the DTF menu.
+            menu: &[],
             shortcut: None,
             params: r##"{"scale":"2|3|4"="2","alpha":"model|smooth"="model" (edges of the transparency through the network, or smoothly enlarged),"keepPrintSize":bool=true (raise the resolution so the print size stays),"resolution":json (optional ppi of the copy, 72–1200; overrides keepPrintSize)} → {width,height,layers,resolution}. Real-ESRGAN general ×4 model on the CPU; raster layers are enlarged by the network, other layers resampled"##,
             enabled: has_doc,

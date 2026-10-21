@@ -689,6 +689,9 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
     if crate::select_mask_view::owns(f) {
         crate::select_mask_view::controls(ui, f);
     }
+    // DTF Craft: the tool's help sheet ("?"), and a tooltip over each setting's rows.
+    crate::dtf_help::sheet_ui(ui, f, &cmd);
+    let mut tip_from: Option<(String, f32)> = None;
     for p in parse_spec(&spec) {
         // DTF Craft: Remove White Background's colour only shows once detection on the edges is
         // off, and the minimum hole size once interior holes are on.
@@ -698,6 +701,10 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
         {
             continue;
         }
+        if let Some((key, top)) = tip_from.take() {
+            crate::dtf_help::tip_over(ui, &cmd, &key, top);
+        }
+        tip_from = Some((p.key.clone(), ui.cursor().top()));
         match p.kind {
             Kind::Range { min, max, default } => {
                 let mut v = f.get(&p.key).and_then(Value::as_f64).unwrap_or(default as f64) as f32;
@@ -873,6 +880,9 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
                 f.insert(p.key, json!(v.round() as i64));
             }
         }
+    }
+    if let Some((key, top)) = tip_from.take() {
+        crate::dtf_help::tip_over(ui, &cmd, &key, top);
     }
     // Read-only context the dialog opener supplies (e.g. the monitor profile in use).
     if let Some(note) = f.get("__note").and_then(Value::as_str) {

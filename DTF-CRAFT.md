@@ -20,11 +20,13 @@ produit officiel du projet PhotoCraft.
 | Netteté optimisée… | Netteté optimisée avec aperçu |
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
-| Agrandissement IA… | ×2, ×3 ou ×4 par le modèle Real-ESRGAN (hors ligne, sur le processeur), sur une copie nommée « nom x2 » : l'original n'est pas modifié |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 
 ## Onglets DTF
+
+Chaque onglet DTF et la fenêtre Halftone DTF ont un bouton « ? » qui ouvre la fiche d'aide de l'outil
+(à quoi il sert, quand l'utiliser, réglages conseillés) ; chaque réglage a une infobulle au survol.
 
 Chaque outil DTF a son onglet (Conformité, Détourage, Fond de contrôle, Pixels transparents,
 Supprimer franges, Netteté, Saturation). Ils se déplacent, se regroupent, se détachent et
@@ -48,12 +50,14 @@ indiquent la taille obtenue (cm et px). La transparence est rognée avant le red
 Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès
 que l'onglet est ouvert ou cliqué ; « Afficher l'avant » montre l'image d'origine pour comparer.
 
-Détourage : « Fond d'aperçu » choisit la couleur sur laquelle l'aperçu s'affiche (celle du Fond
-de contrôle par défaut) ; « Ajouter des trous (baguette magique) » active la baguette : chaque clic
+Détourage : l'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée
+(Fond de contrôle ou « Fond d'aperçu ») ; « Ajouter des trous (baguette magique) » active la baguette : chaque clic
 dans une zone fermée du calque « Sans fond » la rend transparente (tolérance du Détourage, une
 annulation par clic).
 
 ## Agrandissement IA
+
+Lancé depuis l'onglet Conformité (boutons ×2, ×3, ×4) ; il n'est plus dans le menu DTF.
 
 Le modèle `realesr-general-x4v3` de Real-ESRGAN (© 2021 Xintao Wang, licence BSD 3-Clause, voir
 `LICENSE-Real-ESRGAN.txt`) est intégré à l'application. Le calcul se fait sur le processeur,

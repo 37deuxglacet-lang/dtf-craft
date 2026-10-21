@@ -206,6 +206,7 @@ pub mod theme;
 pub mod tiff_options_ui;
 mod tile_overlay;
 mod timeline_ui;
+pub mod dtf_help;
 pub mod dtf_panel;
 mod titlebar;
 pub use titlebar::{Caption, CaptionFamily, CaptionIcon, CaptionIcons, CaptionStyle, RenderIconFn};

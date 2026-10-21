@@ -44,6 +44,28 @@ const RETOUCH: [&str; 4] = ["dtf.sharpen", "dtf.saturation", "filter.dtf.removeS
 /// The Remove White Background preview's control colour, when none was picked.
 pub const PREVIEW_COLOR: &str = "#231c1c";
 
+/// The last colour picked in Control Background or the cut-out's Preview Background (remembered
+/// with the preferences): the cut-out previews on it.
+const LAST_COLOR_PREF: &str = "dtfCraft.lastColor";
+
+fn last_color(app: &PhotocraftApp) -> Option<String> {
+    app.session.prefs().dialogs.get(LAST_COLOR_PREF).and_then(Value::as_str).map(str::to_string)
+}
+
+fn set_last_color(app: &mut PhotocraftApp, hex: &str) {
+    if last_color(app).as_deref() != Some(hex) {
+        app.session.prefs.edit(|prefs| prefs.dialogs.insert(LAST_COLOR_PREF.into(), json!(hex)));
+    }
+}
+
+/// A tab's own control's tooltip (`dtf_help::tip`).
+fn help(response: egui::Response, cmd: &str, key: &str) -> egui::Response {
+    match crate::dtf_help::tip(cmd, key) {
+        Some(text) => response.on_hover_text(text),
+        None => response,
+    }
+}
+
 /// The DTF tabs' state. The settings live in `fields` while the app runs and are saved with the
 /// dialogs' remembered values when applied.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -213,6 +235,11 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
     let preview_color = params.as_object_mut().and_then(|o| o.remove("previewColor"));
     let previewed = app.ui.dtf_panel.previewing.as_deref() == Some(command);
     app.ui.dtf_panel.previewing = None;
+    if command == "dtf.controlBackground"
+        && let Some(hex) = params.get("color").and_then(Value::as_str).map(str::to_string)
+    {
+        set_last_color(app, &hex);
+    }
     let result = app.run(command, params.clone());
     // A filter that runs as a background job keeps its preview until the job lands, as when a
     // dialog is confirmed (`dialogs::confirm`).
@@ -386,7 +413,7 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
                 ("resolution", &format!("{dpi:.0}")),
             ],
         );
-        if ui.add_enabled(enabled, egui::Button::new(text)).clicked() {
+        if help(ui.add_enabled(enabled, egui::Button::new(text)), "dtf.conformity", "upscale").clicked() {
             run = Some(k);
         }
     }
@@ -454,14 +481,16 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     let have_doc = app.session.active().is_some();
     let enabled = have_doc && app.session.is_enabled(cmd);
     let retouch = RETOUCH.contains(&cmd);
-    // A retouching tab opened (shown again after a pass without it) or clicked previews at once.
+    // A retouching tab, or the cut-out's, opened (shown again after a pass without it) or clicked
+    // previews at once.
+    let auto_preview = retouch || cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE;
     let pass = ui.ctx().cumulative_pass_nr();
     let first = *app.ui.dtf_panel.first_pass.get_or_insert(pass);
     let last = app.ui.dtf_panel.drawn.insert(cmd.to_string(), pass);
     let opened = pass > first + 1 && last.is_none_or(|l| l + 1 < pass);
     let area = ui.max_rect().intersect(ui.clip_rect());
     let clicked = ui.input(|i| i.pointer.primary_pressed() && i.pointer.interact_pos().is_some_and(|p| area.contains(p)));
-    if retouch && enabled && (opened || clicked) {
+    if auto_preview && enabled && (opened || clicked) {
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
     }
     let note = if cmd == "dtf.conformity" { current_size_note(app) } else { None };
@@ -483,9 +512,21 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         ui.add_space(4.0);
     }
     ui.spacing_mut().item_spacing.y = 4.0;
+    // The cut-out previews on the last colour picked (here or in Control Background).
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        let color = last_color(app).or_else(|| app.ui.dtf_panel.fields.get("dtf.controlBackground").and_then(|c| c.get("color")).and_then(Value::as_str).map(str::to_string));
+        f.insert("previewColor".into(), json!(color.unwrap_or_else(|| PREVIEW_COLOR.to_string())));
+    }
     let before = f.clone();
     if cmd == "dtf.controlBackground" {
-        color_row(ui, &mut f, "color", &crate::filter_dialog::label("color"));
+        crate::dtf_help::sheet_ui(ui, &mut f, cmd);
+        let top = ui.cursor().top();
+        if color_row(ui, &mut f, "color", &crate::filter_dialog::label("color"))
+            && let Some(hex) = f.get("color").and_then(Value::as_str).map(str::to_string)
+        {
+            set_last_color(app, &hex);
+        }
+        crate::dtf_help::tip_over(ui, cmd, "color", top);
     } else {
         crate::filter_dialog::body(ui, &mut f);
     }
@@ -498,19 +539,21 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     let mut wand = app.ui.dtf_panel.hole_wand.is_some();
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
         // The control colour the cut-out previews on (the garment's).
-        if !f.contains_key("previewColor") {
-            let control = app.ui.dtf_panel.fields.get("dtf.controlBackground").and_then(|c| c.get("color")).cloned();
-            f.insert("previewColor".into(), control.unwrap_or_else(|| json!(PREVIEW_COLOR)));
+        let top = ui.cursor().top();
+        if color_row(ui, &mut f, "previewColor", tl!("Preview Background"))
+            && let Some(hex) = f.get("previewColor").and_then(Value::as_str).map(str::to_string)
+        {
+            set_last_color(app, &hex);
         }
-        color_row(ui, &mut f, "previewColor", tl!("Preview Background"));
+        crate::dtf_help::tip_over(ui, cmd, "previewColor", top);
         // Interior holes by hand: each click with the wand clears the enclosed area it picks.
         ui.add_enabled_ui(have_doc, |ui| {
-            crate::widgets::checkbox(ui, &mut wand, tl!("Add Holes (Magic Wand)"));
+            help(crate::widgets::checkbox(ui, &mut wand, tl!("Add Holes (Magic Wand)")), cmd, "holeWand");
         });
     }
     if retouch {
         let mut show_before = f.get("__before").and_then(Value::as_bool).unwrap_or(false);
-        crate::widgets::checkbox(ui, &mut show_before, tl!("Show Before"));
+        help(crate::widgets::checkbox(ui, &mut show_before, tl!("Show Before")), cmd, "showBefore");
         f.insert("__before".into(), json!(show_before));
     }
     let changed = f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v));
@@ -519,18 +562,18 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         if cmd == "dtf.controlBackground" {
             // Show (or recolour) the control background, and remove it, from the same tab.
             ui.add_enabled_ui(enabled, |ui| {
-                apply_it = crate::widgets::primary_button(ui, tl!("Show Background"), 130.0).clicked();
+                apply_it = help(crate::widgets::primary_button(ui, tl!("Show Background"), 130.0), cmd, "showBackground").clicked();
             });
             ui.add_enabled_ui(have_doc && has_backfill, |ui| {
-                remove_bg = crate::widgets::secondary_button(ui, tl!("Delete Background"), 130.0).clicked();
+                remove_bg = help(crate::widgets::secondary_button(ui, tl!("Delete Background"), 130.0), cmd, "deleteBackground").clicked();
             });
         } else {
             ui.add_enabled_ui(enabled, |ui| {
-                apply_it = crate::widgets::primary_button(ui, tl!("Apply"), 110.0).clicked();
+                apply_it = help(crate::widgets::primary_button(ui, tl!("Apply"), 110.0), cmd, "apply").clicked();
             });
         }
         if previewing {
-            cancel = crate::widgets::secondary_button(ui, tl!("Cancel"), 110.0).clicked();
+            cancel = help(crate::widgets::secondary_button(ui, tl!("Cancel"), 110.0), cmd, "cancel").clicked();
         }
     });
     app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
@@ -894,6 +937,66 @@ mod tests {
         assert!(preview_source(h.state()).is_none(), "Show Before: the image as it is");
     }
 
+    /// The help: "?" opens the tool's sheet; a setting's tooltip shows over its row and the slider
+    /// under it still drags.
+    #[test]
+    fn the_help_sheet_and_tooltips_leave_the_settings_working() {
+        use egui_kittest::kittest::Queryable;
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.ui.panels.dtf = true;
+        let sat = tab_of("dtf.saturation");
+        app.ui.dock_tabs.dtf = sat;
+        let mut h = tabs_harness(app, move |ui, app| tool_body(app, ui, sat));
+        h.run_steps(4);
+        // The slider runs under the "Saturation" label, across the tab.
+        let label = h.get_by_label("Saturation").rect();
+        let y = label.bottom() + 14.0;
+        let (from, to) = (egui::pos2(170.0, y), egui::pos2(4.0, y));
+        h.event(egui::Event::PointerMoved(from));
+        for _ in 0..90 {
+            h.run_steps(1);
+        }
+        assert!(h.query_by_label_contains("De −100").is_some(), "the setting's tooltip shows");
+        let before = h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap();
+        h.event(egui::Event::PointerButton { pos: from, button: egui::PointerButton::Primary, pressed: true, modifiers: egui::Modifiers::NONE });
+        h.run_steps(1);
+        for k in 1..=8 {
+            h.event(egui::Event::PointerMoved(from + (to - from) * (k as f32 / 8.0)));
+            h.run_steps(1);
+        }
+        h.event(egui::Event::PointerButton { pos: to, button: egui::PointerButton::Primary, pressed: false, modifiers: egui::Modifiers::NONE });
+        h.run_steps(2);
+        let after = h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap();
+        assert!(after < before - 50.0, "the slider drags under its tooltip: {before} → {after}");
+        assert!(h.query_by_label_contains("Renforcer ou atténuer").is_none(), "the sheet starts closed");
+        h.get_by_label("?").click();
+        h.run_steps(2);
+        assert!(h.query_by_label_contains("Renforcer ou atténuer").is_some(), "the sheet opens");
+    }
+
+    /// The cut-out previews on the last colour picked, here or in Control Background.
+    #[test]
+    fn the_cutout_previews_on_the_last_colour_picked() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.ui.panels.dtf = true;
+        set_last_color(&mut app, "#112233");
+        let cut = tab_of(photocraft_engine::dtf_cmds::REMOVE_WHITE);
+        app.ui.dock_tabs.dtf = cut;
+        let mut h = tabs_harness(app, move |ui, app| tool_body(app, ui, cut));
+        h.run_steps(3);
+        assert_eq!(h.state().ui.dtf_panel.fields[photocraft_engine::dtf_cmds::REMOVE_WHITE]["previewColor"], json!("#112233"));
+        // A colour applied as Control Background becomes the cut-out's.
+        let app = h.state_mut();
+        let mut f = initial_fields(app, "dtf.controlBackground");
+        f.insert("color".into(), json!("#445566"));
+        app.ui.dtf_panel.fields.insert("dtf.controlBackground".into(), f);
+        apply(app, "dtf.controlBackground");
+        h.run_steps(2);
+        assert_eq!(h.state().ui.dtf_panel.fields[photocraft_engine::dtf_cmds::REMOVE_WHITE]["previewColor"], json!("#445566"));
+    }
+
     /// Screenshots for review (`DTF_VISUALS=<folder>`): the Home screen, the panel with a
     /// preview, and the layers DTF Halftone builds, in French.
     #[test]
@@ -991,6 +1094,14 @@ mod tests {
             app.ui.dtf_panel.fields.insert("dtf.saturation".into(), f);
             app.ui.dtf_panel.first_pass = Some(0);
             app.run("window.panel.activate", json!({"panel": "Saturation"})).unwrap();
+        });
+        // The help sheet open in the cut-out's tab.
+        shot(on_white(), "aide", &|app| {
+            app.run("window.panel.activate", json!({"panel": "Cutout"})).unwrap();
+            let cmd = "filter.dtf.removeWhiteBackground";
+            let mut f = initial_fields(app, cmd);
+            f.insert("__help".into(), json!(true));
+            app.ui.dtf_panel.fields.insert(cmd.into(), f);
         });
         let mut halftoned = visual();
         halftoned.execute("filter.dtf.halftone", json!({"mode": "semiTransparent", "frequency": 25})).unwrap();
