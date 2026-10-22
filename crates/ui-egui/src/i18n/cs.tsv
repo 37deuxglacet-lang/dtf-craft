@@ -3818,3 +3818,57 @@ navigator	Zoom	Zvětšení
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Přidat otvory (kouzelná guma)
 	Eraser Tolerance	Tolerance gumy
+# DTF Craft (11)
+	Color Analyzer…	Analyzátor barev…
+	Color Analyzer	Analyzátor barev
+	Replace Colors with Swatches	Nahradit barvy vzorky
+	the document is not modified	dokument se nemění
+	Original Colors	Původní barvy
+	Replaced Colors	Nahrazené barvy
+	With Patches	Se vzorky
+	Add a color with the eyedropper: click the visual.	Přidat barvu kapátkem: klikněte do motivu.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Kopie, v níž jsou zaškrtnuté barvy nahrazeny referencemi, uložená jako PNG a otevřená na nové kartě.
+	PDF Sheet…	List PDF…
+	An A4 sheet with the visual, its colors and their references.	List A4 s motivem, jeho barvami a jejich referencemi.
+	Export PNG…	Exportovat PNG…
+	Analyzed Pixels	Analyzované pixely
+	Visible, transparency ignored	Viditelné, průhlednost ignorována
+	RGB {bits} bits	RGB {bits} bitů
+	Maximum Colors	Maximum barev
+	Grouping (ΔE)	Seskupení (ΔE)
+	Colors closer than this difference are counted as one.	Barvy bližší než tento rozdíl se počítají jako jedna.
+	Ignore colors under 0.5 % of the area	Ignorovat barvy pod 0,5 % plochy
+	Reference Swatch Book	Referenční vzorník
+	None loaded	Žádný nenačten
+	{name} · {n} colors	{name} · barev: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formáty: .ase, .aco, .csv (ref; R; G; B nebo L*a*b*). Rozdíl měřen v ΔE 2000.
+	Detected Colors: {n}	Zjištěné barvy: {n}
+	Patches · on-screen check and PDF sheet	Vzorky · kontrola na obrazovce a list PDF
+	Below	Pod
+	Reference	Reference
+	Hex	Hex
+	Client	Zákazník
+	On the PDF sheet	Na listu PDF
+	Replaced in the PNG export	Nahrazeno při exportu PNG
+	Visual	Motiv
+	Match	Shoda
+	Remove this color	Odebrat tuto barvu
+	Change…	Změnit…
+	Load a swatch book to find the references.	Načtěte vzorník pro nalezení referencí.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Zaškrtnuto: barva motivu se při exportu PNG nahradí referencí. ΔE: do 2 = nepostřehnutelné · 2 až 5 = viditelné zblízka · výše = jiný odstín
+	Reference for {hex}	Reference pro {hex}
+	Nearest (automatic)	Nejbližší (automaticky)
+	No visible pixels to analyze.	Žádné viditelné pixely k analýze.
+	Swatch book loaded: {name}, {n} colors	Vzorník načten: {name}, barev: {n}
+	{name} color sheet	{name} list barev
+	Color sheet saved: {path}	List barev uložen: {path}
+	Color Sheet	List barev
+	Swatch Book	Vzorník
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Zjištěné barvy: {n}
+	No swatch book loaded: the colors have no reference.	Není načten vzorník: barvy nemají referenci.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Shody při ΔE 2 nebo méně: {good}; ke kontrole (ΔE 2 až 5): {check}; nad 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Velikost motivu: {w} × {h} px, {wcm} × {hcm} cm při {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = nepostřehnutelný rozdíl · 2 až 5 = viditelné zblízka · nad 5 = jiný odstín.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Barvy zobrazené v sRGB: výsledek tisku závisí na tiskárně, inkoustech a materiálu.
+	Sheet made with DTF Craft	List vytvořen v DTF Craft

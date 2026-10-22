@@ -46,6 +46,7 @@ pub mod fill_cmds;
 pub mod fill_key_cmds;
 pub mod filters;
 pub mod dtf_cmds;
+pub mod dtf_color_cmds;
 pub mod filters_ext;
 pub mod float_cmds;
 mod frame_cmds;

@@ -4131,3 +4131,56 @@ cameraRaw	Yellow	Sárga
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Lyukak hozzáadása (varázsradír)
 	Eraser Tolerance	Radír tűrése
+# DTF Craft (11)
+	Color Analyzer…	Színelemző…
+	Color Analyzer	Színelemző
+	Replace Colors with Swatches	Színek cseréje színmintákra
+	the document is not modified	a dokumentum nem változik
+	Original Colors	Eredeti színek
+	Replaced Colors	Lecserélt színek
+	With Patches	Színfoltokkal
+	Add a color with the eyedropper: click the visual.	Szín hozzáadása pipettával: kattintson a motívumra.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Másolat, amelyben a bejelölt színeket a referenciáik váltják fel, PNG-ként mentve és új lapon megnyitva.
+	PDF Sheet…	PDF-adatlap…
+	An A4 sheet with the visual, its colors and their references.	A4-es adatlap a motívummal, a színeivel és a referenciáikkal.
+	Export PNG…	PNG exportálása…
+	Analyzed Pixels	Elemzett képpontok
+	Visible, transparency ignored	Látható, átlátszóság figyelmen kívül
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Színek legfeljebb
+	Grouping (ΔE)	Csoportosítás (ΔE)
+	Colors closer than this difference are counted as one.	Az ennél kisebb eltérésű színek egynek számítanak.
+	Ignore colors under 0.5 % of the area	A terület 0,5 %-a alatti színek kihagyása
+	Reference Swatch Book	Referencia-színminta
+	None loaded	Nincs betöltve
+	{name} · {n} colors	{name} · {n} szín
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formátumok: .ase, .aco, .csv (ref; R; G; B vagy L*a*b*). Eltérés ΔE 2000-ben mérve.
+	Detected Colors: {n}	Észlelt színek: {n}
+	Patches · on-screen check and PDF sheet	Színfoltok · ellenőrzés a képernyőn és PDF-adatlap
+	Below	Alul
+	Reference	Referencia
+	Hex	Hex
+	Client	Ügyfél
+	On the PDF sheet	A PDF-adatlapon
+	Replaced in the PNG export	Lecserélve a PNG-exportban
+	Visual	Motívum
+	Match	Megfelelés
+	Remove this color	Szín eltávolítása
+	Load a swatch book to find the references.	Töltsön be egy színmintát a referenciák kereséséhez.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Bejelölve: a motívum színét a PNG-exportban a referencia váltja fel. ΔE: 2-ig = észrevehetetlen · 2–5 = közelről látható · felette = más árnyalat
+	Reference for {hex}	Referencia ehhez: {hex}
+	Nearest (automatic)	Legközelebbi (automatikus)
+	No visible pixels to analyze.	Nincs elemezhető látható képpont.
+	Swatch book loaded: {name}, {n} colors	Színminta betöltve: {name}, {n} szín
+	{name} color sheet	{name} színadatlap
+	Color sheet saved: {path}	Színadatlap mentve: {path}
+	Color Sheet	Színadatlap
+	Swatch Book	Színminta
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Észlelt színek: {n}
+	No swatch book loaded: the colors have no reference.	Nincs betöltött színminta: a színeknek nincs referenciájuk.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Egyezések ΔE 2 vagy kevesebb: {good}; ellenőrizendő (ΔE 2–5): {check}; 5 felett: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Motívum mérete: {w} × {h} px, {wcm} × {hcm} cm {dpi} ppi mellett.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: 2-ig = észrevehetetlen eltérés · 2–5 = közelről látható · 5 felett = más árnyalat.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	sRGB-ben megjelenített színek: a nyomat a nyomtatótól, a tintáktól és a hordozótól függ.
+	Sheet made with DTF Craft	Az adatlap a DTF Crafttal készült

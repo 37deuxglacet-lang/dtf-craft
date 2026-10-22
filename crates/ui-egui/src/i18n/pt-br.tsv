@@ -4000,3 +4000,56 @@ layerLabel	No Color	Sem cor
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Adicionar furos (borracha mágica)
 	Eraser Tolerance	Tolerância da borracha
+# DTF Craft (11)
+	Color Analyzer…	Analisador de cores…
+	Color Analyzer	Analisador de cores
+	Replace Colors with Swatches	Substituir cores por amostras
+	the document is not modified	o documento não é modificado
+	Original Colors	Cores originais
+	Replaced Colors	Cores substituídas
+	With Patches	Com patches
+	Add a color with the eyedropper: click the visual.	Adicionar uma cor com o conta-gotas: clique no visual.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Uma cópia com as cores marcadas substituídas pelas referências, salva em PNG e aberta em uma nova aba.
+	PDF Sheet…	Ficha PDF…
+	An A4 sheet with the visual, its colors and their references.	Uma ficha A4 com o visual, suas cores e as referências.
+	Export PNG…	Exportar PNG…
+	Analyzed Pixels	Pixels analisados
+	Visible, transparency ignored	Visíveis, transparência ignorada
+	RGB {bits} bits	RGB {bits} bits
+	Maximum Colors	Máximo de cores
+	Grouping (ΔE)	Agrupamento (ΔE)
+	Colors closer than this difference are counted as one.	Cores mais próximas que esta diferença contam como uma só.
+	Ignore colors under 0.5 % of the area	Ignorar cores abaixo de 0,5 % da área
+	Reference Swatch Book	Catálogo de cores de referência
+	None loaded	Nenhum carregado
+	{name} · {n} colors	{name} · {n} cores
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formatos: .ase, .aco, .csv (ref; R; G; B ou L*a*b*). Diferença medida em ΔE 2000.
+	Detected Colors: {n}	Cores detectadas: {n}
+	Patches · on-screen check and PDF sheet	Patches · controle na tela e ficha PDF
+	Below	Abaixo
+	Reference	Referência
+	Hex	Hexa
+	Client	Cliente
+	On the PDF sheet	Na ficha PDF
+	Replaced in the PNG export	Substituída na exportação PNG
+	Visual	Visual
+	Match	Correspondência
+	Remove this color	Remover esta cor
+	Load a swatch book to find the references.	Carregue um catálogo de cores para encontrar as referências.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Marcado: a cor do visual é substituída pela referência na exportação PNG. ΔE: até 2 = imperceptível · 2 a 5 = visível de perto · acima = outro tom
+	Reference for {hex}	Referência para {hex}
+	Nearest (automatic)	A mais próxima (automático)
+	No visible pixels to analyze.	Nenhum pixel visível para analisar.
+	Swatch book loaded: {name}, {n} colors	Catálogo carregado: {name}, {n} cores
+	{name} color sheet	{name} ficha de cores
+	Color sheet saved: {path}	Ficha de cores salva: {path}
+	Color Sheet	Ficha de cores
+	Swatch Book	Catálogo de cores
+	Hex · RGB	Hexa · RGB
+	Colors detected: {n}	Cores detectadas: {n}
+	No swatch book loaded: the colors have no reference.	Nenhum catálogo carregado: as cores não têm referência.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Correspondências com ΔE 2 ou menos: {good}; a verificar (ΔE 2 a 5): {check}; acima de 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Tamanho do visual: {w} × {h} px, {wcm} × {hcm} cm a {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: até 2 = diferença imperceptível · 2 a 5 = visível de perto · acima de 5 = outro tom.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Cores exibidas em sRGB: o resultado impresso depende da impressora, das tintas e do suporte.
+	Sheet made with DTF Craft	Ficha criada com DTF Craft

@@ -3203,3 +3203,60 @@ curves	Smooth	Haluskan
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Tambah lubang (penghapus ajaib)
 	Eraser Tolerance	Toleransi penghapus
+# DTF Craft (11)
+	Color Analyzer…	Penganalisis Warna…
+	Color Analyzer	Penganalisis Warna
+	Replace Colors with Swatches	Ganti warna dengan swatch
+	the document is not modified	dokumen tidak diubah
+	Original Colors	Warna asli
+	Replaced Colors	Warna pengganti
+	With Patches	Dengan patch
+	Add a color with the eyedropper: click the visual.	Tambah warna dengan pipet: klik pada visual.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Salinan dengan warna yang dicentang diganti referensinya, disimpan sebagai PNG dan dibuka di tab baru.
+	PDF Sheet…	Lembar PDF…
+	An A4 sheet with the visual, its colors and their references.	Lembar A4 berisi visual, warnanya, dan referensinya.
+	Export PNG…	Ekspor PNG…
+	Analyzed Pixels	Piksel yang dianalisis
+	Visible, transparency ignored	Terlihat, transparansi diabaikan
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Warna maksimum
+	Grouping (ΔE)	Pengelompokan (ΔE)
+	Colors closer than this difference are counted as one.	Warna yang lebih dekat dari selisih ini dihitung sebagai satu.
+	Ignore colors under 0.5 % of the area	Abaikan warna di bawah 0,5 % luas
+	Reference Swatch Book	Buku swatch referensi
+	None loaded	Belum dimuat
+	{name} · {n} colors	{name} · {n} warna
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Format: .ase, .aco, .csv (ref; R; G; B atau L*a*b*). Selisih diukur dalam ΔE 2000.
+	Detected Colors: {n}	Warna terdeteksi: {n}
+	Patches · on-screen check and PDF sheet	Patch · pemeriksaan di layar dan lembar PDF
+	Below	Di bawah
+	Reference	Referensi
+	Hex	Hex
+	Client	Klien
+	On the PDF sheet	Di lembar PDF
+	Replaced in the PNG export	Diganti saat ekspor PNG
+	Visual	Visual
+	Area	Luas
+	Match	Kecocokan
+	Remove this color	Hapus warna ini
+	Change…	Ubah…
+	Load a swatch book to find the references.	Muat buku swatch untuk menemukan referensi.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Dicentang: warna visual diganti referensi saat ekspor PNG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain
+	Reference for {hex}	Referensi untuk {hex}
+	Nearest (automatic)	Terdekat (otomatis)
+	No visible pixels to analyze.	Tidak ada piksel terlihat untuk dianalisis.
+	Swatch book loaded: {name}, {n} colors	Buku swatch dimuat: {name}, {n} warna
+	{name} color sheet	{name} lembar warna
+	Color sheet saved: {path}	Lembar warna disimpan: {path}
+	Color Sheet	Lembar Warna
+	Date	Tanggal
+	Profile	Profil
+	Swatch Book	Buku swatch
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Warna terdeteksi: {n}
+	No swatch book loaded: the colors have no reference.	Belum ada buku swatch: warna tidak memiliki referensi.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Cocok pada ΔE 2 atau kurang: {good}; perlu diperiksa (ΔE 2 sampai 5): {check}; di atas 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Ukuran visual: {w} × {h} px, {wcm} × {hcm} cm pada {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: hingga 2 = selisih tak terlihat · 2 sampai 5 = terlihat dari dekat · di atas 5 = rona lain.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Warna ditampilkan dalam sRGB: hasil cetak bergantung pada printer, tinta, dan media.
+	Sheet made with DTF Craft	Lembar dibuat dengan DTF Craft

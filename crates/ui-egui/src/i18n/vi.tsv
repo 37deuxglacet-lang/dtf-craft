@@ -3697,3 +3697,58 @@ curves	Smooth	Làm mượt
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Thêm lỗ (tẩy thần)
 	Eraser Tolerance	Dung sai của tẩy
+# DTF Craft (11)
+	Color Analyzer…	Trình phân tích màu…
+	Color Analyzer	Trình phân tích màu
+	Replace Colors with Swatches	Thay màu bằng mẫu màu
+	the document is not modified	tài liệu không bị thay đổi
+	Original Colors	Màu gốc
+	Replaced Colors	Màu đã thay
+	With Patches	Kèm ô màu
+	Add a color with the eyedropper: click the visual.	Thêm màu bằng ống hút: nhấp vào hình.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Bản sao với các màu đã chọn được thay bằng màu tham chiếu, lưu dạng PNG và mở trong thẻ mới.
+	PDF Sheet…	Phiếu PDF…
+	An A4 sheet with the visual, its colors and their references.	Phiếu A4 gồm hình, các màu và màu tham chiếu.
+	Export PNG…	Xuất PNG…
+	Analyzed Pixels	Điểm ảnh được phân tích
+	Visible, transparency ignored	Hiển thị, bỏ qua độ trong suốt
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Số màu tối đa
+	Grouping (ΔE)	Gộp nhóm (ΔE)
+	Colors closer than this difference are counted as one.	Các màu gần nhau hơn mức chênh lệch này được tính là một.
+	Ignore colors under 0.5 % of the area	Bỏ qua màu dưới 0,5 % diện tích
+	Reference Swatch Book	Bảng màu tham chiếu
+	None loaded	Chưa tải
+	{name} · {n} colors	{name} · {n} màu
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Định dạng: .ase, .aco, .csv (ref; R; G; B hoặc L*a*b*). Chênh lệch đo bằng ΔE 2000.
+	Detected Colors: {n}	Màu phát hiện: {n}
+	Patches · on-screen check and PDF sheet	Ô màu · kiểm tra trên màn hình và phiếu PDF
+	Below	Bên dưới
+	Reference	Tham chiếu
+	Hex	Hex
+	Client	Khách hàng
+	On the PDF sheet	Trên phiếu PDF
+	Replaced in the PNG export	Được thay khi xuất PNG
+	Visual	Hình
+	Match	Màu tương ứng
+	Remove this color	Xóa màu này
+	Change…	Đổi…
+	Load a swatch book to find the references.	Tải bảng màu để tìm màu tham chiếu.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Đã chọn: màu của hình được thay bằng màu tham chiếu khi xuất PNG. ΔE: đến 2 = không nhận thấy · 2 đến 5 = thấy khi nhìn gần · trên = sắc khác
+	Reference for {hex}	Tham chiếu cho {hex}
+	Nearest (automatic)	Gần nhất (tự động)
+	No visible pixels to analyze.	Không có điểm ảnh hiển thị để phân tích.
+	Swatch book loaded: {name}, {n} colors	Đã tải bảng màu: {name}, {n} màu
+	{name} color sheet	{name} phiếu màu
+	Color sheet saved: {path}	Đã lưu phiếu màu: {path}
+	Color Sheet	Phiếu màu
+	Date	Ngày
+	Swatch Book	Bảng màu
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Màu phát hiện: {n}
+	No swatch book loaded: the colors have no reference.	Chưa tải bảng màu: các màu không có tham chiếu.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Khớp ở ΔE 2 trở xuống: {good}; cần kiểm tra (ΔE 2 đến 5): {check}; trên 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Kích thước hình: {w} × {h} px, {wcm} × {hcm} cm ở {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: đến 2 = khác biệt không nhận thấy · 2 đến 5 = thấy khi nhìn gần · trên 5 = sắc khác.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Màu hiển thị theo sRGB: kết quả in phụ thuộc vào máy in, mực và vật liệu.
+	Sheet made with DTF Craft	Phiếu tạo bằng DTF Craft

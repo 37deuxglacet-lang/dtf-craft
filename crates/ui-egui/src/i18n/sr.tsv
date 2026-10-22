@@ -4285,3 +4285,56 @@ shape	Appearance	Izgled
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Dodaj rupe (čarobna gumica)
 	Eraser Tolerance	Tolerancija gumice
+# DTF Craft (11)
+	Color Analyzer…	Analizator boja…
+	Color Analyzer	Analizator boja
+	Replace Colors with Swatches	Zameni boje uzorcima
+	the document is not modified	dokument se ne menja
+	Original Colors	Originalne boje
+	Replaced Colors	Zamenjene boje
+	With Patches	Sa uzorcima
+	Add a color with the eyedropper: click the visual.	Dodaj boju pipetom: kliknite na motiv.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Kopija u kojoj su označene boje zamenjene referencama, sačuvana kao PNG i otvorena u novoj kartici.
+	PDF Sheet…	PDF list…
+	An A4 sheet with the visual, its colors and their references.	List A4 sa motivom, njegovim bojama i referencama.
+	Export PNG…	Izvezi PNG…
+	Analyzed Pixels	Analizirani pikseli
+	Visible, transparency ignored	Vidljivi, providnost zanemarena
+	RGB {bits} bits	RGB {bits} bita
+	Maximum Colors	Najviše boja
+	Grouping (ΔE)	Grupisanje (ΔE)
+	Colors closer than this difference are counted as one.	Boje bliže od ove razlike računaju se kao jedna.
+	Ignore colors under 0.5 % of the area	Zanemari boje ispod 0,5 % površine
+	Reference Swatch Book	Referentna karta boja
+	None loaded	Nije učitana
+	{name} · {n} colors	{name} · boja: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formati: .ase, .aco, .csv (ref; R; G; B ili L*a*b*). Razlika merena u ΔE 2000.
+	Detected Colors: {n}	Pronađene boje: {n}
+	Patches · on-screen check and PDF sheet	Uzorci · provera na ekranu i PDF list
+	Below	Ispod
+	Reference	Referenca
+	Hex	Hex
+	Client	Klijent
+	On the PDF sheet	Na PDF listu
+	Replaced in the PNG export	Zamenjuje se pri izvozu PNG
+	Visual	Motiv
+	Match	Podudaranje
+	Remove this color	Ukloni ovu boju
+	Load a swatch book to find the references.	Učitajte kartu boja da biste pronašli reference.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Označeno: boja motiva se pri izvozu PNG zamenjuje referencom. ΔE: do 2 = neprimetno · 2 do 5 = vidljivo izbliza · iznad = druga nijansa
+	Reference for {hex}	Referenca za {hex}
+	Nearest (automatic)	Najbliža (automatski)
+	No visible pixels to analyze.	Nema vidljivih piksela za analizu.
+	Swatch book loaded: {name}, {n} colors	Karta boja učitana: {name}, boja: {n}
+	{name} color sheet	{name} list boja
+	Color sheet saved: {path}	List boja sačuvan: {path}
+	Color Sheet	List boja
+	Swatch Book	Karta boja
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Pronađene boje: {n}
+	No swatch book loaded: the colors have no reference.	Karta boja nije učitana: boje nemaju referencu.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Podudaranja na ΔE 2 ili manje: {good}; za proveru (ΔE 2 do 5): {check}; iznad 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Veličina motiva: {w} × {h} px, {wcm} × {hcm} cm na {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = neprimetna razlika · 2 do 5 = vidljivo izbliza · iznad 5 = druga nijansa.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Boje prikazane u sRGB: rezultat štampe zavisi od štampača, mastila i podloge.
+	Sheet made with DTF Craft	List napravljen u DTF Craft

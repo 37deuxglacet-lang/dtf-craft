@@ -2900,3 +2900,62 @@ curves	Smooth	Suavizar
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Añadir huecos (borrador mágico)
 	Eraser Tolerance	Tolerancia del borrador
+# DTF Craft (11)
+	Color Analyzer…	Analizador de color…
+	Color Analyzer	Analizador de color
+	Replace Colors with Swatches	Reemplazar colores por muestras
+	the document is not modified	el documento no se modifica
+	Original Colors	Colores originales
+	Replaced Colors	Colores reemplazados
+	With Patches	Con parches
+	Add a color with the eyedropper: click the visual.	Añadir un color con el cuentagotas: haga clic en el diseño.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Una copia con los colores marcados reemplazados por sus referencias, guardada como PNG y abierta en una nueva pestaña.
+	PDF Sheet…	Ficha PDF…
+	An A4 sheet with the visual, its colors and their references.	Una ficha A4 con el diseño, sus colores y sus referencias.
+	Export PNG…	Exportar PNG…
+	Analyzed Pixels	Píxeles analizados
+	Visible, transparency ignored	Visibles, transparencia ignorada
+	RGB {bits} bits	RGB {bits} bits
+	Maximum Colors	Colores máximos
+	Grouping (ΔE)	Agrupación (ΔE)
+	Colors closer than this difference are counted as one.	Los colores más cercanos que esta diferencia cuentan como uno.
+	Ignore colors under 0.5 % of the area	Ignorar colores por debajo del 0,5 % de la superficie
+	Reference Swatch Book	Muestrario de referencia
+	None loaded	Ninguno cargado
+	{name} · {n} colors	{name} · {n} colores
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formatos: .ase, .aco, .csv (ref; R; G; B o L*a*b*). Diferencia medida en ΔE 2000.
+	Detected Colors: {n}	Colores detectados: {n}
+	Patches · on-screen check and PDF sheet	Parches · control en pantalla y ficha PDF
+	Below	Debajo
+	Reference	Referencia
+	Hex	Hex
+	Client	Cliente
+	On the PDF sheet	En la ficha PDF
+	Replaced in the PNG export	Reemplazado en la exportación PNG
+	Visual	Diseño
+	Area	Superficie
+	Match	Correspondencia
+	Remove this color	Quitar este color
+	Change…	Cambiar…
+	Load a swatch book to find the references.	Cargue un muestrario para encontrar las referencias.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Marcado: el color del diseño se reemplaza por la referencia al exportar PNG. ΔE: hasta 2 = imperceptible · 2 a 5 = visible de cerca · más = otro tono
+	Reference for {hex}	Referencia para {hex}
+	Nearest (automatic)	La más cercana (automático)
+	No visible pixels to analyze.	No hay píxeles visibles que analizar.
+	Swatch book loaded: {name}, {n} colors	Muestrario cargado: {name}, {n} colores
+	{name} color sheet	{name} ficha de color
+	Color sheet saved: {path}	Ficha de color guardada: {path}
+	Color Sheet	Ficha de color
+	Date	Fecha
+	Profile	Perfil
+	Swatch Book	Muestrario
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Colores detectados: {n}
+	No swatch book loaded: the colors have no reference.	Ningún muestrario cargado: los colores no tienen referencia.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Correspondencias con ΔE 2 o menos: {good}; por revisar (ΔE 2 a 5): {check}; más de 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Tamaño del diseño: {w} × {h} px, {wcm} × {hcm} cm a {dpi} ppp.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: hasta 2 = diferencia imperceptible · 2 a 5 = visible de cerca · más de 5 = otro tono.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Colores mostrados en sRGB: el resultado impreso depende de la impresora, las tintas y el soporte.
+	Sheet made with DTF Craft	Ficha creada con DTF Craft
+	RGB	RGB
+	Color Profile	Perfil de color

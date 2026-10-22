@@ -59,6 +59,11 @@ pub fn sheet(command: &str) -> Option<Sheet> {
             when: "Ombres douces, dégradés vers le vide, effets vintage ; pour un visuel entier tramé sur textile foncé ou clair.",
             advice: "25 lpi, angle 22,5°, point rond, point minimal 5 %, maximal 95 %. Montez la fréquence pour une trame plus fine, baissez-la pour un effet plus marqué.",
         },
+        "dtf.colorAnalyzer" => Sheet {
+            what: "Relever les couleurs principales du visuel (RVB, profil sRGB, transparence ignorée) et trouver pour chacune la couleur la plus proche d'un nuancier que vous chargez (.ase, .aco, .csv). L'écart est donné en ΔE 2000. Des patchs avec les références s'affichent à côté du visuel ; une fiche PDF A4 les reprend. L'export PNG remplace les couleurs cochées par celles du nuancier dans une copie, ouverte dans un nouvel onglet : le document n'est jamais modifié.",
+            when: "Logo ou visuel en aplats, quand le client impose des couleurs de référence, ou pour documenter un travail avant impression.",
+            advice: "8 couleurs, regroupement ΔE 5, couleurs sous 0,5 % ignorées. Ajoutez une couleur oubliée à la pipette. ΔE jusqu'à 2 : écart imperceptible ; de 2 à 5 : visible de près ; au-delà : autre teinte, choisissez une autre référence avec « Changer… ». Une couleur à plus de ΔE 5 de sa référence (souvent un contour lissé) n'est pas cochée d'office. Le remplacement garde les contours lissés et les dégradés ; vérifiez-le avec l'aperçu « Couleurs remplacées ».",
+        },
         _ => return None,
     })
 }
@@ -114,18 +119,23 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
 /// The "?" button and, while it is on, the tool's sheet, at the top of its tab or dialog. The
 /// open state lives in the fields (`__help`).
 pub fn sheet_ui(ui: &mut egui::Ui, f: &mut Map<String, Value>, command: &str) {
+    let mut open = f.get("__help").and_then(Value::as_bool).unwrap_or(false);
+    sheet_toggle(ui, &mut open, command);
+    f.insert("__help".into(), json!(open));
+}
+
+/// The "?" button and, while `open`, the tool's sheet.
+pub fn sheet_toggle(ui: &mut egui::Ui, open: &mut bool, command: &str) {
     let Some(sheet) = sheet(command) else { return };
     let t = Tokens::get(ui.ctx());
-    let mut open = f.get("__help").and_then(Value::as_bool).unwrap_or(false);
     // One row's height: a right-to-left layout alone would take the whole tab's height.
     ui.allocate_ui_with_layout(egui::vec2(ui.available_width(), 22.0), egui::Layout::right_to_left(egui::Align::Center), |ui| {
-        let b = egui::Button::new(RichText::new("?").strong()).selected(open).min_size(egui::vec2(22.0, 20.0));
-        if ui.add(b).on_hover_text(if open { "Masquer l'aide" } else { "Aide de l'outil" }).clicked() {
-            open = !open;
+        let b = egui::Button::new(RichText::new("?").strong()).selected(*open).min_size(egui::vec2(22.0, 20.0));
+        if ui.add(b).on_hover_text(if *open { "Masquer l'aide" } else { "Aide de l'outil" }).clicked() {
+            *open = !*open;
         }
     });
-    f.insert("__help".into(), json!(open));
-    if !open {
+    if !*open {
         return;
     }
     egui::Frame::group(ui.style()).fill(t.card).show(ui, |ui| {

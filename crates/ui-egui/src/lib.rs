@@ -38,6 +38,8 @@ pub mod brush_preset_dialog;
 pub mod brush_preview;
 pub mod brush_resize;
 pub mod brush_sections;
+pub mod color_analyzer_ui;
+pub mod color_sheet;
 pub mod brushes_tab;
 pub(crate) mod cam_preview;
 mod cam_transform;
@@ -678,6 +680,8 @@ pub struct PhotocraftApp {
     pub(crate) gradient: gradient_ui::LiveGradient,
     /// Filter › Camera Raw Filter dialog (camera_raw_ui).
     pub(crate) camera_raw: Option<camera_raw_ui::CameraRawDialog>,
+    /// DTF › Color Analyzer, open over the main window (DTF Craft).
+    pub(crate) color_analyzer: Option<color_analyzer_ui::ColorAnalyzer>,
     /// A raw file just opened interactively, waiting for the open-time Camera Raw dialog (shown
     /// on the next frame, which has the egui context).
     pub(crate) pending_raw_open: Option<camera_raw_ui::RawOpen>,
@@ -874,6 +878,7 @@ impl PhotocraftApp {
             distort: Default::default(),
             gradient: Default::default(),
             camera_raw: None,
+            color_analyzer: None,
             pending_raw_open: None,
             raw_redevelop: None,
             wide_angle: None,
@@ -1885,6 +1890,7 @@ impl eframe::App for PhotocraftApp {
         targa_options_ui::show(self, &ctx);
         distort_ui::show(self, &ctx);
         camera_raw_ui::show(self, &ctx);
+        color_analyzer_ui::show(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         canvas::extra_windows(self, &ctx);
         notices::show(self, &ctx);

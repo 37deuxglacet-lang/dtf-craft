@@ -3909,3 +3909,57 @@ curves	Smooth	Εξομάλυνση
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Προσθήκη οπών (μαγική γόμα)
 	Eraser Tolerance	Ανοχή γόμας
+# DTF Craft (11)
+	Color Analyzer…	Αναλυτής χρωμάτων…
+	Color Analyzer	Αναλυτής χρωμάτων
+	Replace Colors with Swatches	Αντικατάσταση χρωμάτων με δείγματα
+	the document is not modified	το έγγραφο δεν τροποποιείται
+	Original Colors	Αρχικά χρώματα
+	Replaced Colors	Αντικατεστημένα χρώματα
+	With Patches	Με δείγματα
+	Add a color with the eyedropper: click the visual.	Προσθήκη χρώματος με το σταγονόμετρο: κάντε κλικ στο σχέδιο.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Αντίγραφο με τα επιλεγμένα χρώματα αντικατεστημένα από τις αναφορές τους, αποθηκευμένο ως PNG και ανοιγμένο σε νέα καρτέλα.
+	PDF Sheet…	Φύλλο PDF…
+	An A4 sheet with the visual, its colors and their references.	Φύλλο A4 με το σχέδιο, τα χρώματά του και τις αναφορές τους.
+	Export PNG…	Εξαγωγή PNG…
+	Analyzed Pixels	Πίξελ που αναλύονται
+	Visible, transparency ignored	Ορατά, η διαφάνεια αγνοείται
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Μέγιστος αριθμός χρωμάτων
+	Grouping (ΔE)	Ομαδοποίηση (ΔE)
+	Colors closer than this difference are counted as one.	Χρώματα πιο κοντά από αυτή τη διαφορά μετρούν ως ένα.
+	Ignore colors under 0.5 % of the area	Παράβλεψη χρωμάτων κάτω από 0,5 % της επιφάνειας
+	Reference Swatch Book	Δειγματολόγιο αναφοράς
+	None loaded	Δεν φορτώθηκε
+	{name} · {n} colors	{name} · {n} χρώματα
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Μορφές: .ase, .aco, .csv (ref; R; G; B ή L*a*b*). Διαφορά σε ΔE 2000.
+	Detected Colors: {n}	Χρώματα που εντοπίστηκαν: {n}
+	Patches · on-screen check and PDF sheet	Δείγματα · έλεγχος στην οθόνη και φύλλο PDF
+	Below	Κάτω
+	Reference	Αναφορά
+	Hex	Hex
+	Client	Πελάτης
+	On the PDF sheet	Στο φύλλο PDF
+	Replaced in the PNG export	Αντικαθίσταται στην εξαγωγή PNG
+	Visual	Σχέδιο
+	Match	Αντιστοιχία
+	Remove this color	Αφαίρεση αυτού του χρώματος
+	Load a swatch book to find the references.	Φορτώστε ένα δειγματολόγιο για να βρείτε τις αναφορές.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Επιλεγμένο: το χρώμα του σχεδίου αντικαθίσταται από την αναφορά στην εξαγωγή PNG. ΔE: έως 2 = ανεπαίσθητο · 2 έως 5 = ορατό από κοντά · πάνω = άλλη απόχρωση
+	Reference for {hex}	Αναφορά για {hex}
+	Nearest (automatic)	Πλησιέστερο (αυτόματα)
+	No visible pixels to analyze.	Δεν υπάρχουν ορατά πίξελ για ανάλυση.
+	Swatch book loaded: {name}, {n} colors	Φορτώθηκε δειγματολόγιο: {name}, {n} χρώματα
+	{name} color sheet	{name} φύλλο χρωμάτων
+	Color sheet saved: {path}	Το φύλλο χρωμάτων αποθηκεύτηκε: {path}
+	Color Sheet	Φύλλο χρωμάτων
+	Swatch Book	Δειγματολόγιο
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Χρώματα που εντοπίστηκαν: {n}
+	No swatch book loaded: the colors have no reference.	Δεν φορτώθηκε δειγματολόγιο: τα χρώματα δεν έχουν αναφορά.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Αντιστοιχίες με ΔE 2 ή λιγότερο: {good}· για έλεγχο (ΔE 2 έως 5): {check}· πάνω από 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Μέγεθος σχεδίου: {w} × {h} px, {wcm} × {hcm} cm στα {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: έως 2 = ανεπαίσθητη διαφορά · 2 έως 5 = ορατή από κοντά · πάνω από 5 = άλλη απόχρωση.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Χρώματα σε sRGB: το εκτυπωμένο αποτέλεσμα εξαρτάται από τον εκτυπωτή, τα μελάνια και το υπόστρωμα.
+	Sheet made with DTF Craft	Φύλλο που δημιουργήθηκε με το DTF Craft
+	RGB	RGB

@@ -3970,3 +3970,56 @@ curves	Smooth	Vloeiend maken
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Gaten toevoegen (toverwisser)
 	Eraser Tolerance	Tolerantie van de gum
+# DTF Craft (11)
+	Color Analyzer…	Kleuranalyse…
+	Color Analyzer	Kleuranalyse
+	Replace Colors with Swatches	Kleuren vervangen door stalen
+	the document is not modified	het document wordt niet gewijzigd
+	Original Colors	Oorspronkelijke kleuren
+	Replaced Colors	Vervangen kleuren
+	With Patches	Met kleurvlakken
+	Add a color with the eyedropper: click the visual.	Kleur toevoegen met de pipet: klik op het ontwerp.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Een kopie waarin de aangevinkte kleuren door hun referentie zijn vervangen, opgeslagen als PNG en geopend in een nieuw tabblad.
+	PDF Sheet…	PDF-blad…
+	An A4 sheet with the visual, its colors and their references.	Een A4-blad met het ontwerp, de kleuren en hun referenties.
+	Export PNG…	PNG exporteren…
+	Analyzed Pixels	Geanalyseerde pixels
+	Visible, transparency ignored	Zichtbaar, transparantie genegeerd
+	RGB {bits} bits	RGB {bits} bits
+	Maximum Colors	Maximaal aantal kleuren
+	Grouping (ΔE)	Groeperen (ΔE)
+	Colors closer than this difference are counted as one.	Kleuren die dichter bij elkaar liggen dan dit verschil tellen als één.
+	Ignore colors under 0.5 % of the area	Kleuren onder 0,5 % van het oppervlak negeren
+	Reference Swatch Book	Referentiekleurenwaaier
+	None loaded	Niets geladen
+	{name} · {n} colors	{name} · {n} kleuren
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formaten: .ase, .aco, .csv (ref; R; G; B of L*a*b*). Verschil gemeten in ΔE 2000.
+	Detected Colors: {n}	Gevonden kleuren: {n}
+	Patches · on-screen check and PDF sheet	Kleurvlakken · controle op het scherm en PDF-blad
+	Below	Onder
+	Reference	Referentie
+	Hex	Hex
+	Client	Klant
+	On the PDF sheet	Op het PDF-blad
+	Replaced in the PNG export	Vervangen bij de PNG-export
+	Visual	Ontwerp
+	Match	Overeenkomst
+	Remove this color	Deze kleur verwijderen
+	Load a swatch book to find the references.	Laad een kleurenwaaier om de referenties te vinden.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Aangevinkt: de kleur van het ontwerp wordt bij de PNG-export vervangen door de referentie. ΔE: tot 2 = onzichtbaar · 2 tot 5 = van dichtbij zichtbaar · daarboven = andere tint
+	Reference for {hex}	Referentie voor {hex}
+	Nearest (automatic)	Dichtstbijzijnde (automatisch)
+	No visible pixels to analyze.	Geen zichtbare pixels om te analyseren.
+	Swatch book loaded: {name}, {n} colors	Kleurenwaaier geladen: {name}, {n} kleuren
+	{name} color sheet	{name} kleurenblad
+	Color sheet saved: {path}	Kleurenblad opgeslagen: {path}
+	Color Sheet	Kleurenblad
+	Swatch Book	Kleurenwaaier
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Gevonden kleuren: {n}
+	No swatch book loaded: the colors have no reference.	Geen kleurenwaaier geladen: de kleuren hebben geen referentie.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Overeenkomsten bij ΔE 2 of minder: {good}; te controleren (ΔE 2 tot 5): {check}; boven 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Formaat van het ontwerp: {w} × {h} px, {wcm} × {hcm} cm bij {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: tot 2 = onzichtbaar verschil · 2 tot 5 = van dichtbij zichtbaar · boven 5 = andere tint.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Kleuren weergegeven in sRGB: het drukresultaat hangt af van printer, inkt en drager.
+	Sheet made with DTF Craft	Blad gemaakt met DTF Craft

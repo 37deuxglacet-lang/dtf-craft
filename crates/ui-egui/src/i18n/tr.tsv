@@ -3942,3 +3942,56 @@ cameraData	Lens	Lens
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Delik ekle (sihirli silgi)
 	Eraser Tolerance	Silgi toleransı
+# DTF Craft (11)
+	Color Analyzer…	Renk Analizcisi…
+	Color Analyzer	Renk Analizcisi
+	Replace Colors with Swatches	Renkleri renk örnekleriyle değiştir
+	the document is not modified	belge değiştirilmez
+	Original Colors	Özgün renkler
+	Replaced Colors	Değiştirilen renkler
+	With Patches	Yamalarla
+	Add a color with the eyedropper: click the visual.	Damlalıkla renk ekle: görsele tıklayın.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	İşaretli renklerin referanslarıyla değiştirildiği bir kopya; PNG olarak kaydedilir ve yeni sekmede açılır.
+	PDF Sheet…	PDF Sayfası…
+	An A4 sheet with the visual, its colors and their references.	Görseli, renklerini ve referanslarını içeren A4 sayfası.
+	Export PNG…	PNG Dışa Aktar…
+	Analyzed Pixels	Çözümlenen pikseller
+	Visible, transparency ignored	Görünür, saydamlık yok sayılır
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	En fazla renk
+	Grouping (ΔE)	Gruplama (ΔE)
+	Colors closer than this difference are counted as one.	Bu farktan daha yakın renkler tek renk sayılır.
+	Ignore colors under 0.5 % of the area	Alanın %0,5'inden az renkleri yok say
+	Reference Swatch Book	Referans renk kataloğu
+	None loaded	Yüklenmedi
+	{name} · {n} colors	{name} · {n} renk
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Biçimler: .ase, .aco, .csv (ref; R; G; B veya L*a*b*). Fark ΔE 2000 ile ölçülür.
+	Detected Colors: {n}	Algılanan renkler: {n}
+	Patches · on-screen check and PDF sheet	Yamalar · ekranda kontrol ve PDF sayfası
+	Below	Altta
+	Reference	Referans
+	Hex	Onaltılık
+	Client	Müşteri
+	On the PDF sheet	PDF sayfasında
+	Replaced in the PNG export	PNG dışa aktarımda değiştirilir
+	Visual	Görsel
+	Match	Eşleşme
+	Remove this color	Bu rengi kaldır
+	Load a swatch book to find the references.	Referansları bulmak için bir renk kataloğu yükleyin.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Işaretli: görselin rengi PNG dışa aktarımında referansla değiştirilir. ΔE: 2'ye kadar = fark edilmez · 2–5 = yakından görünür · üstü = başka ton
+	Reference for {hex}	{hex} için referans
+	Nearest (automatic)	En yakın (otomatik)
+	No visible pixels to analyze.	Çözümlenecek görünür piksel yok.
+	Swatch book loaded: {name}, {n} colors	Renk kataloğu yüklendi: {name}, {n} renk
+	{name} color sheet	{name} renk sayfası
+	Color sheet saved: {path}	Renk sayfası kaydedildi: {path}
+	Color Sheet	Renk Sayfası
+	Swatch Book	Renk kataloğu
+	Hex · RGB	Onaltılık · RGB
+	Colors detected: {n}	Algılanan renkler: {n}
+	No swatch book loaded: the colors have no reference.	Renk kataloğu yüklenmedi: renklerin referansı yok.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	ΔE 2 veya altı eşleşmeler: {good}; kontrol edilecek (ΔE 2–5): {check}; 5 üstü: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Görsel boyutu: {w} × {h} px, {dpi} ppi'de {wcm} × {hcm} cm.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: 2'ye kadar = fark edilmez · 2–5 = yakından görünür · 5 üstü = başka ton.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Renkler sRGB olarak gösterilir: baskı sonucu yazıcıya, mürekkeplere ve malzemeye bağlıdır.
+	Sheet made with DTF Craft	DTF Craft ile hazırlanan sayfa

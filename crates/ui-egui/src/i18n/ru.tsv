@@ -3180,3 +3180,59 @@ curves	Smooth	Сгладить
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Добавить отверстия (волшебный ластик)
 	Eraser Tolerance	Допуск ластика
+# DTF Craft (11)
+	Color Analyzer…	Анализатор цвета…
+	Color Analyzer	Анализатор цвета
+	Replace Colors with Swatches	Заменить цвета образцами
+	the document is not modified	документ не изменяется
+	Original Colors	Исходные цвета
+	Replaced Colors	Заменённые цвета
+	With Patches	С плашками
+	Add a color with the eyedropper: click the visual.	Добавить цвет пипеткой: щёлкните по изображению.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Копия, где отмеченные цвета заменены образцами, сохраняется в PNG и открывается в новой вкладке.
+	PDF Sheet…	PDF-карта…
+	An A4 sheet with the visual, its colors and their references.	Лист A4 с изображением, его цветами и образцами.
+	Export PNG…	Экспорт PNG…
+	Analyzed Pixels	Анализируемые пиксели
+	Visible, transparency ignored	Видимые, прозрачность не учитывается
+	RGB {bits} bits	RGB {bits} бит
+	Maximum Colors	Максимум цветов
+	Grouping (ΔE)	Группировка (ΔE)
+	Colors closer than this difference are counted as one.	Цвета ближе этого различия считаются одним.
+	Ignore colors under 0.5 % of the area	Игнорировать цвета менее 0,5 % площади
+	Reference Swatch Book	Эталонный каталог цветов
+	None loaded	Не загружен
+	{name} · {n} colors	{name} · цветов: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Форматы: .ase, .aco, .csv (ref; R; G; B или L*a*b*). Различие в ΔE 2000.
+	Detected Colors: {n}	Найдено цветов: {n}
+	Patches · on-screen check and PDF sheet	Плашки · контроль на экране и PDF-карта
+	Below	Снизу
+	Reference	Образец
+	Hex	Hex
+	Client	Клиент
+	On the PDF sheet	На PDF-карте
+	Replaced in the PNG export	Заменяется при экспорте PNG
+	Visual	Изображение
+	Match	Соответствие
+	Remove this color	Удалить этот цвет
+	Change…	Изменить…
+	Load a swatch book to find the references.	Загрузите каталог цветов, чтобы найти образцы.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Отмечено: цвет изображения заменяется образцом при экспорте PNG. ΔE: до 2 = незаметно · 2–5 = видно вблизи · выше = другой оттенок
+	Reference for {hex}	Образец для {hex}
+	Nearest (automatic)	Ближайший (автоматически)
+	No visible pixels to analyze.	Нет видимых пикселей для анализа.
+	Swatch book loaded: {name}, {n} colors	Каталог загружен: {name}, цветов: {n}
+	{name} color sheet	{name} карта цветов
+	Color sheet saved: {path}	Карта цветов сохранена: {path}
+	Color Sheet	Карта цветов
+	Date	Дата
+	Profile	Профиль
+	Swatch Book	Каталог цветов
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Найдено цветов: {n}
+	No swatch book loaded: the colors have no reference.	Каталог не загружен: у цветов нет образцов.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Соответствий при ΔE 2 и меньше: {good}; проверить (ΔE 2–5): {check}; выше 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Размер изображения: {w} × {h} пикс., {wcm} × {hcm} см при {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: до 2 = незаметное различие · 2–5 = видно вблизи · выше 5 = другой оттенок.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Цвета показаны в sRGB: результат печати зависит от принтера, чернил и материала.
+	Sheet made with DTF Craft	Карта создана в DTF Craft

@@ -1101,5 +1101,53 @@ mod tests {
         let mut halftoned = visual();
         halftoned.execute("filter.dtf.halftone", json!({"mode": "semiTransparent", "frequency": 25})).unwrap();
         shot(halftoned, "halftone", &|_| {});
+        // The Color Analyzer on a flat-colour logo, with a fictitious swatch book.
+        let logo = || {
+            let mut s = photocraft_engine::Session::new();
+            s.execute("file.new", json!({"width": 400, "height": 400, "resolution": 300, "background": "transparent", "name": "logo-client.png"})).unwrap();
+            s.edit("Logo", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                let rgb = |h: u32| [((h >> 16) & 255) as f32 / 255.0, ((h >> 8) & 255) as f32 / 255.0, (h & 255) as f32 / 255.0];
+                for y in 0..400 {
+                    for x in 0..400 {
+                        let (fx, fy) = (x as f32 + 0.5, y as f32 + 0.5);
+                        let d = ((fx - 200.0).powi(2) + (fy - 200.0).powi(2)).sqrt();
+                        let cover = |edge: f32| (edge + 0.5).clamp(0.0, 1.0);
+                        let alpha = cover(190.0 - d);
+                        if alpha <= 0.0 {
+                            continue;
+                        }
+                        let sun = ((fx - 200.0).powi(2) + (fy - 150.0).powi(2)).sqrt();
+                        let wave = 235.0 + 12.0 * (fx / 40.0).sin();
+                        let mut c = rgb(0x1F3A93);
+                        let mix = |a: [f32; 3], b: [f32; 3], k: f32| [0, 1, 2].map(|i| a[i] + (b[i] - a[i]) * k);
+                        c = mix(c, rgb(0xF2C14E), cover(55.0 - sun));
+                        c = mix(c, rgb(0xE4572E), cover(fy - wave) * cover(150.0 - (fx - 200.0).abs()));
+                        c = mix(c, rgb(0x2E8B57), cover(fy - wave - 34.0));
+                        c = mix(c, rgb(0xFFFFFF), cover(3.0 - (d - 172.0).abs()));
+                        surf.write_pixel(x, y, &[c[0], c[1], c[2], alpha]);
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+            s
+        };
+        let analyzer = |app: &mut PhotocraftApp, view: crate::color_analyzer_ui::View| {
+            let csv = "Ref;R;V;B\nEX-201 Bleu roi;30;59;150\nEX-000 Blanc;255;255;255\nEX-114 Orange vif;226;94;43\nEX-087 Jaune soleil;243;191;82\nEX-152 Vert prairie;47;148;80\nEX-900 Noir;0;0;0\n";
+            let swatches = photocraft_algo::dtf_color::parse_swatch_book("Nuancier-exemple.csv", csv.as_bytes()).unwrap();
+            crate::color_analyzer_ui::open(app).unwrap();
+            let a = app.color_analyzer.as_mut().unwrap();
+            a.set_book(Some(crate::color_analyzer_ui::Book { name: "Nuancier-exemple.csv".into(), swatches }));
+            a.settings.client = "Atelier (exemple)".into();
+            a.view = view;
+        };
+        shot(logo(), "analyseur", &|app| analyzer(app, crate::color_analyzer_ui::View::Original));
+        shot(logo(), "analyseur_patchs", &|app| analyzer(app, crate::color_analyzer_ui::View::Patches));
+        shot(logo(), "analyseur_remplace", &|app| analyzer(app, crate::color_analyzer_ui::View::Replaced));
+        // The colour sheet, as a PDF beside the shots.
+        let mut app = PhotocraftApp::new(logo(), crate::Services::default());
+        analyzer(&mut app, crate::color_analyzer_ui::View::Original);
+        std::fs::write(dir.join("fiche.pdf"), crate::color_sheet::pdf(&app.color_analyzer.as_ref().unwrap().sheet())).unwrap();
     }
 }

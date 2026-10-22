@@ -3887,3 +3887,58 @@ curves	Smooth	スムーズ
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	穴を追加（マジック消しゴム）
 	Eraser Tolerance	消しゴムの許容値
+# DTF Craft (11)
+	Color Analyzer…	カラーアナライザー…
+	Color Analyzer	カラーアナライザー
+	Replace Colors with Swatches	色をスウォッチに置き換え
+	the document is not modified	ドキュメントは変更されません
+	Original Colors	元の色
+	Replaced Colors	置き換え後の色
+	With Patches	パッチ付き
+	Add a color with the eyedropper: click the visual.	スポイトで色を追加：ビジュアルをクリックします。
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	チェックした色を参照色に置き換えたコピーを PNG で保存し、新しいタブで開きます。
+	PDF Sheet…	PDF シート…
+	An A4 sheet with the visual, its colors and their references.	ビジュアル、その色と参照色をまとめた A4 シート。
+	Export PNG…	PNG を書き出し…
+	Analyzed Pixels	解析するピクセル
+	Visible, transparency ignored	表示部分のみ、透明部分は無視
+	RGB {bits} bits	RGB {bits} ビット
+	Maximum Colors	最大色数
+	Grouping (ΔE)	グループ化 (ΔE)
+	Colors closer than this difference are counted as one.	この差より近い色は 1 色として数えます。
+	Ignore colors under 0.5 % of the area	面積の 0.5 % 未満の色を無視
+	Reference Swatch Book	参照スウォッチブック
+	None loaded	未読み込み
+	{name} · {n} colors	{name} · {n} 色
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	形式：.ase、.aco、.csv（ref; R; G; B または L*a*b*）。差は ΔE 2000 で測定。
+	Detected Colors: {n}	検出された色：{n}
+	Patches · on-screen check and PDF sheet	パッチ・画面での確認と PDF シート
+	Below	下
+	Reference	参照
+	Hex	16 進
+	Client	クライアント
+	On the PDF sheet	PDF シートに記載
+	Replaced in the PNG export	PNG 書き出しで置き換え
+	Visual	ビジュアル
+	Match	対応色
+	Remove this color	この色を削除
+	Change…	変更…
+	Load a swatch book to find the references.	参照色を探すにはスウォッチブックを読み込んでください。
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	チェック：PNG 書き出しでビジュアルの色を参照色に置き換えます。ΔE：2 まで = 識別不可 · 2〜5 = 近くで見える · それ以上 = 別の色合い
+	Reference for {hex}	{hex} の参照色
+	Nearest (automatic)	最も近い色（自動）
+	No visible pixels to analyze.	解析できる表示ピクセルがありません。
+	Swatch book loaded: {name}, {n} colors	スウォッチブックを読み込みました：{name}、{n} 色
+	{name} color sheet	{name} カラーシート
+	Color sheet saved: {path}	カラーシートを保存しました：{path}
+	Color Sheet	カラーシート
+	Date	日付
+	Swatch Book	スウォッチブック
+	Hex · RGB	16 進 · RGB
+	Colors detected: {n}	検出された色：{n}
+	No swatch book loaded: the colors have no reference.	スウォッチブック未読み込み：色に参照色はありません。
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	ΔE 2 以下の一致：{good}、要確認（ΔE 2〜5）：{check}、5 超：{far}。
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	ビジュアルのサイズ：{w} × {h} px、{dpi} ppi で {wcm} × {hcm} cm。
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000：2 まで = 識別できない差 · 2〜5 = 近くで見える · 5 超 = 別の色合い。
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	色は sRGB で表示：印刷結果はプリンター、インク、素材によって異なります。
+	Sheet made with DTF Craft	DTF Craft で作成したシート

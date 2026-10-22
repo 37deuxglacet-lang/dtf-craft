@@ -3910,3 +3910,58 @@ curves	Smooth	Згладити
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Додати отвори (чарівна гумка)
 	Eraser Tolerance	Допуск гумки
+# DTF Craft (11)
+	Color Analyzer…	Аналізатор кольору…
+	Color Analyzer	Аналізатор кольору
+	Replace Colors with Swatches	Замінити кольори зразками
+	the document is not modified	документ не змінюється
+	Original Colors	Вихідні кольори
+	Replaced Colors	Замінені кольори
+	With Patches	З плашками
+	Add a color with the eyedropper: click the visual.	Додати колір піпеткою: клацніть на зображенні.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Копія, де позначені кольори замінено зразками, зберігається у PNG і відкривається в новій вкладці.
+	PDF Sheet…	PDF-картка…
+	An A4 sheet with the visual, its colors and their references.	Аркуш A4 із зображенням, його кольорами та зразками.
+	Export PNG…	Експорт PNG…
+	Analyzed Pixels	Проаналізовані пікселі
+	Visible, transparency ignored	Видимі, прозорість не враховується
+	RGB {bits} bits	RGB {bits} біт
+	Maximum Colors	Максимум кольорів
+	Grouping (ΔE)	Групування (ΔE)
+	Colors closer than this difference are counted as one.	Кольори, ближчі за цю різницю, вважаються одним.
+	Ignore colors under 0.5 % of the area	Ігнорувати кольори менше 0,5 % площі
+	Reference Swatch Book	Еталонний каталог кольорів
+	None loaded	Не завантажено
+	{name} · {n} colors	{name} · кольорів: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Формати: .ase, .aco, .csv (ref; R; G; B або L*a*b*). Різниця в ΔE 2000.
+	Detected Colors: {n}	Знайдено кольорів: {n}
+	Patches · on-screen check and PDF sheet	Плашки · контроль на екрані та PDF-картка
+	Below	Знизу
+	Reference	Зразок
+	Hex	Hex
+	Client	Клієнт
+	On the PDF sheet	На PDF-картці
+	Replaced in the PNG export	Замінюється під час експорту PNG
+	Visual	Зображення
+	Match	Відповідність
+	Remove this color	Видалити цей колір
+	Change…	Змінити…
+	Load a swatch book to find the references.	Завантажте каталог кольорів, щоб знайти зразки.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Позначено: колір зображення замінюється зразком під час експорту PNG. ΔE: до 2 = непомітно · 2–5 = видно зблизька · вище = інший відтінок
+	Reference for {hex}	Зразок для {hex}
+	Nearest (automatic)	Найближчий (автоматично)
+	No visible pixels to analyze.	Немає видимих пікселів для аналізу.
+	Swatch book loaded: {name}, {n} colors	Каталог завантажено: {name}, кольорів: {n}
+	{name} color sheet	{name} картка кольорів
+	Color sheet saved: {path}	Картку кольорів збережено: {path}
+	Color Sheet	Картка кольорів
+	Date	Дата
+	Swatch Book	Каталог кольорів
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Знайдено кольорів: {n}
+	No swatch book loaded: the colors have no reference.	Каталог не завантажено: кольори не мають зразків.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Відповідностей при ΔE 2 і менше: {good}; перевірити (ΔE 2–5): {check}; понад 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Розмір зображення: {w} × {h} пкс, {wcm} × {hcm} см при {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: до 2 = непомітна різниця · 2–5 = видно зблизька · понад 5 = інший відтінок.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Кольори показано в sRGB: результат друку залежить від принтера, чорнил і матеріалу.
+	Sheet made with DTF Craft	Картку створено в DTF Craft

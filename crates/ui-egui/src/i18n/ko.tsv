@@ -3386,3 +3386,60 @@ curves	Smooth	매끄럽게
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	구멍 추가(자동 지우개)
 	Eraser Tolerance	지우개 허용치
+# DTF Craft (11)
+	Color Analyzer…	색상 분석기…
+	Color Analyzer	색상 분석기
+	Replace Colors with Swatches	색상을 견본으로 바꾸기
+	the document is not modified	문서는 변경되지 않습니다
+	Original Colors	원래 색상
+	Replaced Colors	바뀐 색상
+	With Patches	패치 표시
+	Add a color with the eyedropper: click the visual.	스포이드로 색상 추가: 이미지를 클릭하세요.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	선택한 색상을 기준 색상으로 바꾼 사본을 PNG로 저장하고 새 탭에서 엽니다.
+	PDF Sheet…	PDF 시트…
+	An A4 sheet with the visual, its colors and their references.	이미지, 색상 및 기준 색상을 담은 A4 시트입니다.
+	Export PNG…	PNG 내보내기…
+	Analyzed Pixels	분석한 픽셀
+	Visible, transparency ignored	보이는 픽셀, 투명도 무시
+	RGB {bits} bits	RGB {bits}비트
+	Maximum Colors	최대 색상 수
+	Grouping (ΔE)	그룹화 (ΔE)
+	Colors closer than this difference are counted as one.	이 차이보다 가까운 색상은 하나로 셉니다.
+	Ignore colors under 0.5 % of the area	면적의 0.5 % 미만 색상 무시
+	Reference Swatch Book	기준 색상 견본집
+	None loaded	불러오지 않음
+	{name} · {n} colors	{name} · {n}개 색상
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	형식: .ase, .aco, .csv (ref; R; G; B 또는 L*a*b*). 차이는 ΔE 2000으로 측정.
+	Detected Colors: {n}	감지된 색상: {n}
+	Patches · on-screen check and PDF sheet	패치 · 화면 확인 및 PDF 시트
+	Below	아래
+	Reference	기준
+	Hex	16진수
+	Client	고객
+	On the PDF sheet	PDF 시트에 표시
+	Replaced in the PNG export	PNG 내보내기에서 바뀜
+	Visual	이미지
+	Match	대응 색상
+	Remove this color	이 색상 제거
+	Change…	변경…
+	Load a swatch book to find the references.	기준 색상을 찾으려면 색상 견본집을 불러오세요.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	선택: PNG 내보내기에서 이미지 색상이 기준 색상으로 바뀝니다. ΔE: 2 이하 = 구분 불가 · 2~5 = 가까이서 보임 · 초과 = 다른 색조
+	Reference for {hex}	{hex}의 기준 색상
+	Nearest (automatic)	가장 가까운 색상 (자동)
+	No visible pixels to analyze.	분석할 보이는 픽셀이 없습니다.
+	Swatch book loaded: {name}, {n} colors	색상 견본집 불러옴: {name}, {n}개 색상
+	{name} color sheet	{name} 색상 시트
+	Color sheet saved: {path}	색상 시트 저장됨: {path}
+	Color Sheet	색상 시트
+	Date	날짜
+	Swatch Book	색상 견본집
+	Hex · RGB	16진수 · RGB
+	Colors detected: {n}	감지된 색상: {n}
+	No swatch book loaded: the colors have no reference.	색상 견본집 없음: 색상에 기준 색상이 없습니다.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	ΔE 2 이하 일치: {good}, 확인 필요 (ΔE 2~5): {check}, 5 초과: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	이미지 크기: {w} × {h} px, {dpi} ppi에서 {wcm} × {hcm} cm.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: 2 이하 = 구분 불가 · 2~5 = 가까이서 보임 · 5 초과 = 다른 색조.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	sRGB로 표시된 색상: 인쇄 결과는 프린터, 잉크, 소재에 따라 달라집니다.
+	Sheet made with DTF Craft	DTF Craft로 만든 시트
+	RGB	RGB
+	Color Profile	색상 프로파일

@@ -12,7 +12,7 @@ use crate::state::DialogKind;
 /// commands also usable through shortcuts. Camera Raw blocks menu commands entirely, and a pending
 /// crop blocks the commands Photoshop greys during one (`crop_ui::blocks`).
 pub(crate) fn modal_allows(app: &PhotocraftApp, id: &str) -> bool {
-    if app.camera_raw.is_some() || crate::crop_ui::blocks(app, id) {
+    if app.camera_raw.is_some() || app.color_analyzer.is_some() || crate::crop_ui::blocks(app, id) {
         return false;
     }
     (app.ui.dialogs.is_empty() && app.discard.is_none()) || crate::shortcuts::NAV_COMMANDS.contains(&id)
@@ -252,6 +252,10 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     }
     // Liquify dialog, Puppet Warp and Perspective Warp modes (and their control params).
     if let Some(r) = crate::distort_ui::menu(app, ctx, id, &params) {
+        return r;
+    }
+    // DTF › Color Analyzer (DTF Craft).
+    if let Some(r) = crate::color_analyzer_ui::menu(app, id, &params) {
         return r;
     }
     // Camera Raw Filter dialog (and its control params).

@@ -2825,3 +2825,62 @@ curves	Smooth	平滑
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	添加孔洞（魔术橡皮擦）
 	Eraser Tolerance	橡皮擦容差
+# DTF Craft (11)
+	Color Analyzer…	颜色分析器…
+	Color Analyzer	颜色分析器
+	Replace Colors with Swatches	用色板替换颜色
+	the document is not modified	文档不会被修改
+	Original Colors	原始颜色
+	Replaced Colors	替换后的颜色
+	With Patches	带色块
+	Add a color with the eyedropper: click the visual.	用吸管添加颜色：单击图像。
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	将勾选的颜色替换为参考色的副本，存储为 PNG 并在新标签页中打开。
+	PDF Sheet…	PDF 说明单…
+	An A4 sheet with the visual, its colors and their references.	包含图像、其颜色及参考色的 A4 说明单。
+	Export PNG…	导出 PNG…
+	Analyzed Pixels	分析的像素
+	Visible, transparency ignored	可见像素，忽略透明
+	RGB {bits} bits	RGB {bits} 位
+	Maximum Colors	最多颜色数
+	Grouping (ΔE)	合并 (ΔE)
+	Colors closer than this difference are counted as one.	差异小于此值的颜色计为一种。
+	Ignore colors under 0.5 % of the area	忽略面积低于 0.5 % 的颜色
+	Reference Swatch Book	参考色卡
+	None loaded	未载入
+	{name} · {n} colors	{name} · {n} 种颜色
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	格式：.ase、.aco、.csv（ref; R; G; B 或 L*a*b*）。差异以 ΔE 2000 衡量。
+	Detected Colors: {n}	检测到的颜色：{n}
+	Patches · on-screen check and PDF sheet	色块 · 屏幕检查与 PDF 说明单
+	Below	下方
+	Reference	参考
+	Hex	十六进制
+	Client	客户
+	On the PDF sheet	显示在 PDF 说明单上
+	Replaced in the PNG export	导出 PNG 时替换
+	Visual	图像
+	Area	面积
+	Match	对应色
+	Remove this color	移除此颜色
+	Change…	更改…
+	Load a swatch book to find the references.	载入色卡以查找参考色。
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	勾选：导出 PNG 时图像颜色替换为参考色。ΔE：≤2 = 无法察觉 · 2 至 5 = 近看可见 · 以上 = 另一色调
+	Reference for {hex}	{hex} 的参考色
+	Nearest (automatic)	最接近（自动）
+	No visible pixels to analyze.	没有可分析的可见像素。
+	Swatch book loaded: {name}, {n} colors	已载入色卡：{name}，{n} 种颜色
+	{name} color sheet	{name} 颜色说明单
+	Color sheet saved: {path}	已存储颜色说明单：{path}
+	Color Sheet	颜色说明单
+	Date	日期
+	Profile	配置文件
+	Swatch Book	色卡
+	Hex · RGB	十六进制 · RGB
+	Colors detected: {n}	检测到的颜色：{n}
+	No swatch book loaded: the colors have no reference.	未载入色卡：颜色没有参考色。
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	ΔE ≤ 2 的匹配：{good}；待检查（ΔE 2 至 5）：{check}；大于 5：{far}。
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	图像尺寸：{w} × {h} 像素，{dpi} ppi 时为 {wcm} × {hcm} 厘米。
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000：≤2 = 无法察觉的差异 · 2 至 5 = 近看可见 · 大于 5 = 另一色调。
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	颜色以 sRGB 显示：打印效果取决于打印机、墨水和承印物。
+	Sheet made with DTF Craft	由 DTF Craft 生成的说明单
+	RGB	RGB
+	Color Profile	颜色配置文件

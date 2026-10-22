@@ -3809,3 +3809,58 @@ curves	Smooth	Wygładź
 # DTF Craft (10)
 	Add Holes (Magic Eraser)	Dodaj otwory (magiczna gumka)
 	Eraser Tolerance	Tolerancja gumki
+# DTF Craft (11)
+	Color Analyzer…	Analizator kolorów…
+	Color Analyzer	Analizator kolorów
+	Replace Colors with Swatches	Zastąp kolory próbkami
+	the document is not modified	dokument nie jest zmieniany
+	Original Colors	Kolory oryginalne
+	Replaced Colors	Zastąpione kolory
+	With Patches	Z polami kolorów
+	Add a color with the eyedropper: click the visual.	Dodaj kolor pipetą: kliknij projekt.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Kopia z zaznaczonymi kolorami zastąpionymi referencjami, zapisana jako PNG i otwarta w nowej karcie.
+	PDF Sheet…	Karta PDF…
+	An A4 sheet with the visual, its colors and their references.	Karta A4 z projektem, jego kolorami i ich referencjami.
+	Export PNG…	Eksportuj PNG…
+	Analyzed Pixels	Analizowane piksele
+	Visible, transparency ignored	Widoczne, przezroczystość pominięta
+	RGB {bits} bits	RGB {bits} bity
+	Maximum Colors	Maksymalna liczba kolorów
+	Grouping (ΔE)	Grupowanie (ΔE)
+	Colors closer than this difference are counted as one.	Kolory bliższe niż ta różnica liczą się jako jeden.
+	Ignore colors under 0.5 % of the area	Pomiń kolory poniżej 0,5 % powierzchni
+	Reference Swatch Book	Wzornik referencyjny
+	None loaded	Nie wczytano
+	{name} · {n} colors	{name} · kolory: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formaty: .ase, .aco, .csv (ref; R; G; B lub L*a*b*). Różnica mierzona w ΔE 2000.
+	Detected Colors: {n}	Wykryte kolory: {n}
+	Patches · on-screen check and PDF sheet	Pola kolorów · kontrola na ekranie i karta PDF
+	Below	Poniżej
+	Reference	Referencja
+	Hex	Hex
+	Client	Klient
+	On the PDF sheet	Na karcie PDF
+	Replaced in the PNG export	Zastąpiony w eksporcie PNG
+	Visual	Projekt
+	Match	Odpowiednik
+	Remove this color	Usuń ten kolor
+	Change…	Zmień…
+	Load a swatch book to find the references.	Wczytaj wzornik, aby znaleźć referencje.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Zaznaczone: kolor projektu jest zastępowany referencją w eksporcie PNG. ΔE: do 2 = niezauważalne · 2 do 5 = widoczne z bliska · powyżej = inny odcień
+	Reference for {hex}	Referencja dla {hex}
+	Nearest (automatic)	Najbliższa (automatycznie)
+	No visible pixels to analyze.	Brak widocznych pikseli do analizy.
+	Swatch book loaded: {name}, {n} colors	Wczytano wzornik: {name}, kolory: {n}
+	{name} color sheet	{name} karta kolorów
+	Color sheet saved: {path}	Zapisano kartę kolorów: {path}
+	Color Sheet	Karta kolorów
+	Date	Data
+	Swatch Book	Wzornik
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Wykryte kolory: {n}
+	No swatch book loaded: the colors have no reference.	Nie wczytano wzornika: kolory nie mają referencji.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Dopasowania przy ΔE 2 lub mniej: {good}; do sprawdzenia (ΔE 2–5): {check}; powyżej 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Rozmiar projektu: {w} × {h} px, {wcm} × {hcm} cm przy {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = różnica niezauważalna · 2 do 5 = widoczna z bliska · powyżej 5 = inny odcień.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Kolory wyświetlane w sRGB: wynik druku zależy od drukarki, tuszy i podłoża.
+	Sheet made with DTF Craft	Karta utworzona w DTF Craft
