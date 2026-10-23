@@ -116,7 +116,7 @@ pub fn parse_spec(spec: &str) -> Vec<Param> {
             Kind::Color(crate::color_picker_ui::parse_hex(default.split(|c: char| c.is_whitespace() || c == '(').next().unwrap_or(default)))
         } else if v == "doc" {
             Kind::Document
-        } else if v == "json" || v.starts_with("layer id") || v.starts_with('[') || v.starts_with('{') {
+        } else if v == "json" || v.starts_with("json (") || v.starts_with("layer id") || v.starts_with('[') || v.starts_with('{') {
             Kind::Json
         } else if let Some(n) = v.strip_prefix("int[").and_then(|r| r.strip_suffix(']')).and_then(|n| n.parse().ok()) {
             Kind::Grid(n)
@@ -971,6 +971,21 @@ pub(crate) fn preview_document_for_target(
                 // sign: the floor that keeps a radius positive turned them into +0.1 (#2063).
                 let x = x / run_k as f64;
                 *v = json!(if x > 0.0 { x.max(floor) } else { minimum.map_or(x, |m| x.max(m)) });
+            }
+        }
+    }
+    // The cut-out's holes are clicked in document pixels.
+    if command == photocraft_engine::dtf_cmds::REMOVE_WHITE
+        && run_k > 1
+        && let Some(Value::Array(points)) = p.get_mut("holePoints")
+    {
+        for pt in points.iter_mut() {
+            if let Some(xy) = pt.as_array_mut() {
+                for v in xy.iter_mut() {
+                    if let Some(c) = v.as_f64() {
+                        *v = json!((c / run_k as f64).floor());
+                    }
+                }
             }
         }
     }

@@ -4341,3 +4341,10 @@ shape	Appearance	Izgled
 # DTF Craft (12)
 	Add Holes	Dodaj rupe
 	Add Hole	Dodaj rupu
+# DTF Craft (13)
+	Pick the Background Colour	Boja pozadine pipetom
+	Click the background colour to remove.	Kliknite na boju pozadine koju treba ukloniti.
+	Click a visible pixel of the background.	Kliknite na vidljiv piksel pozadine.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nije pronađena jednobojna pozadina: pozadina je već providna, ili izaberite njenu boju pipetom.
+	Holes: {n}	Rupe: {n}
+	Remove Last Hole	Ukloni poslednju rupu

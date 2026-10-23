@@ -2962,3 +2962,10 @@ curves	Smooth	Suavizar
 # DTF Craft (12)
 	Add Holes	Añadir agujeros
 	Add Hole	Añadir agujero
+# DTF Craft (13)
+	Pick the Background Colour	Color de fondo con cuentagotas
+	Click the background colour to remove.	Haga clic en el color de fondo que desea quitar.
+	Click a visible pixel of the background.	Haga clic en un píxel visible del fondo.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	No se detectó un fondo liso: el fondo ya es transparente, o elija su color con el cuentagotas.
+	Holes: {n}	Agujeros: {n}
+	Remove Last Hole	Quitar el último agujero

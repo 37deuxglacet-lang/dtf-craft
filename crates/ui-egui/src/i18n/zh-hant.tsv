@@ -2872,3 +2872,10 @@ curves	Smooth	平滑
 # DTF Craft (12)
 	Add Holes	新增孔洞
 	Add Hole	新增孔洞
+# DTF Craft (13)
+	Pick the Background Colour	用滴管取背景色
+	Click the background colour to remove.	按一下要移除的背景顏色。
+	Click a visible pixel of the background.	按一下背景中可見的像素。
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	未偵測到純色背景：背景已透明，或用滴管選擇其顏色。
+	Holes: {n}	孔洞：{n}
+	Remove Last Hole	移除最後一個孔洞

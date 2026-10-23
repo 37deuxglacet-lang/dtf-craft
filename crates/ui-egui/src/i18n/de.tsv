@@ -3273,3 +3273,10 @@ curves	Smooth	Glätten
 # DTF Craft (12)
 	Add Holes	Löcher hinzufügen
 	Add Hole	Loch hinzufügen
+# DTF Craft (13)
+	Pick the Background Colour	Hintergrundfarbe mit Pipette
+	Click the background colour to remove.	Klicken Sie auf die zu entfernende Hintergrundfarbe.
+	Click a visible pixel of the background.	Klicken Sie auf ein sichtbares Pixel des Hintergrunds.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Kein einfarbiger Hintergrund erkannt: Der Hintergrund ist bereits transparent, oder wählen Sie seine Farbe mit der Pipette.
+	Holes: {n}	Löcher: {n}
+	Remove Last Hole	Letztes Loch entfernen

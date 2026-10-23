@@ -3945,3 +3945,10 @@ curves	Smooth	スムーズ
 # DTF Craft (12)
 	Add Holes	穴を追加
 	Add Hole	穴を追加
+# DTF Craft (13)
+	Pick the Background Colour	スポイトで背景色
+	Click the background colour to remove.	削除する背景色をクリックしてください。
+	Click a visible pixel of the background.	背景の見えているピクセルをクリックしてください。
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	単色の背景が見つかりません：背景はすでに透明か、スポイトで色を選んでください。
+	Holes: {n}	穴：{n}
+	Remove Last Hole	最後の穴を削除

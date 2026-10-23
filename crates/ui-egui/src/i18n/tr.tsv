@@ -3998,3 +3998,10 @@ cameraData	Lens	Lens
 # DTF Craft (12)
 	Add Holes	Delik ekle
 	Add Hole	Delik ekle
+# DTF Craft (13)
+	Pick the Background Colour	Damlalıkla arka plan rengi
+	Click the background colour to remove.	Kaldırılacak arka plan rengine tıklayın.
+	Click a visible pixel of the background.	Arka planın görünür bir pikseline tıklayın.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Düz arka plan algılanmadı: arka plan zaten saydam, ya da rengini damlalıkla seçin.
+	Holes: {n}	Delikler: {n}
+	Remove Last Hole	Son deliği kaldır

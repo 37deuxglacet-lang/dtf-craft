@@ -3755,3 +3755,10 @@ curves	Smooth	Làm mượt
 # DTF Craft (12)
 	Add Holes	Thêm lỗ
 	Add Hole	Thêm lỗ
+# DTF Craft (13)
+	Pick the Background Colour	Màu nền bằng ống hút
+	Click the background colour to remove.	Nhấp vào màu nền cần xóa.
+	Click a visible pixel of the background.	Nhấp vào một điểm ảnh nhìn thấy của nền.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Không phát hiện nền trơn: nền đã trong suốt, hoặc chọn màu nền bằng ống hút.
+	Holes: {n}	Lỗ: {n}
+	Remove Last Hole	Bỏ lỗ cuối

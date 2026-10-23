@@ -3446,3 +3446,10 @@ curves	Smooth	매끄럽게
 # DTF Craft (12)
 	Add Holes	구멍 추가
 	Add Hole	구멍 추가
+# DTF Craft (13)
+	Pick the Background Colour	스포이드로 배경색
+	Click the background colour to remove.	제거할 배경색을 클릭하세요.
+	Click a visible pixel of the background.	배경의 보이는 픽셀을 클릭하세요.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	단색 배경을 찾지 못했습니다: 배경이 이미 투명하거나, 스포이드로 색을 고르세요.
+	Holes: {n}	구멍: {n}
+	Remove Last Hole	마지막 구멍 제거

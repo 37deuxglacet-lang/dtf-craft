@@ -4975,6 +4975,15 @@ pub fn tool_event(app: &mut PhotocraftApp, ev: ToolEvent, mods: egui::Modifiers)
     }
     let tool = event_tool(app, mods);
     if tool == Tool::Eyedropper {
+        // DTF Craft: the cut-out's background eyedropper takes the colour on a click.
+        if let ToolEvent::Down { x, y, .. } = ev
+            && crate::dtf_panel::pick_background(app, x, y)
+        {
+            return;
+        }
+        if app.ui.dtf_panel.background_picker.is_some() {
+            return;
+        }
         match ev {
             ToolEvent::Down { x, y, .. } | ToolEvent::Move { x, y, .. } => {
                 sample_eyedropper(app, x, y, mods);

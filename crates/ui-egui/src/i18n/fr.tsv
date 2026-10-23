@@ -3299,3 +3299,10 @@ curves	Smooth	Lisser
 # DTF Craft (12)
 	Add Holes	Ajouter des trous
 	Add Hole	Ajouter un trou
+# DTF Craft (13)
+	Pick the Background Colour	Couleur du fond à la pipette
+	Click the background colour to remove.	Cliquez sur la couleur du fond à supprimer.
+	Click a visible pixel of the background.	Cliquez sur un pixel visible du fond.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Aucun fond uni détecté : le fond est déjà transparent, ou choisissez la couleur à la pipette.
+	Holes: {n}	Trous : {n}
+	Remove Last Hole	Retirer le dernier trou

@@ -3968,3 +3968,10 @@ curves	Smooth	Згладити
 # DTF Craft (12)
 	Add Holes	Додати отвори
 	Add Hole	Додати отвір
+# DTF Craft (13)
+	Pick the Background Colour	Колір тла піпеткою
+	Click the background colour to remove.	Клацніть колір тла, який треба видалити.
+	Click a visible pixel of the background.	Клацніть видимий піксель тла.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Однотонне тло не знайдено: тло вже прозоре, або виберіть його колір піпеткою.
+	Holes: {n}	Отвори: {n}
+	Remove Last Hole	Прибрати останній отвір

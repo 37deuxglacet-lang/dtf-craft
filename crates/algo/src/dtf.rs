@@ -217,7 +217,7 @@ pub(crate) fn alpha_threshold(src: &Image, out: Rect, ctx: &Ctx, threshold: f32,
 /// The background is the plain colour the visual sits on (white for most files). It is removed
 /// from the image edges inwards, so the same colour inside the visual stays, and the contour
 /// pixels mixed with it are unmixed (see [`crate::color_to_alpha`]) so no light halo is left.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CutoutSpec {
     /// The background colour (straight sRGB 0–1), or `None` to read it on the image edges.
@@ -232,16 +232,19 @@ pub struct CutoutSpec {
     /// shapes) of at least `min_hole` pixels.
     pub holes: bool,
     pub min_hole: u32,
-    /// A hole clicked by hand (document coordinates): only the area of the clicked pixel's
-    /// colour reached from there is removed, and its contour unmixed from that colour, instead of
-    /// the background reached from the image edges.
+    /// Holes clicked by hand (document coordinates): each removes the area of the clicked
+    /// pixel's colour reached from it, its contour unmixed from that colour, along with the
+    /// background (at most [`MAX_HOLES`]).
     #[serde(default)]
-    pub seed: Option<[i32; 2]>,
+    pub seeds: Vec<[i32; 2]>,
 }
+
+/// The most holes one cut-out takes by hand.
+pub const MAX_HOLES: usize = 250;
 
 impl Default for CutoutSpec {
     fn default() -> Self {
-        CutoutSpec { color: None, tolerance: 0.1, edge: 2.0, decontaminate: true, holes: false, min_hole: 100, seed: None }
+        CutoutSpec { color: None, tolerance: 0.1, edge: 2.0, decontaminate: true, holes: false, min_hole: 100, seeds: Vec::new() }
     }
 }
 
@@ -255,8 +258,12 @@ const CONTOUR: u8 = 2;
 #[derive(Clone, Debug)]
 pub struct CutoutPlan {
     rect: Rect,
-    /// The background colour in the samples' own colour model (colour channels only).
-    key: Vec<f32>,
+    /// The colours removed, in the samples' own colour model (colour channels only): the
+    /// background's, then each hole's.
+    keys: Vec<Vec<f32>>,
+    /// Which of `keys` each removed or contour pixel was removed from or is unmixed against
+    /// (empty: all the first).
+    owner: Vec<u8>,
     class: Vec<u8>,
     /// For contour pixels: the colour of the nearest kept pixel of the visual (its own colour,
     /// which the contour pixel is a mix of with the background).
@@ -270,17 +277,25 @@ fn distance(colour: &[f32], key: &[f32]) -> f32 {
     colour.iter().zip(key).map(|(p, k)| (p - k).abs()).fold(0.0, f32::max)
 }
 
-/// The background colour read on the image edges: the per-channel median of the opaque pixels
-/// of the outer ring. A transparent margin around the image (Print Conformity leaves 2 px) has
-/// none: the ring of the opaque pixels' bounds is read instead. `None` when the image has no
-/// opaque pixel (nothing to remove).
-fn edge_colour(src: &Image, cc: usize) -> Option<Vec<f32>> {
+/// The plain background read on the image edges: the per-channel median of the outer ring, when
+/// that ring is a plain colour. A transparent margin around the image (Print Conformity leaves
+/// 2 px) has no opaque pixel there: the ring of the opaque pixels' bounds is read instead, again
+/// only when it is plain. `None` when neither is (an already transparent file, whose bounds run
+/// through the visual's own outline): nothing is removed.
+pub fn plain_background(src: &Image, ctx: &Ctx, tolerance: f32) -> Option<Vec<f32>> {
+    if !ctx.alpha || src.ch < 2 {
+        return None;
+    }
+    edge_colour(src, ncol(ctx, src.ch).min(MAXC), tolerance)
+}
+
+fn edge_colour(src: &Image, cc: usize, tolerance: f32) -> Option<Vec<f32>> {
     let n = src.ch;
     let (w, h) = (src.rect.width() as usize, src.rect.height() as usize);
     if w == 0 || h == 0 {
         return None;
     }
-    if let Some(key) = ring_colour(src, cc, (0, 0, w, h)) {
+    if let Some(key) = ring_colour(src, cc, (0, 0, w, h), tolerance) {
         return Some(key);
     }
     let opaque = |i: usize| src.data.get(i * n + n - 1).is_some_and(|a| *a >= 0.5);
@@ -295,19 +310,29 @@ fn edge_colour(src: &Image, cc: usize) -> Option<Vec<f32>> {
     if x1 <= x0 || y1 <= y0 {
         return None;
     }
-    ring_colour(src, cc, (x0, y0, x1, y1))
+    ring_colour(src, cc, (x0, y0, x1, y1), tolerance)
 }
 
-/// The per-channel median of the opaque pixels on the border of `(x0, y0, x1, y1)`.
-fn ring_colour(src: &Image, cc: usize, (x0, y0, x1, y1): (usize, usize, usize, usize)) -> Option<Vec<f32>> {
+/// The share of a ring's pixels that must be opaque, and of those that must be within the
+/// tolerance of its median colour, for it to be a plain background.
+const PLAIN_OPAQUE: f32 = 0.9;
+const PLAIN_SAME: f32 = 0.85;
+
+/// The per-channel median of the opaque pixels on the border of `(x0, y0, x1, y1)`, when that
+/// border is a plain colour: nearly all opaque, nearly all within `tolerance` of the median.
+fn ring_colour(src: &Image, cc: usize, (x0, y0, x1, y1): (usize, usize, usize, usize), tolerance: f32) -> Option<Vec<f32>> {
     let n = src.ch;
     let w = src.rect.width() as usize;
     let mut samples: Vec<Vec<f32>> = vec![Vec::new(); cc];
+    let mut pixels: Vec<usize> = Vec::new();
+    let mut total = 0usize;
     let mut take = |i: usize| {
+        total += 1;
         let Some(px) = src.data.get(i * n..i * n + n) else { return };
         if px.get(n - 1).copied().unwrap_or(0.0) < 0.5 {
             return;
         }
+        pixels.push(i);
         for (c, s) in samples.iter_mut().enumerate() {
             if let Some(v) = px.get(c).filter(|v| v.is_finite()) {
                 s.push(*v);
@@ -334,6 +359,15 @@ fn ring_colour(src: &Image, cc: usize, (x0, y0, x1, y1): (usize, usize, usize, u
         s.sort_by(f32::total_cmp);
         key.push(s[s.len() / 2]);
     }
+    if (pixels.len() as f32) < PLAIN_OPAQUE * total as f32 {
+        return None;
+    }
+    // JPEG noise and a faint gradient pass; a ring through the visual's colours doesn't.
+    let tol = if tolerance.is_finite() { tolerance.clamp(0.04, 1.0) } else { 0.1 };
+    let same = pixels.iter().filter(|&&i| distance(&src.data[i * n..i * n + cc], &key) <= tol).count();
+    if (same as f32) < PLAIN_SAME * pixels.len() as f32 {
+        return None;
+    }
     Some(key)
 }
 
@@ -345,7 +379,8 @@ impl CutoutPlan {
         let tolerance = if spec.tolerance.is_finite() { spec.tolerance.clamp(0.0, 1.0) } else { 0.1 };
         let mut plan = CutoutPlan {
             rect: src.rect,
-            key: Vec::new(),
+            keys: Vec::new(),
+            owner: Vec::new(),
             class: Vec::new(),
             inner: std::collections::HashMap::new(),
             tolerance,
@@ -356,85 +391,107 @@ impl CutoutPlan {
             return Some(plan);
         }
         let cc = ncol(ctx, n).min(MAXC);
-        // A clicked hole: the clicked (visible) pixel's own colour; nothing on a transparent one.
-        let clicked = match spec.seed {
-            Some([x, y]) => {
-                if !src.rect.contains(x, y) {
-                    return Some(plan);
+        let main = match spec.color {
+            Some(c) => native(ctx, [c[0], c[1], c[2], 1.0]).get(..cc).map(<[f32]>::to_vec),
+            None => edge_colour(src, cc, tolerance),
+        };
+        // The holes clicked by hand: on a visible pixel of the image, its own colour.
+        let seeds: Vec<usize> = spec
+            .seeds
+            .iter()
+            .filter(|[x, y]| src.rect.contains(*x, *y))
+            .map(|[x, y]| (*y - src.rect.y0) as usize * w + (*x - src.rect.x0) as usize)
+            .filter(|&i| src.data[i * n + n - 1] >= 0.5)
+            .take(MAX_HOLES)
+            .collect();
+        if main.is_none() && seeds.is_empty() {
+            return Some(plan);
+        }
+        let mut keys: Vec<Vec<f32>> = Vec::new();
+        let mut owner: Vec<u8> = if seeds.is_empty() { Vec::new() } else { vec![0; w * h] };
+        let mut class = vec![KEEP; w * h];
+        let mut stack: Vec<usize> = Vec::new();
+        // A 4-connected flood fill of `region` from the pixels on `stack`, owned by key `k`.
+        let flood = |class: &mut Vec<u8>, owner: &mut Vec<u8>, stack: &mut Vec<usize>, k: u8, region: &dyn Fn(usize) -> bool| -> bool {
+            let mut steps = 0usize;
+            while let Some(i) = stack.pop() {
+                steps += 1;
+                if steps % (1 << 20) == 0 && ctl.cancelled() {
+                    return false;
                 }
-                let i = (y - src.rect.y0) as usize * w + (x - src.rect.x0) as usize;
-                if src.data[i * n + n - 1] < 0.5 {
-                    return Some(plan);
+                let (x, y) = (i % w, i / w);
+                let mut visit = |j: usize| {
+                    if class[j] == KEEP && region(j) {
+                        class[j] = BACKGROUND;
+                        if let Some(o) = owner.get_mut(j) {
+                            *o = k;
+                        }
+                        stack.push(j);
+                    }
+                };
+                if x > 0 {
+                    visit(i - 1);
                 }
-                Some(i)
+                if x + 1 < w {
+                    visit(i + 1);
+                }
+                if y > 0 {
+                    visit(i - w);
+                }
+                if y + 1 < h {
+                    visit(i + w);
+                }
             }
-            None => None,
+            true
         };
-        let key = match (clicked, spec.color) {
-            (Some(i), _) => Some(src.data[i * n..i * n + cc].to_vec()),
-            (None, Some(c)) => native(ctx, [c[0], c[1], c[2], 1.0]).get(..cc).map(<[f32]>::to_vec),
-            (None, None) => edge_colour(src, cc),
-        };
-        let Some(key) = key else { return Some(plan) };
+        // 1. The background reached from the image edges.
+        let background = main.clone();
         let is_background = |i: usize| -> bool {
             let px = &src.data[i * n..i * n + n];
-            if clicked.is_some() {
-                // The hole stops at the transparency already there (the outside stays as it is).
-                px[n - 1] > 0.0 && distance(&px[..cc], &key) <= tolerance
-            } else {
-                px[n - 1] <= 0.0 || distance(&px[..cc], &key) <= tolerance
-            }
+            background.as_ref().is_some_and(|key| px[n - 1] <= 0.0 || distance(&px[..cc], key) <= tolerance)
         };
-        let mut class = vec![KEEP; w * h];
-        // 1. The background reached from the image edges, or the hole from its clicked pixel
-        // (4-connected flood fill).
-        let mut stack: Vec<usize> = Vec::new();
-        let seed = |i: usize, class: &mut Vec<u8>, stack: &mut Vec<usize>| {
-            if class[i] == KEEP && is_background(i) {
-                class[i] = BACKGROUND;
-                stack.push(i);
-            }
-        };
-        if let Some(i) = clicked {
-            seed(i, &mut class, &mut stack);
-        } else {
-            for x in 0..w {
-                seed(x, &mut class, &mut stack);
-                seed((h - 1) * w + x, &mut class, &mut stack);
-            }
-            for y in 0..h {
-                seed(y * w, &mut class, &mut stack);
-                seed(y * w + w - 1, &mut class, &mut stack);
-            }
-        }
-        let mut steps = 0usize;
-        while let Some(i) = stack.pop() {
-            steps += 1;
-            if steps % (1 << 20) == 0 && ctl.cancelled() {
-                return None;
-            }
-            let (x, y) = (i % w, i / w);
-            let mut visit = |j: usize| {
-                if class[j] == KEEP && is_background(j) {
-                    class[j] = BACKGROUND;
-                    stack.push(j);
+        if let Some(key) = main {
+            keys.push(key);
+            let start = |i: usize, class: &mut Vec<u8>, stack: &mut Vec<usize>| {
+                if class[i] == KEEP && is_background(i) {
+                    class[i] = BACKGROUND;
+                    stack.push(i);
                 }
             };
-            if x > 0 {
-                visit(i - 1);
+            for x in 0..w {
+                start(x, &mut class, &mut stack);
+                start((h - 1) * w + x, &mut class, &mut stack);
             }
-            if x + 1 < w {
-                visit(i + 1);
+            for y in 0..h {
+                start(y * w, &mut class, &mut stack);
+                start(y * w + w - 1, &mut class, &mut stack);
             }
-            if y > 0 {
-                visit(i - w);
-            }
-            if y + 1 < h {
-                visit(i + w);
+            if !flood(&mut class, &mut owner, &mut stack, 0, &is_background) {
+                return None;
             }
         }
+        // 1b. Each hole clicked by hand: its colour reached from the click, up to the
+        // transparency already there.
+        for &i in &seeds {
+            if class[i] != KEEP {
+                continue;
+            }
+            let key = src.data[i * n..i * n + cc].to_vec();
+            let k = keys.len() as u8;
+            let in_hole = |j: usize| {
+                let px = &src.data[j * n..j * n + n];
+                px[n - 1] > 0.0 && distance(&px[..cc], &key) <= tolerance
+            };
+            class[i] = BACKGROUND;
+            owner[i] = k;
+            stack.push(i);
+            if !flood(&mut class, &mut owner, &mut stack, k, &in_hole) {
+                return None;
+            }
+            keys.push(key);
+        }
         // 2. Enclosed areas of the background colour, when asked, from a minimum size.
-        if spec.holes && clicked.is_none() {
+        if spec.holes && background.is_some() {
             const SEEN: u8 = 3;
             let mut region: Vec<usize> = Vec::new();
             for start in 0..w * h {
@@ -499,6 +556,9 @@ impl CutoutPlan {
                             let j = ny as usize * w + nx as usize;
                             if class[j] == KEEP {
                                 class[j] = CONTOUR;
+                                if !owner.is_empty() {
+                                    owner[j] = owner[i];
+                                }
                                 next.push(j);
                             }
                         }
@@ -547,7 +607,8 @@ impl CutoutPlan {
                 front = next;
             }
         }
-        plan.key = key;
+        plan.keys = keys;
+        plan.owner = owner;
         plan.class = class;
         plan.inner = inner;
         Some(plan)
@@ -557,10 +618,10 @@ impl CutoutPlan {
     pub fn apply(&self, src: &Image, out: Rect, ctx: &Ctx) -> Vec<f32> {
         let n = src.ch;
         let mut res = src.crop(out);
-        if self.class.is_empty() || n < 2 {
+        if self.class.is_empty() || self.keys.is_empty() || n < 2 {
             return res;
         }
-        let cc = ncol(ctx, n).min(MAXC).min(self.key.len());
+        let cc = ncol(ctx, n).min(MAXC).min(self.keys[0].len());
         let w = self.rect.width() as usize;
         for (i, px) in res.chunks_exact_mut(n).enumerate() {
             let (x, y) = xy(out, i);
@@ -577,7 +638,8 @@ impl CutoutPlan {
                 CONTOUR if self.decontaminate => {
                     let Some((alpha, colour)) = px.split_last_mut() else { continue };
                     let colour = &mut colour[..cc];
-                    let key = &self.key[..cc];
+                    let owner = self.owner.get(k).map_or(0, |o| usize::from(*o));
+                    let key = &self.keys.get(owner).unwrap_or(&self.keys[0])[..cc];
                     *alpha *= match self.inner.get(&k) {
                         Some(f) => unmix_towards(colour, key, &f[..cc], self.tolerance),
                         None => crate::color_to_alpha::unmix(colour, key, self.tolerance, 1.0),
@@ -814,28 +876,69 @@ mod tests {
     }
 
     #[test]
-    fn a_clicked_hole_is_removed_and_its_contour_unmixed() {
-        // The outside cut first, then a click in the white enclosed by the ring.
+    fn clicked_holes_are_removed_with_the_background_and_their_contour_unmixed() {
         let mut img = logo([1.0; 3]);
         // An antialiased inner edge: a 50 % grey (black mixed with white) at (14, 20).
         let at = (20 * 40 + 14) * 4;
         img.data[at..at + 3].copy_from_slice(&[0.5; 3]);
-        img.data = cut(&img, CutoutSpec::default());
-        let outer = img.data.clone();
-        let out = cut(&img, CutoutSpec { seed: Some([20, 20]), ..CutoutSpec::default() });
-        assert_eq!(alpha_at(&out, 20, 20), 0.0, "the hole");
+        let out = cut(&img, CutoutSpec { seeds: vec![[20, 20]], ..CutoutSpec::default() });
+        assert_eq!((alpha_at(&out, 20, 20), alpha_at(&out, 0, 0)), (0.0, 0.0), "the hole and the background");
         assert_eq!(alpha_at(&out, 12, 12), 1.0, "the ring stays");
         // The grey contour pixel is unmixed: black at half opacity, no light line left.
         assert!((alpha_at(&out, 14, 20) - 0.5).abs() < 0.02, "{}", alpha_at(&out, 14, 20));
         assert!(out[at..at + 3].iter().all(|v| *v < 0.02), "{:?}", &out[at..at + 3]);
-        // The outside, already cut, is not touched again.
-        for (x, y) in [(0, 0), (9, 20), (10, 10)] {
-            let i = (y * 40 + x) * 4;
-            assert_eq!(&out[i..i + 4], &outer[i..i + 4], "({x}, {y})");
+        // A click on the background, or outside the image, adds nothing.
+        let plain = cut(&img, CutoutSpec::default());
+        assert_eq!(cut(&img, CutoutSpec { seeds: vec![[0, 0], [-5, 99]], ..CutoutSpec::default() }), plain);
+    }
+
+    /// An already transparent logo: its bounds run through its own outline, not a background.
+    fn rounded_logo() -> Image {
+        let r = Rect::new(0, 0, 40, 40);
+        let mut data = Vec::new();
+        for y in 0..40 {
+            for x in 0..40 {
+                let d = ((x as f32 - 19.5).powi(2) + (y as f32 - 19.5).powi(2)).sqrt();
+                // A brown disc with a dark outline (14–18 px) and a white centre (< 6 px).
+                let c = if d < 6.0 {
+                    [1.0, 1.0, 1.0, 1.0]
+                } else if d < 14.0 {
+                    [0.7, 0.5, 0.3, 1.0]
+                } else if d < 18.0 {
+                    [0.3, 0.2, 0.1, 1.0]
+                } else {
+                    [0.0, 0.0, 0.0, 0.0]
+                };
+                data.extend_from_slice(&c);
+            }
         }
-        // A click on the transparency, or outside the image, does nothing.
-        assert_eq!(cut(&img, CutoutSpec { seed: Some([0, 0]), ..CutoutSpec::default() }), img.data);
-        assert_eq!(cut(&img, CutoutSpec { seed: Some([-5, 99]), ..CutoutSpec::default() }), img.data);
+        Image { rect: r, ch: 4, data }
+    }
+
+    #[test]
+    fn an_already_transparent_file_has_no_background_to_detect() {
+        let img = rounded_logo();
+        let ctx = Ctx { bounds: img.rect, mode: ColorMode::Rgb, alpha: true };
+        assert_eq!(plain_background(&img, &ctx, 0.1), None);
+        // Nothing is removed: the dark outline stays.
+        assert_eq!(cut(&img, CutoutSpec::default()), img.data);
+        // A hole clicked in the white centre is still cut.
+        let out = cut(&img, CutoutSpec { seeds: vec![[20, 20]], ..CutoutSpec::default() });
+        assert_eq!((alpha_at(&out, 20, 20), alpha_at(&out, 20, 3)), (0.0, 1.0));
+        // A white file is detected, a photo-like edge is not.
+        assert_eq!(plain_background(&logo([1.0; 3]), &ctx, 0.1).map(|k| k.iter().all(|v| *v > 0.95)), Some(true));
+        let mut mixed = logo([1.0; 3]);
+        for x in 0..40 {
+            let i = x * 4;
+            mixed.data[i..i + 3].copy_from_slice(&[(x as f32) / 40.0, 0.2, 0.8]);
+            let i = (39 * 40 + x) * 4;
+            mixed.data[i..i + 3].copy_from_slice(&[0.1, (x as f32) / 40.0, 0.3]);
+        }
+        for y in 0..40 {
+            let i = y * 40 * 4;
+            mixed.data[i..i + 3].copy_from_slice(&[0.9, 0.1, (y as f32) / 40.0]);
+        }
+        assert_eq!(plain_background(&mixed, &ctx, 0.1), None);
     }
 
     #[test]

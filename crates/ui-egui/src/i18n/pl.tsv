@@ -3867,3 +3867,10 @@ curves	Smooth	Wygładź
 # DTF Craft (12)
 	Add Holes	Dodaj otwory
 	Add Hole	Dodaj otwór
+# DTF Craft (13)
+	Pick the Background Colour	Kolor tła pipetą
+	Click the background colour to remove.	Kliknij kolor tła do usunięcia.
+	Click a visible pixel of the background.	Kliknij widoczny piksel tła.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nie wykryto jednolitego tła: tło jest już przezroczyste lub wybierz jego kolor pipetą.
+	Holes: {n}	Otwory: {n}
+	Remove Last Hole	Usuń ostatni otwór

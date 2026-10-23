@@ -90,6 +90,12 @@ pub struct DtfPanelUi {
     /// The interior-hole Magic Eraser is on: the tool it replaced, given back when it goes off.
     #[serde(skip)]
     pub hole_eraser: Option<crate::state::Tool>,
+    /// The cut-out's background eyedropper is on: the tool it replaced.
+    #[serde(skip)]
+    pub background_picker: Option<crate::state::Tool>,
+    /// Whether a plain background was detected, for (document, revision, layer, tolerance × 10).
+    #[serde(skip)]
+    detected: Option<((photocraft_doc::DocId, u64, u64, i64), bool)>,
     /// The beta notice is on screen (shown at every start of DTF Craft until OK).
     #[serde(skip)]
     pub beta_notice: bool,
@@ -258,14 +264,21 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
             if let Value::Object(saved) = params
                 && !saved.is_empty()
             {
-                let mut saved: Map<String, Value> = saved.into_iter().filter(|(k, _)| k != "layer" && k != "channel").collect();
+                // The holes belong to this image: not remembered, and cut now.
+                let mut saved: Map<String, Value> = saved.into_iter().filter(|(k, _)| k != "layer" && k != "channel" && k != HOLES).collect();
+                if let Some(f) = app.ui.dtf_panel.fields.get_mut(command) {
+                    f.remove(HOLES);
+                }
                 if let Some(c) = preview_color {
                     saved.insert("previewColor".into(), c);
                 }
                 app.session.prefs.edit(|prefs| prefs.dialogs.insert(command.into(), Value::Object(saved)));
             }
         }
-        Err(error) => crate::notices::error(app, error),
+        Err(error) => {
+            let error = crate::i18n::t(&error).to_string();
+            crate::notices::error(app, error);
+        }
     }
 }
 
@@ -424,12 +437,21 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     }
 }
 
+/// The cut-out's holes clicked by hand, kept in its settings (`holePoints`, document px): they
+/// are part of its preview and are cut with the background on Apply.
+const HOLES: &str = "holePoints";
+
+fn holes(f: &Map<String, Value>) -> usize {
+    f.get(HOLES).and_then(Value::as_array).map_or(0, Vec::len)
+}
+
 /// Turn Add Holes on or off (Remove White Background tab). On, the Magic Eraser's cursor is
-/// active and a click on the canvas cuts the enclosed area under it as the cut-out cuts the
-/// outside ([`hole_click`]). Off, the previous tool comes back.
+/// active and a click on the canvas adds a hole to the cut-out ([`hole_click`]); the background
+/// eyedropper goes off. Off, the previous tool comes back.
 pub(crate) fn set_hole_eraser(app: &mut PhotocraftApp, on: bool) {
     match (on, app.ui.dtf_panel.hole_eraser) {
         (true, None) => {
+            set_background_picker(app, false);
             app.ui.dtf_panel.hole_eraser = Some(app.ui.tool);
             app.ui.tool = crate::state::Tool::MagicEraser;
             app.ui.status = tl!("Click an enclosed area to make it transparent.").into();
@@ -444,29 +466,105 @@ pub(crate) fn set_hole_eraser(app: &mut PhotocraftApp, on: bool) {
     }
 }
 
-/// A click with Add Holes on (`x`, `y` in document pixels): the enclosed area under it becomes
-/// transparent on the active layer, its contour unmixed with the tab's Tolerance, Contour and
-/// Remove Halo settings (`dtf.cutoutHole`). False when Add Holes is off.
+/// Turn the cut-out's background eyedropper on or off. On, the Eyedropper's cursor is active and
+/// a click on the canvas takes the colour to remove ([`pick_background`]); Add Holes goes off.
+pub(crate) fn set_background_picker(app: &mut PhotocraftApp, on: bool) {
+    match (on, app.ui.dtf_panel.background_picker) {
+        (true, None) => {
+            set_hole_eraser(app, false);
+            app.ui.dtf_panel.background_picker = Some(app.ui.tool);
+            app.ui.tool = crate::state::Tool::Eyedropper;
+            app.ui.status = tl!("Click the background colour to remove.").into();
+        }
+        (false, Some(previous)) => {
+            app.ui.dtf_panel.background_picker = None;
+            if app.ui.tool == crate::state::Tool::Eyedropper {
+                app.ui.tool = previous;
+            }
+        }
+        _ => {}
+    }
+}
+
+/// The cut-out's settings (from the panel, else as they start).
+fn cutout_fields(app: &mut PhotocraftApp) -> Map<String, Value> {
+    let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+    match app.ui.dtf_panel.fields.get(cmd) {
+        Some(f) => f.clone(),
+        None => initial_fields(app, cmd),
+    }
+}
+
+/// A click with Add Holes on (`x`, `y` in document pixels): a hole is added to the cut-out's
+/// preview, cut with the background on Apply. False when Add Holes is off.
 pub(crate) fn hole_click(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
     if app.ui.dtf_panel.hole_eraser.is_none() {
         return false;
     }
     let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
-    let f = app.ui.dtf_panel.fields.get(cmd).cloned().unwrap_or_else(|| initial_fields(app, cmd));
-    let mut p = json!({"x": x.floor(), "y": y.floor()});
-    for k in ["tolerance", "contour", "removeHalo"] {
-        if let Some(v) = f.get(k) {
-            p[k] = v.clone();
+    let mut f = cutout_fields(app);
+    let mut points = f.get(HOLES).and_then(Value::as_array).cloned().unwrap_or_default();
+    if points.len() < photocraft_algo::dtf::MAX_HOLES {
+        points.push(json!([x.floor(), y.floor()]));
+    }
+    f.insert(HOLES.into(), Value::Array(points));
+    app.ui.dtf_panel.fields.insert(cmd.into(), f);
+    app.ui.dtf_panel.previewing = Some(cmd.into());
+    true
+}
+
+/// "Remove Last Hole": the last hole clicked leaves the preview.
+fn remove_last_hole(f: &mut Map<String, Value>) {
+    if let Some(Value::Array(points)) = f.get_mut(HOLES) {
+        points.pop();
+        if points.is_empty() {
+            f.remove(HOLES);
         }
     }
-    // The hole is cut in the layer itself: a cut-out preview on screen is dropped first.
-    if app.ui.dtf_panel.previewing.as_deref() == Some(cmd) {
-        stop_preview(app);
+}
+
+/// A click with the background eyedropper on: the clicked pixel of the active layer becomes the
+/// colour to remove, its detection goes off and the cut-out previews again; the eyedropper goes
+/// off. False when it is off.
+pub(crate) fn pick_background(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
+    if app.ui.dtf_panel.background_picker.is_none() {
+        return false;
     }
-    if let Err(e) = app.run(photocraft_engine::dtf_cmds::CUTOUT_HOLE, p) {
-        crate::notices::error(app, e);
-    }
+    let colour = app.session.active().and_then(|st| {
+        let surf = st.doc.layer(st.active_layer?)?.surface()?;
+        let px = surf.pixel(x.floor() as i32, y.floor() as i32);
+        let rgba = photocraft_raster::to_rgba(&surf.format(), &px);
+        (rgba[3] >= 0.5).then(|| crate::color_picker_ui::hex([rgba[0], rgba[1], rgba[2]]))
+    });
+    let Some(hex) = colour else {
+        app.ui.status = tl!("Click a visible pixel of the background.").into();
+        return true;
+    };
+    let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+    let mut f = cutout_fields(app);
+    f.insert("color".into(), json!(hex));
+    f.insert("detectColor".into(), json!(false));
+    app.ui.dtf_panel.fields.insert(cmd.into(), f);
+    app.ui.dtf_panel.previewing = Some(cmd.into());
+    set_background_picker(app, false);
     true
+}
+
+/// Is a plain background detected on the active layer (for the cut-out's warning)? Read once per
+/// document state and tolerance.
+fn background_detected(app: &mut PhotocraftApp, tolerance: f64) -> bool {
+    let Some(st) = app.session.active() else { return true };
+    let Some(layer) = st.active_layer else { return true };
+    let key = (st.doc.id, st.revision, layer.0, (tolerance * 10.0).round() as i64);
+    if let Some((k, found)) = app.ui.dtf_panel.detected
+        && k == key
+    {
+        return found;
+    }
+    // A layer without pixels of its own (a smart object) is left to the command.
+    let found = st.doc.layer(layer).is_none_or(|l| l.surface().is_none()) || photocraft_engine::dtf_cmds::detected_background(&st.doc, layer, tolerance).is_some();
+    app.ui.dtf_panel.detected = Some((key, found));
+    found
 }
 
 /// Print Conformity's note: the active document's print size now, in cm at its resolution.
@@ -548,7 +646,27 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         }
     }
     let mut eraser = app.ui.dtf_panel.hole_eraser.is_some();
+    let mut picker = app.ui.dtf_panel.background_picker.is_some();
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        // The background colour taken from the image with the eyedropper.
+        let top = ui.cursor().top();
+        ui.add_enabled_ui(have_doc, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(RichText::new(tl!("Pick the Background Colour")).color(Tokens::get(ui.ctx()).text_dim));
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if crate::icons::button(ui, "pipette", 22.0, picker, tl!("Eyedropper")).clicked() {
+                        picker = !picker;
+                    }
+                });
+            });
+        });
+        crate::dtf_help::tip_over(ui, cmd, "backgroundPicker", top);
+        // Detection on and nothing plain on the edges: nothing would be removed.
+        let detect = f.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
+        let tolerance = f.get("tolerance").and_then(Value::as_f64).unwrap_or(10.0);
+        if have_doc && detect && holes(&f) == 0 && !background_detected(app, tolerance) {
+            ui.label(RichText::new(tl!("No plain background detected: the background is already transparent, or pick its colour with the eyedropper.")).color(Tokens::get(ui.ctx()).warning));
+        }
         // The control colour the cut-out previews on (the garment's).
         let top = ui.cursor().top();
         if color_row(ui, &mut f, "previewColor", tl!("Preview Background"))
@@ -561,6 +679,17 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         ui.add_enabled_ui(have_doc, |ui| {
             help(crate::widgets::checkbox(ui, &mut eraser, tl!("Add Holes")), cmd, "holeEraser");
         });
+        let n = holes(&f);
+        if n > 0 {
+            ui.horizontal(|ui| {
+                ui.label(RichText::new(crate::i18n::fmt(tl!("Holes: {n}"), &[("n", &n.to_string())])).color(Tokens::get(ui.ctx()).text_dim));
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if help(crate::widgets::secondary_button(ui, tl!("Remove Last Hole"), 150.0), cmd, "removeLastHole").clicked() {
+                        remove_last_hole(&mut f);
+                    }
+                });
+            });
+        }
     }
     if retouch {
         let mut show_before = f.get("__before").and_then(Value::as_bool).unwrap_or(false);
@@ -588,8 +717,13 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         }
     });
     app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
-    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE && eraser != app.ui.dtf_panel.hole_eraser.is_some() {
-        set_hole_eraser(app, eraser);
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        if eraser != app.ui.dtf_panel.hole_eraser.is_some() {
+            set_hole_eraser(app, eraser);
+        }
+        if picker != app.ui.dtf_panel.background_picker.is_some() {
+            set_background_picker(app, picker);
+        }
     }
     if changed && enabled && !WITHOUT_PREVIEW.contains(&cmd) {
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
@@ -605,6 +739,10 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         }
     } else if cancel {
         stop_preview(app);
+        // Cancel drops the holes clicked for this cut-out.
+        if let Some(f) = app.ui.dtf_panel.fields.get_mut(cmd) {
+            f.remove(HOLES);
+        }
     }
 }
 
@@ -877,40 +1015,112 @@ mod tests {
         assert_eq!(f.get("width"), Some(&json!(10.0)));
     }
 
-    /// Add Holes: a click cuts the enclosed area and unmixes its contour (no light line left);
-    /// off, the previous tool comes back.
+    /// Add Holes: each click adds a hole to the cut-out's preview, on the preview background;
+    /// Apply cuts them with the background, contour unmixed (no light line); "Remove Last Hole"
+    /// takes one back; off, the previous tool comes back.
     #[test]
-    fn add_holes_cuts_interior_holes_with_a_clean_contour() {
+    fn add_holes_preview_with_the_cutout_and_apply_together() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
-        app.run("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
-        app.run("select.rect", json!({"x": 0, "y": 0, "width": 30, "height": 30})).unwrap();
-        app.run("edit.fill", json!({"color": "#ff0000"})).unwrap();
-        app.run("select.rect", json!({"x": 10, "y": 10, "width": 10, "height": 10})).unwrap();
-        app.run("edit.fill", json!({"color": "#ffffff"})).unwrap();
-        app.run("select.deselect", json!({})).unwrap();
-        // An antialiased edge of the hole: pink, red mixed half with white.
+        app.background_jobs = false;
+        app.run("file.new", json!({"width": 40, "height": 40, "resolution": 300, "background": "white"})).unwrap();
+        // A red square (8..32) with a white hole (16..24); a pink antialiased hole edge at x = 15.
         app.session
-            .edit("Edge", |doc, active| {
+            .edit("Logo", |doc, active| {
                 let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
-                for y in 10..20 {
-                    surf.write_pixel(9, y, &[1.0, 0.5, 0.5, 1.0]);
+                for y in 8..32 {
+                    for x in 8..32 {
+                        let hole = (16..24).contains(&x) && (16..24).contains(&y);
+                        let c = if hole { [1.0; 3] } else if x == 15 && (16..24).contains(&y) { [1.0, 0.5, 0.5] } else { [1.0, 0.0, 0.0] };
+                        surf.write_pixel(x, y, &[c[0], c[1], c[2], 1.0]);
+                    }
                 }
                 Ok(())
             })
             .unwrap();
+        app.ui.panels.dtf = true;
+        let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+        app.ui.dock_tabs.dtf = tab_of(cmd);
         app.ui.tool = crate::state::Tool::Brush;
-        assert!(!hole_click(&mut app, 15.0, 15.0), "off: the click is the tool's");
+        assert!(!hole_click(&mut app, 20.0, 20.0), "off: the click is the tool's");
         set_hole_eraser(&mut app, true);
         assert_eq!(app.ui.tool, crate::state::Tool::MagicEraser);
-        assert!(hole_click(&mut app, 15.0, 15.0));
+        assert!(hole_click(&mut app, 20.0, 20.0));
+        assert!(hole_click(&mut app, 2.0, 2.0));
+        assert_eq!(holes(&app.ui.dtf_panel.fields[cmd]), 2);
+        remove_last_hole(app.ui.dtf_panel.fields.get_mut(cmd).unwrap());
+        assert_eq!(holes(&app.ui.dtf_panel.fields[cmd]), 1);
+        // The preview shows the hole on the preview background, the document is unchanged.
+        assert_eq!(app.ui.dtf_panel.previewing.as_deref(), Some(cmd));
+        let ctx = egui::Context::default();
+        assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
+        let doc = app.filter_preview.as_ref().unwrap().result.as_ref().unwrap();
+        let rgb = photocraft_compose::flatten_to_surface(doc, photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false), None);
+        let control = crate::color_picker_ui::parse_hex(PREVIEW_COLOR).unwrap();
+        for (x, y) in [(20, 20), (2, 2)] {
+            assert!(rgb.pixel(x, y)[..3].iter().zip(control).all(|(a, b)| (a - b).abs() < 0.01), "({x}, {y}) {:?}", rgb.pixel(x, y));
+        }
+        let st = app.session.active().unwrap();
+        assert_eq!(st.doc.layer(st.active_layer.unwrap()).unwrap().surface().unwrap().pixel(20, 20)[3], 1.0);
+        // Apply: one cut, the hole and the background; the pink edge unmixed; holes not kept.
+        apply(&mut app, cmd);
         let st = app.session.active().unwrap();
         let layer = st.doc.layer(st.active_layer.unwrap()).unwrap().surface().unwrap();
-        assert_eq!((layer.pixel(15, 15)[3], layer.pixel(2, 2)[3]), (0.0, 1.0));
-        // The pink edge is unmixed: red at half opacity, no light line.
-        let edge = layer.pixel(9, 15);
+        assert_eq!((layer.pixel(20, 20)[3], layer.pixel(2, 2)[3], layer.pixel(10, 10)[3]), (0.0, 0.0, 1.0));
+        let edge = layer.pixel(15, 20);
         assert!((edge[3] - 0.5).abs() < 0.02 && edge[1] < 0.02 && edge[0] > 0.98, "{edge:?}");
+        assert_eq!(holes(&app.ui.dtf_panel.fields[cmd]), 0);
+        assert!(app.session.prefs().dialogs.get(cmd).is_some_and(|v| v.get(HOLES).is_none()), "holes are not remembered");
         set_hole_eraser(&mut app, false);
         assert_eq!(app.ui.tool, crate::state::Tool::Brush);
+    }
+
+    /// The background eyedropper takes the clicked colour, turns detection off and goes off;
+    /// it and Add Holes are never on together.
+    #[test]
+    fn the_background_eyedropper_takes_the_colour_to_remove() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.run("select.rect", json!({"x": 0, "y": 0, "width": 20, "height": 20})).unwrap();
+        app.run("edit.fill", json!({"color": "#336699"})).unwrap();
+        app.run("select.deselect", json!({})).unwrap();
+        let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+        app.ui.tool = crate::state::Tool::Brush;
+        assert!(!pick_background(&mut app, 3.0, 3.0));
+        set_hole_eraser(&mut app, true);
+        set_background_picker(&mut app, true);
+        assert!(app.ui.dtf_panel.hole_eraser.is_none(), "Add Holes goes off");
+        assert_eq!(app.ui.tool, crate::state::Tool::Eyedropper);
+        assert!(pick_background(&mut app, 3.0, 3.0));
+        let f = &app.ui.dtf_panel.fields[cmd];
+        assert_eq!((f.get("color"), f.get("detectColor")), (Some(&json!("#336699")), Some(&json!(false))));
+        assert_eq!(app.ui.dtf_panel.previewing.as_deref(), Some(cmd));
+        assert!(app.ui.dtf_panel.background_picker.is_none());
+        assert_eq!(app.ui.tool, crate::state::Tool::Brush, "the previous tool comes back");
+    }
+
+    /// An already transparent file: the tab says no plain background is detected.
+    #[test]
+    fn the_cutout_tab_warns_when_no_plain_background_is_detected() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
+        // A brown disc on transparency.
+        app.session
+            .edit("Disc", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 0..30 {
+                    for x in 0..30 {
+                        if (x as f32 - 14.5).hypot(y as f32 - 14.5) < 10.0 {
+                            surf.write_pixel(x, y, &[0.4, 0.2, 0.0, 1.0]);
+                        }
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+        assert!(!background_detected(&mut app, 10.0));
+        let mut white = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        white.run("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "white"})).unwrap();
+        assert!(background_detected(&mut white, 10.0));
     }
 
     /// The cut-out previews on the colour picked in its tab.
