@@ -424,15 +424,14 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     }
 }
 
-/// Turn the interior-hole Magic Eraser on or off (Remove White Background tab). On, the Magic
-/// Eraser tool is active, contiguous: a click on the canvas erases the enclosed area it reaches,
-/// with the tolerance set in the tab (the tool's own). Off, the previous tool comes back.
+/// Turn Add Holes on or off (Remove White Background tab). On, the Magic Eraser's cursor is
+/// active and a click on the canvas cuts the enclosed area under it as the cut-out cuts the
+/// outside ([`hole_click`]). Off, the previous tool comes back.
 pub(crate) fn set_hole_eraser(app: &mut PhotocraftApp, on: bool) {
     match (on, app.ui.dtf_panel.hole_eraser) {
         (true, None) => {
             app.ui.dtf_panel.hole_eraser = Some(app.ui.tool);
             app.ui.tool = crate::state::Tool::MagicEraser;
-            app.ui.tool_options.contiguous = true;
             app.ui.status = tl!("Click an enclosed area to make it transparent.").into();
         }
         (false, Some(previous)) => {
@@ -443,6 +442,31 @@ pub(crate) fn set_hole_eraser(app: &mut PhotocraftApp, on: bool) {
         }
         _ => {}
     }
+}
+
+/// A click with Add Holes on (`x`, `y` in document pixels): the enclosed area under it becomes
+/// transparent on the active layer, its contour unmixed with the tab's Tolerance, Contour and
+/// Remove Halo settings (`dtf.cutoutHole`). False when Add Holes is off.
+pub(crate) fn hole_click(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
+    if app.ui.dtf_panel.hole_eraser.is_none() {
+        return false;
+    }
+    let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+    let f = app.ui.dtf_panel.fields.get(cmd).cloned().unwrap_or_else(|| initial_fields(app, cmd));
+    let mut p = json!({"x": x.floor(), "y": y.floor()});
+    for k in ["tolerance", "contour", "removeHalo"] {
+        if let Some(v) = f.get(k) {
+            p[k] = v.clone();
+        }
+    }
+    // The hole is cut in the layer itself: a cut-out preview on screen is dropped first.
+    if app.ui.dtf_panel.previewing.as_deref() == Some(cmd) {
+        stop_preview(app);
+    }
+    if let Err(e) = app.run(photocraft_engine::dtf_cmds::CUTOUT_HOLE, p) {
+        crate::notices::error(app, e);
+    }
+    true
 }
 
 /// Print Conformity's note: the active document's print size now, in cm at its resolution.
@@ -533,17 +557,10 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             set_last_color(app, &hex);
         }
         crate::dtf_help::tip_over(ui, cmd, "previewColor", top);
-        // Interior holes by hand: each click with the Magic Eraser erases the enclosed area.
+        // Interior holes by hand: each click cuts the enclosed area, with the tab's settings.
         ui.add_enabled_ui(have_doc, |ui| {
-            help(crate::widgets::checkbox(ui, &mut eraser, tl!("Add Holes (Magic Eraser)")), cmd, "holeEraser");
+            help(crate::widgets::checkbox(ui, &mut eraser, tl!("Add Holes")), cmd, "holeEraser");
         });
-        if eraser {
-            let top = ui.cursor().top();
-            let mut tolerance = app.ui.tool_options.tolerance;
-            crate::widgets::slider_row(ui, tl!("Eraser Tolerance"), &mut tolerance, 0.0..=255.0, "", None);
-            app.ui.tool_options.tolerance = tolerance.round();
-            crate::dtf_help::tip_over(ui, cmd, "eraserTolerance", top);
-        }
     }
     if retouch {
         let mut show_before = f.get("__before").and_then(Value::as_bool).unwrap_or(false);
@@ -710,7 +727,9 @@ mod tests {
         assert_eq!(preview.key.dialog, PREVIEW_DIALOG);
         let doc = preview.result.as_ref().unwrap();
         let layer = doc.layer(doc.layers[0].id).unwrap().surface().unwrap();
-        assert!((0..32).all(|x| [0.0, 1.0].contains(&layer.pixel(x, 4)[3])), "the preview is binary");
+        // The ramp starts transparent at x = 0: its fringe (2 px) becomes binary, the rest stays.
+        assert!((1..3).all(|x| [0.0, 1.0].contains(&layer.pixel(x, 4)[3])), "the fringe is binary");
+        assert!((layer.pixel(10, 4)[3] - 10.0 / 31.0).abs() < 0.01, "inside, the pixels stay");
         // The document itself is untouched until Apply.
         let st = app.session.active().unwrap();
         assert!(st.doc.layer(st.doc.layers[0].id).unwrap().surface().unwrap().pixel(10, 4)[3] > 0.0);
@@ -858,10 +877,10 @@ mod tests {
         assert_eq!(f.get("width"), Some(&json!(10.0)));
     }
 
-    /// The interior holes: on, the Magic Eraser (contiguous) erases the enclosed area clicked;
+    /// Add Holes: a click cuts the enclosed area and unmixes its contour (no light line left);
     /// off, the previous tool comes back.
     #[test]
-    fn the_hole_eraser_erases_interior_holes() {
+    fn add_holes_cuts_interior_holes_with_a_clean_contour() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.run("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
         app.run("select.rect", json!({"x": 0, "y": 0, "width": 30, "height": 30})).unwrap();
@@ -869,15 +888,27 @@ mod tests {
         app.run("select.rect", json!({"x": 10, "y": 10, "width": 10, "height": 10})).unwrap();
         app.run("edit.fill", json!({"color": "#ffffff"})).unwrap();
         app.run("select.deselect", json!({})).unwrap();
+        // An antialiased edge of the hole: pink, red mixed half with white.
+        app.session
+            .edit("Edge", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 10..20 {
+                    surf.write_pixel(9, y, &[1.0, 0.5, 0.5, 1.0]);
+                }
+                Ok(())
+            })
+            .unwrap();
         app.ui.tool = crate::state::Tool::Brush;
-        app.ui.tool_options.contiguous = false;
+        assert!(!hole_click(&mut app, 15.0, 15.0), "off: the click is the tool's");
         set_hole_eraser(&mut app, true);
         assert_eq!(app.ui.tool, crate::state::Tool::MagicEraser);
-        assert!(app.ui.tool_options.contiguous, "only the enclosed area clicked");
-        assert!(crate::eraser_ui::click(&mut app, crate::state::Tool::MagicEraser, 15.0, 15.0));
+        assert!(hole_click(&mut app, 15.0, 15.0));
         let st = app.session.active().unwrap();
         let layer = st.doc.layer(st.active_layer.unwrap()).unwrap().surface().unwrap();
         assert_eq!((layer.pixel(15, 15)[3], layer.pixel(2, 2)[3]), (0.0, 1.0));
+        // The pink edge is unmixed: red at half opacity, no light line.
+        let edge = layer.pixel(9, 15);
+        assert!((edge[3] - 0.5).abs() < 0.02 && edge[1] < 0.02 && edge[0] > 0.98, "{edge:?}");
         set_hole_eraser(&mut app, false);
         assert_eq!(app.ui.tool, crate::state::Tool::Brush);
     }

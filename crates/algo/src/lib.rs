@@ -545,9 +545,12 @@ pub enum FilterParams {
     DtfHalftone {
         spec: dtf::HalftoneSpec,
     },
-    /// Remove Semi-Transparent Pixels: alpha `>= threshold` (0–1) becomes 1, below it 0.
+    /// Remove Semi-Transparent Pixels: on the fringe (within `width` px of the transparency),
+    /// alpha `>= threshold` (0–1) becomes 1, below it 0.
     DtfAlphaThreshold {
         threshold: f32,
+        #[serde(default = "dtf::default_fringe_width")]
+        width: f32,
     },
     /// Remove White Background: the plain background colour flood-filled to transparency from
     /// the image edges, the contour unmixed from it (see [`dtf::CutoutPlan`]).
@@ -714,8 +717,9 @@ fn halo_ext(p: &FilterParams) -> Halo {
         | FilterParams::HsbHsl { .. }
         | FilterParams::ColorToAlpha { .. }
         | FilterParams::NtscColors
-        | FilterParams::DtfHalftone { .. }
-        | FilterParams::DtfAlphaThreshold { .. } => Halo::Radius(0),
+        | FilterParams::DtfHalftone { .. } => Halo::Radius(0),
+        // The fringe is read from the transparency around each pixel.
+        FilterParams::DtfAlphaThreshold { width, .. } => r(width.clamp(1.0, 64.0)),
         FilterParams::Diffuse { .. } => r(1.0),
         FilterParams::Extrude { size, depth, .. } => r(stylize2::extrude_reach(*depth) + size.clamp(2.0, 255.0) * 3.0 + 1.0),
         FilterParams::OilPaint { stylization, scale, .. } => r(oil::reach(*stylization, *scale)),
@@ -934,7 +938,7 @@ pub fn kernel(params: &FilterParams, src: &Image, out: Rect, ctx: &Ctx) -> Vec<f
             color_to_alpha::color_to_alpha(src, out, ctx, *color, *transparency_threshold, *opacity_threshold)
         }
         FilterParams::DtfHalftone { spec } => dtf::halftone(src, out, ctx, spec),
-        FilterParams::DtfAlphaThreshold { threshold } => dtf::alpha_threshold(src, out, ctx, *threshold),
+        FilterParams::DtfAlphaThreshold { threshold, width } => dtf::alpha_threshold(src, out, ctx, *threshold, *width),
         FilterParams::DtfCutout { spec } => dtf::cutout(src, out, ctx, spec),
         FilterParams::DeInterlace { eliminate_even, interpolate } => video::deinterlace(src, out, ctx, *eliminate_even, *interpolate),
         FilterParams::NtscColors => video::ntsc(src, out, ctx),

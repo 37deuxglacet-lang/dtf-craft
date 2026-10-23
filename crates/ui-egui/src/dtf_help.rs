@@ -27,7 +27,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
         "filter.dtf.removeWhiteBackground" => Sheet {
             what: "Supprimer un fond uni, souvent blanc, en partant des bords vers l'intérieur. Le travail se fait sur une copie « Sans fond » du calque ; l'original est masqué et intact. Le blanc à l'intérieur du visuel est conservé.",
             when: "Fichier client sur fond blanc ou uni (JPEG, capture, logo exporté sans transparence), à la place de la gomme magique.",
-            advice: "Tolérance 10 %, contour 2 px, « Supprimer le liseré » coché. L'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée (Fond de contrôle ou Fond d'aperçu). Effacez les zones fermées restantes à la gomme magique (« Ajouter des trous »), en réglant sa tolérance.",
+            advice: "Tolérance 10 %, contour 2 px, « Supprimer le liseré » coché. L'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée (Fond de contrôle ou Fond d'aperçu). Rendez transparentes les zones fermées restantes avec « Ajouter des trous » : un clic par zone, contour nettoyé comme le bord extérieur.",
         },
         "dtf.controlBackground" => Sheet {
             what: "Placer sous l'image un calque de couleur unie nommé « backfill », de la couleur du textile, pour juger le rendu : liserés, pixels clairs, contraste.",
@@ -35,12 +35,12 @@ pub fn sheet(command: &str) -> Option<Sheet> {
             advice: "#231c1c pour un textile foncé, la couleur réelle du textile sinon. Supprimez le fond avant l'export, sinon il sera imprimé.",
         },
         "filter.dtf.removeSemiTransparent" => Sheet {
-            what: "Rendre chaque pixel soit opaque, soit transparent. Les pixels semi-transparents (ombres douces, dégradés vers le vide, bords flous) s'impriment mal en DTF.",
+            what: "Rendre opaques ou transparents les pixels semi-transparents de la frange du visuel : le bord extérieur et le bord des trous, sur la largeur choisie. Ces pixels s'impriment mal en DTF. L'intérieur du visuel (ombres, dégradés, lissage entre deux couleurs) n'est pas touché.",
             when: "Sur un visuel détouré ou un PNG avec ombres ou flous, avant l'export. Pour garder l'effet d'un dégradé, préférez Halftone DTF.",
-            advice: "Seuil 62 %. Comparez avec « Afficher l'avant » sur les bords fins.",
+            advice: "Seuil 62 %, largeur 2 px. Comparez avec « Afficher l'avant » sur les bords fins.",
         },
         "dtf.defringe" => Sheet {
-            what: "Recolorer les pixels du bord du visuel avec la couleur de leurs voisins intérieurs. Le liseré hérité de l'ancien fond, clair ou sombre, disparaît.",
+            what: "Recolorer les pixels du bord du visuel, et du bord des trous, avec la couleur de leurs voisins intérieurs. Le liseré hérité de l'ancien fond, clair ou sombre, disparaît.",
             when: "Après un détourage, quand un fin contour de l'ancien fond reste visible sur le fond de contrôle.",
             advice: "Largeur 1 px, 2 px au plus. Au-delà, les détails fins du contour s'empattent.",
         },
@@ -70,7 +70,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
 
 /// The tooltip of a setting (`key` as in the command's spec), or of a tab's own control
 /// (`apply`, `cancel`, `showBefore`, `showBackground`, `deleteBackground`, `previewColor`,
-/// `holeEraser`, `eraserTolerance`, `upscale`).
+/// `holeEraser`, `upscale`).
 pub fn tip(command: &str, key: &str) -> Option<&'static str> {
     Some(match (command, key) {
         (_, "apply") => "Applique l'outil au calque actif. Annulable avec Édition › Annuler.",
@@ -92,8 +92,8 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("filter.dtf.removeWhiteBackground", "interiorHoles") => "Supprime aussi le fond enfermé dans le visuel (intérieur d'un O, d'un anneau).",
         ("filter.dtf.removeWhiteBackground", "minHoleSize") => "Les zones fermées plus petites que cette surface, en pixels, sont gardées.",
         ("filter.dtf.removeWhiteBackground", "previewColor") => "Couleur sur laquelle l'aperçu s'affiche : la dernière couleur utilisée, ici ou dans Fond de contrôle. Sert seulement à l'aperçu.",
-        ("filter.dtf.removeWhiteBackground", "holeEraser") => "Cochée : la gomme magique est active ; chaque clic dans une zone fermée du calque « Sans fond » l'efface. Un clic = une annulation. Décochée : l'outil précédent revient.",
-        ("filter.dtf.removeWhiteBackground", "eraserTolerance") => "Écart de couleur effacé autour du point cliqué (0–255). Plus haut : la gomme mord davantage sur les couleurs proches.",
+        ("filter.dtf.removeWhiteBackground", "holeEraser") => "Cochée : chaque clic dans une zone fermée du calque « Sans fond » la rend transparente, avec le même traitement que le contour extérieur (Tolérance, Contour, Supprimer le liseré de l'onglet) : pas de liseré autour du trou. Un clic = une annulation. Décochée : l'outil précédent revient.",
+        ("filter.dtf.removeSemiTransparent", "width") => "Largeur de la frange traitée, en px, autour de la transparence (bord du visuel et trous). Les pixels semi-transparents plus à l'intérieur (ombres, dégradés, lissage entre deux couleurs) ne changent pas.",
         ("dtf.controlBackground", "color") => "Couleur du textile. Cliquez sur la pastille pour la choisir.",
         ("dtf.controlBackground", "showBackground") => "Ajoute le fond sous tous les calques ; un fond déjà présent est remplacé.",
         ("dtf.controlBackground", "deleteBackground") => "Retire le calque « backfill ». À faire avant l'export.",

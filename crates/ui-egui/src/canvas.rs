@@ -5164,7 +5164,10 @@ pub fn tool_event(app: &mut PhotocraftApp, ev: ToolEvent, mods: egui::Modifiers)
                     return;
                 }
                 Tool::MagicEraser => {
-                    crate::eraser_ui::click(app, tool, x, y);
+                    // DTF Craft: with the cut-out's Add Holes on, a click cuts a hole instead.
+                    if !crate::dtf_panel::hole_click(app, x, y) {
+                        crate::eraser_ui::click(app, tool, x, y);
+                    }
                     return;
                 }
                 Tool::PaintBucket => {

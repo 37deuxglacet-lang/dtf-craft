@@ -168,21 +168,43 @@ pub(crate) fn halftone(src: &Image, out: Rect, ctx: &Ctx, spec: &HalftoneSpec) -
     res
 }
 
-/// The Remove Semi-Transparent Pixels kernel: alpha `>= threshold` → 1, else 0 (`threshold` 0–1,
-/// at least one 8-bit step). Colour channels are unchanged.
-pub(crate) fn alpha_threshold(src: &Image, out: Rect, ctx: &Ctx, threshold: f32) -> Vec<f32> {
+/// The fringe width Remove Semi-Transparent Pixels treats when none is given, in px.
+pub fn default_fringe_width() -> f32 {
+    2.0
+}
+
+/// The Remove Semi-Transparent Pixels kernel, on the fringe only: a semi-transparent pixel at
+/// most `width` px from a fully transparent one (around the visual, or in a hole) becomes opaque
+/// when its alpha is `>= threshold` (0–1, at least one 8-bit step), transparent below it. Pixels
+/// further inside (soft shadows, gradients, antialiasing between two colours) are left alone, and
+/// so is a layer without transparency. Colour channels are unchanged.
+pub(crate) fn alpha_threshold(src: &Image, out: Rect, ctx: &Ctx, threshold: f32, width: f32) -> Vec<f32> {
     let n = src.ch;
     let mut res = src.crop(out);
+    if !ctx.alpha || n < 2 {
+        return res;
+    }
     let t = if threshold.is_finite() { threshold.clamp(1.0 / 255.0, 1.0) } else { 0.5 };
-    if ctx.alpha && n >= 2 {
-        for px in res.chunks_exact_mut(n) {
-            if let Some(a) = px.last_mut() {
-                *a = if *a >= t { 1.0 } else { 0.0 };
-            }
+    let width = if width.is_finite() { width.clamp(1.0, 64.0) } else { 2.0 };
+    // Distances to the transparency, over the source (it reaches `width` px around `out`).
+    let (w, h) = (src.rect.width() as usize, src.rect.height() as usize);
+    if src.data.len() < w * h * n {
+        return res;
+    }
+    let clear: Vec<bool> = (0..w * h).map(|i| src.data[i * n + n - 1] < 0.5 / 255.0).collect();
+    if !clear.iter().any(|c| *c) {
+        return res;
+    }
+    let dist = crate::selection::edt(&clear, w, h);
+    for (i, px) in res.chunks_exact_mut(n).enumerate() {
+        let (x, y) = crate::fxutil::xy(out, i);
+        if !src.rect.contains(x, y) {
+            continue;
         }
-    } else {
-        for v in res.iter_mut() {
-            *v = if *v >= t { 1.0 } else { 0.0 };
+        let k = (y - src.rect.y0) as usize * w + (x - src.rect.x0) as usize;
+        let Some(a) = px.last_mut() else { continue };
+        if *a > 0.0 && *a < 1.0 && dist.get(k).is_some_and(|d| *d <= width + 1e-3) {
+            *a = if *a >= t { 1.0 } else { 0.0 };
         }
     }
     res
@@ -210,11 +232,16 @@ pub struct CutoutSpec {
     /// shapes) of at least `min_hole` pixels.
     pub holes: bool,
     pub min_hole: u32,
+    /// A hole clicked by hand (document coordinates): only the area of the clicked pixel's
+    /// colour reached from there is removed, and its contour unmixed from that colour, instead of
+    /// the background reached from the image edges.
+    #[serde(default)]
+    pub seed: Option<[i32; 2]>,
 }
 
 impl Default for CutoutSpec {
     fn default() -> Self {
-        CutoutSpec { color: None, tolerance: 0.1, edge: 2.0, decontaminate: true, holes: false, min_hole: 100 }
+        CutoutSpec { color: None, tolerance: 0.1, edge: 2.0, decontaminate: true, holes: false, min_hole: 100, seed: None }
     }
 }
 
@@ -329,17 +356,38 @@ impl CutoutPlan {
             return Some(plan);
         }
         let cc = ncol(ctx, n).min(MAXC);
-        let key = match spec.color {
-            Some(c) => native(ctx, [c[0], c[1], c[2], 1.0]).get(..cc).map(<[f32]>::to_vec),
-            None => edge_colour(src, cc),
+        // A clicked hole: the clicked (visible) pixel's own colour; nothing on a transparent one.
+        let clicked = match spec.seed {
+            Some([x, y]) => {
+                if !src.rect.contains(x, y) {
+                    return Some(plan);
+                }
+                let i = (y - src.rect.y0) as usize * w + (x - src.rect.x0) as usize;
+                if src.data[i * n + n - 1] < 0.5 {
+                    return Some(plan);
+                }
+                Some(i)
+            }
+            None => None,
+        };
+        let key = match (clicked, spec.color) {
+            (Some(i), _) => Some(src.data[i * n..i * n + cc].to_vec()),
+            (None, Some(c)) => native(ctx, [c[0], c[1], c[2], 1.0]).get(..cc).map(<[f32]>::to_vec),
+            (None, None) => edge_colour(src, cc),
         };
         let Some(key) = key else { return Some(plan) };
         let is_background = |i: usize| -> bool {
             let px = &src.data[i * n..i * n + n];
-            px[n - 1] <= 0.0 || distance(&px[..cc], &key) <= tolerance
+            if clicked.is_some() {
+                // The hole stops at the transparency already there (the outside stays as it is).
+                px[n - 1] > 0.0 && distance(&px[..cc], &key) <= tolerance
+            } else {
+                px[n - 1] <= 0.0 || distance(&px[..cc], &key) <= tolerance
+            }
         };
         let mut class = vec![KEEP; w * h];
-        // 1. The background reached from the image edges (4-connected flood fill).
+        // 1. The background reached from the image edges, or the hole from its clicked pixel
+        // (4-connected flood fill).
         let mut stack: Vec<usize> = Vec::new();
         let seed = |i: usize, class: &mut Vec<u8>, stack: &mut Vec<usize>| {
             if class[i] == KEEP && is_background(i) {
@@ -347,13 +395,17 @@ impl CutoutPlan {
                 stack.push(i);
             }
         };
-        for x in 0..w {
-            seed(x, &mut class, &mut stack);
-            seed((h - 1) * w + x, &mut class, &mut stack);
-        }
-        for y in 0..h {
-            seed(y * w, &mut class, &mut stack);
-            seed(y * w + w - 1, &mut class, &mut stack);
+        if let Some(i) = clicked {
+            seed(i, &mut class, &mut stack);
+        } else {
+            for x in 0..w {
+                seed(x, &mut class, &mut stack);
+                seed((h - 1) * w + x, &mut class, &mut stack);
+            }
+            for y in 0..h {
+                seed(y * w, &mut class, &mut stack);
+                seed(y * w + w - 1, &mut class, &mut stack);
+            }
         }
         let mut steps = 0usize;
         while let Some(i) = stack.pop() {
@@ -382,7 +434,7 @@ impl CutoutPlan {
             }
         }
         // 2. Enclosed areas of the background colour, when asked, from a minimum size.
-        if spec.holes {
+        if spec.holes && clicked.is_none() {
             const SEEN: u8 = 3;
             let mut region: Vec<usize> = Vec::new();
             for start in 0..w * h {
@@ -600,15 +652,67 @@ mod tests {
         v.chunks_exact(4).map(|p| p[3]).collect()
     }
 
+    /// 40 × 40: transparent outside a square (10..30), a 1 px semi-transparent edge (alpha 0.7)
+    /// and a 1 px semi-transparent band (alpha 0.3) on the inside of the edge; a 2 × 2 hole
+    /// (19..21) with a 0.4 ring; a semi-transparent shadow (0.5) deep inside at (14, 24).
+    fn square() -> Image {
+        let r = Rect::new(0, 0, 40, 40);
+        let mut data = Vec::new();
+        for y in 0..40i32 {
+            for x in 0..40i32 {
+                let d = (x - 10).min(29 - x).min(y - 10).min(29 - y);
+                let hole = (x as f32 - 19.5).abs().max((y as f32 - 19.5).abs());
+                let a = if d < 0 {
+                    0.0
+                } else if d == 0 {
+                    0.7
+                } else if d == 1 {
+                    0.3
+                } else if (19..21).contains(&x) && (19..21).contains(&y) {
+                    0.0
+                } else if hole < 1.6 {
+                    0.4
+                } else if (x, y) == (14, 24) {
+                    0.5
+                } else {
+                    1.0
+                };
+                data.extend_from_slice(&[0.2, 0.4, 0.6, a]);
+            }
+        }
+        Image { rect: r, ch: 4, data }
+    }
+
     #[test]
-    fn threshold_leaves_only_opaque_or_transparent_and_keeps_colours() {
-        let src = ramp([0.2, 0.4, 0.6]);
-        let out = alpha_threshold(&src, src.rect, &ctx(), 0.5);
-        assert!(alphas(&out).iter().all(|a| *a == 0.0 || *a == 1.0));
-        // 127/255 < 0.5 → 0, 128/255 ≥ 0.5 → 1 (the 8-bit 50 % split).
-        assert_eq!(out[127 * 4 + 3], 0.0);
-        assert_eq!(out[128 * 4 + 3], 1.0);
+    fn threshold_works_on_the_fringe_only_and_keeps_colours() {
+        let src = square();
+        let out = alpha_threshold(&src, src.rect, &ctx(), 0.62, 2.0);
+        let a = |x: usize, y: usize| out[(y * 40 + x) * 4 + 3];
+        // The edge (1 px from the transparency) at 0.7 → opaque, the band (2 px) at 0.3 → clear.
+        assert_eq!((a(10, 20), a(11, 20)), (1.0, 0.0));
+        // The hole's ring is fringe too: 0.4 → clear.
+        assert_eq!(a(18, 20), 0.0);
+        // Deep inside, the shadow stays semi-transparent.
+        assert_eq!(a(14, 24), 0.5);
         assert!(out.chunks_exact(4).all(|p| p[0] == 0.2 && p[1] == 0.4 && p[2] == 0.6));
+        // 1 px wide: the inner band is no longer fringe.
+        let out = alpha_threshold(&src, src.rect, &ctx(), 0.62, 1.0);
+        assert_eq!((out[(20 * 40 + 10) * 4 + 3], out[(20 * 40 + 11) * 4 + 3]), (1.0, 0.3));
+    }
+
+    #[test]
+    fn threshold_leaves_a_layer_without_transparency_alone() {
+        // RGB without alpha: the antialiasing greys stay (they used to be pushed to 0 or 1).
+        let r = Rect::new(0, 0, 4, 1);
+        let src = Image { rect: r, ch: 3, data: vec![0.2, 0.5, 0.8, 0.1, 0.9, 0.4, 0.6, 0.6, 0.6, 0.3, 0.3, 0.3] };
+        let no_alpha = Ctx { alpha: false, ..ctx() };
+        assert_eq!(alpha_threshold(&src, r, &no_alpha, 0.5, 2.0), src.data);
+        // The 8-bit 50 % split on the fringe: 127/255 < 0.5 → 0, 128/255 ≥ 0.5 → 1.
+        let r = Rect::new(0, 0, 3, 1);
+        let src = Image { rect: r, ch: 2, data: vec![0.0, 0.0, 0.5, 127.0 / 255.0, 0.5, 128.0 / 255.0] };
+        let one = Ctx { bounds: r, ..ctx() };
+        let out = alpha_threshold(&src, r, &one, 0.5, 2.0);
+        assert_eq!((out[3], out[5]), (0.0, 1.0));
     }
 
     #[test]
@@ -710,6 +814,31 @@ mod tests {
     }
 
     #[test]
+    fn a_clicked_hole_is_removed_and_its_contour_unmixed() {
+        // The outside cut first, then a click in the white enclosed by the ring.
+        let mut img = logo([1.0; 3]);
+        // An antialiased inner edge: a 50 % grey (black mixed with white) at (14, 20).
+        let at = (20 * 40 + 14) * 4;
+        img.data[at..at + 3].copy_from_slice(&[0.5; 3]);
+        img.data = cut(&img, CutoutSpec::default());
+        let outer = img.data.clone();
+        let out = cut(&img, CutoutSpec { seed: Some([20, 20]), ..CutoutSpec::default() });
+        assert_eq!(alpha_at(&out, 20, 20), 0.0, "the hole");
+        assert_eq!(alpha_at(&out, 12, 12), 1.0, "the ring stays");
+        // The grey contour pixel is unmixed: black at half opacity, no light line left.
+        assert!((alpha_at(&out, 14, 20) - 0.5).abs() < 0.02, "{}", alpha_at(&out, 14, 20));
+        assert!(out[at..at + 3].iter().all(|v| *v < 0.02), "{:?}", &out[at..at + 3]);
+        // The outside, already cut, is not touched again.
+        for (x, y) in [(0, 0), (9, 20), (10, 10)] {
+            let i = (y * 40 + x) * 4;
+            assert_eq!(&out[i..i + 4], &outer[i..i + 4], "({x}, {y})");
+        }
+        // A click on the transparency, or outside the image, does nothing.
+        assert_eq!(cut(&img, CutoutSpec { seed: Some([0, 0]), ..CutoutSpec::default() }), img.data);
+        assert_eq!(cut(&img, CutoutSpec { seed: Some([-5, 99]), ..CutoutSpec::default() }), img.data);
+    }
+
+    #[test]
     fn cutout_removes_the_outer_white_and_keeps_the_white_inside() {
         let out = cut(&logo([1.0; 3]), CutoutSpec::default());
         // The background, JPEG-like noise included, is gone.
@@ -802,7 +931,7 @@ mod tests {
         let spec = HalftoneSpec { cell: f32::NAN, angle: f32::INFINITY, gamma: -3.0, low: 2.0, high: -1.0, min_dot: f32::NAN, ..HalftoneSpec::default() };
         let src = ramp([0.5, 0.5, 0.5]);
         let _ = halftone(&src, src.rect, &ctx(), &spec);
-        let _ = alpha_threshold(&src, src.rect, &ctx(), f32::NAN);
+        let _ = alpha_threshold(&src, src.rect, &ctx(), f32::NAN, f32::NAN);
         let empty = Image { rect: Rect::EMPTY, ch: 4, data: vec![] };
         assert!(halftone(&empty, Rect::EMPTY, &ctx(), &spec).is_empty());
     }

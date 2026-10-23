@@ -21,6 +21,8 @@ use crate::{EngineError, Result, Session};
 pub const HALFTONE: &str = "filter.dtf.halftone";
 pub const REMOVE_SEMI_TRANSPARENT: &str = "filter.dtf.removeSemiTransparent";
 pub const REMOVE_WHITE: &str = "filter.dtf.removeWhiteBackground";
+/// A hole clicked by hand in the cut-out (Remove White Background's "Add Holes").
+pub const CUTOUT_HOLE: &str = "dtf.cutoutHole";
 /// Name of the copy Remove White Background cuts out (the source layer stays, hidden).
 pub const CUTOUT_LAYER: &str = "Sans fond";
 
@@ -63,7 +65,22 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
             };
             Some(FilterParams::DtfHalftone { spec })
         }
-        REMOVE_SEMI_TRANSPARENT => Some(FilterParams::DtfAlphaThreshold { threshold: (num(p, "threshold", 62.0).clamp(1.0, 100.0) / 100.0) as f32 }),
+        REMOVE_SEMI_TRANSPARENT => Some(FilterParams::DtfAlphaThreshold {
+            threshold: (num(p, "threshold", 62.0).clamp(1.0, 100.0) / 100.0) as f32,
+            width: num(p, "width", 2.0).clamp(1.0, 64.0) as f32,
+        }),
+        CUTOUT_HOLE => {
+            let spec = CutoutSpec {
+                color: None,
+                tolerance: (num(p, "tolerance", 10.0).clamp(0.0, 100.0) / 100.0) as f32,
+                edge: num(p, "contour", 2.0).clamp(0.0, 10.0) as f32,
+                decontaminate: p.get("removeHalo").and_then(Value::as_bool).unwrap_or(true),
+                holes: false,
+                min_hole: 1,
+                seed: Some([num(p, "x", -1.0).floor() as i32, num(p, "y", -1.0).floor() as i32]),
+            };
+            Some(FilterParams::DtfCutout { spec })
+        }
         REMOVE_WHITE => {
             let detect = p.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
             let color = if detect { None } else { Some(hex_rgb(text(p, "color", "#ffffff")).unwrap_or([1.0; 3])) };
@@ -74,6 +91,7 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
                 decontaminate: p.get("removeHalo").and_then(Value::as_bool).unwrap_or(true),
                 holes: p.get("interiorHoles").and_then(Value::as_bool).unwrap_or(false),
                 min_hole: num(p, "minHoleSize", 100.0).clamp(1.0, 1_000_000.0) as u32,
+                seed: None,
             };
             Some(FilterParams::DtfCutout { spec })
         }
@@ -188,6 +206,7 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
 
 fn remove_semi(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(REMOVE_SEMI_TRANSPARENT, p, "threshold", 1.0, 100.0)?;
+    check_range(REMOVE_SEMI_TRANSPARENT, p, "width", 1.0, 64.0)?;
     crate::filters::run_filter(s, REMOVE_SEMI_TRANSPARENT, p)
 }
 
@@ -222,6 +241,25 @@ fn remove_white(s: &mut Session, p: &Value) -> Result<Value> {
     crate::filters::run_filter(s, REMOVE_WHITE, &p2)
 }
 
+/// Add Holes: the enclosed area under the click (the clicked pixel's colour, within the
+/// tolerance) becomes transparent on the active layer, its contour unmixed as the cut-out's
+/// outer contour is (Contour, Remove Halo). One click, one undo step.
+fn cutout_hole(s: &mut Session, p: &Value) -> Result<Value> {
+    for k in ["x", "y"] {
+        if !p.get(k).is_some_and(Value::is_number) {
+            return Err(bad(CUTOUT_HOLE, format!("`{k}` must be a number (document pixels)")));
+        }
+    }
+    check_range(CUTOUT_HOLE, p, "tolerance", 0.0, 100.0)?;
+    check_range(CUTOUT_HOLE, p, "contour", 0.0, 10.0)?;
+    let st = s.active().ok_or(EngineError::NoDocument)?;
+    let layer = st.active_layer.ok_or_else(|| EngineError::Other("select the cut-out layer".into()))?;
+    match st.doc.layer(layer).map(|l| &l.content) {
+        Some(photocraft_doc::LayerContent::Raster(_) | photocraft_doc::LayerContent::Smart(_)) => {}
+        _ => return Err(EngineError::Other("Add Holes works on a pixel layer: select the cut-out layer".into())),
+    }
+    crate::filters::run_filter(s, CUTOUT_HOLE, p)
+}
 
 // ---------------------------------------------------------------- AI upscale
 
@@ -593,11 +631,22 @@ pub fn specs() -> Vec<CommandSpec> {
             journal: true,
         },
         CommandSpec {
+            id: CUTOUT_HOLE,
+            label: "Add Hole",
+            // Run by a click on the canvas with Remove White Background's "Add Holes" on.
+            menu: &[],
+            shortcut: None,
+            params: r##"{"x":0..1000000=0 (document px),"y":0..1000000=0 (document px),"tolerance":0..100=10 (% difference from the clicked colour still removed),"contour":0..10=2 (px of contour unmixed),"removeHalo":bool=true} The enclosed area under the click becomes transparent on the active layer and its contour is unmixed from the clicked colour, as the cut-out's outer contour is; the transparency already there is left as it is"##,
+            enabled: crate::filters::has_filterable_layer,
+            run: cutout_hole,
+            journal: true,
+        },
+        CommandSpec {
             id: REMOVE_SEMI_TRANSPARENT,
             label: "Remove Semi-Transparent Pixels…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"threshold":1..100=62} (% opacity: at or above becomes opaque, below transparent)"##,
+            params: r##"{"threshold":1..100=62 (% opacity: at or above becomes opaque, below transparent),"width":1..64=2 (px of fringe treated around the transparency, holes included; pixels further inside are left alone)}"##,
             enabled: crate::filters::has_filterable_layer,
             run: remove_semi,
             journal: true,
@@ -641,13 +690,15 @@ mod tests {
     }
 
     #[test]
-    fn remove_semi_transparent_makes_alpha_binary_and_undoes() {
+    fn remove_semi_transparent_makes_the_fringe_binary_and_undoes() {
         let mut s = session_with_ramp();
         let before = alphas(&s);
         s.execute(REMOVE_SEMI_TRANSPARENT, json!({"threshold": 50})).unwrap();
         let a = alphas(&s);
-        assert!(a.iter().all(|v| *v == 0.0 || *v == 1.0));
-        assert!(a.iter().any(|v| *v == 1.0) && a.iter().any(|v| *v == 0.0));
+        // The ramp starts transparent at x = 0: x = 1 and 2 are its fringe, the rest stays.
+        let (w, changed) = (200, a.iter().zip(&before).filter(|(x, y)| x != y).count());
+        assert!(changed > 0 && a.iter().step_by(w).all(|v| *v == 0.0));
+        assert_eq!(a[100], before[100]);
         assert!(s.undo());
         assert_eq!(alphas(&s), before);
     }
@@ -868,6 +919,72 @@ mod tests {
         let surf = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap();
         assert_eq!(surf.pixel(5, 5)[3], 0.0, "the white background is removed");
         assert_eq!(surf.pixel(30, 20)[3], 1.0, "the visual stays");
+    }
+
+    /// Add Holes: after the cut-out, a click in the enclosed white makes it transparent, as one
+    /// undo step on the cut-out layer; the outside is not touched again.
+    #[test]
+    fn a_clicked_hole_is_cut_on_the_cutout_layer() {
+        let mut s = session_with_logo();
+        s.execute(REMOVE_WHITE, json!({})).unwrap();
+        let alpha = |s: &Session, x: i32, y: i32| {
+            let d = s.active().unwrap();
+            d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().pixel(x, y)[3]
+        };
+        assert_eq!((alpha(&s, 14, 9), alpha(&s, 2, 2)), (1.0, 0.0), "the enclosed white stays after the cut-out");
+        s.execute(CUTOUT_HOLE, json!({"x": 14.6, "y": 9.2})).unwrap();
+        assert_eq!((alpha(&s, 14, 9), alpha(&s, 11, 6)), (0.0, 1.0));
+        assert!(s.undo());
+        assert_eq!(alpha(&s, 14, 9), 1.0, "one click, one undo step");
+        assert!(s.execute(CUTOUT_HOLE, json!({"y": 9})).is_err());
+    }
+
+    /// Remove Semi-Transparent Pixels works on the fringe only (the antialiasing inside stays).
+    #[test]
+    fn transparent_pixels_work_on_the_fringe_only() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 30, "height": 10, "resolution": 300, "background": "transparent"})).unwrap();
+        s.edit("Visual", |doc, active| {
+            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+            for x in 5..25 {
+                for y in 2..8 {
+                    let a = if x == 5 { 0.4 } else if x == 15 { 0.5 } else { 1.0 };
+                    surf.write_pixel(x, y, &[0.1, 0.1, 0.1, a]);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        s.execute(REMOVE_SEMI_TRANSPARENT, json!({"threshold": 62, "width": 2})).unwrap();
+        let d = s.active().unwrap();
+        let surf = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap();
+        assert_eq!((surf.pixel(5, 4)[3], surf.pixel(10, 4)[3]), (0.0, 1.0));
+        assert!((surf.pixel(15, 4)[3] - 0.5).abs() < 0.01, "the semi-transparent pixel inside stays");
+    }
+
+    /// Remove Fringe recolours the edge of the holes too, not only the outer edge.
+    #[test]
+    fn defringe_treats_the_edge_of_the_holes() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "transparent"})).unwrap();
+        s.edit("Visual", |doc, active| {
+            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+            for y in 2..18 {
+                for x in 2..18 {
+                    // Red, a white line around the hole (8..12), the hole transparent.
+                    let hole = (8..12).contains(&x) && (8..12).contains(&y);
+                    let line = (7..13).contains(&x) && (7..13).contains(&y);
+                    let c = if hole { [0.0, 0.0, 0.0, 0.0] } else if line { [1.0, 1.0, 1.0, 1.0] } else { [1.0, 0.0, 0.0, 1.0] };
+                    surf.write_pixel(x, y, &c);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        s.execute(DEFRINGE, json!({"width": 1})).unwrap();
+        let d = s.active().unwrap();
+        let px = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().pixel(7, 10);
+        assert!(px[1] < 0.01 && px[0] > 0.99, "the white line around the hole is recoloured: {px:?}");
     }
 
     /// A trimmed visual gets 2 px of transparency on every side, after the resize.
