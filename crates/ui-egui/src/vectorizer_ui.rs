@@ -804,7 +804,8 @@ mod tests {
         crate::menus::invoke(&mut app, &ctx, cmds::VECTORIZE, json!({})).unwrap();
         let v = app.vectorizer.as_ref().unwrap();
         let q = v.quantized.as_ref().unwrap();
-        assert_eq!(q.palette.iter().map(|c| vectorize::hex(c.rgb)).collect::<Vec<_>>(), ["#FFFFFF", "#1F4FB5", "#E4572E"]);
+        // Largest share first: orange (576 px) before blue (540 px, its white dot aside).
+        assert_eq!(q.palette.iter().map(|c| vectorize::hex(c.rgb)).collect::<Vec<_>>(), ["#FFFFFF", "#E4572E", "#1F4FB5"]);
         assert_eq!(v.background(), Some([255, 255, 255]));
         assert_eq!((v.size_mm.0.round(), v.size_mm.1.round()), (6.0, 4.0));
         // White dot, blue, orange: the white around is removed.
