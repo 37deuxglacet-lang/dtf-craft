@@ -4005,3 +4005,41 @@ cameraData	Lens	Lens
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Düz arka plan algılanmadı: arka plan zaten saydam, ya da rengini damlalıkla seçin.
 	Holes: {n}	Delikler: {n}
 	Remove Last Hole	Son deliği kaldır
+# DTF Craft (14)
+	Vectorization…	Vektörleştirme…
+	Vectorization	Vektörleştirme
+	Vectorized	Vektörleştirilmiş
+	Side by Side	Yan yana
+	Show Contours	Konturları Göster
+	Checkerboard under Transparency	Saydamlık Altında Dama Deseni
+	{colors} colors · {shapes} shapes · {points} points	{colors} renk · {shapes} şekil · {points} nokta
+	Cut-out shapes, no overlap	Kesilmiş şekiller, üst üste binme yok
+	Open document, flattened	Açık belge, düzleştirilmiş
+	{w} × {h} mm at {dpi} ppi	{dpi} ppi'de {w} × {h} mm
+	Type of Visual	Görsel Türü
+	Logo · flat colors	Logo · düz renkler
+	Illustration · shades	İllüstrasyon · tonlar
+	Number of Colors	Renk Sayısı
+	Detail Level	Ayrıntı Düzeyi
+	Sharp Corners	Keskin Köşeler
+	Remove the Background	Arka Planı Kaldır
+	read on the visual's edge	görselin kenarından okundu
+	No background found: the visual is already cut out.	Arka plan bulunamadı: görsel zaten kesilmiş.
+	Palette	Palet
+	{n} colors · {k} in the SVG	{n} renk · SVG'de {k}
+	Edge Background	Arka plan
+	Keep {hex} in the SVG	{hex} rengini SVG'de tut
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	İşaretsiz: renk SVG'ye dahil edilmez; şekilleri birleştirilmez, kaldırılır.
+	SVG · cut-out shapes	SVG · kesilmiş şekiller
+	{w} × {h} mm (document size)	{w} × {h} mm (belge boyutu)
+	Open the SVG in DTF Craft after the export	Dışa aktardıktan sonra SVG'yi DTF Craft'ta aç
+	Export SVG…	SVG Dışa Aktar…
+	Cut-out shapes at the document's print size, saved as SVG.	Belgenin baskı boyutunda kesilmiş şekiller, SVG olarak kaydedilir.
+	SVG saved: {path}	SVG kaydedildi: {path}
+	No visible pixels to vectorize.	Vektörleştirilecek görünür piksel yok.
+	Nothing to export: every color is left out.	Dışa aktarılacak bir şey yok: tüm renkler hariç tutuldu.
+	Low Detail	Düşük
+	Medium Detail	Orta
+	High Detail	Yüksek
+	Close the Seams between Colors	Renkler Arasındaki Ekleri Kapat
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Her şekil komşularıyla yarım piksel örtüşür; böylece baskıda iki renk arasında saydam kıl çizgisi görünmez. Tam kesilmiş şekiller için işareti kaldırın (kesim plotteri).

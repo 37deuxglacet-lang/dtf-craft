@@ -3975,3 +3975,41 @@ curves	Smooth	Згладити
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Однотонне тло не знайдено: тло вже прозоре, або виберіть його колір піпеткою.
 	Holes: {n}	Отвори: {n}
 	Remove Last Hole	Прибрати останній отвір
+# DTF Craft (14)
+	Vectorization…	Векторизація…
+	Vectorization	Векторизація
+	Vectorized	Векторизовано
+	Side by Side	Поруч
+	Show Contours	Показати контури
+	Checkerboard under Transparency	Шахівниця під прозорістю
+	{colors} colors · {shapes} shapes · {points} points	Кольори: {colors} · фігури: {shapes} · точки: {points}
+	Cut-out shapes, no overlap	Вирізані фігури без накладання
+	Open document, flattened	Відкритий документ, зведений
+	{w} × {h} mm at {dpi} ppi	{w} × {h} мм при {dpi} ppi
+	Type of Visual	Тип зображення
+	Logo · flat colors	Логотип · плоскі кольори
+	Illustration · shades	Ілюстрація · відтінки
+	Number of Colors	Кількість кольорів
+	Detail Level	Рівень деталізації
+	Sharp Corners	Гострі кути
+	Remove the Background	Видалити фон
+	read on the visual's edge	визначено за краєм зображення
+	No background found: the visual is already cut out.	Фон не знайдено: зображення вже вирізане.
+	Palette	Палітра
+	{n} colors · {k} in the SVG	Кольори: {n} · у SVG: {k}
+	Edge Background	Фон
+	Keep {hex} in the SVG	Залишити {hex} у SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Не позначено: колір вилучається з SVG; його фігури видаляються, а не об’єднуються.
+	SVG · cut-out shapes	SVG · вирізані фігури
+	{w} × {h} mm (document size)	{w} × {h} мм (розмір документа)
+	Open the SVG in DTF Craft after the export	Відкрити SVG у DTF Craft після експорту
+	Export SVG…	Експорт SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Вирізані фігури в друкованому розмірі документа, збережені як SVG.
+	SVG saved: {path}	SVG збережено: {path}
+	No visible pixels to vectorize.	Немає видимих пікселів для векторизації.
+	Nothing to export: every color is left out.	Нічого експортувати: усі кольори вилучено.
+	Low Detail	Низький
+	Medium Detail	Середній
+	High Detail	Високий
+	Close the Seams between Colors	Закрити стики між кольорами
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Кожна фігура заходить на сусідні на пів пікселя, щоб під час друку між двома кольорами не з’являлася прозора лінія. Зніміть позначку для строго вирізаних фігур (ріжучий плотер).

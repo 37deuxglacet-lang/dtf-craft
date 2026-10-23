@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Keyboard shortcuts: Photoshop defaults from the command registry, plus single-key tools.
 
 use egui::{Key, KeyboardShortcut, Modifiers};
@@ -331,7 +333,7 @@ pub fn handle(app: &mut PhotocraftApp, ctx: &egui::Context) {
     // Camera Raw is modal like Photoshop's filter dialog: no application shortcut (Save, Undo,
     // tools) runs beneath it, and it handles its own keys (Y, U, O, S). Unlike the other dialogs
     // below it covers the canvas, so canvas zoom keys are blocked too.
-    if app.camera_raw.is_some() || app.color_analyzer.is_some() {
+    if app.camera_raw.is_some() || app.color_analyzer.is_some() || app.vectorizer.is_some() {
         return;
     }
     // An open menu owns the keyboard (arrows, ↩, Esc), like a native menu; so does an open

@@ -2969,3 +2969,44 @@ curves	Smooth	Suavizar
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	No se detectó un fondo liso: el fondo ya es transparente, o elija su color con el cuentagotas.
 	Holes: {n}	Agujeros: {n}
 	Remove Last Hole	Quitar el último agujero
+# DTF Craft (14)
+	Vectorization…	Vectorización…
+	Vectorization	Vectorización
+	Vectorized	Vectorizado
+	Side by Side	Lado a lado
+	Show Contours	Mostrar contornos
+	Checkerboard under Transparency	Cuadrícula bajo la transparencia
+	{colors} colors · {shapes} shapes · {points} points	{colors} colores · {shapes} formas · {points} puntos
+	Cut-out shapes, no overlap	Formas recortadas, sin superposición
+	Open document, flattened	Documento abierto, acoplado
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm a {dpi} ppp
+	Type of Visual	Tipo de imagen
+	Logo · flat colors	Logotipo · colores planos
+	Illustration · shades	Ilustración · matices
+	Number of Colors	Número de colores
+	Detail Level	Nivel de detalle
+	Sharp Corners	Esquinas vivas
+	Remove the Background	Eliminar el fondo
+	read on the visual's edge	leído en el borde de la imagen
+	No background found: the visual is already cut out.	No se encontró fondo: la imagen ya está recortada.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	{n} colores · {k} en el SVG
+	Edge Background	Fondo
+	Keep {hex} in the SVG	Conservar {hex} en el SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Sin marcar: el color se excluye del SVG; sus formas se eliminan, no se fusionan.
+	SVG · cut-out shapes	SVG · formas recortadas
+	{w} × {h} mm (document size)	{w} × {h} mm (tamaño del documento)
+	Open the SVG in DTF Craft after the export	Abrir el SVG en DTF Craft después de exportar
+	Export SVG…	Exportar SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Formas recortadas al tamaño de impresión del documento, guardadas como SVG.
+	SVG saved: {path}	SVG guardado: {path}
+	No visible pixels to vectorize.	No hay píxeles visibles que vectorizar.
+	Nothing to export: every color is left out.	Nada que exportar: todos los colores están excluidos.
+	High	Alto
+	Low	Bajo
+	Settings	Ajustes
+	Low Detail	Bajo
+	Medium Detail	Medio
+	High Detail	Alto
+	Close the Seams between Colors	Cerrar las juntas entre colores
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Cada forma se superpone medio píxel a sus vecinas, para que no aparezca ninguna línea transparente entre dos colores al imprimir. Desmarque para formas estrictamente recortadas (plóter de corte).

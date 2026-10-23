@@ -2894,3 +2894,44 @@ curves	Smooth	平滑
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	未检测到纯色背景：背景已透明，或用吸管选择其颜色。
 	Holes: {n}	孔洞：{n}
 	Remove Last Hole	移除最后一个孔洞
+# DTF Craft (14)
+	Vectorization…	矢量化…
+	Vectorization	矢量化
+	Vectorized	矢量化结果
+	Side by Side	并排
+	Show Contours	显示轮廓
+	Checkerboard under Transparency	透明区域显示棋盘格
+	{colors} colors · {shapes} shapes · {points} points	{colors} 种颜色 · {shapes} 个形状 · {points} 个点
+	Cut-out shapes, no overlap	切割形状，无重叠
+	Open document, flattened	打开的文档，已拼合
+	{w} × {h} mm at {dpi} ppi	{w} × {h} 毫米，{dpi} ppi
+	Type of Visual	图像类型
+	Logo · flat colors	标志 · 平涂色
+	Illustration · shades	插图 · 色调层次
+	Number of Colors	颜色数量
+	Detail Level	细节级别
+	Sharp Corners	尖角
+	Remove the Background	移除背景
+	read on the visual's edge	从图像边缘读取
+	No background found: the visual is already cut out.	未找到背景：图像已抠出。
+	Palette	调色板
+	{n} colors · {k} in the SVG	{n} 种颜色 · SVG 中 {k} 种
+	Edge Background	背景
+	Keep {hex} in the SVG	在 SVG 中保留 {hex}
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	未勾选：该颜色从 SVG 中排除；其形状被删除，而不是合并。
+	SVG · cut-out shapes	SVG · 切割形状
+	{w} × {h} mm (document size)	{w} × {h} 毫米（文档尺寸）
+	Open the SVG in DTF Craft after the export	导出后在 DTF Craft 中打开 SVG
+	Export SVG…	导出 SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	按文档打印尺寸的切割形状，存储为 SVG。
+	SVG saved: {path}	SVG 已存储：{path}
+	No visible pixels to vectorize.	没有可矢量化的可见像素。
+	Nothing to export: every color is left out.	没有可导出的内容：所有颜色均已排除。
+	High	高
+	Low	低
+	Settings	设置
+	Low Detail	低
+	Medium Detail	中
+	High Detail	高
+	Close the Seams between Colors	闭合颜色间的接缝
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	每个形状与相邻形状重叠半个像素，打印时两种颜色之间不会出现透明细线。取消勾选可得到严格切割的形状（刻字机）。

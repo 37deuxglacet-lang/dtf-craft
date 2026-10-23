@@ -4033,3 +4033,41 @@ curves	Smooth	Vloeiend maken
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Geen effen achtergrond gevonden: de achtergrond is al transparant, of kies de kleur met de pipet.
 	Holes: {n}	Gaten: {n}
 	Remove Last Hole	Laatste gat verwijderen
+# DTF Craft (14)
+	Vectorization…	Vectorisatie…
+	Vectorization	Vectorisatie
+	Vectorized	Gevectoriseerd
+	Side by Side	Naast elkaar
+	Show Contours	Contouren tonen
+	Checkerboard under Transparency	Dambord onder transparantie
+	{colors} colors · {shapes} shapes · {points} points	{colors} kleuren · {shapes} vormen · {points} punten
+	Cut-out shapes, no overlap	Uitgesneden vormen, zonder overlap
+	Open document, flattened	Geopend document, samengevoegd
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm bij {dpi} ppi
+	Type of Visual	Soort afbeelding
+	Logo · flat colors	Logo · egale kleuren
+	Illustration · shades	Illustratie · nuances
+	Number of Colors	Aantal kleuren
+	Detail Level	Detailniveau
+	Sharp Corners	Scherpe hoeken
+	Remove the Background	Achtergrond verwijderen
+	read on the visual's edge	gelezen aan de rand van de afbeelding
+	No background found: the visual is already cut out.	Geen achtergrond gevonden: de afbeelding is al uitgesneden.
+	Palette	Palet
+	{n} colors · {k} in the SVG	{n} kleuren · {k} in de SVG
+	Edge Background	Achtergrond
+	Keep {hex} in the SVG	{hex} in de SVG behouden
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Niet aangevinkt: de kleur wordt uit de SVG weggelaten; de vormen worden verwijderd, niet samengevoegd.
+	SVG · cut-out shapes	SVG · uitgesneden vormen
+	{w} × {h} mm (document size)	{w} × {h} mm (documentgrootte)
+	Open the SVG in DTF Craft after the export	De SVG na het exporteren in DTF Craft openen
+	Export SVG…	SVG exporteren…
+	Cut-out shapes at the document's print size, saved as SVG.	Uitgesneden vormen op het afdrukformaat van het document, opgeslagen als SVG.
+	SVG saved: {path}	SVG opgeslagen: {path}
+	No visible pixels to vectorize.	Geen zichtbare pixels om te vectoriseren.
+	Nothing to export: every color is left out.	Niets te exporteren: alle kleuren zijn weggelaten.
+	Low Detail	Laag
+	Medium Detail	Gemiddeld
+	High Detail	Hoog
+	Close the Seams between Colors	Naden tussen kleuren dichten
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Elke vorm overlapt zijn buren met een halve pixel, zodat bij het afdrukken geen transparante haarlijn tussen twee kleuren verschijnt. Uitvinken voor strikt uitgesneden vormen (snijplotter).
