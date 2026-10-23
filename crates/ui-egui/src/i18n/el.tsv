@@ -3966,3 +3966,36 @@ curves	Smooth	Εξομάλυνση
 # DTF Craft (12)
 	Add Holes	Προσθήκη οπών
 	Add Hole	Προσθήκη οπής
+# DTF Craft (13)
+	Vectorization…	Διανυσματοποίηση…
+	Vectorization	Διανυσματοποίηση
+	Vectorized	Διανυσματοποιημένο
+	Side by Side	Δίπλα-δίπλα
+	Show Contours	Εμφάνιση περιγραμμάτων
+	Checkerboard under Transparency	Σκακιέρα κάτω από τη διαφάνεια
+	{colors} colors · {shapes} shapes · {points} points	Χρώματα: {colors} · σχήματα: {shapes} · σημεία: {points}
+	Cut-out shapes, no overlap	Αποκομμένα σχήματα, χωρίς επικάλυψη
+	Open document, flattened	Ανοιχτό έγγραφο, ισοπεδωμένο
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm στα {dpi} ppi
+	Type of Visual	Τύπος εικόνας
+	Logo · flat colors	Λογότυπο · συμπαγή χρώματα
+	Illustration · shades	Εικονογράφηση · αποχρώσεις
+	Number of Colors	Αριθμός χρωμάτων
+	Detail Level	Επίπεδο λεπτομέρειας
+	Sharp Corners	Αιχμηρές γωνίες
+	Remove the Background	Αφαίρεση φόντου
+	read on the visual's edge	από την άκρη της εικόνας
+	No background found: the visual is already cut out.	Δεν βρέθηκε φόντο: η εικόνα είναι ήδη αποκομμένη.
+	Palette	Παλέτα
+	{n} colors · {k} in the SVG	Χρώματα: {n} · στο SVG: {k}
+	Edge Background	Φόντο
+	Keep {hex} in the SVG	Διατήρηση του {hex} στο SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Χωρίς επιλογή: το χρώμα εξαιρείται από το SVG· τα σχήματά του αφαιρούνται, δεν συγχωνεύονται.
+	SVG · cut-out shapes	SVG · αποκομμένα σχήματα
+	{w} × {h} mm (document size)	{w} × {h} mm (μέγεθος εγγράφου)
+	Open the SVG in DTF Craft after the export	Άνοιγμα του SVG στο DTF Craft μετά την εξαγωγή
+	Export SVG…	Εξαγωγή SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Αποκομμένα σχήματα στο μέγεθος εκτύπωσης του εγγράφου, αποθηκευμένα ως SVG.
+	SVG saved: {path}	Το SVG αποθηκεύτηκε: {path}
+	No visible pixels to vectorize.	Δεν υπάρχουν ορατά pixel για διανυσματοποίηση.
+	Nothing to export: every color is left out.	Τίποτα για εξαγωγή: όλα τα χρώματα εξαιρούνται.

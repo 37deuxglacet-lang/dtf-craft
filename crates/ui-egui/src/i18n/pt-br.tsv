@@ -4056,3 +4056,36 @@ layerLabel	No Color	Sem cor
 # DTF Craft (12)
 	Add Holes	Adicionar furos
 	Add Hole	Adicionar furo
+# DTF Craft (13)
+	Vectorization…	Vetorização…
+	Vectorization	Vetorização
+	Vectorized	Vetorizado
+	Side by Side	Lado a lado
+	Show Contours	Mostrar contornos
+	Checkerboard under Transparency	Xadrez sob a transparência
+	{colors} colors · {shapes} shapes · {points} points	{colors} cores · {shapes} formas · {points} pontos
+	Cut-out shapes, no overlap	Formas recortadas, sem sobreposição
+	Open document, flattened	Documento aberto, achatado
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm a {dpi} ppi
+	Type of Visual	Tipo de imagem
+	Logo · flat colors	Logotipo · cores chapadas
+	Illustration · shades	Ilustração · nuances
+	Number of Colors	Número de cores
+	Detail Level	Nível de detalhe
+	Sharp Corners	Cantos vivos
+	Remove the Background	Remover o fundo
+	read on the visual's edge	lido na borda da imagem
+	No background found: the visual is already cut out.	Nenhum fundo encontrado: a imagem já está recortada.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	{n} cores · {k} no SVG
+	Edge Background	Fundo
+	Keep {hex} in the SVG	Manter {hex} no SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Desmarcada: a cor é excluída do SVG; suas formas são removidas, não mescladas.
+	SVG · cut-out shapes	SVG · formas recortadas
+	{w} × {h} mm (document size)	{w} × {h} mm (tamanho do documento)
+	Open the SVG in DTF Craft after the export	Abrir o SVG no DTF Craft após a exportação
+	Export SVG…	Exportar SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Formas recortadas no tamanho de impressão do documento, salvas em SVG.
+	SVG saved: {path}	SVG salvo: {path}
+	No visible pixels to vectorize.	Nenhum pixel visível para vetorizar.
+	Nothing to export: every color is left out.	Nada a exportar: todas as cores foram excluídas.

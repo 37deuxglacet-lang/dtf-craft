@@ -4341,3 +4341,36 @@ shape	Appearance	Izgled
 # DTF Craft (12)
 	Add Holes	Dodaj rupe
 	Add Hole	Dodaj rupu
+# DTF Craft (13)
+	Vectorization…	Vektorizacija…
+	Vectorization	Vektorizacija
+	Vectorized	Vektorizovano
+	Side by Side	Uporedo
+	Show Contours	Prikaži konture
+	Checkerboard under Transparency	Šahovska tabla ispod providnosti
+	{colors} colors · {shapes} shapes · {points} points	Boje: {colors} · oblici: {shapes} · tačke: {points}
+	Cut-out shapes, no overlap	Isečeni oblici, bez preklapanja
+	Open document, flattened	Otvoreni dokument, spljošten
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm pri {dpi} ppi
+	Type of Visual	Vrsta slike
+	Logo · flat colors	Logo · ravne boje
+	Illustration · shades	Ilustracija · nijanse
+	Number of Colors	Broj boja
+	Detail Level	Nivo detalja
+	Sharp Corners	Oštri uglovi
+	Remove the Background	Ukloni pozadinu
+	read on the visual's edge	očitano na ivici slike
+	No background found: the visual is already cut out.	Pozadina nije pronađena: slika je već isečena.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	Boje: {n} · u SVG-u: {k}
+	Edge Background	Pozadina
+	Keep {hex} in the SVG	Zadrži {hex} u SVG-u
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Neoznačeno: boja se izostavlja iz SVG-a; njeni oblici se uklanjaju, ne spajaju.
+	SVG · cut-out shapes	SVG · isečeni oblici
+	{w} × {h} mm (document size)	{w} × {h} mm (veličina dokumenta)
+	Open the SVG in DTF Craft after the export	Otvori SVG u DTF Craft posle izvoza
+	Export SVG…	Izvezi SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Isečeni oblici u veličini štampe dokumenta, sačuvani kao SVG.
+	SVG saved: {path}	SVG sačuvan: {path}
+	No visible pixels to vectorize.	Nema vidljivih piksela za vektorizaciju.
+	Nothing to export: every color is left out.	Nema šta da se izveze: sve boje su izostavljene.

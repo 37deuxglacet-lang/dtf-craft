@@ -3239,3 +3239,36 @@ curves	Smooth	Сгладить
 # DTF Craft (12)
 	Add Holes	Добавить отверстия
 	Add Hole	Добавить отверстие
+# DTF Craft (13)
+	Vectorization…	Векторизация…
+	Vectorization	Векторизация
+	Vectorized	Векторизовано
+	Side by Side	Рядом
+	Show Contours	Показать контуры
+	Checkerboard under Transparency	Шахматка под прозрачностью
+	{colors} colors · {shapes} shapes · {points} points	Цвета: {colors} · фигуры: {shapes} · точки: {points}
+	Cut-out shapes, no overlap	Вырезанные фигуры без наложения
+	Open document, flattened	Открытый документ, сведённый
+	{w} × {h} mm at {dpi} ppi	{w} × {h} мм при {dpi} ppi
+	Type of Visual	Тип изображения
+	Logo · flat colors	Логотип · плоские цвета
+	Illustration · shades	Иллюстрация · оттенки
+	Number of Colors	Количество цветов
+	Detail Level	Уровень детализации
+	Sharp Corners	Острые углы
+	Remove the Background	Удалить фон
+	read on the visual's edge	определён по краю изображения
+	No background found: the visual is already cut out.	Фон не найден: изображение уже вырезано.
+	Palette	Палитра
+	{n} colors · {k} in the SVG	Цвета: {n} · в SVG: {k}
+	Edge Background	Фон
+	Keep {hex} in the SVG	Оставить {hex} в SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Не отмечен: цвет исключается из SVG; его фигуры удаляются, а не объединяются.
+	SVG · cut-out shapes	SVG · вырезанные фигуры
+	{w} × {h} mm (document size)	{w} × {h} мм (размер документа)
+	Open the SVG in DTF Craft after the export	Открыть SVG в DTF Craft после экспорта
+	Export SVG…	Экспорт SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Вырезанные фигуры в печатном размере документа, сохранённые как SVG.
+	SVG saved: {path}	SVG сохранён: {path}
+	No visible pixels to vectorize.	Нет видимых пикселей для векторизации.
+	Nothing to export: every color is left out.	Нечего экспортировать: все цвета исключены.

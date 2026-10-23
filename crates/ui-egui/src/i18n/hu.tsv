@@ -4187,3 +4187,36 @@ cameraRaw	Yellow	Sárga
 # DTF Craft (12)
 	Add Holes	Lyukak hozzáadása
 	Add Hole	Lyuk hozzáadása
+# DTF Craft (13)
+	Vectorization…	Vektorizálás…
+	Vectorization	Vektorizálás
+	Vectorized	Vektorizált
+	Side by Side	Egymás mellett
+	Show Contours	Körvonalak megjelenítése
+	Checkerboard under Transparency	Sakktábla az átlátszóság alatt
+	{colors} colors · {shapes} shapes · {points} points	Színek: {colors} · alakzatok: {shapes} · pontok: {points}
+	Cut-out shapes, no overlap	Kivágott alakzatok, átfedés nélkül
+	Open document, flattened	Megnyitott dokumentum, egyesítve
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm, {dpi} ppi
+	Type of Visual	Kép típusa
+	Logo · flat colors	Logó · egyszínű felületek
+	Illustration · shades	Illusztráció · árnyalatok
+	Number of Colors	Színek száma
+	Detail Level	Részletesség
+	Sharp Corners	Éles sarkok
+	Remove the Background	Háttér eltávolítása
+	read on the visual's edge	a kép szélén leolvasva
+	No background found: the visual is already cut out.	Nem található háttér: a kép már ki van vágva.
+	Palette	Paletta
+	{n} colors · {k} in the SVG	Színek: {n} · az SVG-ben: {k}
+	Edge Background	Háttér
+	Keep {hex} in the SVG	{hex} megtartása az SVG-ben
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Nincs bejelölve: a szín kimarad az SVG-ből; alakzatai törlődnek, nem olvadnak össze.
+	SVG · cut-out shapes	SVG · kivágott alakzatok
+	{w} × {h} mm (document size)	{w} × {h} mm (dokumentumméret)
+	Open the SVG in DTF Craft after the export	Az SVG megnyitása a DTF Craftban az exportálás után
+	Export SVG…	SVG exportálása…
+	Cut-out shapes at the document's print size, saved as SVG.	Kivágott alakzatok a dokumentum nyomtatási méretében, SVG-ként mentve.
+	SVG saved: {path}	SVG mentve: {path}
+	No visible pixels to vectorize.	Nincs vektorizálható látható képpont.
+	Nothing to export: every color is left out.	Nincs mit exportálni: minden szín ki van hagyva.

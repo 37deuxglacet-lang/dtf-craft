@@ -3945,3 +3945,36 @@ curves	Smooth	スムーズ
 # DTF Craft (12)
 	Add Holes	穴を追加
 	Add Hole	穴を追加
+# DTF Craft (13)
+	Vectorization…	ベクトル化…
+	Vectorization	ベクトル化
+	Vectorized	ベクトル化後
+	Side by Side	並べて表示
+	Show Contours	輪郭を表示
+	Checkerboard under Transparency	透明部分に市松模様
+	{colors} colors · {shapes} shapes · {points} points	{colors} 色 · {shapes} 図形 · {points} 点
+	Cut-out shapes, no overlap	切り抜き図形、重なりなし
+	Open document, flattened	開いているドキュメント（統合）
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm（{dpi} ppi）
+	Type of Visual	画像の種類
+	Logo · flat colors	ロゴ · ベタ塗り
+	Illustration · shades	イラスト · 階調
+	Number of Colors	色数
+	Detail Level	ディテールレベル
+	Sharp Corners	鋭角
+	Remove the Background	背景を削除
+	read on the visual's edge	画像の端から検出
+	No background found: the visual is already cut out.	背景が見つかりません：画像はすでに切り抜かれています。
+	Palette	パレット
+	{n} colors · {k} in the SVG	{n} 色 · SVG に {k} 色
+	Edge Background	背景
+	Keep {hex} in the SVG	{hex} を SVG に残す
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	オフ：その色は SVG から除外され、図形は統合されずに削除されます。
+	SVG · cut-out shapes	SVG · 切り抜き図形
+	{w} × {h} mm (document size)	{w} × {h} mm（ドキュメントサイズ）
+	Open the SVG in DTF Craft after the export	書き出し後に SVG を DTF Craft で開く
+	Export SVG…	SVG を書き出し…
+	Cut-out shapes at the document's print size, saved as SVG.	ドキュメントの印刷サイズの切り抜き図形を SVG として保存します。
+	SVG saved: {path}	SVG を保存しました：{path}
+	No visible pixels to vectorize.	ベクトル化する表示ピクセルがありません。
+	Nothing to export: every color is left out.	書き出すものがありません：すべての色が除外されています。

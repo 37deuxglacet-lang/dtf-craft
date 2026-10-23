@@ -64,6 +64,11 @@ pub fn sheet(command: &str) -> Option<Sheet> {
             when: "Logo ou visuel en aplats, quand le client impose des couleurs de référence, ou pour documenter un travail avant impression.",
             advice: "8 couleurs, regroupement ΔE 5, couleurs sous 0,5 % ignorées. Ajoutez une couleur oubliée à la pipette. ΔE jusqu'à 2 : écart imperceptible ; de 2 à 5 : visible de près ; au-delà : autre teinte, choisissez une autre référence avec « Changer… ». Une couleur à plus de ΔE 5 de sa référence (souvent un contour lissé) n'est pas cochée d'office. Le remplacement garde les contours lissés et les dégradés ; vérifiez-le avec l'aperçu « Couleurs remplacées ».",
         },
+        "dtf.vectorize" => Sheet {
+            what: "Redessiner le visuel en formes vectorielles nettes, une couleur unie par forme : les couleurs sont réduites à une palette (8 par défaut), puis chaque zone est tracée en courbes. Les formes sont découpées, sans superposition. Le fond lu au bord du visuel peut être supprimé ; la même couleur à l'intérieur du visuel reste. L'export SVG est à la taille d'impression du document et peut s'ouvrir dans un nouvel onglet en calques de forme : le document n'est jamais modifié.",
+            when: "Logo ou visuel en aplats de basse définition, flou ou pixelisé, à remettre au propre avant l'impression ou à fournir en vectoriel (découpe, broderie, sérigraphie).",
+            advice: "Logo · aplats, 8 couleurs, détail moyen, courbes. Réduisez le nombre de couleurs si des contours lissés forment des couleurs en trop ; « Élevé » garde les petits détails, « Faible » simplifie. « Angles vifs » pour les textes et formes géométriques. Décochez une couleur de la palette pour la retirer du SVG. Vérifiez avec « Afficher les contours » et la vue côte à côte.",
+        },
         _ => return None,
     })
 }
