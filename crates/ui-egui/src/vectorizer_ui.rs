@@ -765,9 +765,12 @@ mod tests {
     const BLUE: [f32; 3] = [31.0 / 255.0, 79.0 / 255.0, 181.0 / 255.0];
     const ORANGE: [f32; 3] = [228.0 / 255.0, 87.0 / 255.0, 46.0 / 255.0];
 
+    /// The files the app wrote: path and bytes.
+    type Written = std::rc::Rc<std::cell::RefCell<Vec<(String, Vec<u8>)>>>;
+
     /// An app with a 60 × 40 visual at 254 ppi on white: a blue square with a white dot, an
     /// orange square; and the files written.
-    fn app() -> (PhotocraftApp, std::rc::Rc<std::cell::RefCell<Vec<(String, Vec<u8>)>>>) {
+    fn app() -> (PhotocraftApp, Written) {
         let written = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
         let files = written.clone();
         let mut app = PhotocraftApp::new(

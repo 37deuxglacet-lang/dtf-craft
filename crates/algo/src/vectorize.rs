@@ -738,6 +738,36 @@ mod tests {
         assert_eq!((q.width, q.height), (2000, 4));
     }
 
+    /// Timing on a 2500 px antialiased logo (`cargo test --release -p photocraft-algo -- --ignored
+    /// vectorize_timing --nocapture`).
+    #[test]
+    #[ignore]
+    fn vectorize_timing() {
+        let n = 2500usize;
+        let mut px = vec![WHITE; n * n];
+        for y in 0..n {
+            for x in 0..n {
+                let (fx, fy) = (x as f32 + 0.5 - n as f32 / 2.0, y as f32 + 0.5 - n as f32 / 2.0);
+                let d = (fx * fx + fy * fy).sqrt();
+                let cover = (n as f32 * 0.45 - d + 0.5).clamp(0.0, 1.0);
+                let wave = (fx / 90.0).sin() * 60.0;
+                let c = if fy > wave { ORANGE } else { BLUE };
+                let q = &mut px[y * n + x];
+                for k in 0..3 {
+                    q[k] = 1.0 + (c[k] - 1.0) * cover;
+                }
+            }
+        }
+        let t0 = std::time::Instant::now();
+        let q = quantize(n, n, &px, &Settings::default()).unwrap();
+        let t1 = std::time::Instant::now();
+        let o = TraceOptions { detail: Detail::Medium, smoothing: Smoothing::Curves, remove_background: true, excluded: vec![] };
+        let t = q.trace(&o).unwrap();
+        let t2 = std::time::Instant::now();
+        let s = svg(&t, &q.palette, SvgSize::Mm(211.67, 211.67), None);
+        println!("palette {} · quantize {:?} · trace {:?} · {} shapes, {} points, SVG {} KB", q.palette.len(), t1 - t0, t2 - t1, t.shapes(), t.points(), s.len() / 1024);
+    }
+
     #[test]
     fn bad_input_is_an_error() {
         assert!(quantize(0, 0, &[], &Settings::default()).is_err());
