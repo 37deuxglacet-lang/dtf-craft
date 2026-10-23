@@ -4230,6 +4230,13 @@ navigator	Zoom	Zoom
 	Add Holes	Aggiungi fori
 	Add Hole	Aggiungi foro
 # DTF Craft (13)
+	Pick the Background Colour	Colore di sfondo con contagocce
+	Click the background colour to remove.	Fai clic sul colore di sfondo da rimuovere.
+	Click a visible pixel of the background.	Fai clic su un pixel visibile dello sfondo.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nessuno sfondo uniforme rilevato: lo sfondo è già trasparente, oppure scegli il colore con il contagocce.
+	Holes: {n}	Fori: {n}
+	Remove Last Hole	Rimuovi l'ultimo foro
+# DTF Craft (14)
 	Vectorization…	Vettorializzazione…
 	Vectorization	Vettorializzazione
 	Vectorized	Vettorializzato

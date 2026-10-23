@@ -21,8 +21,6 @@ use crate::{EngineError, Result, Session};
 pub const HALFTONE: &str = "filter.dtf.halftone";
 pub const REMOVE_SEMI_TRANSPARENT: &str = "filter.dtf.removeSemiTransparent";
 pub const REMOVE_WHITE: &str = "filter.dtf.removeWhiteBackground";
-/// A hole clicked by hand in the cut-out (Remove White Background's "Add Holes").
-pub const CUTOUT_HOLE: &str = "dtf.cutoutHole";
 /// Name of the copy Remove White Background cuts out (the source layer stays, hidden).
 pub const CUTOUT_LAYER: &str = "Sans fond";
 
@@ -69,18 +67,6 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
             threshold: (num(p, "threshold", 62.0).clamp(1.0, 100.0) / 100.0) as f32,
             width: num(p, "width", 2.0).clamp(1.0, 64.0) as f32,
         }),
-        CUTOUT_HOLE => {
-            let spec = CutoutSpec {
-                color: None,
-                tolerance: (num(p, "tolerance", 10.0).clamp(0.0, 100.0) / 100.0) as f32,
-                edge: num(p, "contour", 2.0).clamp(0.0, 10.0) as f32,
-                decontaminate: p.get("removeHalo").and_then(Value::as_bool).unwrap_or(true),
-                holes: false,
-                min_hole: 1,
-                seed: Some([num(p, "x", -1.0).floor() as i32, num(p, "y", -1.0).floor() as i32]),
-            };
-            Some(FilterParams::DtfCutout { spec })
-        }
         REMOVE_WHITE => {
             let detect = p.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
             let color = if detect { None } else { Some(hex_rgb(text(p, "color", "#ffffff")).unwrap_or([1.0; 3])) };
@@ -91,13 +77,47 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
                 decontaminate: p.get("removeHalo").and_then(Value::as_bool).unwrap_or(true),
                 holes: p.get("interiorHoles").and_then(Value::as_bool).unwrap_or(false),
                 min_hole: num(p, "minHoleSize", 100.0).clamp(1.0, 1_000_000.0) as u32,
-                seed: None,
+                seeds: hole_points(p),
             };
             Some(FilterParams::DtfCutout { spec })
         }
         _ => None,
     }
 }
+
+/// The holes clicked by hand (`holePoints`: `[[x, y], …]` in document pixels).
+fn hole_points(p: &Value) -> Vec<[i32; 2]> {
+    p.get("holePoints")
+        .and_then(Value::as_array)
+        .map(|a| {
+            a.iter()
+                .filter_map(|pt| {
+                    let xy = pt.as_array()?;
+                    Some([xy.first()?.as_f64()?.floor() as i32, xy.get(1)?.as_f64()?.floor() as i32])
+                })
+                .take(photocraft_algo::dtf::MAX_HOLES)
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// The plain background Remove White Background would detect on `layer` (the image edges, or the
+/// visual's bounds after Print Conformity's margin): `None` when there is none (an already
+/// transparent file), or for a layer without pixels of its own to read.
+pub fn detected_background(doc: &photocraft_doc::Document, layer: photocraft_doc::LayerId, tolerance_percent: f64) -> Option<[f32; 3]> {
+    let surf = doc.layer(layer)?.surface()?;
+    let fmt = surf.format();
+    let img = photocraft_algo::Image::read(surf, doc.bounds());
+    let ctx = photocraft_algo::Ctx { bounds: doc.bounds(), mode: doc.mode, alpha: fmt.alpha };
+    let key = photocraft_algo::dtf::plain_background(&img, &ctx, (tolerance_percent.clamp(0.0, 100.0) / 100.0) as f32)?;
+    let mut px = key.clone();
+    px.push(1.0);
+    let rgba = photocraft_raster::to_rgba(&fmt, &px);
+    Some([rgba[0], rgba[1], rgba[2]])
+}
+
+/// The message when the background colour is to be detected and there is none.
+pub const NO_PLAIN_BACKGROUND: &str = "No plain background detected: the background is already transparent, or pick its colour with the eyedropper.";
 
 /// `#rrggbb` as straight sRGB 0–1.
 fn hex_rgb(hex: &str) -> Option<[f32; 3]> {
@@ -227,6 +247,11 @@ fn remove_white(s: &mut Session, p: &Value) -> Result<Value> {
         Some(photocraft_doc::LayerContent::Raster(_) | photocraft_doc::LayerContent::Smart(_)) => {}
         _ => return Err(EngineError::Other("Remove White Background works on a pixel layer: select the visual's layer".into())),
     }
+    // Nothing to remove: no colour given, none detected, no hole clicked.
+    let detect = p.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
+    if detect && hole_points(p).is_empty() && st.doc.layer(source).is_some_and(|l| l.surface().is_some()) && detected_background(&st.doc, source, num(p, "tolerance", 10.0)).is_none() {
+        return Err(EngineError::Other(NO_PLAIN_BACKGROUND.into()));
+    }
     let copy = s.keeping_background(|s| crate::analysis_cmds::compound(s, "Remove White Background", |s| {
         s.execute("layer.duplicate", json!({"layer": source.0, "name": CUTOUT_LAYER}))?;
         let copy = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
@@ -241,25 +266,7 @@ fn remove_white(s: &mut Session, p: &Value) -> Result<Value> {
     crate::filters::run_filter(s, REMOVE_WHITE, &p2)
 }
 
-/// Add Holes: the enclosed area under the click (the clicked pixel's colour, within the
-/// tolerance) becomes transparent on the active layer, its contour unmixed as the cut-out's
-/// outer contour is (Contour, Remove Halo). One click, one undo step.
-fn cutout_hole(s: &mut Session, p: &Value) -> Result<Value> {
-    for k in ["x", "y"] {
-        if !p.get(k).is_some_and(Value::is_number) {
-            return Err(bad(CUTOUT_HOLE, format!("`{k}` must be a number (document pixels)")));
-        }
-    }
-    check_range(CUTOUT_HOLE, p, "tolerance", 0.0, 100.0)?;
-    check_range(CUTOUT_HOLE, p, "contour", 0.0, 10.0)?;
-    let st = s.active().ok_or(EngineError::NoDocument)?;
-    let layer = st.active_layer.ok_or_else(|| EngineError::Other("select the cut-out layer".into()))?;
-    match st.doc.layer(layer).map(|l| &l.content) {
-        Some(photocraft_doc::LayerContent::Raster(_) | photocraft_doc::LayerContent::Smart(_)) => {}
-        _ => return Err(EngineError::Other("Add Holes works on a pixel layer: select the cut-out layer".into())),
-    }
-    crate::filters::run_filter(s, CUTOUT_HOLE, p)
-}
+
 
 // ---------------------------------------------------------------- AI upscale
 
@@ -625,20 +632,9 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "Remove White Background…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"detectColor":bool=true (read the background colour on the image edges),"color":color=#ffffff (the background colour when it is not read),"tolerance":0..100=10 (% difference still taken as background; absorbs JPEG noise),"contour":0..10=2 (px of contour unmixed from the background),"removeHalo":bool=true (unmix the contour so no light halo is left),"interiorHoles":bool=false (also remove the background colour enclosed by the visual),"minHoleSize":1..1000000=100 (px; smaller enclosed areas stay)} Removes the plain background from the image edges inwards on a copy of the layer named "Sans fond"; the source layer is hidden, unchanged"##,
+            params: r##"{"detectColor":bool=true (read the background colour on the image edges),"color":color=#ffffff (the background colour when it is not read),"tolerance":0..100=10 (% difference still taken as background; absorbs JPEG noise),"contour":0..10=2 (px of contour unmixed from the background),"removeHalo":bool=true (unmix the contour so no light halo is left),"interiorHoles":bool=false (also remove the background colour enclosed by the visual),"minHoleSize":1..1000000=100 (px; smaller enclosed areas stay),"holePoints":json (optional [[x, y], …] in document px: holes clicked by hand, each the clicked colour reached from there, its contour unmixed)} Removes the plain background from the image edges inwards on a copy of the layer named "Sans fond"; the source layer is hidden, unchanged"##,
             enabled: crate::filters::has_filterable_layer,
             run: remove_white,
-            journal: true,
-        },
-        CommandSpec {
-            id: CUTOUT_HOLE,
-            label: "Add Hole",
-            // Run by a click on the canvas with Remove White Background's "Add Holes" on.
-            menu: &[],
-            shortcut: None,
-            params: r##"{"x":0..1000000=0 (document px),"y":0..1000000=0 (document px),"tolerance":0..100=10 (% difference from the clicked colour still removed),"contour":0..10=2 (px of contour unmixed),"removeHalo":bool=true} The enclosed area under the click becomes transparent on the active layer and its contour is unmixed from the clicked colour, as the cut-out's outer contour is; the transparency already there is left as it is"##,
-            enabled: crate::filters::has_filterable_layer,
-            run: cutout_hole,
             journal: true,
         },
         CommandSpec {
@@ -921,22 +917,47 @@ mod tests {
         assert_eq!(surf.pixel(30, 20)[3], 1.0, "the visual stays");
     }
 
-    /// Add Holes: after the cut-out, a click in the enclosed white makes it transparent, as one
-    /// undo step on the cut-out layer; the outside is not touched again.
+    /// Holes clicked by hand are cut with the background, in the same step.
     #[test]
-    fn a_clicked_hole_is_cut_on_the_cutout_layer() {
+    fn clicked_holes_are_cut_with_the_background() {
         let mut s = session_with_logo();
-        s.execute(REMOVE_WHITE, json!({})).unwrap();
-        let alpha = |s: &Session, x: i32, y: i32| {
-            let d = s.active().unwrap();
-            d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().pixel(x, y)[3]
-        };
-        assert_eq!((alpha(&s, 14, 9), alpha(&s, 2, 2)), (1.0, 0.0), "the enclosed white stays after the cut-out");
-        s.execute(CUTOUT_HOLE, json!({"x": 14.6, "y": 9.2})).unwrap();
-        assert_eq!((alpha(&s, 14, 9), alpha(&s, 11, 6)), (0.0, 1.0));
-        assert!(s.undo());
-        assert_eq!(alpha(&s, 14, 9), 1.0, "one click, one undo step");
-        assert!(s.execute(CUTOUT_HOLE, json!({"y": 9})).is_err());
+        s.execute(REMOVE_WHITE, json!({"holePoints": [[14.6, 9.2]]})).unwrap();
+        let d = s.active().unwrap();
+        let surf = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap();
+        assert_eq!((surf.pixel(14, 9)[3], surf.pixel(2, 2)[3], surf.pixel(11, 6)[3]), (0.0, 0.0, 1.0));
+    }
+
+    /// An already transparent file: nothing is detected, nothing removed, the user is told.
+    #[test]
+    fn an_already_transparent_file_is_not_cut_into() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 30, "height": 30, "resolution": 300, "background": "transparent"})).unwrap();
+        s.edit("Logo", |doc, active| {
+            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+            for y in 0..30 {
+                for x in 0..30 {
+                    let d = ((x as f32 - 14.5).powi(2) + (y as f32 - 14.5).powi(2)).sqrt();
+                    let c = if d < 4.0 { [1.0, 1.0, 1.0, 1.0] } else if d < 9.0 { [0.7, 0.5, 0.3, 1.0] } else if d < 12.0 { [0.3, 0.2, 0.1, 1.0] } else { [0.0; 4] };
+                    surf.write_pixel(x, y, &c);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        let layer = s.active().unwrap().active_layer.unwrap();
+        assert_eq!(detected_background(&s.active().unwrap().doc, layer, 10.0), None);
+        let layers = s.active().unwrap().doc.layers.len();
+        assert!(s.execute(REMOVE_WHITE, json!({})).unwrap_err().to_string().contains("No plain background"));
+        assert_eq!(s.active().unwrap().doc.layers.len(), layers, "no copy made");
+        // A hole clicked in the white centre is still cut, the dark outline stays.
+        s.execute(REMOVE_WHITE, json!({"holePoints": [[15, 15]]})).unwrap();
+        let d = s.active().unwrap();
+        let surf = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap();
+        assert_eq!((surf.pixel(15, 15)[3], surf.pixel(15, 4)[3]), (0.0, 1.0));
+        // A white file is detected as white.
+        let s = session_with_logo();
+        let st = s.active().unwrap();
+        assert!(detected_background(&st.doc, st.active_layer.unwrap(), 10.0).is_some_and(|c| c.iter().all(|v| *v > 0.99)));
     }
 
     /// Remove Semi-Transparent Pixels works on the fringe only (the antialiasing inside stays).

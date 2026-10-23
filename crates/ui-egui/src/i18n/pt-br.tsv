@@ -4057,6 +4057,13 @@ layerLabel	No Color	Sem cor
 	Add Holes	Adicionar furos
 	Add Hole	Adicionar furo
 # DTF Craft (13)
+	Pick the Background Colour	Cor de fundo com conta-gotas
+	Click the background colour to remove.	Clique na cor de fundo a remover.
+	Click a visible pixel of the background.	Clique em um pixel visível do fundo.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nenhum fundo liso detectado: o fundo já é transparente, ou escolha a cor com o conta-gotas.
+	Holes: {n}	Furos: {n}
+	Remove Last Hole	Remover o último furo
+# DTF Craft (14)
 	Vectorization…	Vetorização…
 	Vectorization	Vetorização
 	Vectorized	Vetorizado

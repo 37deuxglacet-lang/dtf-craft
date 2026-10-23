@@ -4027,6 +4027,13 @@ curves	Smooth	Vloeiend maken
 	Add Holes	Gaten toevoegen
 	Add Hole	Gat toevoegen
 # DTF Craft (13)
+	Pick the Background Colour	Achtergrondkleur met pipet
+	Click the background colour to remove.	Klik op de achtergrondkleur die u wilt verwijderen.
+	Click a visible pixel of the background.	Klik op een zichtbare pixel van de achtergrond.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Geen effen achtergrond gevonden: de achtergrond is al transparant, of kies de kleur met de pipet.
+	Holes: {n}	Gaten: {n}
+	Remove Last Hole	Laatste gat verwijderen
+# DTF Craft (14)
 	Vectorization…	Vectorisatie…
 	Vectorization	Vectorisatie
 	Vectorized	Gevectoriseerd

@@ -3264,6 +3264,13 @@ curves	Smooth	Haluskan
 	Add Holes	Tambah lubang
 	Add Hole	Tambah lubang
 # DTF Craft (13)
+	Pick the Background Colour	Warna latar dengan pipet
+	Click the background colour to remove.	Klik warna latar yang akan dihapus.
+	Click a visible pixel of the background.	Klik piksel latar yang terlihat.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Tidak ada latar polos terdeteksi: latar sudah transparan, atau pilih warnanya dengan pipet.
+	Holes: {n}	Lubang: {n}
+	Remove Last Hole	Hapus lubang terakhir
+# DTF Craft (14)
 	Vectorization…	Vektorisasi…
 	Vectorization	Vektorisasi
 	Vectorized	Hasil vektor

@@ -3876,6 +3876,13 @@ navigator	Zoom	Zvětšení
 	Add Holes	Přidat otvory
 	Add Hole	Přidat otvor
 # DTF Craft (13)
+	Pick the Background Colour	Barva pozadí kapátkem
+	Click the background colour to remove.	Klikněte na barvu pozadí, kterou chcete odstranit.
+	Click a visible pixel of the background.	Klikněte na viditelný pixel pozadí.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nebylo zjištěno jednobarevné pozadí: pozadí je již průhledné, nebo vyberte jeho barvu kapátkem.
+	Holes: {n}	Otvory: {n}
+	Remove Last Hole	Odebrat poslední otvor
+# DTF Craft (14)
 	Vectorization…	Vektorizace…
 	Vectorization	Vektorizace
 	Vectorized	Vektorizováno

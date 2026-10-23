@@ -3240,6 +3240,13 @@ curves	Smooth	Сгладить
 	Add Holes	Добавить отверстия
 	Add Hole	Добавить отверстие
 # DTF Craft (13)
+	Pick the Background Colour	Цвет фона пипеткой
+	Click the background colour to remove.	Щёлкните по цвету фона, который нужно удалить.
+	Click a visible pixel of the background.	Щёлкните по видимому пикселю фона.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Однотонный фон не найден: фон уже прозрачный, или выберите его цвет пипеткой.
+	Holes: {n}	Отверстия: {n}
+	Remove Last Hole	Убрать последнее отверстие
+# DTF Craft (14)
 	Vectorization…	Векторизация…
 	Vectorization	Векторизация
 	Vectorized	Векторизовано

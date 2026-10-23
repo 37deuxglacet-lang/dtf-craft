@@ -27,7 +27,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
         "filter.dtf.removeWhiteBackground" => Sheet {
             what: "Supprimer un fond uni, souvent blanc, en partant des bords vers l'intérieur. Le travail se fait sur une copie « Sans fond » du calque ; l'original est masqué et intact. Le blanc à l'intérieur du visuel est conservé.",
             when: "Fichier client sur fond blanc ou uni (JPEG, capture, logo exporté sans transparence), à la place de la gomme magique.",
-            advice: "Tolérance 10 %, contour 2 px, « Supprimer le liseré » coché. L'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée (Fond de contrôle ou Fond d'aperçu). Rendez transparentes les zones fermées restantes avec « Ajouter des trous » : un clic par zone, contour nettoyé comme le bord extérieur.",
+            advice: "Tolérance 10 %, contour 2 px, « Supprimer le liseré » coché. L'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée (Fond de contrôle ou Fond d'aperçu). Sur un fichier déjà transparent, la détection ne trouve pas de fond : prenez la couleur à la pipette si besoin. Ajoutez les zones fermées restantes avec « Ajouter des trous » : un clic par zone dans l'aperçu, percées avec le fond à l'application.",
         },
         "dtf.controlBackground" => Sheet {
             what: "Placer sous l'image un calque de couleur unie nommé « backfill », de la couleur du textile, pour juger le rendu : liserés, pixels clairs, contraste.",
@@ -75,7 +75,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
 
 /// The tooltip of a setting (`key` as in the command's spec), or of a tab's own control
 /// (`apply`, `cancel`, `showBefore`, `showBackground`, `deleteBackground`, `previewColor`,
-/// `holeEraser`, `upscale`).
+/// `holeEraser`, `removeLastHole`, `backgroundPicker`, `upscale`).
 pub fn tip(command: &str, key: &str) -> Option<&'static str> {
     Some(match (command, key) {
         (_, "apply") => "Applique l'outil au calque actif. Annulable avec Édition › Annuler.",
@@ -89,7 +89,7 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("dtf.conformity", "trim") => "Supprime les bords transparents autour du visuel et laisse 2 px de marge.",
         ("dtf.conformity", "layerName") => "Nom donné au calque du visuel (« origin » par défaut), repère pour les actions. Vide : le nom ne change pas.",
         ("dtf.conformity", "upscale") => "Agrandissement IA du document dans une copie nommée « nom x2 » (x3, x4), à la résolution de l'onglet ; l'original n'est pas touché. Le bouton indique la taille obtenue en cm et en pixels. Calcul hors ligne, de quelques secondes à plusieurs minutes.",
-        ("filter.dtf.removeWhiteBackground", "detectColor") => "Lit la couleur du fond sur les bords de l'image. Décochez pour la choisir vous-même.",
+        ("filter.dtf.removeWhiteBackground", "detectColor") => "Lit la couleur du fond sur les bords de l'image, s'ils sont d'une couleur unie. Sur un fichier déjà transparent, rien n'est détecté ni supprimé. Décochez pour choisir la couleur vous-même, ou prenez-la à la pipette.",
         ("filter.dtf.removeWhiteBackground", "color") => "Couleur du fond à supprimer, quand elle n'est pas détectée.",
         ("filter.dtf.removeWhiteBackground", "tolerance") => "Écart de couleur encore pris pour du fond, en %. Plus haut : absorbe le bruit JPEG, mais peut mordre sur les couleurs claires du visuel.",
         ("filter.dtf.removeWhiteBackground", "contour") => "Épaisseur du bord, en px, nettoyée du mélange avec le fond.",
@@ -97,7 +97,9 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("filter.dtf.removeWhiteBackground", "interiorHoles") => "Supprime aussi le fond enfermé dans le visuel (intérieur d'un O, d'un anneau).",
         ("filter.dtf.removeWhiteBackground", "minHoleSize") => "Les zones fermées plus petites que cette surface, en pixels, sont gardées.",
         ("filter.dtf.removeWhiteBackground", "previewColor") => "Couleur sur laquelle l'aperçu s'affiche : la dernière couleur utilisée, ici ou dans Fond de contrôle. Sert seulement à l'aperçu.",
-        ("filter.dtf.removeWhiteBackground", "holeEraser") => "Cochée : chaque clic dans une zone fermée du calque « Sans fond » la rend transparente, avec le même traitement que le contour extérieur (Tolérance, Contour, Supprimer le liseré de l'onglet) : pas de liseré autour du trou. Un clic = une annulation. Décochée : l'outil précédent revient.",
+        ("filter.dtf.removeWhiteBackground", "holeEraser") => "Cochée : chaque clic dans une zone fermée ajoute un trou à l'aperçu, sur le fond d'aperçu. Les trous sont percés avec le fond en cliquant sur Appliquer, avec le même traitement que le contour extérieur (Tolérance, Contour, Supprimer le liseré) : pas de liseré autour. Décochée : l'outil précédent revient.",
+        ("filter.dtf.removeWhiteBackground", "removeLastHole") => "Retire de l'aperçu le dernier trou ajouté. Annuler retire tous les trous.",
+        ("filter.dtf.removeWhiteBackground", "backgroundPicker") => "Pipette : cliquez sur le fond dans l'image pour choisir la couleur à supprimer. « Détecter la couleur du fond » se décoche et l'aperçu se met à jour.",
         ("filter.dtf.removeSemiTransparent", "width") => "Largeur de la frange traitée, en px, autour de la transparence (bord du visuel et trous). Les pixels semi-transparents plus à l'intérieur (ombres, dégradés, lissage entre deux couleurs) ne changent pas.",
         ("dtf.controlBackground", "color") => "Couleur du textile. Cliquez sur la pastille pour la choisir.",
         ("dtf.controlBackground", "showBackground") => "Ajoute le fond sous tous les calques ; un fond déjà présent est remplacé.",

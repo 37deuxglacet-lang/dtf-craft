@@ -4188,6 +4188,13 @@ cameraRaw	Yellow	Sárga
 	Add Holes	Lyukak hozzáadása
 	Add Hole	Lyuk hozzáadása
 # DTF Craft (13)
+	Pick the Background Colour	Háttérszín pipettával
+	Click the background colour to remove.	Kattintson az eltávolítandó háttérszínre.
+	Click a visible pixel of the background.	Kattintson a háttér egy látható képpontjára.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nem észlelhető egyszínű háttér: a háttér már átlátszó, vagy válassza ki a színét pipettával.
+	Holes: {n}	Lyukak: {n}
+	Remove Last Hole	Utolsó lyuk eltávolítása
+# DTF Craft (14)
 	Vectorization…	Vektorizálás…
 	Vectorization	Vektorizálás
 	Vectorized	Vektorizált

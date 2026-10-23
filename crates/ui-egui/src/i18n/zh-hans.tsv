@@ -2888,6 +2888,13 @@ curves	Smooth	平滑
 	Add Holes	添加孔洞
 	Add Hole	添加孔洞
 # DTF Craft (13)
+	Pick the Background Colour	用吸管取背景色
+	Click the background colour to remove.	单击要移除的背景颜色。
+	Click a visible pixel of the background.	单击背景中可见的像素。
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	未检测到纯色背景：背景已透明，或用吸管选择其颜色。
+	Holes: {n}	孔洞：{n}
+	Remove Last Hole	移除最后一个孔洞
+# DTF Craft (14)
 	Vectorization…	矢量化…
 	Vectorization	矢量化
 	Vectorized	矢量化结果

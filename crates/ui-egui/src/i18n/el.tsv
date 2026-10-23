@@ -3967,6 +3967,13 @@ curves	Smooth	Εξομάλυνση
 	Add Holes	Προσθήκη οπών
 	Add Hole	Προσθήκη οπής
 # DTF Craft (13)
+	Pick the Background Colour	Χρώμα φόντου με σταγονόμετρο
+	Click the background colour to remove.	Κάντε κλικ στο χρώμα φόντου που θα αφαιρεθεί.
+	Click a visible pixel of the background.	Κάντε κλικ σε ορατό πίξελ του φόντου.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Δεν εντοπίστηκε ομοιόμορφο φόντο: το φόντο είναι ήδη διαφανές ή επιλέξτε το χρώμα του με το σταγονόμετρο.
+	Holes: {n}	Οπές: {n}
+	Remove Last Hole	Αφαίρεση τελευταίας οπής
+# DTF Craft (14)
 	Vectorization…	Διανυσματοποίηση…
 	Vectorization	Διανυσματοποίηση
 	Vectorized	Διανυσματοποιημένο
