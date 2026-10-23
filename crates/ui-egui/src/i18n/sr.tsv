@@ -4338,3 +4338,94 @@ shape	Appearance	Izgled
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = neprimetna razlika · 2 do 5 = vidljivo izbliza · iznad 5 = druga nijansa.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Boje prikazane u sRGB: rezultat štampe zavisi od štampača, mastila i podloge.
 	Sheet made with DTF Craft	List napravljen u DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Zbirni list
+	Visuals	Motivi
+	Add PNG Files…	Dodaj PNG datoteke…
+	Add Open Document	Dodaj otvoreni dokument
+	Add PNG files or the open document.	Dodajte PNG datoteke ili otvoreni dokument.
+	Sheet	List
+	Film Width	Širina folije
+	Max Length	Maks. dužina
+	Allow Rotation	Dozvoli rotaciju
+	Auto Build	Automatski raspored
+	Selected Visual	Izabrani motiv
+	Rotate 90°	Rotiraj 90°
+	Length used: {length} cm	Iskorišćena dužina: {length} cm
+	{n} not placed	Nije postavljeno: {n}
+	{n} too close or overlapping	Preblizu ili preklapanje: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Prevucite motiv da ga pomerite. Strelice: 1 mm (Shift: 1 cm). Delete ga uklanja sa lista.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motivi bliži od margine drugom motivu ili ivici: {n}. Ipak izvesti?
+	Too close to another visual	Preblizu drugom motivu
+	No room to turn this visual	Nema mesta za rotiranje ovog motiva
+	Open a document first	Prvo otvorite dokument
+	the document was closed	dokument je zatvoren
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktivni zbirni listovi
+	Add a New Sheet	Dodaj novi list
+	Add a copy to the sheet	Dodaj kopiju na list
+	Along the edges	Duž ivica
+	Auto Build May Rotate	Dozvoli rotaciju (automatski)
+	Auto Build — every image at once	Automatski raspored — sve slike odjednom
+	Auto Fill	Automatsko popunjavanje
+	Background Warning:	Upozorenje o pozadini:
+	Background not removed (opaque corners)	Pozadina nije uklonjena (neprozirni uglovi)
+	Between images	Između slika
+	Center Horizontally	Centriraj vodoravno
+	Center Vertically	Centriraj uspravno
+	Center on the Sheet	Centriraj na listu
+	Copies of this sheet to print	Broj kopija ovog lista za štampu
+	Custom Color	Prilagođena boja
+	Delete (Del)	Obriši (Del)
+	Delete the Sheet	Obriši list
+	Drag and drop a file here or click to	Prevucite datoteku ovde ili kliknite da
+	Duplicate Image	Dupliraj sliku
+	Export Sheets (PNG)…	Izvezi listove (PNG)…
+	Fill the room left on the sheet with this visual	Popuni slobodan prostor lista ovim motivom
+	Flip Horizontally	Preslikaj vodoravno
+	Flip Vertically	Preslikaj uspravno
+	Good resolution >= 250 dpi	Dobra rezolucija >= 250 dpi
+	Grid (1 cm)	Mreža (1 cm)
+	Image Margin	Margina slike
+	Import Images	Uvezi slike
+	Lock Proportions	Zaključaj proporcije
+	Margin (cm)	Margina (cm)
+	No image yet: import PNG files or add the open document.	Još nema slika: uvezite PNG datoteke ili dodajte otvoreni dokument.
+	No room left on the sheet	Nema više mesta na listu
+	Number of Images:	Broj slika:
+	One copy less	Jedna kopija manje
+	One copy more	Jedna kopija više
+	Optimal	Optimalna
+	Optimal resolution >= 300 dpi	Optimalna rezolucija >= 300 dpi
+	Overlap Lines	Linije preklapanja
+	Overlapping or too close	Preklapa se ili je preblizu
+	Poor	Loša
+	Poor resolution >= 200 dpi	Loša rezolucija >= 200 dpi
+	Proportions:	Proporcije:
+	Push Down	Gurni dole
+	Push Right	Gurni desno
+	Push Up	Gurni gore
+	Qty:	Kol.:
+	Redo (Ctrl+Y)	Ponovi (Ctrl+Y)
+	Rotate 90° Counterclockwise	Rotiraj 90° suprotno od kazaljke
+	Same image, another size	Ista slika, druga veličina
+	Select an object to edit.	Izaberite objekat za uređivanje.
+	Semi-transparent pixels: {p} %	Poluprozirni pikseli: {p} %
+	Sheet Background	Pozadina lista
+	Sheet Margin	Margina lista
+	Show Overlap Lines	Prikaži linije preklapanja
+	Show Resolution Lines	Prikaži linije rezolucije
+	Snap While Moving	Poravnaj pri pomeranju
+	Start Over	Počni iznova
+	Stretch to the Film Width	Rastegni na širinu folije
+	Stretch to the Sheet Length	Rastegni na dužinu lista
+	Supported format: PNG (cropped to its visible pixels)	Podržani format: PNG (isečen na vidljive piksele)
+	Transparency Warning:	Upozorenje o providnosti:
+	Undo (Ctrl+Z)	Opozovi (Ctrl+Z)
+	Very Poor	Veoma loša
+	Very poor resolution < 200 dpi	Veoma loša rezolucija < 200 dpi
+	With the image margin	Sa marginom slike
+	With the sheet margin	Sa marginom lista
+	copy	kopija
+	{n} images	Slike: {n}

@@ -3236,3 +3236,96 @@ curves	Smooth	Сгладить
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: до 2 = незаметное различие · 2–5 = видно вблизи · выше 5 = другой оттенок.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Цвета показаны в sRGB: результат печати зависит от принтера, чернил и материала.
 	Sheet made with DTF Craft	Карта создана в DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Монтажный лист
+	Visuals	Макеты
+	Add PNG Files…	Добавить файлы PNG…
+	Add Open Document	Добавить открытый документ
+	Add PNG files or the open document.	Добавьте файлы PNG или открытый документ.
+	Sheet	Лист
+	Film Width	Ширина плёнки
+	Max Length	Макс. длина
+	Allow Rotation	Разрешить поворот
+	Auto Build	Авторасклад
+	Selected Visual	Выбранный макет
+	Rotate 90°	Повернуть на 90°
+	Length used: {length} cm	Использованная длина: {length} см
+	{n} not placed	Не размещено: {n}
+	{n} too close or overlapping	Слишком близко или перекрываются: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Перетащите макет, чтобы переместить его. Стрелки: 1 мм (Shift: 1 см). Delete убирает его с листа.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Макеты ближе поля к другому макету или краю: {n}. Всё равно экспортировать?
+	Too close to another visual	Слишком близко к другому макету
+	No room to turn this visual	Нет места, чтобы повернуть этот макет
+	Open a document first	Сначала откройте документ
+	the document was closed	документ был закрыт
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Активные листы
+	Add a New Sheet	Добавить новый лист
+	Add a copy to the sheet	Добавить копию на лист
+	Along the edges	Вдоль краёв
+	Auto Build May Rotate	Разрешить поворот (авто)
+	Auto Build — every image at once	Авторасклад — все изображения сразу
+	Auto Fill	Автозаполнение
+	Background Warning:	Предупреждение о фоне:
+	Background not removed (opaque corners)	Фон не удалён (непрозрачные углы)
+	Between images	Между изображениями
+	Center Horizontally	Центрировать по горизонтали
+	Center Vertically	Центрировать по вертикали
+	Center on the Sheet	Центрировать на листе
+	Copies of this sheet to print	Копий этого листа для печати
+	Custom Color	Свой цвет
+	Delete (Del)	Удалить (Del)
+	Delete the Sheet	Удалить лист
+	Drag and drop a file here or click to	Перетащите файл сюда или нажмите, чтобы
+	Duplicate Image	Дублировать изображение
+	Export Sheets (PNG)…	Экспорт листов (PNG)…
+	Fill the room left on the sheet with this visual	Заполнить свободное место листа этим макетом
+	Flip Horizontally	Отразить по горизонтали
+	Flip Vertically	Отразить по вертикали
+	Good	Хорошее
+	Good resolution >= 250 dpi	Хорошее разрешение >= 250 dpi
+	Grid (1 cm)	Сетка (1 см)
+	Image Margin	Отступ изображения
+	Import Images	Импорт изображений
+	Lock Proportions	Сохранять пропорции
+	Margin (cm)	Отступ (см)
+	No image yet: import PNG files or add the open document.	Изображений нет: импортируйте PNG или добавьте открытый документ.
+	No room left on the sheet	На листе нет места
+	Number of Images:	Количество изображений:
+	One copy less	На одну копию меньше
+	One copy more	На одну копию больше
+	Optimal	Оптимальное
+	Optimal resolution >= 300 dpi	Оптимальное разрешение >= 300 dpi
+	Overlap Lines	Линии наложения
+	Overlapping or too close	Наложение или слишком близко
+	Poor	Плохое
+	Poor resolution >= 200 dpi	Плохое разрешение >= 200 dpi
+	Proportions:	Пропорции:
+	Push Down	Сдвинуть вниз
+	Push Left	Сдвинуть влево
+	Push Right	Сдвинуть вправо
+	Push Up	Сдвинуть вверх
+	Qty:	Кол-во:
+	Redo (Ctrl+Y)	Повторить (Ctrl+Y)
+	Rotate 90° Counterclockwise	Повернуть на 90° против часовой
+	Same image, another size	То же изображение, другой размер
+	Select an object to edit.	Выберите объект для изменения.
+	Semi-transparent pixels: {p} %	Полупрозрачные пиксели: {p} %
+	Sheet Background	Фон листа
+	Sheet Margin	Поле листа
+	Show Overlap Lines	Показывать линии наложения
+	Show Resolution Lines	Показывать линии разрешения
+	Snap While Moving	Выравнивать при перемещении
+	Start Over	Начать заново
+	Stretch to the Film Width	Растянуть на ширину плёнки
+	Stretch to the Sheet Length	Растянуть на длину листа
+	Supported format: PNG (cropped to its visible pixels)	Поддерживаемый формат: PNG (обрезается по видимым пикселям)
+	Transparency Warning:	Предупреждение о прозрачности:
+	Undo (Ctrl+Z)	Отменить (Ctrl+Z)
+	Very Poor	Очень плохое
+	Very poor resolution < 200 dpi	Очень плохое разрешение < 200 dpi
+	With the image margin	С отступом изображения
+	With the sheet margin	С полем листа
+	copy	копия
+	{n} images	Изображений: {n}

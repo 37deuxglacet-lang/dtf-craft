@@ -3864,3 +3864,96 @@ curves	Smooth	Wygładź
 	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = różnica niezauważalna · 2 do 5 = widoczna z bliska · powyżej 5 = inny odcień.
 	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Kolory wyświetlane w sRGB: wynik druku zależy od drukarki, tuszy i podłoża.
 	Sheet made with DTF Craft	Karta utworzona w DTF Craft
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Arkusz zbiorczy
+	Visuals	Grafiki
+	Add PNG Files…	Dodaj pliki PNG…
+	Add Open Document	Dodaj otwarty dokument
+	Add PNG files or the open document.	Dodaj pliki PNG lub otwarty dokument.
+	Sheet	Arkusz
+	Film Width	Szerokość folii
+	Max Length	Maks. długość
+	Allow Rotation	Zezwalaj na obrót
+	Auto Build	Rozmieść automatycznie
+	Selected Visual	Zaznaczona grafika
+	Rotate 90°	Obróć o 90°
+	Length used: {length} cm	Użyta długość: {length} cm
+	{n} not placed	Nieumieszczone: {n}
+	{n} too close or overlapping	Za blisko lub nachodzące: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Przeciągnij grafikę, aby ją przesunąć. Strzałki: 1 mm (Shift: 1 cm). Delete usuwa ją z arkusza.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Grafiki bliżej niż margines od innej grafiki lub krawędzi: {n}. Eksportować mimo to?
+	Too close to another visual	Za blisko innej grafiki
+	No room to turn this visual	Brak miejsca na obrót tej grafiki
+	Open a document first	Najpierw otwórz dokument
+	the document was closed	dokument został zamknięty
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktywne arkusze
+	Add a New Sheet	Dodaj nowy arkusz
+	Add a copy to the sheet	Dodaj kopię do arkusza
+	Along the edges	Wzdłuż krawędzi
+	Auto Build May Rotate	Zezwalaj na obrót (automatycznie)
+	Auto Build — every image at once	Rozmieszczanie automatyczne — wszystkie obrazy naraz
+	Auto Fill	Wypełnianie automatyczne
+	Background Warning:	Ostrzeżenie o tle:
+	Background not removed (opaque corners)	Tło nieusunięte (nieprzezroczyste narożniki)
+	Between images	Między obrazami
+	Center Horizontally	Wyśrodkuj poziomo
+	Center Vertically	Wyśrodkuj pionowo
+	Center on the Sheet	Wyśrodkuj na arkuszu
+	Copies of this sheet to print	Liczba kopii tego arkusza do druku
+	Custom Color	Kolor własny
+	Delete (Del)	Usuń (Del)
+	Delete the Sheet	Usuń arkusz
+	Drag and drop a file here or click to	Przeciągnij plik tutaj lub kliknij, aby
+	Duplicate Image	Duplikuj obraz
+	Export Sheets (PNG)…	Eksportuj arkusze (PNG)…
+	Fill the room left on the sheet with this visual	Wypełnij wolne miejsce arkusza tą grafiką
+	Flip Horizontally	Odbij w poziomie
+	Flip Vertically	Odbij w pionie
+	Good	Dobra
+	Good resolution >= 250 dpi	Dobra rozdzielczość >= 250 dpi
+	Grid (1 cm)	Siatka (1 cm)
+	Image Margin	Margines obrazu
+	Import Images	Importuj obrazy
+	Lock Proportions	Zablokuj proporcje
+	Margin (cm)	Margines (cm)
+	No image yet: import PNG files or add the open document.	Brak obrazów: zaimportuj pliki PNG lub dodaj otwarty dokument.
+	No room left on the sheet	Brak miejsca na arkuszu
+	Number of Images:	Liczba obrazów:
+	One copy less	O jedną kopię mniej
+	One copy more	O jedną kopię więcej
+	Optimal	Optymalna
+	Optimal resolution >= 300 dpi	Optymalna rozdzielczość >= 300 dpi
+	Overlap Lines	Linie nakładania
+	Overlapping or too close	Nakładające się lub za blisko
+	Poor	Słaba
+	Poor resolution >= 200 dpi	Słaba rozdzielczość >= 200 dpi
+	Proportions:	Proporcje:
+	Push Down	Dosuń w dół
+	Push Left	Dosuń w lewo
+	Push Right	Dosuń w prawo
+	Push Up	Dosuń w górę
+	Qty:	Ilość:
+	Redo (Ctrl+Y)	Ponów (Ctrl+Y)
+	Rotate 90° Counterclockwise	Obróć o 90° w lewo
+	Same image, another size	Ten sam obraz, inny rozmiar
+	Select an object to edit.	Zaznacz obiekt do edycji.
+	Semi-transparent pixels: {p} %	Piksele półprzezroczyste: {p} %
+	Sheet Background	Tło arkusza
+	Sheet Margin	Margines arkusza
+	Show Overlap Lines	Pokaż linie nakładania
+	Show Resolution Lines	Pokaż linie rozdzielczości
+	Snap While Moving	Wyrównuj podczas przesuwania
+	Start Over	Zacznij od nowa
+	Stretch to the Film Width	Rozciągnij do szerokości folii
+	Stretch to the Sheet Length	Rozciągnij do długości arkusza
+	Supported format: PNG (cropped to its visible pixels)	Obsługiwany format: PNG (przycięty do widocznych pikseli)
+	Transparency Warning:	Ostrzeżenie o przezroczystości:
+	Undo (Ctrl+Z)	Cofnij (Ctrl+Z)
+	Very Poor	Bardzo słaba
+	Very poor resolution < 200 dpi	Bardzo słaba rozdzielczość < 200 dpi
+	With the image margin	Z marginesem obrazu
+	With the sheet margin	Z marginesem arkusza
+	copy	kopia
+	{n} images	Obrazy: {n}

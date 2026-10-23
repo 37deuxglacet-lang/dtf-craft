@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Keyboard shortcuts: Photoshop defaults from the command registry, plus single-key tools.
 
 use egui::{Key, KeyboardShortcut, Modifiers};
@@ -332,6 +334,10 @@ pub fn handle(app: &mut PhotocraftApp, ctx: &egui::Context) {
     // tools) runs beneath it, and it handles its own keys (Y, U, O, S). Unlike the other dialogs
     // below it covers the canvas, so canvas zoom keys are blocked too.
     if app.camera_raw.is_some() || app.color_analyzer.is_some() {
+        return;
+    }
+    // DTF Craft: Gang Sheet covers the window the same way and handles its own keys.
+    if app.gang_sheet.is_some() {
         return;
     }
     // An open menu owns the keyboard (arrows, ↩, Esc), like a native menu; so does an open

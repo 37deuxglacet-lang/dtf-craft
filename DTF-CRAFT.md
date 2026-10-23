@@ -20,6 +20,7 @@ produit officiel du projet PhotoCraft.
 | Netteté optimisée… | Netteté optimisée avec aperçu |
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
+| Gang sheet… | Fenêtre plein écran claire : import, réglages, plusieurs planches, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 
@@ -54,6 +55,56 @@ Détourage : l'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière 
 (Fond de contrôle ou « Fond d'aperçu ») ; « Ajouter des trous (gomme magique) » active la gomme magique (en mode contigu), avec sa tolérance
 réglable dans l'onglet : chaque clic dans une zone fermée du calque « Sans fond » l'efface (une
 annulation par clic) ; décocher rend l'outil précédent.
+
+## Gang sheet
+
+DTF › Gang sheet… ouvre une fenêtre plein écran, toujours claire (quel que soit le thème), sur le
+modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
+
+- **En-tête** : Annuler, Exporter le PNG… (ou Exporter les planches quand il y en a plusieurs).
+- **Barre d'outils** : format de la planche (laize × longueur), annuler / rétablir, grille, marge
+  de l'image, outils du visuel sélectionné (rotation 90° dans les deux sens, retournement
+  horizontal et vertical, étirement à la laize ou à la longueur, centrage horizontal, vertical ou
+  sur la planche, pousser à gauche, à droite, en haut, en bas, supprimer) et Construction auto.
+- **Accueil** (colonne de gauche) : zone d'import (« Importer des images », PNG uniquement, ou
+  fichiers glissés sur la fenêtre ; « Ajouter le document ouvert », aplati). Chaque visuel est
+  rogné à ses pixels visibles et apparaît en vignette avec son nombre d'exemplaires sur la planche
+  (clic : un exemplaire de plus ; × : retirer le visuel). Le visuel sélectionné se règle :
+  largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
+  d'images sur la planche, marge propre (interrupteur), Remplissage automatique (remplit la place
+  restante), Dupliquer l'image.
+- **Paramètres** : lignes de résolution, lignes en chevauchement, alignement automatique pendant
+  le déplacement, avertissement sur l'arrière-plan (coins opaques : fond non détouré),
+  avertissement de transparence (plus de 0,5 % de pixels semi-transparents), grille 1 cm, fond de
+  la planche (damier, gris, noir, blanc, couleur au choix), marge du plan de travail (le long des
+  bords, 1 cm par défaut), marge de l'image (entre les visuels, 1 cm par défaut), laize (56 cm par
+  défaut), longueur max (100 cm au plus), rotation autorisée pour la construction auto. Ces
+  réglages sont repris à l'ouverture suivante.
+- **Planche** : règles en cm, carte en haut à gauche (afficher les lignes en chevauchement et de
+  résolution, légende, et pour le visuel survolé ou sélectionné : position gauche / haut, largeur,
+  hauteur, résolution, avertissements). Contours : vert ≥ 300 ppp, jaune ≥ 250, rouge ≥ 200, noir
+  en dessous ; bleu pour un visuel en chevauchement ou trop proche. Molette : défilement ;
+  Ctrl + molette : zoom ; boutons de zoom en bas à droite.
+- **Déplacement** : glisser au millimètre ; le visuel reste sur le film, marge du plan de travail
+  comprise. Lâché à moins de la marge d'un autre visuel (la plus grande des deux marges), il revient
+  à sa place. Flèches : 1 mm (Maj : 1 cm) ; Suppr, Ctrl+C / Ctrl+V, Ctrl+D, Ctrl+Z / Ctrl+Y ; clic
+  droit : copier, coller, supprimer, dupliquer, remplissage automatique, rotation.
+- **Gang sheets actives** (colonne de droite) : une carte par planche (format, nom modifiable,
+  nombre d'images, quantité à imprimer, dupliquer, supprimer) ; Ajouter une nouvelle planche,
+  Construction auto, Recommencer ; longueur utilisée.
+- **Construction auto** : tous les visuels avec largeur, hauteur, verrou des proportions,
+  résolution et nombre d'exemplaires (dupliquer : même image, autre taille) ; marges et rotation ;
+  Appliquer replace tout, les plus grands d'abord, et ouvre une nouvelle planche quand une est
+  pleine.
+- **Export** : chaque planche avec des visuels est rendue à 300 ppp (laize × longueur utilisée,
+  un calque par visuel), enregistrée en PNG (résolution inscrite) et ouverte comme nouveau
+  document. Plusieurs planches : « nom 1.png », « nom 2.png »… ; une quantité supérieure à 1 est
+  ajoutée au nom (« x3 »). Les visuels trop proches ou hors du film sont signalés avant l'export.
+
+La commande `dtf.gangSheet` fait le même travail sans fenêtre (actions, ligne de commande) : avec
+`sources` seulement, elle construit la planche elle-même ; avec `placements` (position, rotation,
+retournements), elle reprend la mise en place donnée. Marges : `edgeMargin` (bords) et `spacing`
+(entre visuels), en mm ; `marginMm` par visuel.
 
 ## Agrandissement IA
 

@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Design system: themes, colour tokens, radii, typography.
 //!
 //! - **Studio**: near-black surfaces, rounded cards, Inter + JetBrains Mono, soft violet
@@ -975,7 +977,12 @@ pub fn apply(ctx: &egui::Context, kind: ThemeKind) {
     // Keep native windows at SystemDefault so macOS continues reporting OS appearance changes,
     // including when an integration or restored egui state pinned its own theme preference.
     ctx.set_theme(egui::ThemePreference::System);
-    let t = Tokens::for_kind(kind);
+    apply_tokens(ctx, Tokens::for_kind(kind));
+}
+
+/// What [`apply`] installs, for a given set of tokens (DTF Craft: the Gang Sheet window draws
+/// with its own light tokens, see `gang_sheet_ui::light_scope`).
+pub(crate) fn apply_tokens(ctx: &egui::Context, t: Tokens) {
     ctx.data_mut(|d| d.insert_temp(egui::Id::new("photocraft-theme"), t));
     let mut v = if t.dark() { Visuals::dark() } else { Visuals::light() };
     v.panel_fill = t.chrome;
