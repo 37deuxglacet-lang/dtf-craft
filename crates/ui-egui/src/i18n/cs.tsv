@@ -3915,3 +3915,8 @@ navigator	Zoom	Zvětšení
 	SVG saved: {path}	SVG uloženo: {path}
 	No visible pixels to vectorize.	Žádné viditelné pixely k vektorizaci.
 	Nothing to export: every color is left out.	Není co exportovat: všechny barvy jsou vynechány.
+	Low Detail	Nízká
+	Medium Detail	Střední
+	High Detail	Vysoká
+	Close the Seams between Colors	Uzavřít spáry mezi barvami
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Každý tvar přesahuje sousední o půl pixelu, aby se při tisku mezi dvěma barvami neobjevila průhledná linka. Zrušte zaškrtnutí pro přesně vyříznuté tvary (řezací plotr).

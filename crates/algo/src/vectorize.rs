@@ -578,9 +578,22 @@ pub enum SvgSize {
     Px(f64, f64),
 }
 
-/// The SVG document: one `<path>` per colour, named by its colour. With `outline`, the shapes'
-/// contours only (the preview's "Show contours"), `outline` px wide.
-pub fn svg(t: &Traced, palette: &[PaletteColor], size: SvgSize, outline: Option<f64>) -> String {
+/// How the shapes are painted.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Style {
+    /// Filled with their colour. With `seal`, each shape also gets a stroke of its own colour
+    /// [`SEAM`] px wide, so it overlaps its neighbours by half a pixel: the curves of two
+    /// colours that touch, smoothed each on its own, leave no transparent hairline between them.
+    Fill { seal: bool },
+    /// The contours only (the preview's "Show contours"), this many px wide.
+    Contours(f64),
+}
+
+/// The stroke that closes the seams between colours, in traced px.
+pub const SEAM: f64 = 1.0;
+
+/// The SVG document: one `<path>` per colour, named by its colour.
+pub fn svg(t: &Traced, palette: &[PaletteColor], size: SvgSize, style: Style) -> String {
     let (w, h) = match size {
         SvgSize::Mm(w, h) if w.is_finite() && h.is_finite() && w > 0.0 && h > 0.0 => (format!("{}mm", num(w)), format!("{}mm", num(h))),
         SvgSize::Px(w, h) if w.is_finite() && h.is_finite() && w > 0.0 && h > 0.0 => (num(w), num(h)),
@@ -596,13 +609,18 @@ pub fn svg(t: &Traced, palette: &[PaletteColor], size: SvgSize, outline: Option<
         let Some(c) = palette.get(p.color) else { continue };
         let colour = hex(c.rgb);
         let id = format!("couleur-{}", colour.trim_start_matches('#'));
-        match outline {
-            Some(width) => out.push_str(&format!(
+        match style {
+            Style::Contours(width) => out.push_str(&format!(
                 "<path id=\"{id}\" d=\"{}\" fill=\"none\" stroke=\"#FF2FA0\" stroke-width=\"{}\" stroke-linejoin=\"round\"/>\n",
                 p.d,
                 num(width)
             )),
-            None => out.push_str(&format!("<path id=\"{id}\" d=\"{}\" fill=\"{colour}\"/>\n", p.d)),
+            Style::Fill { seal: true } => out.push_str(&format!(
+                "<path id=\"{id}\" d=\"{}\" fill=\"{colour}\" stroke=\"{colour}\" stroke-width=\"{}\" stroke-linejoin=\"round\"/>\n",
+                p.d,
+                num(SEAM)
+            )),
+            Style::Fill { seal: false } => out.push_str(&format!("<path id=\"{id}\" d=\"{}\" fill=\"{colour}\"/>\n", p.d)),
         }
     }
     out.push_str("</svg>\n");
@@ -681,12 +699,16 @@ mod tests {
         let q = quantize(100, 80, &logo(), &Settings::default()).unwrap();
         let o = TraceOptions { detail: Detail::High, smoothing: Smoothing::Curves, remove_background: true, excluded: vec![] };
         let t = q.trace(&o).unwrap();
-        let s = svg(&t, &q.palette, SvgSize::Mm(16.93, 13.55), None);
+        let s = svg(&t, &q.palette, SvgSize::Mm(16.93, 13.55), Style::Fill { seal: false });
         assert!(s.contains("width=\"16.93mm\" height=\"13.55mm\" viewBox=\"0 0 100 80\""), "{s}");
         assert_eq!(s.matches("<path ").count(), 3);
         assert!(s.contains("id=\"couleur-1F4FB5\"") && s.contains("fill=\"#E4572E\""));
-        let outline = svg(&t, &q.palette, SvgSize::Px(200.0, 160.0), Some(1.5));
+        let outline = svg(&t, &q.palette, SvgSize::Px(200.0, 160.0), Style::Contours(1.5));
         assert!(outline.contains("width=\"200\"") && outline.contains("fill=\"none\"") && outline.contains("stroke-width=\"1.5\""));
+        assert!(!s.contains("stroke"), "strictly cut out: {s}");
+        // Sealed: each shape strokes its own colour, half a pixel over its neighbours.
+        let sealed = svg(&t, &q.palette, SvgSize::Mm(16.93, 13.55), Style::Fill { seal: true });
+        assert!(sealed.contains("fill=\"#E4572E\" stroke=\"#E4572E\" stroke-width=\"1\""), "{sealed}");
     }
 
     #[test]
@@ -764,7 +786,7 @@ mod tests {
         let o = TraceOptions { detail: Detail::Medium, smoothing: Smoothing::Curves, remove_background: true, excluded: vec![] };
         let t = q.trace(&o).unwrap();
         let t2 = std::time::Instant::now();
-        let s = svg(&t, &q.palette, SvgSize::Mm(211.67, 211.67), None);
+        let s = svg(&t, &q.palette, SvgSize::Mm(211.67, 211.67), Style::Fill { seal: true });
         println!("palette {} · quantize {:?} · trace {:?} · {} shapes, {} points, SVG {} KB", q.palette.len(), t1 - t0, t2 - t1, t.shapes(), t.points(), s.len() / 1024);
     }
 

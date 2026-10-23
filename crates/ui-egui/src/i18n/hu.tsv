@@ -4227,3 +4227,8 @@ cameraRaw	Yellow	Sárga
 	SVG saved: {path}	SVG mentve: {path}
 	No visible pixels to vectorize.	Nincs vektorizálható látható képpont.
 	Nothing to export: every color is left out.	Nincs mit exportálni: minden szín ki van hagyva.
+	Low Detail	Alacsony
+	Medium Detail	Közepes
+	High Detail	Magas
+	Close the Seams between Colors	Színek közötti illesztések lezárása
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Minden alakzat fél képponttal átfedi a szomszédait, így nyomtatáskor nem jelenik meg átlátszó hajszálvonal két szín között. Kapcsolja ki a pontosan kivágott alakzatokhoz (vágóplotter).

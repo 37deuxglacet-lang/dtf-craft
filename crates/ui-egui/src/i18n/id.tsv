@@ -3303,3 +3303,8 @@ curves	Smooth	Haluskan
 	SVG saved: {path}	SVG disimpan: {path}
 	No visible pixels to vectorize.	Tidak ada piksel terlihat untuk divektorisasi.
 	Nothing to export: every color is left out.	Tidak ada yang diekspor: semua warna dikeluarkan.
+	Low Detail	Rendah
+	Medium Detail	Sedang
+	High Detail	Tinggi
+	Close the Seams between Colors	Tutup Sambungan antar Warna
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Setiap bentuk menumpuk setengah piksel pada tetangganya, sehingga tidak ada garis tipis transparan di antara dua warna saat dicetak. Hapus centang untuk bentuk yang terpotong persis (plotter pemotong).

@@ -3279,3 +3279,8 @@ curves	Smooth	Сгладить
 	SVG saved: {path}	SVG сохранён: {path}
 	No visible pixels to vectorize.	Нет видимых пикселей для векторизации.
 	Nothing to export: every color is left out.	Нечего экспортировать: все цвета исключены.
+	Low Detail	Низкий
+	Medium Detail	Средний
+	High Detail	Высокий
+	Close the Seams between Colors	Закрыть стыки между цветами
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Каждая фигура заходит на соседние на полпикселя, чтобы при печати между двумя цветами не появлялась прозрачная линия. Снимите флажок для строго вырезанных фигур (режущий плоттер).

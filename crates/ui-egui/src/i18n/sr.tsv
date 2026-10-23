@@ -4381,3 +4381,8 @@ shape	Appearance	Izgled
 	SVG saved: {path}	SVG sačuvan: {path}
 	No visible pixels to vectorize.	Nema vidljivih piksela za vektorizaciju.
 	Nothing to export: every color is left out.	Nema šta da se izveze: sve boje su izostavljene.
+	Low Detail	Nizak
+	Medium Detail	Srednji
+	High Detail	Visok
+	Close the Seams between Colors	Zatvori spojeve između boja
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Svaki oblik prelazi preko susednih za pola piksela, da se pri štampi ne pojavi providna linija između dve boje. Isključite za strogo isečene oblike (ploter za sečenje).

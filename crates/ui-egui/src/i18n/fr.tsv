@@ -3339,3 +3339,8 @@ curves	Smooth	Lisser
 	SVG saved: {path}	SVG enregistré : {path}
 	No visible pixels to vectorize.	Aucun pixel visible à vectoriser.
 	Nothing to export: every color is left out.	Rien à exporter : toutes les couleurs sont retirées.
+	Low Detail	Faible
+	Medium Detail	Moyen
+	High Detail	Élevé
+	Close the Seams between Colors	Fermer les joints entre couleurs
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Chaque forme déborde d'un demi-pixel sur ses voisines : aucun liseré transparent n'apparaît entre deux couleurs à l'impression. Décochez pour des formes strictement découpées (traceur de découpe).

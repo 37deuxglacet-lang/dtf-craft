@@ -4096,3 +4096,8 @@ layerLabel	No Color	Sem cor
 	SVG saved: {path}	SVG salvo: {path}
 	No visible pixels to vectorize.	Nenhum pixel visível para vetorizar.
 	Nothing to export: every color is left out.	Nada a exportar: todas as cores foram excluídas.
+	Low Detail	Baixo
+	Medium Detail	Médio
+	High Detail	Alto
+	Close the Seams between Colors	Fechar as junções entre cores
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Cada forma se sobrepõe meio pixel às vizinhas, para que nenhuma linha transparente apareça entre duas cores na impressão. Desmarque para formas estritamente recortadas (plotter de recorte).

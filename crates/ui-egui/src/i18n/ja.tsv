@@ -3985,3 +3985,8 @@ curves	Smooth	スムーズ
 	SVG saved: {path}	SVG を保存しました：{path}
 	No visible pixels to vectorize.	ベクトル化する表示ピクセルがありません。
 	Nothing to export: every color is left out.	書き出すものがありません：すべての色が除外されています。
+	Low Detail	低
+	Medium Detail	中
+	High Detail	高
+	Close the Seams between Colors	色の境目を閉じる
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	各図形が隣の図形に半ピクセル重なり、印刷時に 2 色の間に透明な細線が出ないようにします。厳密な切り抜き図形（カッティングプロッター用）にするにはオフにします。

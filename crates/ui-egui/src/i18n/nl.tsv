@@ -4066,3 +4066,8 @@ curves	Smooth	Vloeiend maken
 	SVG saved: {path}	SVG opgeslagen: {path}
 	No visible pixels to vectorize.	Geen zichtbare pixels om te vectoriseren.
 	Nothing to export: every color is left out.	Niets te exporteren: alle kleuren zijn weggelaten.
+	Low Detail	Laag
+	Medium Detail	Gemiddeld
+	High Detail	Hoog
+	Close the Seams between Colors	Naden tussen kleuren dichten
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Elke vorm overlapt zijn buren met een halve pixel, zodat bij het afdrukken geen transparante haarlijn tussen twee kleuren verschijnt. Uitvinken voor strikt uitgesneden vormen (snijplotter).

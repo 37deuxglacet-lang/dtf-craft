@@ -4269,3 +4269,8 @@ navigator	Zoom	Zoom
 	SVG saved: {path}	SVG salvato: {path}
 	No visible pixels to vectorize.	Nessun pixel visibile da vettorializzare.
 	Nothing to export: every color is left out.	Niente da esportare: tutti i colori sono esclusi.
+	Low Detail	Basso
+	Medium Detail	Medio
+	High Detail	Alto
+	Close the Seams between Colors	Chiudi le giunture tra i colori
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Ogni forma si sovrappone di mezzo pixel alle vicine, così in stampa non appare alcuna linea trasparente tra due colori. Deseleziona per forme rigorosamente ritagliate (plotter da taglio).

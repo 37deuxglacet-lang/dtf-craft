@@ -4038,3 +4038,8 @@ cameraData	Lens	Lens
 	SVG saved: {path}	SVG kaydedildi: {path}
 	No visible pixels to vectorize.	Vektörleştirilecek görünür piksel yok.
 	Nothing to export: every color is left out.	Dışa aktarılacak bir şey yok: tüm renkler hariç tutuldu.
+	Low Detail	Düşük
+	Medium Detail	Orta
+	High Detail	Yüksek
+	Close the Seams between Colors	Renkler Arasındaki Ekleri Kapat
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Her şekil komşularıyla yarım piksel örtüşür; böylece baskıda iki renk arasında saydam kıl çizgisi görünmez. Tam kesilmiş şekiller için işareti kaldırın (kesim plotteri).

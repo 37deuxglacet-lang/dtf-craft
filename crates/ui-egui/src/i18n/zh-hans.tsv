@@ -2930,3 +2930,8 @@ curves	Smooth	平滑
 	High	高
 	Low	低
 	Settings	设置
+	Low Detail	低
+	Medium Detail	中
+	High Detail	高
+	Close the Seams between Colors	闭合颜色间的接缝
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	每个形状与相邻形状重叠半个像素，打印时两种颜色之间不会出现透明细线。取消勾选可得到严格切割的形状（刻字机）。

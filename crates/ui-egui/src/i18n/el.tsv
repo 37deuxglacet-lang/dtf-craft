@@ -4006,3 +4006,8 @@ curves	Smooth	Εξομάλυνση
 	SVG saved: {path}	Το SVG αποθηκεύτηκε: {path}
 	No visible pixels to vectorize.	Δεν υπάρχουν ορατά pixel για διανυσματοποίηση.
 	Nothing to export: every color is left out.	Τίποτα για εξαγωγή: όλα τα χρώματα εξαιρούνται.
+	Low Detail	Χαμηλό
+	Medium Detail	Μεσαίο
+	High Detail	Υψηλό
+	Close the Seams between Colors	Κλείσιμο ενώσεων μεταξύ χρωμάτων
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Κάθε σχήμα επικαλύπτει τα γειτονικά κατά μισό pixel, ώστε να μην εμφανίζεται διαφανής γραμμή ανάμεσα σε δύο χρώματα στην εκτύπωση. Απενεργοποιήστε για αυστηρά αποκομμένα σχήματα (plotter κοπής).

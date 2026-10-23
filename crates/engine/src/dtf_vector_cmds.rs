@@ -9,7 +9,7 @@
 //!
 //! RGB values are read as sRGB; other colour modes are converted to RGB first.
 
-use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Settings, Smoothing, SvgSize, TraceOptions, Traced};
+use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Settings, Smoothing, Style, SvgSize, TraceOptions, Traced};
 use photocraft_doc::Document;
 use serde_json::{Value, json};
 
@@ -136,9 +136,17 @@ pub fn result_name(doc_name: &str, path: Option<&str>) -> (String, String) {
     (name, hint)
 }
 
+/// `sealSeams` (default true): each shape overlaps its neighbours by half a pixel.
+pub fn seal_param(p: &Value) -> Result<bool> {
+    match p.get("sealSeams").filter(|v| !v.is_null()) {
+        None => Ok(true),
+        Some(v) => v.as_bool().ok_or_else(|| bad("`sealSeams` must be true or false")),
+    }
+}
+
 /// Opens `t` in a new tab: shape layers at the document's pixel size and resolution.
-pub fn open_traced(s: &mut Session, t: &Traced, q: &Quantized, name: &str, size_px: (u32, u32), dpi: f64) -> Result<usize> {
-    let svg = vectorize::svg(t, &q.palette, SvgSize::Px(f64::from(size_px.0), f64::from(size_px.1)), None);
+pub fn open_traced(s: &mut Session, t: &Traced, q: &Quantized, name: &str, size_px: (u32, u32), dpi: f64, seal: bool) -> Result<usize> {
+    let svg = vectorize::svg(t, &q.palette, SvgSize::Px(f64::from(size_px.0), f64::from(size_px.1)), Style::Fill { seal });
     let r = photocraft_io::import(&format!("{name}.svg"), svg.as_bytes()).map_err(|e| EngineError::Other(format!("{name}: {e}")))?;
     let mut doc = r.document;
     doc.name = name.to_string();
@@ -159,8 +167,9 @@ fn run(s: &mut Session, p: &Value) -> Result<Value> {
     let (w, h, px) = visual_pixels(&st.doc)?;
     let q = vectorize::quantize(w as usize, h as usize, &px, &settings).map_err(bad)?;
     let o = trace_param(p, &q)?;
+    let seal = seal_param(p)?;
     let t = q.trace(&o).map_err(EngineError::Other)?;
-    let svg = vectorize::svg(&t, &q.palette, SvgSize::Mm(mm.0, mm.1), None);
+    let svg = vectorize::svg(&t, &q.palette, SvgSize::Mm(mm.0, mm.1), Style::Fill { seal });
     let mut out = json!({
         "width": t.width,
         "height": t.height,
@@ -180,7 +189,7 @@ fn run(s: &mut Session, p: &Value) -> Result<Value> {
         None => out["svg"] = json!(svg),
     }
     if open {
-        out["document"] = json!(open_traced(s, &t, &q, &name, size, dpi)?);
+        out["document"] = json!(open_traced(s, &t, &q, &name, size, dpi, seal)?);
         out["name"] = json!(name);
     }
     Ok(out)
@@ -192,7 +201,7 @@ pub fn specs() -> Vec<CommandSpec> {
         label: "Vectorization…",
         menu: &["DTF"],
         shortcut: None,
-        params: r##"{"colors":2..32=8,"kind":logo|illustration=logo (logo: colours read in the flat areas, close ones grouped),"detail":low|medium|high=medium (smallest area kept, closeness of the curves),"smoothing":curves|corners=curves,"removeBackground":bool=true (the colour on the visual's edge, where it touches the edge; the same colour inside stays),"exclude":json (optional #rrggbb palette colours left out of the SVG),"path":str (optional; the SVG is written there, else returned as "svg"),"open":bool=false (open the result in a new tab, as shape layers at the document's size and resolution)} → {width,height (px traced),widthMm,heightMm,palette:[{hex,rgb,share (%),background,excluded,inSvg}],colors,shapes,points,svg|path,document?,name?}. Cut-out shapes, one flat colour each, no shape over another; the SVG has the document's print size. The document is not changed. The app opens the full-screen Vectorization module"##,
+        params: r##"{"colors":2..32=8,"kind":logo|illustration=logo (logo: colours read in the flat areas, close ones grouped),"detail":low|medium|high=medium (smallest area kept, closeness of the curves),"smoothing":curves|corners=curves,"removeBackground":bool=true (the colour on the visual's edge, where it touches the edge; the same colour inside stays),"exclude":json (optional #rrggbb palette colours left out of the SVG),"sealSeams":bool=true (each shape overlaps its neighbours by half a pixel, so no transparent hairline shows between two colours; false: strictly cut out),"path":str (optional; the SVG is written there, else returned as "svg"),"open":bool=false (open the result in a new tab, as shape layers at the document's size and resolution)} → {width,height (px traced),widthMm,heightMm,palette:[{hex,rgb,share (%),background,excluded,inSvg}],colors,shapes,points,svg|path,document?,name?}. Cut-out shapes, one flat colour each, no shape over another; the SVG has the document's print size. The document is not changed. The app opens the full-screen Vectorization module"##,
         enabled: has_doc,
         run,
         journal: true,
@@ -243,6 +252,9 @@ mod tests {
         assert_eq!(r["shapes"], 3);
         let svg = r["svg"].as_str().unwrap();
         assert!(svg.contains("width=\"10mm\" height=\"6mm\" viewBox=\"0 0 100 60\""), "{svg}");
+        assert!(svg.contains("stroke-width=\"1\""), "seams closed by default");
+        let cut = s.execute(VECTORIZE, json!({"sealSeams": false})).unwrap();
+        assert!(!cut["svg"].as_str().unwrap().contains("stroke"));
         assert_eq!(s.active().unwrap().revision, revision, "the document is left alone");
         assert_eq!(s.documents().len(), 1);
         // White left out: two colours.
@@ -298,6 +310,7 @@ mod tests {
             json!({"removeBackground": "yes"}),
             json!({"open": 1}),
             json!({"path": 5}),
+            json!({"sealSeams": "no"}),
             json!({"colors": 1e300}),
             json!({"colors": -4}),
         ] {

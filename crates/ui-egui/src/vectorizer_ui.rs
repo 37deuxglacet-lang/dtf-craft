@@ -12,7 +12,7 @@
 use std::collections::HashSet;
 
 use egui::{Align2, Color32, FontId, Rect, RichText, Sense, Stroke, pos2, vec2};
-use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Smoothing, SvgSize, TraceOptions, Traced};
+use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Smoothing, Style, SvgSize, TraceOptions, Traced};
 use photocraft_engine::dtf_vector_cmds as cmds;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -45,6 +45,8 @@ pub struct Settings {
     pub detail: Detail,
     pub smoothing: Smoothing,
     pub remove_background: bool,
+    /// Each shape overlaps its neighbours by half a pixel (no transparent hairline at the seams).
+    pub seal: bool,
     /// Open the exported SVG in a new tab, as shape layers.
     pub open_after: bool,
     pub contours: bool,
@@ -59,6 +61,7 @@ impl Default for Settings {
             detail: Detail::Medium,
             smoothing: Smoothing::Curves,
             remove_background: true,
+            seal: true,
             open_after: true,
             contours: false,
             checker: true,
@@ -124,9 +127,13 @@ fn rgba8(px: &[[f32; 4]]) -> Vec<u8> {
     px.iter().flat_map(|q| [to8(q[0]), to8(q[1]), to8(q[2]), to8(q[3])]).collect()
 }
 
-/// `12,5` in French, `12.5` in English: one decimal, trailing zero dropped.
+/// `12,5` in French, `12.5` in English: one decimal, `150` rather than `150,0`.
 fn decimal(v: f64) -> String {
-    crate::color_sheet::decimal(v, 1)
+    let s = crate::color_sheet::decimal(v, 1);
+    match s.strip_suffix(",0").or_else(|| s.strip_suffix(".0")) {
+        Some(whole) => whole.to_string(),
+        None => s,
+    }
 }
 
 impl Vectorizer {
@@ -277,13 +284,13 @@ impl Vectorizer {
             .map(|q| q.palette.iter().map(|c| vectorize::hex(c.rgb)).filter(|h| self.excluded.contains(h)).collect())
             .unwrap_or_default();
         exclude.sort();
-        json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "exclude": exclude})
+        json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "sealSeams": s.seal, "exclude": exclude})
     }
 
     /// The SVG as it is exported (print size in mm).
     pub fn svg(&self) -> Option<String> {
         let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
-        Some(vectorize::svg(t, &q.palette, SvgSize::Mm(self.size_mm.0, self.size_mm.1), None))
+        Some(vectorize::svg(t, &q.palette, SvgSize::Mm(self.size_mm.0, self.size_mm.1), Style::Fill { seal: self.settings.seal }))
     }
 
     /// The scale of the vectorized preview against the traced copy.
@@ -295,8 +302,8 @@ impl Vectorizer {
     fn render(&self, contours: bool) -> Option<egui::ColorImage> {
         let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
         let k = self.preview_scale();
-        let outline = contours.then(|| f64::from(CONTOUR_PX / k));
-        let svg = vectorize::svg(t, &q.palette, SvgSize::Px(self.w as f64, self.h as f64), outline);
+        let style = if contours { Style::Contours(f64::from(CONTOUR_PX / k)) } else { Style::Fill { seal: self.settings.seal } };
+        let svg = vectorize::svg(t, &q.palette, SvgSize::Px(self.w as f64, self.h as f64), style);
         let buf = photocraft_io::svg::rasterize(svg.as_bytes(), k).ok()?;
         let (w, h) = (buf.rect.width() as usize, buf.rect.height() as usize);
         (w * h == buf.px.len() && w > 0 && h > 0).then(|| egui::ColorImage::from_rgba_unmultiplied([w, h], &rgba8(&buf.px)))
@@ -477,15 +484,7 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
     let galley = painter.layout_no_wrap(tl!("Vectorization").to_string(), crate::theme::semibold(15.0), t.text);
     let title_w = galley.size().x;
     painter.galley(pos2(title.left() + 16.0, title.center().y - galley.size().y / 2.0), galley, t.text);
-    let info = format!(
-        "{} · {} · {} × {} px · {} ppi · {}",
-        v.name,
-        v.mode,
-        v.size.0,
-        v.size.1,
-        decimal(v.dpi),
-        tl!("the document is not modified")
-    );
+    let info = format!("{} · {} · {} × {} px · {}", v.name, v.mode, v.size.0, v.size.1, tl!("the document is not modified"));
     painter.text(pos2(title.left() + 32.0 + title_w, title.center().y), Align2::LEFT_CENTER, info, FontId::proportional(12.5), t.text_dim);
     let footer_h = 56.0;
     let body = Rect::from_min_max(pos2(full.left(), title.bottom()), pos2(full.right(), full.bottom() - footer_h));
@@ -664,7 +663,7 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) {
         }
         ui.end_row();
         ui.label(tl!("Detail Level"));
-        if choice(ui, &mut v.settings.detail, &[(Detail::Low, tl!("Low")), (Detail::Medium, tl!("Medium")), (Detail::High, tl!("High"))]) {
+        if choice(ui, &mut v.settings.detail, &[(Detail::Low, tl!("Low Detail")), (Detail::Medium, tl!("Medium Detail")), (Detail::High, tl!("High Detail"))]) {
             redo = Redo::Quantize;
         }
         ui.end_row();
@@ -690,6 +689,13 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) {
     });
     if background.is_none() {
         ui.label(RichText::new(tl!("No background found: the visual is already cut out.")).small().color(t.text_faint));
+    }
+    let seal = ui
+        .checkbox(&mut v.settings.seal, tl!("Close the Seams between Colors"))
+        .on_hover_text(tl!("Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter)."));
+    if seal.changed() {
+        // Only the drawing changes: the shapes stay.
+        v.revision += 1;
     }
     v.redo(redo);
     palette_ui(ui, v, &section);
@@ -865,6 +871,32 @@ mod tests {
         assert!(lines.pixels.iter().any(|p| p.a() > 0));
     }
 
+    /// Two colours meeting on a wavy line, the whole image covered: sealed, no pixel inside is
+    /// transparent.
+    #[test]
+    fn sealed_seams_leave_no_transparent_hairline() {
+        let (w, h) = (90usize, 60usize);
+        let mut px = Vec::with_capacity(w * h);
+        for y in 0..h {
+            for x in 0..w {
+                let wave = 30.0 + 9.0 * (x as f32 / 9.0).sin();
+                let c = if (y as f32 + 0.5) < wave { ORANGE } else { BLUE };
+                px.push([c[0], c[1], c[2], 1.0]);
+            }
+        }
+        let settings = Settings { remove_background: false, ..Settings::default() };
+        let mut v = Vectorizer::new(photocraft_doc::DocId::fresh(), "vague.png", None, (w as u32, h as u32), 300.0, (7.62, 5.08), "RVB 8 bits".into(), &px, settings);
+        let holes = |img: &egui::ColorImage| {
+            let [iw, ih] = img.size;
+            // Inside only: the outer edge is antialiased whatever the seams.
+            (8..ih - 8).flat_map(|y| (8..iw - 8).map(move |x| (x, y))).filter(|(x, y)| img.pixels[y * iw + x].a() < 250).count()
+        };
+        assert_eq!(holes(&v.render(false).unwrap()), 0, "sealed");
+        v.settings.seal = false;
+        assert!(!v.svg().unwrap().contains("stroke"));
+        assert_eq!(v.params()["sealSeams"], false);
+    }
+
     #[test]
     fn the_export_writes_the_svg_and_opens_it_in_a_new_tab() {
         let (mut app, written) = app();
@@ -910,6 +942,55 @@ mod tests {
         app.run("file.new", json!({"width": 10, "height": 10, "background": "transparent"})).unwrap();
         assert!(open(&mut app).is_err());
         assert!(app.vectorizer.is_none());
+    }
+
+    /// A screenshot of the module in French on an antialiased logo (`DTF_VISUALS=<folder>`).
+    #[test]
+    fn capture_vectorizer() {
+        let Some(dir) = std::env::var_os("DTF_VISUALS").map(std::path::PathBuf::from) else { return };
+        std::fs::create_dir_all(&dir).unwrap();
+        let _fr = crate::i18n::language_scope(crate::i18n::Lang::from_pref("fr"));
+        let mut session = photocraft_engine::Session::new();
+        session.execute("file.new", json!({"width": 600, "height": 600, "resolution": 150, "background": "white", "name": "logo-client.png"})).unwrap();
+        session
+            .edit("Logo", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                let rgb = |h: u32| [((h >> 16) & 255) as f32 / 255.0, ((h >> 8) & 255) as f32 / 255.0, (h & 255) as f32 / 255.0];
+                let mix = |a: [f32; 3], b: [f32; 3], k: f32| [0, 1, 2].map(|i| a[i] + (b[i] - a[i]) * k);
+                let cover = |edge: f32| (edge + 0.5).clamp(0.0, 1.0);
+                for y in 0..600 {
+                    for x in 0..600 {
+                        let (fx, fy) = (x as f32 + 0.5, y as f32 + 0.5);
+                        let d = ((fx - 300.0).powi(2) + (fy - 300.0).powi(2)).sqrt();
+                        let sun = ((fx - 300.0).powi(2) + (fy - 240.0).powi(2)).sqrt();
+                        let wave = 360.0 + 18.0 * (fx / 55.0).sin();
+                        let mut c = rgb(0xFFFFFF);
+                        c = mix(c, rgb(0x14264F), cover(280.0 - d));
+                        c = mix(c, rgb(0x8FC1E3), cover(250.0 - d));
+                        c = mix(c, rgb(0xF2C14E), cover(75.0 - sun) * cover(250.0 - d));
+                        c = mix(c, rgb(0x1F4FB5), cover(fy - wave) * cover(250.0 - d));
+                        c = mix(c, rgb(0xE4572E), cover(14.0 - (fy - wave).abs()) * cover(250.0 - d));
+                        surf.write_pixel(x, y, &[c[0], c[1], c[2], 1.0]);
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, 900.0)).wgpu().build_eframe(move |cc| {
+            PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
+            PhotocraftApp::new(session, crate::Services::default())
+        });
+        h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());
+        h.run_steps(4);
+        h.state_mut().ui.dtf_panel.beta_notice = false;
+        open(h.state_mut()).unwrap();
+        h.state_mut().vectorizer.as_mut().unwrap().settings.contours = false;
+        h.run_steps(6);
+        h.render().unwrap().save(dir.join("vectorisation.png")).unwrap();
+        h.state_mut().vectorizer.as_mut().unwrap().settings.contours = true;
+        h.state_mut().vectorizer.as_mut().unwrap().view = View::Vectorized;
+        h.run_steps(6);
+        h.render().unwrap().save(dir.join("vectorisation_contours.png")).unwrap();
     }
 
     #[test]

@@ -3314,3 +3314,8 @@ curves	Smooth	Glätten
 	No visible pixels to vectorize.	Keine sichtbaren Pixel zum Vektorisieren.
 	Nothing to export: every color is left out.	Nichts zu exportieren: Alle Farben sind ausgeschlossen.
 	Settings	Einstellungen
+	Low Detail	Gering
+	Medium Detail	Mittel
+	High Detail	Hoch
+	Close the Seams between Colors	Fugen zwischen Farben schließen
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Jede Form überlappt ihre Nachbarn um einen halben Pixel, damit beim Druck keine transparente Haarlinie zwischen zwei Farben entsteht. Deaktivieren für streng ausgeschnittene Formen (Schneideplotter).

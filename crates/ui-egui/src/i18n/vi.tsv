@@ -3795,3 +3795,8 @@ curves	Smooth	Làm mượt
 	SVG saved: {path}	Đã lưu SVG: {path}
 	No visible pixels to vectorize.	Không có điểm ảnh hiển thị để vector hóa.
 	Nothing to export: every color is left out.	Không có gì để xuất: mọi màu đều bị loại.
+	Low Detail	Thấp
+	Medium Detail	Trung bình
+	High Detail	Cao
+	Close the Seams between Colors	Khép kín mối nối giữa các màu
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Mỗi hình chồng lên hình kế bên nửa điểm ảnh, để khi in không xuất hiện đường mảnh trong suốt giữa hai màu. Bỏ chọn để có hình cắt rời chính xác (máy cắt decal).

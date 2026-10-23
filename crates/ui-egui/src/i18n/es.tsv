@@ -3005,3 +3005,8 @@ curves	Smooth	Suavizar
 	High	Alto
 	Low	Bajo
 	Settings	Ajustes
+	Low Detail	Bajo
+	Medium Detail	Medio
+	High Detail	Alto
+	Close the Seams between Colors	Cerrar las juntas entre colores
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Cada forma se superpone medio píxel a sus vecinas, para que no aparezca ninguna línea transparente entre dos colores al imprimir. Desmarque para formas estrictamente recortadas (plóter de corte).
