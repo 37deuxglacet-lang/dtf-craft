@@ -3283,3 +3283,73 @@ curves	Smooth	Haluskan
 	Open a document first	Buka dokumen terlebih dahulu
 	the document was closed	dokumen telah ditutup
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Lembar aktif
+	Add a New Sheet	Tambah lembar baru
+	Add a copy to the sheet	Tambah satu salinan ke lembar
+	Along the edges	Di sepanjang tepi
+	Auto Build May Rotate	Izinkan rotasi (otomatis)
+	Auto Build — every image at once	Susun otomatis — semua gambar sekaligus
+	Auto Fill	Isi otomatis
+	Background Warning:	Peringatan latar:
+	Background not removed (opaque corners)	Latar belum dihapus (sudut buram)
+	Between images	Antar gambar
+	Center Horizontally	Tengahkan horizontal
+	Center Vertically	Tengahkan vertikal
+	Center on the Sheet	Tengahkan di lembar
+	Copies of this sheet to print	Salinan lembar ini yang dicetak
+	Custom Color	Warna khusus
+	Delete (Del)	Hapus (Del)
+	Delete the Sheet	Hapus lembar
+	Drag and drop a file here or click to	Seret file ke sini atau klik untuk
+	Duplicate Image	Duplikat gambar
+	Export Sheets (PNG)…	Ekspor lembar (PNG)…
+	Fill the room left on the sheet with this visual	Isi ruang kosong lembar dengan desain ini
+	Flip Horizontally	Balik horizontal
+	Flip Vertically	Balik vertikal
+	Good	Baik
+	Good resolution >= 250 dpi	Resolusi baik >= 250 dpi
+	Grid (1 cm)	Kisi (1 cm)
+	Image Margin	Margin gambar
+	Import Images	Impor gambar
+	Lock Proportions	Kunci proporsi
+	Margin (cm)	Margin (cm)
+	No image yet: import PNG files or add the open document.	Belum ada gambar: impor file PNG atau tambahkan dokumen yang terbuka.
+	No room left on the sheet	Tidak ada ruang di lembar
+	Number of Images:	Jumlah gambar:
+	One copy less	Kurangi satu salinan
+	One copy more	Tambah satu salinan
+	Optimal	Optimal
+	Optimal resolution >= 300 dpi	Resolusi optimal >= 300 dpi
+	Overlap Lines	Garis tumpang tindih
+	Overlapping or too close	Tumpang tindih atau terlalu dekat
+	Poor	Buruk
+	Poor resolution >= 200 dpi	Resolusi buruk >= 200 dpi
+	Proportions:	Proporsi:
+	Push Down	Dorong ke bawah
+	Push Left	Dorong ke kiri
+	Push Right	Dorong ke kanan
+	Push Up	Dorong ke atas
+	Qty:	Jml:
+	Redo (Ctrl+Y)	Ulangi (Ctrl+Y)
+	Rotate 90° Counterclockwise	Putar 90° berlawanan arah jarum jam
+	Same image, another size	Gambar sama, ukuran lain
+	Select an object to edit.	Pilih objek untuk diedit.
+	Semi-transparent pixels: {p} %	Piksel semi-transparan: {p} %
+	Sheet Background	Latar lembar
+	Sheet Margin	Margin lembar
+	Show Overlap Lines	Tampilkan garis tumpang tindih
+	Show Resolution Lines	Tampilkan garis resolusi
+	Snap While Moving	Rapatkan saat memindah
+	Start Over	Mulai ulang
+	Stretch to the Film Width	Regangkan ke lebar film
+	Stretch to the Sheet Length	Regangkan ke panjang lembar
+	Supported format: PNG (cropped to its visible pixels)	Format didukung: PNG (dipangkas ke piksel yang terlihat)
+	Transparency Warning:	Peringatan transparansi:
+	Undo (Ctrl+Z)	Urungkan (Ctrl+Z)
+	Very Poor	Sangat buruk
+	Very poor resolution < 200 dpi	Resolusi sangat buruk < 200 dpi
+	With the image margin	Dengan margin gambar
+	With the sheet margin	Dengan margin lembar
+	copy	salinan
+	{n} images	{n} gambar

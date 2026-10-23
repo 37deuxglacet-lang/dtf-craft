@@ -28,8 +28,10 @@ pub const GANG_SHEET: &str = "dtf.gangSheet";
 pub const DEFAULT_FILM_WIDTH_CM: f64 = 56.0;
 /// Longest sheet (cm).
 pub const DEFAULT_MAX_LENGTH_CM: f64 = 100.0;
-/// Margin around every visual (mm): to the other visuals and to the film edges.
-pub const DEFAULT_MARGIN_MM: f64 = 5.0;
+/// Margin kept along the film edges (mm).
+pub const DEFAULT_EDGE_MM: f64 = 10.0;
+/// Spacing kept between two visuals (mm).
+pub const DEFAULT_SPACING_MM: f64 = 10.0;
 /// Print resolution of the sheet.
 pub const DEFAULT_RESOLUTION: f64 = 300.0;
 
@@ -65,7 +67,8 @@ pub fn format() -> PixelFormat {
 }
 
 /// One visual: its name, its pixels cropped to the visible ones (at the origin), their size and
-/// the resolution the file records.
+/// the resolution the file records, plus what the sheet warns about: a background left on it
+/// (its four corners opaque) and the share of its visible pixels that are semi-transparent.
 #[derive(Clone)]
 pub struct Visual {
     pub name: String,
@@ -73,7 +76,13 @@ pub struct Visual {
     pub width: u32,
     pub height: u32,
     pub dpi: f64,
+    pub background: bool,
+    pub semi_transparent: f64,
 }
+
+/// Share of semi-transparent pixels above which a visual is flagged (0.5 %: a few antialiased
+/// edges stay below it, a soft shadow or a faded area does not).
+pub const SEMI_TRANSPARENT_WARNING: f64 = 0.005;
 
 impl Visual {
     /// Its print width (layout units) at its own resolution, no wider than the sheet allows.
@@ -87,11 +96,13 @@ impl Visual {
     }
 }
 
-/// The visible pixels of `surf` (alpha above zero) within `full`.
-fn alpha_bounds(surf: &Surface, full: Rect) -> Rect {
+/// The visible pixels of `surf` (alpha above zero) within `full`, how many there are and how many
+/// of them are semi-transparent.
+fn alpha_bounds(surf: &Surface, full: Rect) -> (Rect, u64, u64) {
     let w = full.width() as usize;
+    let (mut visible, mut semi) = (0u64, 0u64);
     if w == 0 || full.height() == 0 {
-        return Rect::EMPTY;
+        return (Rect::EMPTY, 0, 0);
     }
     let mut out = Rect::EMPTY;
     // Bands of rows keep the scan's memory small on large visuals.
@@ -103,6 +114,8 @@ fn alpha_bounds(surf: &Surface, full: Rect) -> Rect {
         let bytes = surf.to_interleaved(r);
         for (row, line) in bytes.chunks_exact(w * 4).enumerate() {
             let xs: Vec<usize> = line.chunks_exact(4).enumerate().filter(|(_, px)| px.get(3).is_some_and(|a| *a > 0)).map(|(x, _)| x).collect();
+            visible += xs.len() as u64;
+            semi += line.chunks_exact(4).filter(|px| px.get(3).is_some_and(|a| *a > 0 && *a < 255)).count() as u64;
             if let (Some(a), Some(b)) = (xs.first(), xs.last()) {
                 let yy = y + row as i32;
                 out = out.union(&Rect::new(full.x0 + *a as i32, yy, full.x0 + *b as i32 + 1, yy + 1));
@@ -110,7 +123,7 @@ fn alpha_bounds(surf: &Surface, full: Rect) -> Rect {
         }
         y = y1;
     }
-    out
+    (out, visible, semi)
 }
 
 /// A document's visual: flattened, cropped to its visible pixels.
@@ -118,13 +131,18 @@ pub fn load_document(doc: &Document, name: &str) -> Result<Visual> {
     crate::allocation::checkpoint("flattening a gang sheet visual")?;
     let surf = file_cmds::flattened(doc, format());
     let full = Rect::new(0, 0, doc.size.width as i32, doc.size.height as i32);
-    let r = alpha_bounds(&surf, full);
+    let (r, visible, semi) = alpha_bounds(&surf, full);
     if r.is_empty() {
         return Err(bad(format!("{name}: the image is empty")));
     }
+    let pixels = surf.translated(-r.x0, -r.y0, r);
+    let (w, h) = (r.width() as i32, r.height() as i32);
+    let opaque = |x: i32, y: i32| pixels.rgba(x, y)[3] >= 0.999;
     Ok(Visual {
         name: name.to_string(),
-        pixels: surf.translated(-r.x0, -r.y0, r),
+        background: opaque(0, 0) && opaque(w - 1, 0) && opaque(0, h - 1) && opaque(w - 1, h - 1),
+        semi_transparent: if visible > 0 { semi as f64 / visible as f64 } else { 0.0 },
+        pixels,
         width: r.width(),
         height: r.height(),
         dpi: f64::from(doc.resolution_dpi),
@@ -161,16 +179,52 @@ fn rotate_cw(px: &[u8], w: usize, h: usize) -> Vec<u8> {
     out
 }
 
-/// The visual at `tw × th` pixels (as printed, so turned first when `rotated`), at the origin.
-fn rendition(v: &Visual, tw: i64, th: i64, rotated: bool) -> Result<Surface> {
-    crate::allocation::checkpoint("rendering a gang sheet visual")?;
-    let (mut src, mut sw, mut sh) = (v.pixels.clone(), i64::from(v.width), i64::from(v.height));
-    if rotated {
-        let px = src.to_interleaved(Rect::new(0, 0, sw as i32, sh as i32));
-        let turned = rotate_cw(&px, sw as usize, sh as usize);
-        (sw, sh) = (sh, sw);
-        src = Surface::from_interleaved(format(), Rect::new(0, 0, sw as i32, sh as i32), &turned);
+/// `px` (`w × h` interleaved RGBA bytes) mirrored left-right (`horizontal`) or top-bottom.
+fn flip(px: &mut [u8], w: usize, h: usize, horizontal: bool) {
+    if horizontal {
+        for row in px.chunks_exact_mut(w * 4) {
+            for x in 0..w / 2 {
+                let (a, b) = (x * 4, (w - 1 - x) * 4);
+                for c in 0..4 {
+                    row.swap(a + c, b + c);
+                }
+            }
+        }
+    } else {
+        for y in 0..h / 2 {
+            let (a, b) = (y * w * 4, (h - 1 - y) * w * 4);
+            let (top, rest) = px.split_at_mut(b);
+            if let (Some(t), Some(bm)) = (top.get_mut(a..a + w * 4), rest.get_mut(..w * 4)) {
+                t.swap_with_slice(bm);
+            }
+        }
     }
+}
+
+/// The visual's pixels as placed: turned `quarter` × 90° clockwise, then mirrored.
+fn oriented(v: &Visual, o: Orientation) -> (Surface, i64, i64) {
+    let (sw, sh) = (i64::from(v.width), i64::from(v.height));
+    if o == Orientation::default() {
+        return (v.pixels.clone(), sw, sh);
+    }
+    let (mut px, mut w, mut h) = (v.pixels.to_interleaved(Rect::new(0, 0, sw as i32, sh as i32)), sw as usize, sh as usize);
+    for _ in 0..o.quarter % 4 {
+        px = rotate_cw(&px, w, h);
+        (w, h) = (h, w);
+    }
+    if o.flip_h {
+        flip(&mut px, w, h, true);
+    }
+    if o.flip_v {
+        flip(&mut px, w, h, false);
+    }
+    (Surface::from_interleaved(format(), Rect::new(0, 0, w as i32, h as i32), &px), w as i64, h as i64)
+}
+
+/// The visual at `tw × th` pixels as placed (see [`oriented`]), at the origin.
+fn rendition(v: &Visual, tw: i64, th: i64, o: Orientation) -> Result<Surface> {
+    crate::allocation::checkpoint("rendering a gang sheet visual")?;
+    let (src, sw, sh) = oriented(v, o);
     if sw <= 0 || sh <= 0 || tw <= 0 || th <= 0 {
         return Err(bad(format!("{}: nothing to render", v.name)));
     }
@@ -191,18 +245,45 @@ fn rendition(v: &Visual, tw: i64, th: i64, rotated: bool) -> Result<Surface> {
     Ok(Surface::from_interleaved(format(), target, &bytes))
 }
 
-/// One placed visual: the source it shows, where (layout units) and whether it is turned.
+/// How a visual is turned (`quarter` × 90° clockwise) and mirrored on the sheet.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct Orientation {
+    pub quarter: u8,
+    pub flip_h: bool,
+    pub flip_v: bool,
+}
+
+impl Orientation {
+    /// Whether the width and height are swapped.
+    pub fn turned(&self) -> bool {
+        self.quarter % 2 == 1
+    }
+
+    /// Turned by `quarters` × 90° (negative: anticlockwise). A mirrored visual turns the other way
+    /// in its own frame, so what the operator sees turns as asked.
+    pub fn rotated(self, quarters: i32) -> Self {
+        let q = if self.flip_h != self.flip_v { -quarters } else { quarters };
+        Orientation { quarter: (i32::from(self.quarter) + q).rem_euclid(4) as u8, ..self }
+    }
+
+    /// Mirrored left-right (`horizontal`) or top-bottom, as seen on the sheet.
+    pub fn mirrored(self, horizontal: bool) -> Self {
+        if horizontal { Orientation { flip_h: !self.flip_h, ..self } } else { Orientation { flip_v: !self.flip_v, ..self } }
+    }
+}
+
+/// One placed visual: the source it shows, where (layout units) and how it is turned.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Placed {
     pub source: usize,
     pub x: i64,
     pub y: i64,
-    pub rotated: bool,
+    pub orientation: Orientation,
 }
 
-/// The visual's footprint on the sheet for a source printed `w × h` (unrotated).
+/// The visual's footprint on the sheet for a source printed `w × h` (unturned).
 pub fn footprint(p: &Placed, w: i64, h: i64) -> Item {
-    if p.rotated { Item::new(p.x, p.y, h, w) } else { Item::new(p.x, p.y, w, h) }
+    if p.orientation.turned() { Item::new(p.x, p.y, h, w) } else { Item::new(p.x, p.y, w, h) }
 }
 
 fn cm(v: f64) -> i64 {
@@ -210,12 +291,18 @@ fn cm(v: f64) -> i64 {
 }
 
 fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
+    for k in ["margin", "edgeMargin", "spacing"] {
+        check_range(p, k, 0.0, 100.0)?;
+    }
     check_range(p, "filmWidth", 1.0, 500.0)?;
     check_range(p, "maxLength", 1.0, 2000.0)?;
-    check_range(p, "margin", 0.0, 100.0)?;
     check_range(p, "resolution", 72.0, 1200.0)?;
     let dpi = num(p, "resolution", DEFAULT_RESOLUTION);
-    let sheet = Sheet::new(cm(num(p, "filmWidth", DEFAULT_FILM_WIDTH_CM)), cm(num(p, "maxLength", DEFAULT_MAX_LENGTH_CM)), (num(p, "margin", DEFAULT_MARGIN_MM) * 10.0).round() as i64);
+    let mm = |v: f64| (v * 10.0).round() as i64;
+    // `margin` (older params) sets both the edge margin and the spacing.
+    let edge = mm(num(p, "edgeMargin", num(p, "margin", DEFAULT_EDGE_MM)));
+    let spacing = mm(num(p, "spacing", num(p, "margin", DEFAULT_SPACING_MM)));
+    let sheet = Sheet::new(cm(num(p, "filmWidth", DEFAULT_FILM_WIDTH_CM)), cm(num(p, "maxLength", DEFAULT_MAX_LENGTH_CM)), edge, spacing);
     let (iw, il) = sheet.inner();
     if iw <= 0 || il <= 0 {
         return Err(bad("the margins leave no room on the sheet"));
@@ -229,8 +316,8 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
     if list.len() > MAX_SOURCES {
         return Err(bad(format!("at most {MAX_SOURCES} visuals per gang sheet")));
     }
-    // Each source: its pixels, its print size (layout units, unrotated) and its copies.
-    let mut visuals: Vec<(Visual, i64, i64, usize)> = Vec::new();
+    // Each source: its pixels, its print size (layout units, unturned), its copies and spacing.
+    let mut visuals: Vec<(Visual, i64, i64, usize, i64)> = Vec::new();
     for (i, src) in list.iter().enumerate() {
         let v = if let Some(path) = src.get("path").and_then(Value::as_str) {
             load_file(path)?
@@ -241,11 +328,23 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
             return Err(bad(format!("source {i}: give a \"path\" or a \"document\"")));
         };
         check_range(src, "widthCm", 0.1, 500.0)?;
+        check_range(src, "heightCm", 0.1, 2000.0)?;
         check_range(src, "quantity", 1.0, 999.0)?;
-        let width = src.get("widthCm").and_then(Value::as_f64).map_or_else(|| v.natural_width(&sheet), cm);
-        let (w, h) = gang_sheet::size_for_width(v.width, v.height, width);
+        check_range(src, "marginMm", 0.0, 100.0)?;
+        let given = |k: &str| src.get(k).and_then(Value::as_f64).filter(|v| v.is_finite()).map(cm);
+        // Width and height: both given stretch the visual; one alone keeps its proportions.
+        let (w, h) = match (given("widthCm"), given("heightCm")) {
+            (Some(w), Some(h)) => (w, h),
+            (None, Some(h)) => {
+                // The height plays the width's part with the axes swapped.
+                let (h, w) = gang_sheet::size_for_width(v.height, v.width, h);
+                (w, h)
+            }
+            (w, None) => gang_sheet::size_for_width(v.width, v.height, w.unwrap_or_else(|| v.natural_width(&sheet))),
+        };
         let copies = num(src, "quantity", 1.0).round().clamp(1.0, 999.0) as usize;
-        visuals.push((v, w, h, copies));
+        let gap = src.get("marginMm").and_then(Value::as_f64).map_or(spacing, mm);
+        visuals.push((v, w, h, copies, gap));
     }
     // The layout: the window's, or one built here.
     let mut placed: Vec<Placed> = Vec::new();
@@ -263,8 +362,14 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
                 if !(x.is_finite() && y.is_finite()) {
                     return Err(bad(format!("placement {i}: x and y must be numbers")));
                 }
-                let rotated = pl.get("rotated").and_then(Value::as_bool).unwrap_or(false);
-                let one = Placed { source, x: cm(x), y: cm(y), rotated };
+                // `rotation` in degrees clockwise (multiples of 90), or `rotated` (90°, older params).
+                let degrees = pl.get("rotation").and_then(Value::as_f64).unwrap_or(if pl.get("rotated").and_then(Value::as_bool) == Some(true) { 90.0 } else { 0.0 });
+                if !(degrees.is_finite() && (degrees / 90.0).fract() == 0.0) {
+                    return Err(bad(format!("placement {i}: `rotation` must be 0, 90, 180 or 270")));
+                }
+                let flag = |k: &str| pl.get(k).and_then(Value::as_bool).unwrap_or(false);
+                let orientation = Orientation { quarter: ((degrees / 90.0) as i64).rem_euclid(4) as u8, flip_h: flag("flipH"), flip_v: flag("flipV") };
+                let one = Placed { source, x: cm(x), y: cm(y), orientation };
                 let (w, h) = visuals.get(source).map_or((0, 0), |v| (v.1, v.2));
                 let r = footprint(&one, w, h);
                 if r.x < 0 || r.y < 0 || r.x + r.w > sheet.width || r.y + r.h > sheet.max_length {
@@ -283,9 +388,11 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
                 return Err(bad(format!("at most {MAX_PLACEMENTS} visuals on one sheet")));
             }
             let sizes: Vec<(i64, i64)> = slots.iter().map(|i| visuals.get(*i).map_or((0, 0), |v| (v.1, v.2))).collect();
-            for (slot, spot) in slots.iter().zip(sheet.pack(&sizes, &[], rotate)) {
+            // Packed at the largest spacing any visual asks for.
+            let widest = visuals.iter().map(|v| v.4).fold(spacing, i64::max);
+            for (slot, spot) in slots.iter().zip(sheet.with_gap(widest).pack(&sizes, &[], rotate)) {
                 match spot {
-                    Some(sp) => placed.push(Placed { source: *slot, x: sp.x, y: sp.y, rotated: sp.rotated }),
+                    Some(sp) => placed.push(Placed { source: *slot, x: sp.x, y: sp.y, orientation: Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() } }),
                     None => unplaced += 1,
                 }
             }
@@ -296,25 +403,27 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
         return Err(bad("nothing to place on the sheet"));
     }
     let items: Vec<Item> = placed.iter().map(|pl| visuals.get(pl.source).map_or_else(Item::default, |v| footprint(pl, v.1, v.2))).collect();
-    let conflicts = sheet.conflicts(&items).iter().filter(|c| **c).count();
+    let gaps: Vec<i64> = placed.iter().map(|pl| visuals.get(pl.source).map_or(spacing, |v| v.4)).collect();
+    let conflicts = sheet.conflicts(&items, &gaps).iter().filter(|c| **c).count();
     let length = sheet.used_length(&items).max(1);
     // Render: one layer per visual, in sheet pixels.
     let (pw, ph) = (gang_sheet::to_px(sheet.width, dpi).max(1), gang_sheet::to_px(length, dpi).max(1));
-    let mut doc = Document::new("Gang sheet", Size::new(pw as u32, ph as u32), ColorMode::Rgb, SampleType::U8);
+    let doc_name = p.get("name").and_then(Value::as_str).filter(|n| !n.trim().is_empty()).unwrap_or("Gang sheet");
+    let mut doc = Document::new(doc_name, Size::new(pw as u32, ph as u32), ColorMode::Rgb, SampleType::U8);
     doc.resolution_dpi = dpi as f32;
     doc.layers.clear();
-    let mut cache: std::collections::HashMap<(usize, bool), Surface> = std::collections::HashMap::new();
+    let mut cache: std::collections::HashMap<(usize, Orientation, i64, i64), Surface> = std::collections::HashMap::new();
     let mut count = vec![0usize; visuals.len()];
     for (pl, it) in placed.iter().zip(&items) {
         let Some(v) = visuals.get(pl.source) else { continue };
         // The pixel box: both edges rounded, so neighbours never drift apart or overlap.
         let (x0, y0) = (gang_sheet::to_px(it.x, dpi), gang_sheet::to_px(it.y, dpi));
         let (tw, th) = (gang_sheet::to_px(it.x + it.w, dpi) - x0, gang_sheet::to_px(it.y + it.h, dpi) - y0);
-        let key = (pl.source, pl.rotated);
+        let key = (pl.source, pl.orientation, tw, th);
         let pixels = match cache.get(&key) {
             Some(px) => px.clone(),
             None => {
-                let px = rendition(&v.0, tw.max(1), th.max(1), pl.rotated)?;
+                let px = rendition(&v.0, tw.max(1), th.max(1), pl.orientation)?;
                 cache.insert(key, px.clone());
                 px
             }
@@ -361,7 +470,7 @@ pub fn specs() -> Vec<CommandSpec> {
         label: "Gang Sheet…",
         menu: &["DTF"],
         shortcut: None,
-        params: r##"{"sources":[{"path":str|"document":int,"widthCm":0.1..500 (print width; height proportional; default the file's own size),"quantity":1..999=1}],"placements":[{"source":int,"x":cm,"y":cm,"rotated":bool}] (omit to build the layout automatically),"filmWidth":1..500=56 (cm),"maxLength":1..2000=100 (cm),"margin":0..100=5 (mm, around every visual),"resolution":72..1200=300,"rotate":bool=true (automatic layout may turn visuals 90°),"output":str (a .png path),"open":bool=true}"##,
+        params: r##"{"sources":[{"path":str|"document":int,"widthCm":0.1..500,"heightCm":0.1..2000 (print size; one alone keeps the proportions, both stretch; default the file's own size),"quantity":1..999=1,"marginMm":0..100 (this visual's spacing; default `spacing`)}],"placements":[{"source":int,"x":cm,"y":cm,"rotation":0|90|180|270 (clockwise),"flipH":bool,"flipV":bool}] (omit to build the layout automatically),"filmWidth":1..500=56 (cm),"maxLength":1..2000=100 (cm),"edgeMargin":0..100=10 (mm, along the film edges),"spacing":0..100=10 (mm, between visuals),"resolution":72..1200=300,"rotate":bool=true (automatic layout may turn visuals 90°),"name":str="Gang sheet","output":str (a .png path),"open":bool=true}"##,
         enabled: crate::commands::always,
         run: gang_sheet_cmd,
         journal: true,
@@ -398,7 +507,9 @@ mod tests {
         assert_eq!(v.name, "logo");
         assert!((v.dpi - 300.0).abs() < 0.5);
         // 120 px at 300 ppi: 1.016 cm.
-        assert_eq!(v.natural_width(&Sheet::new(5600, 10_000, 50)), 102);
+        assert_eq!(v.natural_width(&Sheet::new(5600, 10_000, 50, 50)), 102);
+        assert!(v.background, "a plain opaque rectangle reads as a background left on");
+        assert_eq!(v.semi_transparent, 0.0);
         assert!(load_bytes("logo.jpg", &[]).is_err(), "PNG only");
         let _ = std::fs::remove_dir_all(dir);
     }
@@ -454,7 +565,7 @@ mod tests {
         let r = s
             .execute(
                 GANG_SHEET,
-                json!({"sources": [{"path": a, "widthCm": 2}], "placements": [{"source": 0, "x": 1, "y": 1}, {"source": 0, "x": 3.5, "y": 1, "rotated": true}], "filmWidth": 10, "resolution": 254}),
+                json!({"sources": [{"path": a, "widthCm": 2}], "placements": [{"source": 0, "x": 1, "y": 1}, {"source": 0, "x": 3.5, "y": 1, "rotated": true}], "filmWidth": 10, "resolution": 254, "margin": 5}),
             )
             .unwrap();
         // 254 ppi: 100 px per cm. Bottom of the visuals at 3 cm, plus the 5 mm margin.
@@ -468,11 +579,70 @@ mod tests {
         assert_eq!(b, Rect::new(350, 100, 550, 300));
         // Too close together: reported, still rendered.
         let r = s
-            .execute(GANG_SHEET, json!({"sources": [{"path": a, "widthCm": 2}], "placements": [{"source": 0, "x": 1, "y": 1}, {"source": 0, "x": 3.2, "y": 1}], "filmWidth": 10, "open": false}))
+            .execute(GANG_SHEET, json!({"sources": [{"path": a, "widthCm": 2}], "placements": [{"source": 0, "x": 1, "y": 1}, {"source": 0, "x": 3.2, "y": 1}], "filmWidth": 10, "margin": 5, "open": false}))
             .unwrap();
         assert_eq!(r["conflicts"], 2);
         assert!(r.get("document").is_none());
         let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn edge_spacing_sizes_and_orientation() {
+        let mut s = Session::new();
+        // A 2 × 1 visual: left half red, right half blue, at 254 ppi (100 px per cm).
+        s.execute("file.new", json!({"width": 200, "height": 100, "resolution": 254, "background": "transparent"})).unwrap();
+        s.execute("select.rect", json!({"x": 0, "y": 0, "width": 100, "height": 100})).unwrap();
+        s.execute("edit.fill", json!({"color": "#ff0000"})).unwrap();
+        s.execute("select.rect", json!({"x": 100, "y": 0, "width": 100, "height": 100})).unwrap();
+        s.execute("edit.fill", json!({"color": "#0000ff"})).unwrap();
+        s.execute("select.deselect", json!({})).unwrap();
+        let v = load_document(&s.active().unwrap().doc, "v").unwrap();
+        assert!(v.background, "opaque corners: a background is left");
+        // Height alone keeps the proportions; both stretch.
+        let r = s.execute(GANG_SHEET, json!({"sources": [{"document": 0, "heightCm": 1}], "filmWidth": 10, "resolution": 254, "edgeMargin": 10, "open": false})).unwrap();
+        assert_eq!(r["pixels"], json!([1000, 300]), "1 cm high + 1 cm edge above and below");
+        let r = s.execute(GANG_SHEET, json!({"sources": [{"document": 0, "widthCm": 3, "heightCm": 3}], "filmWidth": 10, "resolution": 254, "edgeMargin": 0, "open": false})).unwrap();
+        assert_eq!(r["pixels"], json!([1000, 300]));
+        // Per-visual spacing: 2 cm apart is fine at 1 cm, too close when one asks for 3 cm.
+        let two = |m: Value| json!({"sources": [{"document": 0, "widthCm": 2, "marginMm": m}], "placements": [{"source": 0, "x": 1, "y": 1}, {"source": 0, "x": 5, "y": 1}], "filmWidth": 10, "resolution": 254, "open": false});
+        assert_eq!(s.execute(GANG_SHEET, two(json!(10))).unwrap()["conflicts"], 0);
+        assert_eq!(s.execute(GANG_SHEET, two(json!(30))).unwrap()["conflicts"], 2);
+        // Turned 180°: blue on the left; mirrored left-right: blue on the left too; both: red.
+        let pixel = |s: &mut Session, extra: Value| -> [f32; 4] {
+            let mut pl = json!({"source": 0, "x": 1, "y": 1});
+            if let (Value::Object(o), Value::Object(e)) = (&mut pl, extra) {
+                o.extend(e);
+            }
+            s.execute(GANG_SHEET, json!({"sources": [{"document": 0, "widthCm": 2}], "placements": [pl], "filmWidth": 10, "resolution": 254})).unwrap();
+            let st = s.active().unwrap();
+            match &st.doc.layers[0].content {
+                LayerContent::Raster(px) => px.rgba(120, 150),
+                _ => [0.0; 4],
+            }
+        };
+        assert!(pixel(&mut s, json!({}))[0] > 0.9, "red on the left");
+        assert!(pixel(&mut s, json!({"rotation": 180}))[2] > 0.9);
+        assert!(pixel(&mut s, json!({"flipH": true}))[2] > 0.9);
+        assert!(pixel(&mut s, json!({"rotation": 180, "flipH": true}))[0] > 0.9);
+        // Turned 90°: 1 cm wide, 2 cm high; red on top.
+        let r = s.execute(GANG_SHEET, json!({"sources": [{"document": 0, "widthCm": 2}], "placements": [{"source": 0, "x": 1, "y": 1, "rotation": 90}], "filmWidth": 10, "resolution": 254, "edgeMargin": 10})).unwrap();
+        assert_eq!(r["pixels"], json!([1000, 400]));
+        // Orientation helpers: a mirrored visual turns the way the operator sees it.
+        let o = Orientation::default().rotated(1);
+        assert_eq!(o.quarter, 1);
+        assert_eq!(o.rotated(-2).quarter, 3);
+        assert_eq!(o.mirrored(true).rotated(1).quarter, 0);
+    }
+
+    #[test]
+    fn semi_transparent_pixels_are_counted() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 100, "height": 100, "background": "transparent"})).unwrap();
+        s.execute("select.rect", json!({"x": 10, "y": 10, "width": 80, "height": 80})).unwrap();
+        s.execute("edit.fill", json!({"color": "#00a000", "opacity": 50})).unwrap();
+        let v = load_document(&s.active().unwrap().doc, "soft").unwrap();
+        assert!(v.semi_transparent > 0.99, "{}", v.semi_transparent);
+        assert!(!v.background);
     }
 
     #[test]
@@ -513,6 +683,9 @@ mod tests {
             json!({"sources": [{"document": 0}], "placements": []}),
             json!({"sources": [{"document": 0, "widthCm": 0}]}),
             json!({"sources": [{"document": 0}], "output": "sheet.tif"}),
+            json!({"sources": [{"document": 0}], "placements": [{"source": 0, "x": 2, "y": 2, "rotation": 45}]}),
+            json!({"sources": [{"document": 0, "marginMm": -1}]}),
+            json!({"sources": [{"document": 0}], "spacing": 500}),
         ] {
             assert!(s.execute(GANG_SHEET, p.clone()).is_err(), "{p}");
         }

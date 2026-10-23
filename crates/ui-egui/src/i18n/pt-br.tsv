@@ -4076,3 +4076,72 @@ layerLabel	No Color	Sem cor
 	Open a document first	Abra um documento primeiro
 	the document was closed	o documento foi fechado
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Folhas ativas
+	Add a New Sheet	Adicionar uma nova folha
+	Add a copy to the sheet	Adicionar uma cópia à folha
+	Along the edges	Ao longo das bordas
+	Auto Build May Rotate	Permitir rotação (automática)
+	Auto Build — every image at once	Montagem automática — todas as imagens de uma vez
+	Auto Fill	Preenchimento automático
+	Background Warning:	Aviso de fundo:
+	Background not removed (opaque corners)	Fundo não removido (cantos opacos)
+	Between images	Entre imagens
+	Center Horizontally	Centralizar horizontalmente
+	Center Vertically	Centralizar verticalmente
+	Center on the Sheet	Centralizar na folha
+	Copies of this sheet to print	Cópias desta folha a imprimir
+	Custom Color	Cor personalizada
+	Delete (Del)	Excluir (Del)
+	Delete the Sheet	Excluir a folha
+	Drag and drop a file here or click to	Arraste um arquivo aqui ou clique para
+	Duplicate Image	Duplicar imagem
+	Export Sheets (PNG)…	Exportar folhas (PNG)…
+	Fill the room left on the sheet with this visual	Preencher o espaço livre da folha com esta arte
+	Flip Horizontally	Espelhar horizontalmente
+	Flip Vertically	Espelhar verticalmente
+	Good resolution >= 250 dpi	Boa resolução >= 250 dpi
+	Grid (1 cm)	Grade (1 cm)
+	Image Margin	Margem da imagem
+	Import Images	Importar imagens
+	Lock Proportions	Travar proporções
+	Margin (cm)	Margem (cm)
+	No image yet: import PNG files or add the open document.	Nenhuma imagem: importe arquivos PNG ou adicione o documento aberto.
+	No room left on the sheet	Sem espaço na folha
+	Number of Images:	Número de imagens:
+	One copy less	Uma cópia a menos
+	One copy more	Uma cópia a mais
+	Optimal	Ótima
+	Optimal resolution >= 300 dpi	Resolução ótima >= 300 dpi
+	Overlap Lines	Linhas de sobreposição
+	Overlapping or too close	Sobreposta ou muito próxima
+	Poor	Ruim
+	Poor resolution >= 200 dpi	Resolução ruim >= 200 dpi
+	Proportions:	Proporções:
+	Push Down	Empurrar para baixo
+	Push Left	Empurrar para a esquerda
+	Push Right	Empurrar para a direita
+	Push Up	Empurrar para cima
+	Qty:	Qtd.:
+	Redo (Ctrl+Y)	Refazer (Ctrl+Y)
+	Rotate 90° Counterclockwise	Girar 90° no sentido anti-horário
+	Same image, another size	Mesma imagem, outro tamanho
+	Select an object to edit.	Selecione um objeto para editar.
+	Semi-transparent pixels: {p} %	Pixels semitransparentes: {p} %
+	Sheet Background	Fundo da folha
+	Sheet Margin	Margem da folha
+	Show Overlap Lines	Mostrar linhas de sobreposição
+	Show Resolution Lines	Mostrar linhas de resolução
+	Snap While Moving	Alinhar ao mover
+	Start Over	Recomeçar
+	Stretch to the Film Width	Esticar até a largura do filme
+	Stretch to the Sheet Length	Esticar até o comprimento da folha
+	Supported format: PNG (cropped to its visible pixels)	Formato aceito: PNG (recortado aos pixels visíveis)
+	Transparency Warning:	Aviso de transparência:
+	Undo (Ctrl+Z)	Desfazer (Ctrl+Z)
+	Very Poor	Muito ruim
+	Very poor resolution < 200 dpi	Resolução muito ruim < 200 dpi
+	With the image margin	Com a margem da imagem
+	With the sheet margin	Com a margem da folha
+	copy	cópia
+	{n} images	{n} imagens

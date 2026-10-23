@@ -2893,3 +2893,74 @@ curves	Smooth	平滑
 	the document was closed	文件已關閉
 	Duplicate	複製
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	目前拼版
+	Add a New Sheet	加入新版面
+	Add a copy to the sheet	在版面加入一份
+	Along the edges	沿邊緣
+	Auto Build May Rotate	允許旋轉（自動）
+	Auto Build — every image at once	自動排版 — 一次處理所有圖片
+	Auto Fill	自動填滿
+	Background Warning:	背景警告：
+	Background not removed (opaque corners)	背景未去除（四角不透明）
+	Between images	圖片之間
+	Center Horizontally	水平置中
+	Center Vertically	垂直置中
+	Center on the Sheet	在版面置中
+	Copies of this sheet to print	此版面的列印份數
+	Custom Color	自訂顏色
+	Delete (Del)	刪除（Del）
+	Delete the Sheet	刪除版面
+	Drag and drop a file here or click to	將檔案拖放到此處，或按一下
+	Duplicate Image	複製圖片
+	Export Sheets (PNG)…	匯出版面（PNG）…
+	Fill the room left on the sheet with this visual	以此圖案填滿版面剩餘空間
+	Flip Horizontally	水平翻轉
+	Flip Vertically	垂直翻轉
+	Good	良好
+	Good resolution >= 250 dpi	良好解析度 >= 250 dpi
+	Grid (1 cm)	格線（1 cm）
+	Image Margin	圖片邊界
+	Import Images	匯入圖片
+	Lock Proportions	鎖定比例
+	Margin (cm)	邊界（cm）
+	No image yet: import PNG files or add the open document.	尚無圖片：請匯入 PNG 檔案或加入開啟的文件。
+	No room left on the sheet	版面已無空間
+	Number of Images:	圖片數量：
+	One copy less	減少一份
+	One copy more	增加一份
+	Optimal	最佳
+	Optimal resolution >= 300 dpi	最佳解析度 >= 300 dpi
+	Overlap Lines	重疊線
+	Overlapping or too close	重疊或過近
+	Poor	較差
+	Poor resolution >= 200 dpi	較差解析度 >= 200 dpi
+	Proportions:	比例：
+	Push Down	推到底部
+	Push Left	推到左側
+	Push Right	推到右側
+	Push Up	推到頂部
+	Qty:	數量：
+	Redo (Ctrl+Y)	重做（Ctrl+Y）
+	Rotate 90° Counterclockwise	逆時針旋轉 90°
+	Same image, another size	同一圖片，其他尺寸
+	Select an object to edit.	請選取要編輯的物件。
+	Semi-transparent pixels: {p} %	半透明像素：{p} %
+	Settings	設定
+	Sheet Background	版面背景
+	Sheet Margin	版面邊界
+	Show Overlap Lines	顯示重疊線
+	Show Resolution Lines	顯示解析度線
+	Snap While Moving	移動時自動對齊
+	Start Over	重新開始
+	Stretch to the Film Width	拉伸到膜寬
+	Stretch to the Sheet Length	拉伸到版面長度
+	Supported format: PNG (cropped to its visible pixels)	支援格式：PNG（裁切到可見像素）
+	Transparency Warning:	透明度警告：
+	Undo (Ctrl+Z)	復原（Ctrl+Z）
+	Very Poor	很差
+	Very poor resolution < 200 dpi	很差解析度 < 200 dpi
+	With the image margin	使用圖片邊界
+	With the sheet margin	使用版面邊界
+	copy	副本
+	{n} images	{n} 張圖片

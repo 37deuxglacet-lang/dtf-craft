@@ -4249,3 +4249,72 @@ navigator	Zoom	Zoom
 	Open a document first	Apri prima un documento
 	the document was closed	il documento è stato chiuso
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Fogli attivi
+	Add a New Sheet	Aggiungi un nuovo foglio
+	Add a copy to the sheet	Aggiungi una copia al foglio
+	Along the edges	Lungo i bordi
+	Auto Build May Rotate	Consenti rotazione (automatica)
+	Auto Build — every image at once	Disposizione automatica — tutte le immagini insieme
+	Auto Fill	Riempimento automatico
+	Background Warning:	Avviso sfondo:
+	Background not removed (opaque corners)	Sfondo non rimosso (angoli opachi)
+	Between images	Tra le immagini
+	Center Horizontally	Centra orizzontalmente
+	Center Vertically	Centra verticalmente
+	Center on the Sheet	Centra sul foglio
+	Copies of this sheet to print	Copie di questo foglio da stampare
+	Custom Color	Colore personalizzato
+	Delete (Del)	Elimina (Canc)
+	Delete the Sheet	Elimina il foglio
+	Drag and drop a file here or click to	Trascina un file qui o fai clic per
+	Duplicate Image	Duplica immagine
+	Export Sheets (PNG)…	Esporta fogli (PNG)…
+	Fill the room left on the sheet with this visual	Riempi lo spazio libero del foglio con questa grafica
+	Flip Horizontally	Rifletti orizzontalmente
+	Flip Vertically	Rifletti verticalmente
+	Good resolution >= 250 dpi	Buona risoluzione >= 250 dpi
+	Grid (1 cm)	Griglia (1 cm)
+	Image Margin	Margine immagine
+	Import Images	Importa immagini
+	Lock Proportions	Blocca proporzioni
+	Margin (cm)	Margine (cm)
+	No image yet: import PNG files or add the open document.	Nessuna immagine: importa file PNG o aggiungi il documento aperto.
+	No room left on the sheet	Nessuno spazio libero sul foglio
+	Number of Images:	Numero di immagini:
+	One copy less	Una copia in meno
+	One copy more	Una copia in più
+	Optimal	Ottimale
+	Optimal resolution >= 300 dpi	Risoluzione ottimale >= 300 dpi
+	Overlap Lines	Linee di sovrapposizione
+	Overlapping or too close	Sovrapposta o troppo vicina
+	Poor	Scarsa
+	Poor resolution >= 200 dpi	Risoluzione scarsa >= 200 dpi
+	Proportions:	Proporzioni:
+	Push Down	Spingi in basso
+	Push Left	Spingi a sinistra
+	Push Right	Spingi a destra
+	Push Up	Spingi in alto
+	Qty:	Q.tà:
+	Redo (Ctrl+Y)	Ripeti (Ctrl+Y)
+	Rotate 90° Counterclockwise	Ruota di 90° in senso antiorario
+	Same image, another size	Stessa immagine, altra misura
+	Select an object to edit.	Seleziona un oggetto da modificare.
+	Semi-transparent pixels: {p} %	Pixel semitrasparenti: {p} %
+	Sheet Background	Sfondo del foglio
+	Sheet Margin	Margine del foglio
+	Show Overlap Lines	Mostra linee di sovrapposizione
+	Show Resolution Lines	Mostra linee di risoluzione
+	Snap While Moving	Allinea durante lo spostamento
+	Start Over	Ricomincia
+	Stretch to the Film Width	Estendi alla larghezza della pellicola
+	Stretch to the Sheet Length	Estendi alla lunghezza del foglio
+	Supported format: PNG (cropped to its visible pixels)	Formato supportato: PNG (ritagliato ai pixel visibili)
+	Transparency Warning:	Avviso trasparenza:
+	Undo (Ctrl+Z)	Annulla (Ctrl+Z)
+	Very Poor	Molto scarsa
+	Very poor resolution < 200 dpi	Risoluzione molto scarsa < 200 dpi
+	With the image margin	Con il margine immagine
+	With the sheet margin	Con il margine del foglio
+	copy	copia
+	{n} images	{n} immagini

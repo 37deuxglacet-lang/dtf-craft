@@ -3318,3 +3318,73 @@ curves	Smooth	Lisser
 	Open a document first	Ouvrez d'abord un document
 	the document was closed	le document a été fermé
 	{dpi} ppi	{dpi} ppp
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Gang sheets actives
+	Add a New Sheet	Ajouter une nouvelle planche
+	Add a copy to the sheet	Ajouter un exemplaire à la planche
+	Along the edges	Le long des bords
+	Auto Build May Rotate	Rotation autorisée (construction auto)
+	Auto Build — every image at once	Construction auto — toutes les images en même temps
+	Auto Fill	Remplissage automatique
+	Background Warning:	Avertissement sur l'arrière-plan :
+	Background not removed (opaque corners)	Fond non détouré (coins opaques)
+	Between images	Entre les images
+	Center Horizontally	Centrage horizontal
+	Center Vertically	Centrage vertical
+	Center on the Sheet	Centrer sur la planche
+	Copies of this sheet to print	Exemplaires de cette planche à imprimer
+	Custom Color	Couleur personnalisée
+	Delete (Del)	Supprimer (Suppr)
+	Delete the Sheet	Supprimer la planche
+	Drag and drop a file here or click to	Glissez-déposez un fichier ici ou cliquez pour
+	Duplicate Image	Dupliquer l'image
+	Export Sheets (PNG)…	Exporter les planches (PNG)…
+	Fill the room left on the sheet with this visual	Remplir la place restante de la planche avec ce visuel
+	Flip Horizontally	Retourner horizontalement
+	Flip Vertically	Retourner verticalement
+	Good	Bonne
+	Good resolution >= 250 dpi	Bonne résolution >= 250 dpi
+	Grid (1 cm)	Grille (1 cm)
+	Image Margin	Marge de l'image
+	Import Images	Importer des images
+	Lock Proportions	Verrouiller les proportions
+	Margin (cm)	Marge (cm)
+	No image yet: import PNG files or add the open document.	Aucune image : importez des PNG ou ajoutez le document ouvert.
+	No room left on the sheet	Plus de place sur la planche
+	Number of Images:	Quantité d'images :
+	One copy less	Un exemplaire de moins
+	One copy more	Un exemplaire de plus
+	Optimal	Optimale
+	Optimal resolution >= 300 dpi	Résolution optimale >= 300 dpi
+	Overlap Lines	Lignes en chevauchement
+	Overlapping or too close	En chevauchement ou trop proche
+	Poor	Mauvaise
+	Poor resolution >= 200 dpi	Mauvaise résolution >= 200 dpi
+	Proportions:	Proportions :
+	Push Down	Pousser en bas
+	Push Left	Pousser à gauche
+	Push Right	Pousser à droite
+	Push Up	Pousser en haut
+	Qty:	Qté :
+	Redo (Ctrl+Y)	Rétablir (Ctrl+Y)
+	Rotate 90° Counterclockwise	Rotation 90° antihoraire
+	Same image, another size	Même image, autre taille
+	Select an object to edit.	Sélectionnez un objet à modifier.
+	Semi-transparent pixels: {p} %	Pixels semi-transparents : {p} %
+	Sheet Background	Fond de la planche
+	Sheet Margin	Marge du plan de travail
+	Show Overlap Lines	Afficher les lignes en chevauchement
+	Show Resolution Lines	Afficher les lignes de résolution
+	Snap While Moving	Aligner automatiquement lors du déplacement
+	Start Over	Recommencer
+	Stretch to the Film Width	Étirer à la laize
+	Stretch to the Sheet Length	Étirer à la longueur de la planche
+	Supported format: PNG (cropped to its visible pixels)	Format pris en charge : PNG (rogné à ses pixels visibles)
+	Transparency Warning:	Avertissement de transparence :
+	Undo (Ctrl+Z)	Annuler (Ctrl+Z)
+	Very Poor	Très mauvaise
+	Very poor resolution < 200 dpi	Résolution très mauvaise < 200 dpi
+	With the image margin	Avec la marge de l'image
+	With the sheet margin	Avec la marge du plan de travail
+	copy	copie
+	{n} images	{n} images

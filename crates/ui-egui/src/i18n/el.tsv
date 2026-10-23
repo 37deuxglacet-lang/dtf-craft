@@ -3986,3 +3986,73 @@ curves	Smooth	Εξομάλυνση
 	Open a document first	Ανοίξτε πρώτα ένα έγγραφο
 	the document was closed	το έγγραφο έκλεισε
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Ενεργά φύλλα
+	Add a New Sheet	Προσθήκη νέου φύλλου
+	Add a copy to the sheet	Προσθήκη αντιγράφου στο φύλλο
+	Along the edges	Κατά μήκος των άκρων
+	Auto Build May Rotate	Να επιτρέπεται η περιστροφή (αυτόματα)
+	Auto Build — every image at once	Αυτόματη διάταξη — όλες οι εικόνες μαζί
+	Auto Fill	Αυτόματο γέμισμα
+	Background Warning:	Προειδοποίηση φόντου:
+	Background not removed (opaque corners)	Το φόντο δεν αφαιρέθηκε (αδιαφανείς γωνίες)
+	Between images	Μεταξύ εικόνων
+	Center Horizontally	Οριζόντια στοίχιση στο κέντρο
+	Center Vertically	Κατακόρυφη στοίχιση στο κέντρο
+	Center on the Sheet	Στο κέντρο του φύλλου
+	Copies of this sheet to print	Αντίτυπα αυτού του φύλλου για εκτύπωση
+	Custom Color	Προσαρμοσμένο χρώμα
+	Delete (Del)	Διαγραφή (Del)
+	Delete the Sheet	Διαγραφή φύλλου
+	Drag and drop a file here or click to	Σύρετε ένα αρχείο εδώ ή κάντε κλικ για
+	Duplicate Image	Διπλασιασμός εικόνας
+	Export Sheets (PNG)…	Εξαγωγή φύλλων (PNG)…
+	Fill the room left on the sheet with this visual	Γέμισμα του ελεύθερου χώρου του φύλλου με αυτό το σχέδιο
+	Flip Horizontally	Οριζόντια αναστροφή
+	Flip Vertically	Κατακόρυφη αναστροφή
+	Good	Καλή
+	Good resolution >= 250 dpi	Καλή ανάλυση >= 250 dpi
+	Grid (1 cm)	Πλέγμα (1 cm)
+	Image Margin	Περιθώριο εικόνας
+	Import Images	Εισαγωγή εικόνων
+	Lock Proportions	Κλείδωμα αναλογιών
+	Margin (cm)	Περιθώριο (cm)
+	No image yet: import PNG files or add the open document.	Καμία εικόνα: εισαγάγετε αρχεία PNG ή προσθέστε το ανοιχτό έγγραφο.
+	No room left on the sheet	Δεν υπάρχει χώρος στο φύλλο
+	Number of Images:	Αριθμός εικόνων:
+	One copy less	Ένα αντίγραφο λιγότερο
+	One copy more	Ένα αντίγραφο περισσότερο
+	Optimal	Βέλτιστη
+	Optimal resolution >= 300 dpi	Βέλτιστη ανάλυση >= 300 dpi
+	Overlap Lines	Γραμμές επικάλυψης
+	Overlapping or too close	Επικαλύπτεται ή πολύ κοντά
+	Poor	Κακή
+	Poor resolution >= 200 dpi	Κακή ανάλυση >= 200 dpi
+	Proportions:	Αναλογίες:
+	Push Down	Ώθηση κάτω
+	Push Left	Ώθηση αριστερά
+	Push Right	Ώθηση δεξιά
+	Push Up	Ώθηση πάνω
+	Qty:	Ποσ.:
+	Redo (Ctrl+Y)	Επανάληψη (Ctrl+Y)
+	Rotate 90° Counterclockwise	Περιστροφή 90° αριστερόστροφα
+	Same image, another size	Ίδια εικόνα, άλλο μέγεθος
+	Select an object to edit.	Επιλέξτε ένα αντικείμενο για επεξεργασία.
+	Semi-transparent pixels: {p} %	Ημιδιαφανή pixel: {p} %
+	Sheet Background	Φόντο φύλλου
+	Sheet Margin	Περιθώριο φύλλου
+	Show Overlap Lines	Εμφάνιση γραμμών επικάλυψης
+	Show Resolution Lines	Εμφάνιση γραμμών ανάλυσης
+	Snap While Moving	Ευθυγράμμιση κατά τη μετακίνηση
+	Start Over	Από την αρχή
+	Stretch to the Film Width	Τέντωμα στο πλάτος του φιλμ
+	Stretch to the Sheet Length	Τέντωμα στο μήκος του φύλλου
+	Supported format: PNG (cropped to its visible pixels)	Υποστηριζόμενη μορφή: PNG (περικομμένο στα ορατά pixel)
+	Transparency Warning:	Προειδοποίηση διαφάνειας:
+	Undo (Ctrl+Z)	Αναίρεση (Ctrl+Z)
+	Very Poor	Πολύ κακή
+	Very poor resolution < 200 dpi	Πολύ κακή ανάλυση < 200 dpi
+	With the image margin	Με το περιθώριο εικόνας
+	With the sheet margin	Με το περιθώριο φύλλου
+	copy	αντίγραφο
+	{n} images	Εικόνες: {n}

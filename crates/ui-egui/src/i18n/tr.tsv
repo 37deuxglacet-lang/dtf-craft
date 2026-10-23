@@ -4018,3 +4018,72 @@ cameraData	Lens	Lens
 	Open a document first	Önce bir belge açın
 	the document was closed	belge kapatıldı
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Etkin sayfalar
+	Add a New Sheet	Yeni sayfa ekle
+	Add a copy to the sheet	Sayfaya bir kopya ekle
+	Along the edges	Kenarlar boyunca
+	Auto Build May Rotate	Döndürmeye izin ver (otomatik)
+	Auto Build — every image at once	Otomatik yerleşim — tüm görseller bir arada
+	Auto Fill	Otomatik doldur
+	Background Warning:	Arka plan uyarısı:
+	Background not removed (opaque corners)	Arka plan kaldırılmamış (opak köşeler)
+	Between images	Görseller arası
+	Center Horizontally	Yatay ortala
+	Center Vertically	Dikey ortala
+	Center on the Sheet	Sayfada ortala
+	Copies of this sheet to print	Bu sayfadan basılacak kopya
+	Custom Color	Özel renk
+	Delete (Del)	Sil (Del)
+	Delete the Sheet	Sayfayı sil
+	Drag and drop a file here or click to	Bir dosyayı buraya sürükleyin veya tıklayın:
+	Duplicate Image	Görseli çoğalt
+	Export Sheets (PNG)…	Sayfaları dışa aktar (PNG)…
+	Fill the room left on the sheet with this visual	Sayfadaki boş alanı bu tasarımla doldur
+	Flip Horizontally	Yatay çevir
+	Flip Vertically	Dikey çevir
+	Good resolution >= 250 dpi	İyi çözünürlük >= 250 dpi
+	Grid (1 cm)	Izgara (1 cm)
+	Image Margin	Görsel kenar boşluğu
+	Import Images	Görselleri içe aktar
+	Lock Proportions	Oranları kilitle
+	Margin (cm)	Kenar boşluğu (cm)
+	No image yet: import PNG files or add the open document.	Henüz görsel yok: PNG dosyalarını içe aktarın veya açık belgeyi ekleyin.
+	No room left on the sheet	Sayfada yer kalmadı
+	Number of Images:	Görsel sayısı:
+	One copy less	Bir kopya eksik
+	One copy more	Bir kopya fazla
+	Optimal	Optimum
+	Optimal resolution >= 300 dpi	Optimum çözünürlük >= 300 dpi
+	Overlap Lines	Çakışma çizgileri
+	Overlapping or too close	Çakışıyor veya çok yakın
+	Poor	Kötü
+	Poor resolution >= 200 dpi	Kötü çözünürlük >= 200 dpi
+	Proportions:	Oranlar:
+	Push Down	Aşağı it
+	Push Left	Sola it
+	Push Right	Sağa it
+	Push Up	Yukarı it
+	Qty:	Adet:
+	Redo (Ctrl+Y)	Yinele (Ctrl+Y)
+	Rotate 90° Counterclockwise	90° saat yönünün tersine döndür
+	Same image, another size	Aynı görsel, başka boyut
+	Select an object to edit.	Düzenlemek için bir nesne seçin.
+	Semi-transparent pixels: {p} %	Yarı saydam pikseller: {p} %
+	Sheet Background	Sayfa arka planı
+	Sheet Margin	Sayfa kenar boşluğu
+	Show Overlap Lines	Çakışma çizgilerini göster
+	Show Resolution Lines	Çözünürlük çizgilerini göster
+	Snap While Moving	Taşırken hizala
+	Start Over	Baştan başla
+	Stretch to the Film Width	Film genişliğine uzat
+	Stretch to the Sheet Length	Sayfa uzunluğuna uzat
+	Supported format: PNG (cropped to its visible pixels)	Desteklenen biçim: PNG (görünür piksellere kırpılır)
+	Transparency Warning:	Saydamlık uyarısı:
+	Undo (Ctrl+Z)	Geri al (Ctrl+Z)
+	Very Poor	Çok kötü
+	Very poor resolution < 200 dpi	Çok kötü çözünürlük < 200 dpi
+	With the image margin	Görsel kenar boşluğuyla
+	With the sheet margin	Sayfa kenar boşluğuyla
+	copy	kopya
+	{n} images	{n} görsel

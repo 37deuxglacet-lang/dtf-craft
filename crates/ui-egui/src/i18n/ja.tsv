@@ -3965,3 +3965,71 @@ curves	Smooth	スムーズ
 	Open a document first	先にドキュメントを開いてください
 	the document was closed	ドキュメントが閉じられました
 	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	アクティブなシート
+	Add a New Sheet	新しいシートを追加
+	Add a copy to the sheet	シートに1枚追加
+	Along the edges	端に沿って
+	Auto Build May Rotate	回転を許可（自動）
+	Auto Build — every image at once	自動配置 — すべての画像を一度に
+	Auto Fill	自動で埋める
+	Background Warning:	背景の警告:
+	Background not removed (opaque corners)	背景が残っています（角が不透明）
+	Between images	画像の間
+	Center Horizontally	水平方向中央揃え
+	Center Vertically	垂直方向中央揃え
+	Center on the Sheet	シートの中央に配置
+	Copies of this sheet to print	このシートの印刷枚数
+	Custom Color	カスタムカラー
+	Delete (Del)	削除（Del）
+	Delete the Sheet	シートを削除
+	Drag and drop a file here or click to	ここにファイルをドラッグ＆ドロップするか、クリックして
+	Duplicate Image	画像を複製
+	Export Sheets (PNG)…	シートを書き出し（PNG）…
+	Fill the room left on the sheet with this visual	シートの空きをこのデザインで埋める
+	Flip Horizontally	左右に反転
+	Flip Vertically	上下に反転
+	Good resolution >= 250 dpi	良好な解像度 >= 250 dpi
+	Grid (1 cm)	グリッド（1 cm）
+	Image Margin	画像のマージン
+	Import Images	画像を読み込む
+	Lock Proportions	縦横比を固定
+	Margin (cm)	マージン（cm）
+	No image yet: import PNG files or add the open document.	画像がありません: PNG ファイルを読み込むか、開いているドキュメントを追加してください。
+	No room left on the sheet	シートに空きがありません
+	Number of Images:	画像の数:
+	One copy less	1枚減らす
+	One copy more	1枚増やす
+	Optimal	最適
+	Optimal resolution >= 300 dpi	最適な解像度 >= 300 dpi
+	Overlap Lines	重なりの線
+	Overlapping or too close	重なり・近すぎ
+	Poor	不良
+	Poor resolution >= 200 dpi	不良な解像度 >= 200 dpi
+	Proportions:	縦横比:
+	Push Down	下へ寄せる
+	Push Right	右へ寄せる
+	Push Up	上へ寄せる
+	Qty:	数量:
+	Redo (Ctrl+Y)	やり直し（Ctrl+Y）
+	Rotate 90° Counterclockwise	反時計回りに 90° 回転
+	Same image, another size	同じ画像、別のサイズ
+	Select an object to edit.	編集するオブジェクトを選択してください。
+	Semi-transparent pixels: {p} %	半透明ピクセル: {p} %
+	Sheet Background	シートの背景
+	Sheet Margin	シートのマージン
+	Show Overlap Lines	重なりの線を表示
+	Show Resolution Lines	解像度の線を表示
+	Snap While Moving	移動時に吸着
+	Start Over	やり直す
+	Stretch to the Film Width	フィルム幅に合わせて伸ばす
+	Stretch to the Sheet Length	シートの長さに合わせて伸ばす
+	Supported format: PNG (cropped to its visible pixels)	対応形式: PNG（表示ピクセルで切り抜き）
+	Transparency Warning:	透明部分の警告:
+	Undo (Ctrl+Z)	取り消し（Ctrl+Z）
+	Very Poor	非常に不良
+	Very poor resolution < 200 dpi	非常に不良な解像度 < 200 dpi
+	With the image margin	画像のマージンあり
+	With the sheet margin	シートのマージンあり
+	copy	コピー
+	{n} images	{n} 枚
