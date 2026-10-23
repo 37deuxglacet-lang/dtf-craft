@@ -541,14 +541,14 @@ fn preview(ui: &mut egui::Ui, v: &mut Vectorizer, area: Rect) {
     // The result's figures, under the preview.
     let status = Rect::from_min_max(pos2(view.left(), view.bottom()), pos2(view.right(), area.bottom()));
     let figures = match (&v.traced, &v.error) {
-        (Some(tr), _) => format!(
-            "{}   ·   {}",
-            crate::i18n::fmt(
+        (Some(tr), _) => {
+            let figures = crate::i18n::fmt(
                 tl!("{colors} colors · {shapes} shapes · {points} points"),
-                &[("colors", &tr.paths.len().to_string()), ("shapes", &tr.shapes().to_string()), ("points", &tr.points().to_string())]
-            ),
-            tl!("Cut-out shapes, no overlap")
-        ),
+                &[("colors", &tr.paths.len().to_string()), ("shapes", &tr.shapes().to_string()), ("points", &tr.points().to_string())],
+            );
+            // Sealed seams overlap by half a pixel: "no overlap" only when they are not.
+            if v.settings.seal { figures } else { format!("{figures}   ·   {}", tl!("Cut-out shapes, no overlap")) }
+        }
         (None, Some(e)) => e.clone(),
         (None, None) => String::new(),
     };

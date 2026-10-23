@@ -219,11 +219,12 @@ pub fn quantize(w: usize, h: usize, px: &[[f32; 4]], s: &Settings) -> Result<Qua
     }
     let (w, h, px) = reduce(w, h, px, MAX_SIDE);
     let max = s.colors.clamp(2, MAX_COLORS);
+    let flat = if s.kind == Kind::Logo { flat_mask(w, h, &px) } else { Vec::new() };
     let main = match s.kind {
         // A logo's colours are read inside its flat areas, so the antialiased contours between
         // two colours don't become colours of their own (they go to the nearest one below).
         Kind::Logo => {
-            let core = flat_pixels(w, h, &px);
+            let core = flat_pixels(w, h, &px, &flat);
             let visible = px.iter().filter(|q| q[3] >= 0.5).count();
             if core.len() * 10 >= visible { dtf_color::analyze(&core, max, 5.0, 0.002) } else { dtf_color::analyze(&px, max, 5.0, 0.005) }
         }
@@ -249,6 +250,9 @@ pub fn quantize(w: usize, h: usize, px: &[[f32; 4]], s: &Settings) -> Result<Qua
             })
         })
         .collect();
+    if s.kind == Kind::Logo {
+        snap_contours(w, h, &px, &flat, &centers, &mut index);
+    }
     let scale = (w.max(h) as f64 / 1000.0).max(1.0);
     let min_area = (s.detail.min_area() * scale * scale).round().max(1.0) as usize;
     for _ in 0..2 {
@@ -283,20 +287,59 @@ pub fn quantize(w: usize, h: usize, px: &[[f32; 4]], s: &Settings) -> Result<Qua
     Ok(Quantized { width: w, height: h, index, palette, background, edge })
 }
 
-/// The visible pixels whose 4 neighbours are visible and of the same colour (within 2 % a
-/// channel): the inside of flat areas.
-fn flat_pixels(w: usize, h: usize, px: &[[f32; 4]]) -> Vec<[f32; 4]> {
+/// Which pixels are visible and have their 4 neighbours visible and of the same colour (within
+/// 2 % a channel): the inside of flat areas.
+fn flat_mask(w: usize, h: usize, px: &[[f32; 4]]) -> Vec<bool> {
     let same = |a: &[f32; 4], b: &[f32; 4]| b[3] >= 0.5 && (0..3).all(|k| (a[k] - b[k]).abs() <= 0.02);
-    let mut out = Vec::new();
+    let mut out = vec![false; w * h];
     for y in 0..h {
         for x in 0..w {
             let q = &px[y * w + x];
-            if q[3] >= 0.5 && neighbours(x, y, w, h).iter().all(|j| j.is_some_and(|j| same(q, &px[j]))) {
-                out.push(*q);
-            }
+            out[y * w + x] = q[3] >= 0.5 && neighbours(x, y, w, h).iter().all(|j| j.is_some_and(|j| same(q, &px[j])));
         }
     }
     out
+}
+
+/// The pixels of the flat areas.
+fn flat_pixels(w: usize, h: usize, px: &[[f32; 4]], flat: &[bool]) -> Vec<[f32; 4]> {
+    px.iter().zip(flat).filter(|(_, f)| **f).map(|(q, _)| *q).take(w * h).collect()
+}
+
+/// A logo's antialiased contours: each pixel outside the flat areas takes, among the colours of
+/// the flat pixels within 2 px, the nearest one. A blend of two colours then goes to one of the
+/// two, never to a third colour of the palette that would make a one-pixel strip between them,
+/// too thin to trace, and a gap in the SVG.
+fn snap_contours(w: usize, h: usize, px: &[[f32; 4]], flat: &[bool], centers: &[[f32; 3]], index: &mut [u8]) {
+    let mut out = index.to_vec();
+    for y in 0..h {
+        for x in 0..w {
+            let i = y * w + x;
+            if flat[i] || index[i] == TRANSPARENT {
+                continue;
+            }
+            let mut near: Vec<u8> = Vec::new();
+            for ny in y.saturating_sub(2)..(y + 3).min(h) {
+                for nx in x.saturating_sub(2)..(x + 3).min(w) {
+                    let j = ny * w + nx;
+                    if flat[j] && index[j] != TRANSPARENT && !near.contains(&index[j]) {
+                        near.push(index[j]);
+                    }
+                }
+            }
+            if near.is_empty() {
+                continue;
+            }
+            let q = px[i];
+            let lab = srgb_to_lab([to8(q[0]), to8(q[1]), to8(q[2])].map(|v| f32::from(v) / 255.0));
+            if let Some(best) = near.iter().copied().filter(|c| usize::from(*c) < centers.len()).min_by(|a, b| {
+                dist2(lab, centers[usize::from(*a)]).total_cmp(&dist2(lab, centers[usize::from(*b)]))
+            }) {
+                out[i] = best;
+            }
+        }
+    }
+    index.copy_from_slice(&out);
 }
 
 /// Gives each 4-connected area of one colour smaller than `min_area` px to the colour most
@@ -748,6 +791,32 @@ mod tests {
         assert_eq!(logo.palette.len(), 2);
         let illus = quantize(60, 40, &px, &Settings { colors: 8, kind: Kind::Illustration, detail: Detail::High }).unwrap();
         assert_eq!(illus.palette.len(), 3);
+    }
+
+    /// An orange band over blue, a navy ring around: the antialiased edge between orange and
+    /// blue, nearer navy than either, goes to orange or blue, never to navy.
+    #[test]
+    fn a_logo_contour_goes_to_one_of_its_two_colours() {
+        const NAVY: [f32; 4] = [20.0 / 255.0, 38.0 / 255.0, 79.0 / 255.0, 1.0];
+        let (w, h) = (80usize, 60usize);
+        let mut px = Vec::with_capacity(w * h);
+        for y in 0..h {
+            for x in 0..w {
+                let ring = x < 6 || x >= w - 6;
+                // The band's lower edge at y = 30.5: one row half orange, half blue.
+                let k = (30.5 - y as f32).clamp(0.0, 1.0);
+                let c: [f32; 4] = if ring { NAVY } else { std::array::from_fn(|i| ORANGE[i] * k + BLUE[i] * (1.0 - k)) };
+                px.push(c);
+            }
+        }
+        let q = quantize(w, h, &px, &Settings::default()).unwrap();
+        let names = colours(&q);
+        let navy = names.iter().position(|c| c == "#14264F").unwrap();
+        for y in 25..36 {
+            for x in 10..70 {
+                assert_ne!(usize::from(q.index[y * w + x]), navy, "navy at ({x}, {y}): {names:?}");
+            }
+        }
     }
 
     #[test]
