@@ -93,6 +93,13 @@ pub struct DtfPanelUi {
     /// The cut-out's background eyedropper is on: the tool it replaced.
     #[serde(skip)]
     pub background_picker: Option<crate::state::Tool>,
+    /// The cut-out's settings before its last change, for Toggle Last State (one level, until
+    /// Apply or Cancel).
+    #[serde(skip)]
+    cutout_last: Option<Map<String, Value>>,
+    /// The settings before a change still being dragged (a slider): the last state once released.
+    #[serde(skip)]
+    cutout_pending: Option<Map<String, Value>>,
     /// Whether a plain background was detected, for (document, revision, layer, tolerance × 10).
     #[serde(skip)]
     detected: Option<((photocraft_doc::DocId, u64, u64, i64), bool)>,
@@ -437,6 +444,65 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     }
 }
 
+/// The cut-out's settings without the panel's own keys (`__…`): what Toggle Last State compares
+/// and restores.
+fn cutout_state(f: &Map<String, Value>) -> Map<String, Value> {
+    f.iter().filter(|(k, _)| !k.starts_with("__")).map(|(k, v)| (k.clone(), v.clone())).collect()
+}
+
+/// The cut-out's settings changed from `before`: it becomes the last state (once a drag ends).
+fn record_cutout(app: &mut PhotocraftApp, before: Map<String, Value>, dragging: bool) {
+    let p = &mut app.ui.dtf_panel;
+    if dragging {
+        p.cutout_pending.get_or_insert(before);
+    } else {
+        p.cutout_last = Some(p.cutout_pending.take().unwrap_or(before));
+    }
+}
+
+/// Forget the cut-out's last state (Apply, Cancel).
+fn clear_cutout_history(app: &mut PhotocraftApp) {
+    app.ui.dtf_panel.cutout_last = None;
+    app.ui.dtf_panel.cutout_pending = None;
+}
+
+/// Is Edit › Toggle Last State the cut-out's (its preview on screen, a last state kept)?
+fn cutout_toggles(app: &PhotocraftApp) -> bool {
+    app.ui.dtf_panel.previewing.as_deref() == Some(photocraft_engine::dtf_cmds::REMOVE_WHITE) && app.ui.dtf_panel.cutout_last.is_some()
+}
+
+/// Edit › Toggle Last State (Ctrl+Alt+Z) while the cut-out is previewed, before Apply: its
+/// settings go back to their last state (a hole added by mistake goes), and again forward. One
+/// level, as for the document. `None` otherwise: the document's history.
+pub(crate) fn intercept(app: &mut PhotocraftApp, id: &str) -> Option<Result<Value, String>> {
+    if id != "edit.toggleLastState" || !cutout_toggles(app) {
+        return None;
+    }
+    let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+    let last = app.ui.dtf_panel.cutout_last.take()?;
+    let current = app.ui.dtf_panel.fields.get(cmd).cloned().unwrap_or_default();
+    // The panel's own keys (the help sheet open…) stay as they are.
+    let mut restored: Map<String, Value> = current.iter().filter(|(k, _)| k.starts_with("__")).map(|(k, v)| (k.clone(), v.clone())).collect();
+    restored.extend(last);
+    app.ui.dtf_panel.cutout_last = Some(cutout_state(&current));
+    app.ui.dtf_panel.fields.insert(cmd.into(), restored);
+    Some(Ok(json!({"toggled": cmd})))
+}
+
+/// Toggle Last State's menu item while the cut-out owns it.
+pub(crate) fn is_enabled(app: &PhotocraftApp, id: &str) -> Option<bool> {
+    (id == "edit.toggleLastState" && cutout_toggles(app)).then_some(true)
+}
+
+/// While the cut-out is previewed with neither Add Holes nor the background eyedropper on, a
+/// click on the visual does nothing (the Hand and Zoom tools still work).
+pub(crate) fn blocks_canvas(app: &PhotocraftApp) -> bool {
+    app.ui.dtf_panel.previewing.as_deref() == Some(photocraft_engine::dtf_cmds::REMOVE_WHITE)
+        && app.ui.dtf_panel.hole_eraser.is_none()
+        && app.ui.dtf_panel.background_picker.is_none()
+        && !matches!(app.ui.tool, crate::state::Tool::Hand | crate::state::Tool::Zoom)
+}
+
 /// The cut-out's holes clicked by hand, kept in its settings (`holePoints`, document px): they
 /// are part of its preview and are cut with the background on Apply.
 const HOLES: &str = "holePoints";
@@ -503,6 +569,7 @@ pub(crate) fn hole_click(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
     }
     let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
     let mut f = cutout_fields(app);
+    record_cutout(app, cutout_state(&f), false);
     let mut points = f.get(HOLES).and_then(Value::as_array).cloned().unwrap_or_default();
     if points.len() < photocraft_algo::dtf::MAX_HOLES {
         points.push(json!([x.floor(), y.floor()]));
@@ -542,6 +609,7 @@ pub(crate) fn pick_background(app: &mut PhotocraftApp, x: f64, y: f64) -> bool {
     };
     let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
     let mut f = cutout_fields(app);
+    record_cutout(app, cutout_state(&f), false);
     f.insert("color".into(), json!(hex));
     f.insert("detectColor".into(), json!(false));
     app.ui.dtf_panel.fields.insert(cmd.into(), f);
@@ -576,6 +644,16 @@ fn current_size_note(app: &PhotocraftApp) -> Option<String> {
         tl!("Current size: {width} × {height} cm at {resolution} ppi"),
         &[("width", &cm(doc.size.width)), ("height", &cm(doc.size.height)), ("resolution", &format!("{:.0}", dpi))],
     ))
+}
+
+/// A toggle button with an icon and a label, the panel's width, pressed while `on` (the
+/// cut-out's Add Holes and background eyedropper, like the toolbar's tools).
+fn mode_button(ui: &mut egui::Ui, icon: &str, label: &str, on: bool) -> egui::Response {
+    let tint = if on { ui.visuals().selection.stroke.color } else { Tokens::get(ui.ctx()).text };
+    let button = egui::Button::image_and_text(crate::icons::image(icon, 16.0, tint), RichText::new(label).color(tint))
+        .selected(on)
+        .min_size(egui::vec2(ui.available_width(), 26.0));
+    ui.add(button)
 }
 
 /// One DTF tool's tab (`tab` indexes [`TOOLS`]): its settings, Apply, and Cancel while previewed.
@@ -648,19 +726,6 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     let mut eraser = app.ui.dtf_panel.hole_eraser.is_some();
     let mut picker = app.ui.dtf_panel.background_picker.is_some();
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
-        // The background colour taken from the image with the eyedropper.
-        let top = ui.cursor().top();
-        ui.add_enabled_ui(have_doc, |ui| {
-            ui.horizontal(|ui| {
-                ui.label(RichText::new(tl!("Pick the Background Colour")).color(Tokens::get(ui.ctx()).text_dim));
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if crate::icons::button(ui, "pipette", 22.0, picker, tl!("Eyedropper")).clicked() {
-                        picker = !picker;
-                    }
-                });
-            });
-        });
-        crate::dtf_help::tip_over(ui, cmd, "backgroundPicker", top);
         // Detection on and nothing plain on the edges: nothing would be removed.
         let detect = f.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
         let tolerance = f.get("tolerance").and_then(Value::as_f64).unwrap_or(10.0);
@@ -675,9 +740,21 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             set_last_color(app, &hex);
         }
         crate::dtf_help::tip_over(ui, cmd, "previewColor", top);
-        // Interior holes by hand: each click cuts the enclosed area, with the tab's settings.
+        // The background colour taken from the image with the eyedropper: a toggle button,
+        // exclusive with Add Holes (below).
         ui.add_enabled_ui(have_doc, |ui| {
-            help(crate::widgets::checkbox(ui, &mut eraser, tl!("Add Holes")), cmd, "holeEraser");
+            if help(mode_button(ui, "pipette", tl!("Pick the Background Colour"), picker), cmd, "backgroundPicker").clicked() {
+                picker = !picker;
+                eraser &= !picker;
+            }
+        });
+        // Interior holes by hand: a toggle button, pressed while on; each click on the visual
+        // adds a hole to the preview.
+        ui.add_enabled_ui(have_doc, |ui| {
+            if help(mode_button(ui, "eraser-magic", tl!("Add Holes"), eraser), cmd, "holeEraser").clicked() {
+                eraser = !eraser;
+                picker &= !eraser;
+            }
         });
         let n = holes(&f);
         if n > 0 {
@@ -696,7 +773,17 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         help(crate::widgets::checkbox(ui, &mut show_before, tl!("Show Before")), cmd, "showBefore");
         f.insert("__before".into(), json!(show_before));
     }
-    let changed = f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v));
+    let changed = f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v)) || before.iter().any(|(k, _)| !k.starts_with("__") && !f.contains_key(k));
+    // The cut-out's last state for Toggle Last State: the settings before this change (before a
+    // whole slider drag), or the drag's start once the pointer is released.
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        let dragging = ui.input(|i| i.pointer.any_down());
+        if changed {
+            record_cutout(app, cutout_state(&before), dragging);
+        } else if !dragging && let Some(start) = app.ui.dtf_panel.cutout_pending.take() {
+            app.ui.dtf_panel.cutout_last = Some(start);
+        }
+    }
     ui.add_space(6.0);
     ui.horizontal(|ui| {
         if cmd == "dtf.controlBackground" {
@@ -729,6 +816,9 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
     }
     if apply_it {
+        if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+            clear_cutout_history(app);
+        }
         apply(app, cmd);
     } else if remove_bg {
         if app.ui.dtf_panel.previewing.as_deref() == Some(cmd) {
@@ -742,6 +832,9 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         // Cancel drops the holes clicked for this cut-out.
         if let Some(f) = app.ui.dtf_panel.fields.get_mut(cmd) {
             f.remove(HOLES);
+        }
+        if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+            clear_cutout_history(app);
         }
     }
 }
@@ -1074,6 +1167,59 @@ mod tests {
         assert_eq!(app.ui.tool, crate::state::Tool::Brush);
     }
 
+    /// Toggle Last State (Ctrl+Alt+Z) while the cut-out is previewed: a hole added by mistake
+    /// goes, then comes back; one level; after Apply it is the document's again.
+    #[test]
+    fn toggle_last_state_steps_the_cutout_before_apply() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.background_jobs = false;
+        app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+        assert!(crate::dtf_panel::is_enabled(&app, "edit.toggleLastState").is_none(), "nothing to toggle yet");
+        set_hole_eraser(&mut app, true);
+        assert!(hole_click(&mut app, 5.0, 5.0));
+        assert!(hole_click(&mut app, 8.0, 8.0));
+        assert_eq!(crate::dtf_panel::is_enabled(&app, "edit.toggleLastState"), Some(true));
+        app.run("edit.toggleLastState", json!({})).unwrap();
+        assert_eq!(holes(&app.ui.dtf_panel.fields[cmd]), 1, "the last hole goes");
+        app.run("edit.toggleLastState", json!({})).unwrap();
+        assert_eq!(holes(&app.ui.dtf_panel.fields[cmd]), 2, "and comes back");
+        // A setting changed in the tab is a state too (here as the tab records it).
+        let before = cutout_state(&app.ui.dtf_panel.fields[cmd]);
+        app.ui.dtf_panel.fields.get_mut(cmd).unwrap().insert("tolerance".into(), json!(30));
+        record_cutout(&mut app, before, false);
+        app.run("edit.toggleLastState", json!({})).unwrap();
+        assert_eq!(app.ui.dtf_panel.fields[cmd].get("tolerance"), Some(&json!(10.0)));
+        // Cancel ends it: the document's own history answers again.
+        stop_preview(&mut app);
+        clear_cutout_history(&mut app);
+        assert!(intercept(&mut app, "edit.toggleLastState").is_none());
+    }
+
+    /// Add Holes and the eyedropper are toggle buttons, never on together; with neither on, a
+    /// click on the visual does nothing while the cut-out is previewed.
+    #[test]
+    fn the_cutout_modes_are_exclusive_toggles_and_idle_clicks_do_nothing() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
+        app.ui.tool = crate::state::Tool::Brush;
+        app.ui.dtf_panel.previewing = Some(cmd.into());
+        assert!(blocks_canvas(&app), "no mode on: the click does nothing");
+        let revision = app.session.active().unwrap().revision;
+        crate::canvas::tool_event(&mut app, crate::canvas::ToolEvent::Down { x: 5.0, y: 5.0, pressure: 1.0 }, egui::Modifiers::NONE);
+        crate::canvas::tool_event(&mut app, crate::canvas::ToolEvent::Up { x: 5.0, y: 5.0 }, egui::Modifiers::NONE);
+        assert_eq!(app.session.active().unwrap().revision, revision, "the brush did not paint");
+        set_hole_eraser(&mut app, true);
+        assert!(!blocks_canvas(&app));
+        set_background_picker(&mut app, true);
+        assert!(app.ui.dtf_panel.hole_eraser.is_none() && app.ui.dtf_panel.background_picker.is_some());
+        set_background_picker(&mut app, false);
+        assert_eq!(app.ui.tool, crate::state::Tool::Brush);
+        app.ui.tool = crate::state::Tool::Hand;
+        assert!(!blocks_canvas(&app), "the Hand still moves the view");
+    }
+
     /// The background eyedropper takes the clicked colour, turns detection off and goes off;
     /// it and Add Holes are never on together.
     #[test]
@@ -1241,7 +1387,9 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         let _fr = crate::i18n::language_scope(crate::i18n::Lang::from_pref("fr"));
         let shot = |session: photocraft_engine::Session, name: &str, setup: &dyn Fn(&mut PhotocraftApp)| {
-            let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
+            // The cut-out's tab is long: its shots are taller.
+            let height = if name.starts_with("detourage") { 1300.0 } else { 900.0 };
+            let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, height)).with_max_steps(64).wgpu().build_eframe(move |cc| {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
                 let mut app = PhotocraftApp::new(session, crate::Services::default());
                 // The canvas draws previews on the GPU, as in the app.
@@ -1319,6 +1467,15 @@ mod tests {
             f.insert("tolerance".into(), json!(12));
             app.ui.dtf_panel.fields.insert(cmd.into(), f);
             app.ui.dtf_panel.previewing = Some(cmd.into());
+        });
+        // Add Holes pressed, two holes clicked: the toggle buttons, the counter.
+        shot(on_white(), "detourage_trous", &|app| {
+            app.run("window.panel.activate", json!({"panel": "Cutout"})).unwrap();
+            let cmd = "filter.dtf.removeWhiteBackground";
+            app.ui.dtf_panel.fields.insert(cmd.into(), initial_fields(app, cmd));
+            set_hole_eraser(app, true);
+            hole_click(app, 300.0, 200.0);
+            hole_click(app, 20.0, 20.0);
         });
         shot(visual(), "conformite", &|app| {
             app.run("window.panel.activate", json!({"panel": "Conformity"})).unwrap();

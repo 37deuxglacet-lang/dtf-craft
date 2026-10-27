@@ -4865,6 +4865,10 @@ fn tool_move(app: &mut PhotocraftApp, x: f64, y: f64, pressure: f32, mods: egui:
 
 /// Tool state machine. Shared by mouse input and automation.
 pub fn tool_event(app: &mut PhotocraftApp, ev: ToolEvent, mods: egui::Modifiers) {
+    // DTF Craft: the cut-out previewed with no mode on (Add Holes, eyedropper): clicks do nothing.
+    if crate::dtf_panel::blocks_canvas(app) {
+        return;
+    }
     if crate::symmetry_ui::pointer(app, ev, crate::workspace_ui::sticky_mods(app, mods)) {
         return;
     }

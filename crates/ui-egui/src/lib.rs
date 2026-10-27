@@ -1020,6 +1020,10 @@ impl PhotocraftApp {
         if let Some(r) = crate::crop_ui::intercept(self, id) {
             return r;
         }
+        // DTF Craft: Toggle Last State steps the cut-out's settings while it is previewed.
+        if let Some(r) = crate::dtf_panel::intercept(self, id) {
+            return r;
+        }
         let suppress_events = self.automation_input && self.session.prefs().script_events.enabled;
         if suppress_events {
             self.session.edit_prefs(|prefs| prefs.script_events.enabled = false);
