@@ -2969,3 +2969,98 @@ curves	Smooth	Suavizar
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	No se detectó un fondo liso: el fondo ya es transparente, o elija su color con el cuentagotas.
 	Holes: {n}	Agujeros: {n}
 	Remove Last Hole	Quitar el último agujero
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Hoja de impresión (gang sheet)
+	Visuals	Diseños
+	Add PNG Files…	Añadir archivos PNG…
+	Add Open Document	Añadir el documento abierto
+	Add PNG files or the open document.	Añada archivos PNG o el documento abierto.
+	Sheet	Hoja
+	Film Width	Ancho del film
+	Max Length	Longitud máx.
+	Allow Rotation	Permitir rotación
+	Auto Build	Montaje automático
+	Selected Visual	Diseño seleccionado
+	Rotate 90°	Girar 90°
+	Length used: {length} cm	Longitud usada: {length} cm
+	{n} not placed	Sin colocar: {n}
+	{n} too close or overlapping	Demasiado cerca o superpuestos: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Arrastre un diseño para moverlo. Flechas: 1 mm (Mayús: 1 cm). Supr lo quita de la hoja.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Diseños más cerca que el margen de otro diseño o de un borde: {n}. ¿Exportar de todos modos?
+	Too close to another visual	Demasiado cerca de otro diseño
+	No room to turn this visual	No hay espacio para girar este diseño
+	Open a document first	Abra primero un documento
+	the document was closed	el documento se cerró
+	Duplicate	Duplicar
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Hojas activas
+	Add a New Sheet	Añadir una hoja nueva
+	Add a copy to the sheet	Añadir una copia a la hoja
+	Along the edges	A lo largo de los bordes
+	Auto Build May Rotate	Permitir rotación (automático)
+	Auto Build — every image at once	Montaje automático — todas las imágenes a la vez
+	Auto Fill	Relleno automático
+	Background Warning:	Aviso de fondo:
+	Background not removed (opaque corners)	Fondo sin quitar (esquinas opacas)
+	Between images	Entre imágenes
+	Center Horizontally	Centrar horizontalmente
+	Center Vertically	Centrar verticalmente
+	Center on the Sheet	Centrar en la hoja
+	Copies of this sheet to print	Copias de esta hoja a imprimir
+	Custom Color	Color personalizado
+	Delete (Del)	Eliminar (Supr)
+	Delete the Sheet	Eliminar la hoja
+	Drag and drop a file here or click to	Arrastre un archivo aquí o haga clic para
+	Duplicate Image	Duplicar imagen
+	Export Sheets (PNG)…	Exportar hojas (PNG)…
+	Fill the room left on the sheet with this visual	Rellenar el espacio libre de la hoja con este diseño
+	Flip Horizontally	Voltear horizontalmente
+	Flip Vertically	Voltear verticalmente
+	Good	Buena
+	Good resolution >= 250 dpi	Buena resolución >= 250 dpi
+	Grid (1 cm)	Cuadrícula (1 cm)
+	Image Margin	Margen de la imagen
+	Import Images	Importar imágenes
+	Lock Proportions	Bloquear proporciones
+	Margin (cm)	Margen (cm)
+	No image yet: import PNG files or add the open document.	Aún no hay imágenes: importe archivos PNG o añada el documento abierto.
+	No room left on the sheet	No queda espacio en la hoja
+	Number of Images:	Número de imágenes:
+	One copy less	Una copia menos
+	One copy more	Una copia más
+	Optimal	Óptima
+	Optimal resolution >= 300 dpi	Resolución óptima >= 300 dpi
+	Overlap Lines	Líneas de superposición
+	Overlapping or too close	Superpuesto o demasiado cerca
+	Poor	Mala
+	Poor resolution >= 200 dpi	Mala resolución >= 200 dpi
+	Proportions:	Proporciones:
+	Push Down	Empujar abajo
+	Push Left	Empujar a la izquierda
+	Push Right	Empujar a la derecha
+	Push Up	Empujar arriba
+	Qty:	Cant.:
+	Redo (Ctrl+Y)	Rehacer (Ctrl+Y)
+	Rotate 90° Counterclockwise	Girar 90° en sentido antihorario
+	Same image, another size	Misma imagen, otro tamaño
+	Select an object to edit.	Seleccione un objeto para editarlo.
+	Semi-transparent pixels: {p} %	Píxeles semitransparentes: {p} %
+	Settings	Ajustes
+	Sheet Background	Fondo de la hoja
+	Sheet Margin	Margen de la hoja
+	Show Overlap Lines	Mostrar líneas de superposición
+	Show Resolution Lines	Mostrar líneas de resolución
+	Snap While Moving	Alinear al mover
+	Start Over	Empezar de nuevo
+	Stretch to the Film Width	Estirar al ancho del film
+	Stretch to the Sheet Length	Estirar al largo de la hoja
+	Supported format: PNG (cropped to its visible pixels)	Formato admitido: PNG (recortado a sus píxeles visibles)
+	Transparency Warning:	Aviso de transparencia:
+	Undo (Ctrl+Z)	Deshacer (Ctrl+Z)
+	Very Poor	Muy mala
+	Very poor resolution < 200 dpi	Resolución muy mala < 200 dpi
+	With the image margin	Con el margen de la imagen
+	With the sheet margin	Con el margen de la hoja
+	copy	copia
+	{n} images	{n} imágenes

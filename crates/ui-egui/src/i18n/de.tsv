@@ -3280,3 +3280,97 @@ curves	Smooth	Glätten
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Kein einfarbiger Hintergrund erkannt: Der Hintergrund ist bereits transparent, oder wählen Sie seine Farbe mit der Pipette.
 	Holes: {n}	Löcher: {n}
 	Remove Last Hole	Letztes Loch entfernen
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Sammelbogen
+	Visuals	Motive
+	Add PNG Files…	PNG-Dateien hinzufügen…
+	Add Open Document	Geöffnetes Dokument hinzufügen
+	Add PNG files or the open document.	Fügen Sie PNG-Dateien oder das geöffnete Dokument hinzu.
+	Sheet	Bogen
+	Film Width	Folienbreite
+	Max Length	Max. Länge
+	Allow Rotation	Drehen erlauben
+	Auto Build	Automatisch anordnen
+	Selected Visual	Ausgewähltes Motiv
+	Rotate 90°	90° drehen
+	Length used: {length} cm	Genutzte Länge: {length} cm
+	{n} not placed	Nicht platziert: {n}
+	{n} too close or overlapping	Zu nah oder überlappend: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Ziehen Sie ein Motiv, um es zu verschieben. Pfeiltasten: 1 mm (Umschalt: 1 cm). Entf nimmt es vom Bogen.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motive näher als der Rand an einem anderen Motiv oder einer Kante: {n}. Trotzdem exportieren?
+	Too close to another visual	Zu nah an einem anderen Motiv
+	No room to turn this visual	Kein Platz, um dieses Motiv zu drehen
+	Open a document first	Öffnen Sie zuerst ein Dokument
+	the document was closed	das Dokument wurde geschlossen
+	Duplicate	Duplizieren
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktive Sammelbögen
+	Add a New Sheet	Neuen Bogen hinzufügen
+	Add a copy to the sheet	Eine Kopie zum Bogen hinzufügen
+	Along the edges	Entlang der Ränder
+	Auto Build May Rotate	Drehen erlauben (automatisch)
+	Auto Build — every image at once	Automatisch anordnen — alle Bilder auf einmal
+	Auto Fill	Automatisch füllen
+	Background Warning:	Hintergrundwarnung:
+	Background not removed (opaque corners)	Hintergrund nicht entfernt (deckende Ecken)
+	Between images	Zwischen Bildern
+	Center Horizontally	Horizontal zentrieren
+	Center Vertically	Vertikal zentrieren
+	Center on the Sheet	Auf dem Bogen zentrieren
+	Copies of this sheet to print	Zu druckende Exemplare dieses Bogens
+	Custom Color	Eigene Farbe
+	Delete (Del)	Löschen (Entf)
+	Delete the Sheet	Bogen löschen
+	Drag and drop a file here or click to	Datei hierher ziehen oder klicken, um
+	Duplicate Image	Bild duplizieren
+	Export Sheets (PNG)…	Bögen exportieren (PNG)…
+	Fill the room left on the sheet with this visual	Den freien Platz des Bogens mit diesem Motiv füllen
+	Flip Horizontally	Horizontal spiegeln
+	Flip Vertically	Vertikal spiegeln
+	Good resolution >= 250 dpi	Gute Auflösung >= 250 dpi
+	Grid (1 cm)	Raster (1 cm)
+	Image Margin	Bildabstand
+	Import Images	Bilder importieren
+	Lock Proportions	Proportionen sperren
+	Margin (cm)	Abstand (cm)
+	No image yet: import PNG files or add the open document.	Noch kein Bild: PNG-Dateien importieren oder das geöffnete Dokument hinzufügen.
+	No room left on the sheet	Kein Platz mehr auf dem Bogen
+	Number of Images:	Anzahl der Bilder:
+	One copy less	Eine Kopie weniger
+	One copy more	Eine Kopie mehr
+	Optimal	Optimal
+	Optimal resolution >= 300 dpi	Optimale Auflösung >= 300 dpi
+	Overlap Lines	Überlappungslinien
+	Overlapping or too close	Überlappend oder zu nah
+	Poor	Schlecht
+	Poor resolution >= 200 dpi	Schlechte Auflösung >= 200 dpi
+	Proportions:	Proportionen:
+	Push Down	Nach unten schieben
+	Push Left	Nach links schieben
+	Push Right	Nach rechts schieben
+	Push Up	Nach oben schieben
+	Qty:	Anz.:
+	Redo (Ctrl+Y)	Wiederholen (Strg+Y)
+	Rotate 90° Counterclockwise	Um 90° gegen den Uhrzeigersinn drehen
+	Same image, another size	Gleiches Bild, andere Größe
+	Select an object to edit.	Wählen Sie ein Objekt zum Bearbeiten.
+	Semi-transparent pixels: {p} %	Halbtransparente Pixel: {p} %
+	Settings	Einstellungen
+	Sheet Background	Bogenhintergrund
+	Sheet Margin	Bogenrand
+	Show Overlap Lines	Überlappungslinien anzeigen
+	Show Resolution Lines	Auflösungslinien anzeigen
+	Snap While Moving	Beim Verschieben ausrichten
+	Start Over	Neu beginnen
+	Stretch to the Film Width	Auf Folienbreite strecken
+	Stretch to the Sheet Length	Auf Bogenlänge strecken
+	Supported format: PNG (cropped to its visible pixels)	Unterstütztes Format: PNG (auf sichtbare Pixel zugeschnitten)
+	Transparency Warning:	Transparenzwarnung:
+	Undo (Ctrl+Z)	Rückgängig (Strg+Z)
+	Very Poor	Sehr schlecht
+	Very poor resolution < 200 dpi	Sehr schlechte Auflösung < 200 dpi
+	With the image margin	Mit Bildabstand
+	With the sheet margin	Mit Bogenrand
+	copy	Kopie
+	{n} images	{n} Bilder

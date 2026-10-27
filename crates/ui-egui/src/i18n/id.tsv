@@ -3270,3 +3270,96 @@ curves	Smooth	Haluskan
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Tidak ada latar polos terdeteksi: latar sudah transparan, atau pilih warnanya dengan pipet.
 	Holes: {n}	Lubang: {n}
 	Remove Last Hole	Hapus lubang terakhir
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Lembar gabungan
+	Visuals	Desain
+	Add PNG Files…	Tambah file PNG…
+	Add Open Document	Tambah dokumen yang terbuka
+	Add PNG files or the open document.	Tambahkan file PNG atau dokumen yang terbuka.
+	Sheet	Lembar
+	Film Width	Lebar film
+	Max Length	Panjang maks.
+	Allow Rotation	Izinkan rotasi
+	Auto Build	Susun otomatis
+	Selected Visual	Desain terpilih
+	Rotate 90°	Putar 90°
+	Length used: {length} cm	Panjang terpakai: {length} cm
+	{n} not placed	Belum ditempatkan: {n}
+	{n} too close or overlapping	Terlalu dekat atau bertumpuk: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Seret desain untuk memindahkannya. Panah: 1 mm (Shift: 1 cm). Delete melepasnya dari lembar.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Desain yang lebih dekat dari margin ke desain lain atau ke tepi: {n}. Tetap ekspor?
+	Too close to another visual	Terlalu dekat dengan desain lain
+	No room to turn this visual	Tidak ada ruang untuk memutar desain ini
+	Open a document first	Buka dokumen terlebih dahulu
+	the document was closed	dokumen telah ditutup
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Lembar aktif
+	Add a New Sheet	Tambah lembar baru
+	Add a copy to the sheet	Tambah satu salinan ke lembar
+	Along the edges	Di sepanjang tepi
+	Auto Build May Rotate	Izinkan rotasi (otomatis)
+	Auto Build — every image at once	Susun otomatis — semua gambar sekaligus
+	Auto Fill	Isi otomatis
+	Background Warning:	Peringatan latar:
+	Background not removed (opaque corners)	Latar belum dihapus (sudut buram)
+	Between images	Antar gambar
+	Center Horizontally	Tengahkan horizontal
+	Center Vertically	Tengahkan vertikal
+	Center on the Sheet	Tengahkan di lembar
+	Copies of this sheet to print	Salinan lembar ini yang dicetak
+	Custom Color	Warna khusus
+	Delete (Del)	Hapus (Del)
+	Delete the Sheet	Hapus lembar
+	Drag and drop a file here or click to	Seret file ke sini atau klik untuk
+	Duplicate Image	Duplikat gambar
+	Export Sheets (PNG)…	Ekspor lembar (PNG)…
+	Fill the room left on the sheet with this visual	Isi ruang kosong lembar dengan desain ini
+	Flip Horizontally	Balik horizontal
+	Flip Vertically	Balik vertikal
+	Good	Baik
+	Good resolution >= 250 dpi	Resolusi baik >= 250 dpi
+	Grid (1 cm)	Kisi (1 cm)
+	Image Margin	Margin gambar
+	Import Images	Impor gambar
+	Lock Proportions	Kunci proporsi
+	Margin (cm)	Margin (cm)
+	No image yet: import PNG files or add the open document.	Belum ada gambar: impor file PNG atau tambahkan dokumen yang terbuka.
+	No room left on the sheet	Tidak ada ruang di lembar
+	Number of Images:	Jumlah gambar:
+	One copy less	Kurangi satu salinan
+	One copy more	Tambah satu salinan
+	Optimal	Optimal
+	Optimal resolution >= 300 dpi	Resolusi optimal >= 300 dpi
+	Overlap Lines	Garis tumpang tindih
+	Overlapping or too close	Tumpang tindih atau terlalu dekat
+	Poor	Buruk
+	Poor resolution >= 200 dpi	Resolusi buruk >= 200 dpi
+	Proportions:	Proporsi:
+	Push Down	Dorong ke bawah
+	Push Left	Dorong ke kiri
+	Push Right	Dorong ke kanan
+	Push Up	Dorong ke atas
+	Qty:	Jml:
+	Redo (Ctrl+Y)	Ulangi (Ctrl+Y)
+	Rotate 90° Counterclockwise	Putar 90° berlawanan arah jarum jam
+	Same image, another size	Gambar sama, ukuran lain
+	Select an object to edit.	Pilih objek untuk diedit.
+	Semi-transparent pixels: {p} %	Piksel semi-transparan: {p} %
+	Sheet Background	Latar lembar
+	Sheet Margin	Margin lembar
+	Show Overlap Lines	Tampilkan garis tumpang tindih
+	Show Resolution Lines	Tampilkan garis resolusi
+	Snap While Moving	Rapatkan saat memindah
+	Start Over	Mulai ulang
+	Stretch to the Film Width	Regangkan ke lebar film
+	Stretch to the Sheet Length	Regangkan ke panjang lembar
+	Supported format: PNG (cropped to its visible pixels)	Format didukung: PNG (dipangkas ke piksel yang terlihat)
+	Transparency Warning:	Peringatan transparansi:
+	Undo (Ctrl+Z)	Urungkan (Ctrl+Z)
+	Very Poor	Sangat buruk
+	Very poor resolution < 200 dpi	Resolusi sangat buruk < 200 dpi
+	With the image margin	Dengan margin gambar
+	With the sheet margin	Dengan margin lembar
+	copy	salinan
+	{n} images	{n} gambar

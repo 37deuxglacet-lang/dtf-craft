@@ -4033,3 +4033,95 @@ curves	Smooth	Vloeiend maken
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Geen effen achtergrond gevonden: de achtergrond is al transparant, of kies de kleur met de pipet.
 	Holes: {n}	Gaten: {n}
 	Remove Last Hole	Laatste gat verwijderen
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Verzamelvel
+	Visuals	Ontwerpen
+	Add PNG Files…	PNG-bestanden toevoegen…
+	Add Open Document	Geopend document toevoegen
+	Add PNG files or the open document.	Voeg PNG-bestanden of het geopende document toe.
+	Sheet	Vel
+	Film Width	Filmbreedte
+	Max Length	Max. lengte
+	Allow Rotation	Draaien toestaan
+	Auto Build	Automatisch indelen
+	Selected Visual	Geselecteerd ontwerp
+	Rotate 90°	90° draaien
+	Length used: {length} cm	Gebruikte lengte: {length} cm
+	{n} not placed	Niet geplaatst: {n}
+	{n} too close or overlapping	Te dichtbij of overlappend: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Sleep een ontwerp om het te verplaatsen. Pijlen: 1 mm (Shift: 1 cm). Delete haalt het van het vel.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Ontwerpen dichter dan de marge bij een ander ontwerp of een rand: {n}. Toch exporteren?
+	Too close to another visual	Te dicht bij een ander ontwerp
+	No room to turn this visual	Geen ruimte om dit ontwerp te draaien
+	Open a document first	Open eerst een document
+	the document was closed	het document is gesloten
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Actieve verzamelvellen
+	Add a New Sheet	Nieuw vel toevoegen
+	Add a copy to the sheet	Een kopie aan het vel toevoegen
+	Along the edges	Langs de randen
+	Auto Build May Rotate	Draaien toestaan (automatisch)
+	Auto Build — every image at once	Automatisch indelen — alle afbeeldingen tegelijk
+	Auto Fill	Automatisch vullen
+	Background Warning:	Achtergrondwaarschuwing:
+	Background not removed (opaque corners)	Achtergrond niet verwijderd (dekkende hoeken)
+	Between images	Tussen afbeeldingen
+	Center Horizontally	Horizontaal centreren
+	Center Vertically	Verticaal centreren
+	Center on the Sheet	Centreren op het vel
+	Copies of this sheet to print	Te printen exemplaren van dit vel
+	Custom Color	Eigen kleur
+	Delete (Del)	Verwijderen (Del)
+	Delete the Sheet	Vel verwijderen
+	Drag and drop a file here or click to	Sleep een bestand hierheen of klik om
+	Duplicate Image	Afbeelding dupliceren
+	Export Sheets (PNG)…	Vellen exporteren (PNG)…
+	Fill the room left on the sheet with this visual	De vrije ruimte op het vel vullen met dit ontwerp
+	Flip Horizontally	Horizontaal spiegelen
+	Flip Vertically	Verticaal spiegelen
+	Good resolution >= 250 dpi	Goede resolutie >= 250 dpi
+	Grid (1 cm)	Raster (1 cm)
+	Image Margin	Afbeeldingsmarge
+	Import Images	Afbeeldingen importeren
+	Lock Proportions	Verhoudingen vergrendelen
+	Margin (cm)	Marge (cm)
+	No image yet: import PNG files or add the open document.	Nog geen afbeelding: importeer PNG-bestanden of voeg het geopende document toe.
+	No room left on the sheet	Geen ruimte meer op het vel
+	Number of Images:	Aantal afbeeldingen:
+	One copy less	Eén kopie minder
+	One copy more	Eén kopie meer
+	Optimal	Optimaal
+	Optimal resolution >= 300 dpi	Optimale resolutie >= 300 dpi
+	Overlap Lines	Overlappingslijnen
+	Overlapping or too close	Overlappend of te dichtbij
+	Poor	Slecht
+	Poor resolution >= 200 dpi	Slechte resolutie >= 200 dpi
+	Proportions:	Verhoudingen:
+	Push Down	Naar beneden duwen
+	Push Left	Naar links duwen
+	Push Right	Naar rechts duwen
+	Push Up	Naar boven duwen
+	Qty:	Aantal:
+	Redo (Ctrl+Y)	Opnieuw (Ctrl+Y)
+	Rotate 90° Counterclockwise	90° linksom draaien
+	Same image, another size	Zelfde afbeelding, ander formaat
+	Select an object to edit.	Selecteer een object om te bewerken.
+	Semi-transparent pixels: {p} %	Halfdoorzichtige pixels: {p} %
+	Sheet Background	Achtergrond van het vel
+	Sheet Margin	Velmarge
+	Show Overlap Lines	Overlappingslijnen tonen
+	Show Resolution Lines	Resolutielijnen tonen
+	Snap While Moving	Uitlijnen tijdens verplaatsen
+	Start Over	Opnieuw beginnen
+	Stretch to the Film Width	Uitrekken tot de filmbreedte
+	Stretch to the Sheet Length	Uitrekken tot de vellengte
+	Supported format: PNG (cropped to its visible pixels)	Ondersteund formaat: PNG (bijgesneden tot zichtbare pixels)
+	Transparency Warning:	Transparantiewaarschuwing:
+	Undo (Ctrl+Z)	Ongedaan maken (Ctrl+Z)
+	Very Poor	Zeer slecht
+	Very poor resolution < 200 dpi	Zeer slechte resolutie < 200 dpi
+	With the image margin	Met de afbeeldingsmarge
+	With the sheet margin	Met de velmarge
+	copy	kopie
+	{n} images	{n} afbeeldingen

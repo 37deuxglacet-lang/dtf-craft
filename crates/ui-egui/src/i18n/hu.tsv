@@ -4194,3 +4194,95 @@ cameraRaw	Yellow	Sárga
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nem észlelhető egyszínű háttér: a háttér már átlátszó, vagy válassza ki a színét pipettával.
 	Holes: {n}	Lyukak: {n}
 	Remove Last Hole	Utolsó lyuk eltávolítása
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Gyűjtőlap
+	Visuals	Motívumok
+	Add PNG Files…	PNG-fájlok hozzáadása…
+	Add Open Document	Megnyitott dokumentum hozzáadása
+	Add PNG files or the open document.	Adjon hozzá PNG-fájlokat vagy a megnyitott dokumentumot.
+	Sheet	Lap
+	Film Width	Fóliaszélesség
+	Max Length	Max. hossz
+	Allow Rotation	Forgatás engedélyezése
+	Auto Build	Automatikus elrendezés
+	Selected Visual	Kijelölt motívum
+	Rotate 90°	Forgatás 90°-kal
+	Length used: {length} cm	Felhasznált hossz: {length} cm
+	{n} not placed	Nincs elhelyezve: {n}
+	{n} too close or overlapping	Túl közel vagy átfedésben: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Húzzon egy motívumot az áthelyezéséhez. Nyilak: 1 mm (Shift: 1 cm). A Delete leveszi a lapról.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	A margónál közelebb egy másik motívumhoz vagy szélhez: {n}. Exportálja mégis?
+	Too close to another visual	Túl közel egy másik motívumhoz
+	No room to turn this visual	Nincs hely a motívum elforgatásához
+	Open a document first	Először nyisson meg egy dokumentumot
+	the document was closed	a dokumentumot bezárták
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktív gyűjtőlapok
+	Add a New Sheet	Új lap hozzáadása
+	Add a copy to the sheet	Egy példány hozzáadása a laphoz
+	Along the edges	A szélek mentén
+	Auto Build May Rotate	Forgatás engedélyezése (automatikus)
+	Auto Build — every image at once	Automatikus elrendezés — minden kép egyszerre
+	Auto Fill	Automatikus kitöltés
+	Background Warning:	Háttér figyelmeztetés:
+	Background not removed (opaque corners)	A háttér nincs eltávolítva (átlátszatlan sarkok)
+	Between images	A képek között
+	Center Horizontally	Vízszintes középre igazítás
+	Center Vertically	Függőleges középre igazítás
+	Center on the Sheet	Középre a lapon
+	Copies of this sheet to print	A lap nyomtatandó példányai
+	Custom Color	Egyéni szín
+	Delete (Del)	Törlés (Del)
+	Delete the Sheet	Lap törlése
+	Drag and drop a file here or click to	Húzzon ide egy fájlt, vagy kattintson a
+	Duplicate Image	Kép kettőzése
+	Export Sheets (PNG)…	Lapok exportálása (PNG)…
+	Fill the room left on the sheet with this visual	A lap szabad helyének kitöltése ezzel a motívummal
+	Flip Horizontally	Vízszintes tükrözés
+	Flip Vertically	Függőleges tükrözés
+	Good resolution >= 250 dpi	Jó felbontás >= 250 dpi
+	Grid (1 cm)	Rács (1 cm)
+	Image Margin	Képmargó
+	Import Images	Képek importálása
+	Lock Proportions	Arányok zárolása
+	Margin (cm)	Margó (cm)
+	No image yet: import PNG files or add the open document.	Még nincs kép: importáljon PNG-fájlokat, vagy adja hozzá a megnyitott dokumentumot.
+	No room left on the sheet	Nincs több hely a lapon
+	Number of Images:	Képek száma:
+	One copy less	Eggyel kevesebb példány
+	One copy more	Eggyel több példány
+	Optimal	Optimális
+	Optimal resolution >= 300 dpi	Optimális felbontás >= 300 dpi
+	Overlap Lines	Átfedési vonalak
+	Overlapping or too close	Átfedésben vagy túl közel
+	Poor	Gyenge
+	Poor resolution >= 200 dpi	Gyenge felbontás >= 200 dpi
+	Proportions:	Arányok:
+	Push Down	Tolás le
+	Push Left	Tolás balra
+	Push Right	Tolás jobbra
+	Push Up	Tolás fel
+	Qty:	Db:
+	Redo (Ctrl+Y)	Ismét (Ctrl+Y)
+	Rotate 90° Counterclockwise	Forgatás 90°-kal balra
+	Same image, another size	Ugyanaz a kép, más méret
+	Select an object to edit.	Válasszon ki egy objektumot a szerkesztéshez.
+	Semi-transparent pixels: {p} %	Félig átlátszó képpontok: {p} %
+	Sheet Background	Lap háttere
+	Sheet Margin	Lapmargó
+	Show Overlap Lines	Átfedési vonalak megjelenítése
+	Show Resolution Lines	Felbontásvonalak megjelenítése
+	Snap While Moving	Igazítás mozgatás közben
+	Start Over	Újrakezdés
+	Stretch to the Film Width	Nyújtás a fólia szélességére
+	Stretch to the Sheet Length	Nyújtás a lap hosszára
+	Supported format: PNG (cropped to its visible pixels)	Támogatott formátum: PNG (a látható képpontokra vágva)
+	Transparency Warning:	Átlátszóság figyelmeztetés:
+	Undo (Ctrl+Z)	Visszavonás (Ctrl+Z)
+	Very Poor	Nagyon gyenge
+	Very poor resolution < 200 dpi	Nagyon gyenge felbontás < 200 dpi
+	With the image margin	A képmargóval
+	With the sheet margin	A lapmargóval
+	copy	másolat
+	{n} images	Képek: {n}

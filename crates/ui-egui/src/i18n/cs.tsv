@@ -3882,3 +3882,95 @@ navigator	Zoom	Zvětšení
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nebylo zjištěno jednobarevné pozadí: pozadí je již průhledné, nebo vyberte jeho barvu kapátkem.
 	Holes: {n}	Otvory: {n}
 	Remove Last Hole	Odebrat poslední otvor
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Sdružený arch
+	Visuals	Motivy
+	Add PNG Files…	Přidat soubory PNG…
+	Add Open Document	Přidat otevřený dokument
+	Add PNG files or the open document.	Přidejte soubory PNG nebo otevřený dokument.
+	Sheet	Arch
+	Film Width	Šířka fólie
+	Max Length	Max. délka
+	Allow Rotation	Povolit otáčení
+	Auto Build	Automaticky rozmístit
+	Selected Visual	Vybraný motiv
+	Rotate 90°	Otočit o 90°
+	Length used: {length} cm	Využitá délka: {length} cm
+	{n} not placed	Neumístěno: {n}
+	{n} too close or overlapping	Příliš blízko nebo přes sebe: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Motiv přesunete tažením. Šipky: 1 mm (Shift: 1 cm). Delete jej odebere z archu.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motivy blíže než okraj k jinému motivu nebo k hraně: {n}. Přesto exportovat?
+	Too close to another visual	Příliš blízko jinému motivu
+	No room to turn this visual	Není místo na otočení tohoto motivu
+	Open a document first	Nejprve otevřete dokument
+	the document was closed	dokument byl zavřen
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktivní archy
+	Add a New Sheet	Přidat nový arch
+	Add a copy to the sheet	Přidat kopii na arch
+	Along the edges	Podél okrajů
+	Auto Build May Rotate	Povolit otáčení (automaticky)
+	Auto Build — every image at once	Automatické rozmístění — všechny obrázky najednou
+	Auto Fill	Automaticky vyplnit
+	Background Warning:	Upozornění na pozadí:
+	Background not removed (opaque corners)	Pozadí neodstraněno (neprůhledné rohy)
+	Between images	Mezi obrázky
+	Center Horizontally	Zarovnat na střed vodorovně
+	Center Vertically	Zarovnat na střed svisle
+	Center on the Sheet	Na střed archu
+	Copies of this sheet to print	Počet kopií archu k tisku
+	Custom Color	Vlastní barva
+	Delete (Del)	Odstranit (Del)
+	Delete the Sheet	Odstranit arch
+	Drag and drop a file here or click to	Přetáhněte sem soubor nebo klikněte a
+	Duplicate Image	Duplikovat obrázek
+	Export Sheets (PNG)…	Exportovat archy (PNG)…
+	Fill the room left on the sheet with this visual	Vyplnit volné místo archu tímto motivem
+	Flip Horizontally	Převrátit vodorovně
+	Flip Vertically	Převrátit svisle
+	Good resolution >= 250 dpi	Dobré rozlišení >= 250 dpi
+	Grid (1 cm)	Mřížka (1 cm)
+	Image Margin	Okraj obrázku
+	Import Images	Importovat obrázky
+	Lock Proportions	Zamknout proporce
+	Margin (cm)	Okraj (cm)
+	No image yet: import PNG files or add the open document.	Zatím žádný obrázek: importujte soubory PNG nebo přidejte otevřený dokument.
+	No room left on the sheet	Na archu už není místo
+	Number of Images:	Počet obrázků:
+	One copy less	O kopii méně
+	One copy more	O kopii více
+	Optimal	Optimální
+	Optimal resolution >= 300 dpi	Optimální rozlišení >= 300 dpi
+	Overlap Lines	Čáry překrytí
+	Overlapping or too close	Překrývá se nebo je příliš blízko
+	Poor	Špatné
+	Poor resolution >= 200 dpi	Špatné rozlišení >= 200 dpi
+	Proportions:	Proporce:
+	Push Down	Posunout dolů
+	Push Left	Posunout doleva
+	Push Right	Posunout doprava
+	Push Up	Posunout nahoru
+	Qty:	Počet:
+	Redo (Ctrl+Y)	Znovu (Ctrl+Y)
+	Rotate 90° Counterclockwise	Otočit o 90° proti směru hodin
+	Same image, another size	Stejný obrázek, jiná velikost
+	Select an object to edit.	Vyberte objekt k úpravě.
+	Semi-transparent pixels: {p} %	Poloprůhledné pixely: {p} %
+	Sheet Background	Pozadí archu
+	Sheet Margin	Okraj archu
+	Show Overlap Lines	Zobrazit čáry překrytí
+	Show Resolution Lines	Zobrazit čáry rozlišení
+	Snap While Moving	Zarovnávat při přesunu
+	Start Over	Začít znovu
+	Stretch to the Film Width	Roztáhnout na šířku fólie
+	Stretch to the Sheet Length	Roztáhnout na délku archu
+	Supported format: PNG (cropped to its visible pixels)	Podporovaný formát: PNG (oříznutý na viditelné pixely)
+	Transparency Warning:	Upozornění na průhlednost:
+	Undo (Ctrl+Z)	Zpět (Ctrl+Z)
+	Very Poor	Velmi špatné
+	Very poor resolution < 200 dpi	Velmi špatné rozlišení < 200 dpi
+	With the image margin	S okrajem obrázku
+	With the sheet margin	S okrajem archu
+	copy	kopie
+	{n} images	Obrázky: {n}

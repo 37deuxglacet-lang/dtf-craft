@@ -3762,3 +3762,94 @@ curves	Smooth	Làm mượt
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Không phát hiện nền trơn: nền đã trong suốt, hoặc chọn màu nền bằng ống hút.
 	Holes: {n}	Lỗ: {n}
 	Remove Last Hole	Bỏ lỗ cuối
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Trang ghép in
+	Visuals	Hình in
+	Add PNG Files…	Thêm tệp PNG…
+	Add Open Document	Thêm tài liệu đang mở
+	Add PNG files or the open document.	Thêm tệp PNG hoặc tài liệu đang mở.
+	Sheet	Trang
+	Film Width	Khổ phim
+	Max Length	Chiều dài tối đa
+	Allow Rotation	Cho phép xoay
+	Auto Build	Xếp tự động
+	Selected Visual	Hình đang chọn
+	Rotate 90°	Xoay 90°
+	Length used: {length} cm	Chiều dài đã dùng: {length} cm
+	{n} not placed	Chưa đặt được: {n}
+	{n} too close or overlapping	Quá gần hoặc chồng lên nhau: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Kéo một hình để di chuyển. Phím mũi tên: 1 mm (Shift: 1 cm). Delete gỡ hình khỏi trang.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Hình gần hình khác hoặc mép hơn lề cho phép: {n}. Vẫn xuất?
+	Too close to another visual	Quá gần một hình khác
+	No room to turn this visual	Không đủ chỗ để xoay hình này
+	Open a document first	Hãy mở một tài liệu trước
+	the document was closed	tài liệu đã bị đóng
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Các trang đang dùng
+	Add a New Sheet	Thêm trang mới
+	Add a copy to the sheet	Thêm một bản vào trang
+	Along the edges	Dọc theo mép
+	Auto Build May Rotate	Cho phép xoay (tự động)
+	Auto Build — every image at once	Xếp tự động — tất cả hình cùng lúc
+	Auto Fill	Lấp đầy tự động
+	Background Warning:	Cảnh báo nền:
+	Background not removed (opaque corners)	Chưa xóa nền (góc không trong suốt)
+	Between images	Giữa các hình
+	Center Horizontally	Căn giữa theo chiều ngang
+	Center Vertically	Căn giữa theo chiều dọc
+	Center on the Sheet	Căn giữa trang
+	Copies of this sheet to print	Số bản in của trang này
+	Custom Color	Màu tùy chọn
+	Delete (Del)	Xóa (Del)
+	Delete the Sheet	Xóa trang
+	Drag and drop a file here or click to	Kéo thả tệp vào đây hoặc bấm để
+	Duplicate Image	Nhân bản hình
+	Export Sheets (PNG)…	Xuất các trang (PNG)…
+	Fill the room left on the sheet with this visual	Lấp chỗ trống của trang bằng hình này
+	Flip Horizontally	Lật ngang
+	Flip Vertically	Lật dọc
+	Good resolution >= 250 dpi	Độ phân giải tốt >= 250 dpi
+	Grid (1 cm)	Lưới (1 cm)
+	Image Margin	Lề hình
+	Import Images	Nhập hình
+	Lock Proportions	Khóa tỉ lệ
+	Margin (cm)	Lề (cm)
+	No image yet: import PNG files or add the open document.	Chưa có hình: hãy nhập tệp PNG hoặc thêm tài liệu đang mở.
+	No room left on the sheet	Hết chỗ trên trang
+	Number of Images:	Số lượng hình:
+	One copy less	Bớt một bản
+	One copy more	Thêm một bản
+	Optimal	Tối ưu
+	Optimal resolution >= 300 dpi	Độ phân giải tối ưu >= 300 dpi
+	Overlap Lines	Đường chồng lấn
+	Overlapping or too close	Chồng lấn hoặc quá gần
+	Poor	Kém
+	Poor resolution >= 200 dpi	Độ phân giải kém >= 200 dpi
+	Proportions:	Tỉ lệ:
+	Push Down	Đẩy xuống
+	Push Right	Đẩy sang phải
+	Push Up	Đẩy lên
+	Qty:	SL:
+	Redo (Ctrl+Y)	Làm lại (Ctrl+Y)
+	Rotate 90° Counterclockwise	Xoay 90° ngược chiều kim đồng hồ
+	Same image, another size	Cùng hình, kích thước khác
+	Select an object to edit.	Chọn một đối tượng để chỉnh.
+	Semi-transparent pixels: {p} %	Điểm ảnh bán trong suốt: {p} %
+	Sheet Background	Nền trang
+	Sheet Margin	Lề trang
+	Show Overlap Lines	Hiện đường chồng lấn
+	Show Resolution Lines	Hiện đường độ phân giải
+	Snap While Moving	Căn khi di chuyển
+	Start Over	Làm lại từ đầu
+	Stretch to the Film Width	Kéo giãn theo khổ phim
+	Stretch to the Sheet Length	Kéo giãn theo chiều dài trang
+	Supported format: PNG (cropped to its visible pixels)	Định dạng hỗ trợ: PNG (cắt theo điểm ảnh hiển thị)
+	Transparency Warning:	Cảnh báo trong suốt:
+	Undo (Ctrl+Z)	Hoàn tác (Ctrl+Z)
+	Very Poor	Rất kém
+	Very poor resolution < 200 dpi	Độ phân giải rất kém < 200 dpi
+	With the image margin	Có lề hình
+	With the sheet margin	Có lề trang
+	copy	bản sao
+	{n} images	{n} hình

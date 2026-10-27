@@ -3975,3 +3975,95 @@ curves	Smooth	Згладити
 	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Однотонне тло не знайдено: тло вже прозоре, або виберіть його колір піпеткою.
 	Holes: {n}	Отвори: {n}
 	Remove Last Hole	Прибрати останній отвір
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Монтажний аркуш
+	Visuals	Макети
+	Add PNG Files…	Додати файли PNG…
+	Add Open Document	Додати відкритий документ
+	Add PNG files or the open document.	Додайте файли PNG або відкритий документ.
+	Sheet	Аркуш
+	Film Width	Ширина плівки
+	Max Length	Макс. довжина
+	Allow Rotation	Дозволити поворот
+	Auto Build	Авторозкладка
+	Selected Visual	Вибраний макет
+	Rotate 90°	Повернути на 90°
+	Length used: {length} cm	Використана довжина: {length} см
+	{n} not placed	Не розміщено: {n}
+	{n} too close or overlapping	Занадто близько або перекриваються: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Перетягніть макет, щоб перемістити його. Стрілки: 1 мм (Shift: 1 см). Delete прибирає його з аркуша.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Макети ближче за поле до іншого макета або краю: {n}. Все одно експортувати?
+	Too close to another visual	Занадто близько до іншого макета
+	No room to turn this visual	Немає місця, щоб повернути цей макет
+	Open a document first	Спершу відкрийте документ
+	the document was closed	документ було закрито
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Активні аркуші
+	Add a New Sheet	Додати новий аркуш
+	Add a copy to the sheet	Додати копію на аркуш
+	Along the edges	Уздовж країв
+	Auto Build May Rotate	Дозволити поворот (авто)
+	Auto Build — every image at once	Авторозкладка — усі зображення одразу
+	Auto Fill	Автозаповнення
+	Background Warning:	Попередження про тло:
+	Background not removed (opaque corners)	Тло не видалено (непрозорі кути)
+	Between images	Між зображеннями
+	Center Horizontally	Центрувати по горизонталі
+	Center Vertically	Центрувати по вертикалі
+	Center on the Sheet	Центрувати на аркуші
+	Copies of this sheet to print	Копій цього аркуша для друку
+	Custom Color	Власний колір
+	Delete (Del)	Видалити (Del)
+	Delete the Sheet	Видалити аркуш
+	Drag and drop a file here or click to	Перетягніть файл сюди або натисніть, щоб
+	Duplicate Image	Дублювати зображення
+	Export Sheets (PNG)…	Експорт аркушів (PNG)…
+	Fill the room left on the sheet with this visual	Заповнити вільне місце аркуша цим макетом
+	Flip Horizontally	Віддзеркалити по горизонталі
+	Flip Vertically	Віддзеркалити по вертикалі
+	Good resolution >= 250 dpi	Добра роздільність >= 250 dpi
+	Grid (1 cm)	Сітка (1 см)
+	Image Margin	Відступ зображення
+	Import Images	Імпортувати зображення
+	Lock Proportions	Зберігати пропорції
+	Margin (cm)	Відступ (см)
+	No image yet: import PNG files or add the open document.	Зображень немає: імпортуйте PNG або додайте відкритий документ.
+	No room left on the sheet	На аркуші немає місця
+	Number of Images:	Кількість зображень:
+	One copy less	На одну копію менше
+	One copy more	На одну копію більше
+	Optimal	Оптимальна
+	Optimal resolution >= 300 dpi	Оптимальна роздільність >= 300 dpi
+	Overlap Lines	Лінії накладання
+	Overlapping or too close	Накладання або надто близько
+	Poor	Погана
+	Poor resolution >= 200 dpi	Погана роздільність >= 200 dpi
+	Proportions:	Пропорції:
+	Push Down	Посунути вниз
+	Push Left	Посунути ліворуч
+	Push Right	Посунути праворуч
+	Push Up	Посунути вгору
+	Qty:	К-сть:
+	Redo (Ctrl+Y)	Повторити (Ctrl+Y)
+	Rotate 90° Counterclockwise	Повернути на 90° проти годинникової
+	Same image, another size	Те саме зображення, інший розмір
+	Select an object to edit.	Виберіть об'єкт для зміни.
+	Semi-transparent pixels: {p} %	Напівпрозорі пікселі: {p} %
+	Sheet Background	Тло аркуша
+	Sheet Margin	Поле аркуша
+	Show Overlap Lines	Показувати лінії накладання
+	Show Resolution Lines	Показувати лінії роздільності
+	Snap While Moving	Вирівнювати під час переміщення
+	Start Over	Почати заново
+	Stretch to the Film Width	Розтягнути на ширину плівки
+	Stretch to the Sheet Length	Розтягнути на довжину аркуша
+	Supported format: PNG (cropped to its visible pixels)	Підтримуваний формат: PNG (обрізаний по видимих пікселях)
+	Transparency Warning:	Попередження про прозорість:
+	Undo (Ctrl+Z)	Скасувати (Ctrl+Z)
+	Very Poor	Дуже погана
+	Very poor resolution < 200 dpi	Дуже погана роздільність < 200 dpi
+	With the image margin	З відступом зображення
+	With the sheet margin	З полем аркуша
+	copy	копія
+	{n} images	Зображень: {n}
