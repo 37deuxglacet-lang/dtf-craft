@@ -3398,3 +3398,41 @@ curves	Smooth	Lisser
 	With the sheet margin	Avec la marge du plan de travail
 	copy	copie
 	{n} images	{n} images
+# DTF Craft (14)
+	Vectorization…	Vectorisation…
+	Vectorization	Vectorisation
+	Vectorized	Vectorisé
+	Side by Side	Côte à côte
+	Show Contours	Afficher les contours
+	Checkerboard under Transparency	Damier sous la transparence
+	{colors} colors · {shapes} shapes · {points} points	{colors} couleurs · {shapes} formes · {points} points
+	Cut-out shapes, no overlap	Formes découpées, sans superposition
+	Open document, flattened	Document ouvert, aplati
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm à {dpi} ppp
+	Type of Visual	Type de visuel
+	Logo · flat colors	Logo · aplats
+	Illustration · shades	Illustration · nuances
+	Number of Colors	Nombre de couleurs
+	Detail Level	Niveau de détail
+	Sharp Corners	Angles vifs
+	Remove the Background	Supprimer le fond
+	read on the visual's edge	lu au bord du visuel
+	No background found: the visual is already cut out.	Aucun fond trouvé : le visuel est déjà détouré.
+	Palette	Palette
+	{n} colors · {k} in the SVG	{n} couleurs · {k} dans le SVG
+	Edge Background	Fond
+	Keep {hex} in the SVG	Garder {hex} dans le SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Décochée : la couleur est retirée du SVG ; ses formes sont supprimées, pas fusionnées.
+	SVG · cut-out shapes	SVG · formes découpées
+	{w} × {h} mm (document size)	{w} × {h} mm (taille du document)
+	Open the SVG in DTF Craft after the export	Ouvrir le SVG dans DTF Craft après l'export
+	Export SVG…	Exporter le SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Formes découpées à la taille d'impression du document, enregistrées en SVG.
+	SVG saved: {path}	SVG enregistré : {path}
+	No visible pixels to vectorize.	Aucun pixel visible à vectoriser.
+	Nothing to export: every color is left out.	Rien à exporter : toutes les couleurs sont retirées.
+	Low Detail	Faible
+	Medium Detail	Moyen
+	High Detail	Élevé
+	Close the Seams between Colors	Fermer les joints entre couleurs
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Chaque forme déborde d'un demi-pixel sur ses voisines : aucun liseré transparent n'apparaît entre deux couleurs à l'impression. Décochez pour des formes strictement découpées (traceur de découpe).

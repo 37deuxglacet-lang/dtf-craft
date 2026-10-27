@@ -48,6 +48,7 @@ pub mod filters;
 pub mod dtf_cmds;
 pub mod dtf_color_cmds;
 pub mod gang_sheet_cmds;
+pub mod dtf_vector_cmds;
 pub mod filters_ext;
 pub mod float_cmds;
 mod frame_cmds;

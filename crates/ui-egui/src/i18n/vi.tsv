@@ -3853,3 +3853,41 @@ curves	Smooth	Làm mượt
 	With the sheet margin	Có lề trang
 	copy	bản sao
 	{n} images	{n} hình
+# DTF Craft (14)
+	Vectorization…	Vector hóa…
+	Vectorization	Vector hóa
+	Vectorized	Đã vector hóa
+	Side by Side	Cạnh nhau
+	Show Contours	Hiện đường viền
+	Checkerboard under Transparency	Ô bàn cờ dưới vùng trong suốt
+	{colors} colors · {shapes} shapes · {points} points	{colors} màu · {shapes} hình · {points} điểm
+	Cut-out shapes, no overlap	Hình cắt rời, không chồng lên nhau
+	Open document, flattened	Tài liệu đang mở, đã gộp lớp
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm ở {dpi} ppi
+	Type of Visual	Loại hình ảnh
+	Logo · flat colors	Logo · màu phẳng
+	Illustration · shades	Minh họa · sắc độ
+	Number of Colors	Số màu
+	Detail Level	Mức chi tiết
+	Sharp Corners	Góc sắc
+	Remove the Background	Xóa nền
+	read on the visual's edge	đọc ở mép hình ảnh
+	No background found: the visual is already cut out.	Không tìm thấy nền: hình ảnh đã được tách nền.
+	Palette	Bảng màu
+	{n} colors · {k} in the SVG	{n} màu · {k} trong SVG
+	Edge Background	Nền
+	Keep {hex} in the SVG	Giữ {hex} trong SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Bỏ chọn: màu bị loại khỏi SVG; các hình của nó bị xóa, không gộp.
+	SVG · cut-out shapes	SVG · hình cắt rời
+	{w} × {h} mm (document size)	{w} × {h} mm (kích thước tài liệu)
+	Open the SVG in DTF Craft after the export	Mở SVG trong DTF Craft sau khi xuất
+	Export SVG…	Xuất SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Hình cắt rời theo kích thước in của tài liệu, lưu dưới dạng SVG.
+	SVG saved: {path}	Đã lưu SVG: {path}
+	No visible pixels to vectorize.	Không có điểm ảnh hiển thị để vector hóa.
+	Nothing to export: every color is left out.	Không có gì để xuất: mọi màu đều bị loại.
+	Low Detail	Thấp
+	Medium Detail	Trung bình
+	High Detail	Cao
+	Close the Seams between Colors	Khép kín mối nối giữa các màu
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Mỗi hình chồng lên hình kế bên nửa điểm ảnh, để khi in không xuất hiện đường mảnh trong suốt giữa hai màu. Bỏ chọn để có hình cắt rời chính xác (máy cắt decal).

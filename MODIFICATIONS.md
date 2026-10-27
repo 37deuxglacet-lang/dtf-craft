@@ -7,8 +7,9 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (75)
+## Modified (77)
 
+- `Cargo.lock`
 - `LICENSE-MIT`
 - `NOTICE`
 - `README.md`
@@ -29,6 +30,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `assets/app-icon/photocraft-1024.png`
 - `assets/app-icon/photocraft.icns`
 - `assets/app-icon/photocraft.ico`
+- `crates/algo/Cargo.toml`
 - `crates/algo/src/lib.rs`
 - `crates/algo/src/quantize.rs`
 - `crates/engine/src/commands.rs`
@@ -85,7 +87,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/view_cmds.rs`
 - `crates/ui-egui/src/workspace_ui.rs`
 
-## Added (19)
+## Added (22)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -100,12 +102,15 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/algo/src/dtf.rs`
 - `crates/algo/src/gang_sheet.rs`
 - `crates/algo/src/upscale.rs`
+- `crates/algo/src/vectorize.rs`
 - `crates/engine/src/dtf_cmds.rs`
 - `crates/engine/src/gang_sheet_cmds.rs`
 - `crates/ui-egui/src/dtf_help.rs`
 - `crates/ui-egui/src/dtf_panel.rs`
 - `crates/ui-egui/src/dtf_upscale_gpu_tests.rs`
 - `crates/ui-egui/src/gang_sheet_ui.rs`
+- `crates/engine/src/dtf_vector_cmds.rs`
+- `crates/ui-egui/src/vectorizer_ui.rs`
 
 ## Removed (7)
 

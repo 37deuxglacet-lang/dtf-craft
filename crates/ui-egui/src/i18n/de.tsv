@@ -3374,3 +3374,41 @@ curves	Smooth	Glätten
 	With the sheet margin	Mit Bogenrand
 	copy	Kopie
 	{n} images	{n} Bilder
+# DTF Craft (14)
+	Vectorization…	Vektorisierung…
+	Vectorization	Vektorisierung
+	Vectorized	Vektorisiert
+	Side by Side	Nebeneinander
+	Show Contours	Konturen anzeigen
+	Checkerboard under Transparency	Schachbrett unter Transparenz
+	{colors} colors · {shapes} shapes · {points} points	{colors} Farben · {shapes} Formen · {points} Punkte
+	Cut-out shapes, no overlap	Ausgeschnittene Formen, ohne Überlappung
+	Open document, flattened	Geöffnetes Dokument, reduziert
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm bei {dpi} ppi
+	Type of Visual	Art des Motivs
+	Logo · flat colors	Logo · Flächenfarben
+	Illustration · shades	Illustration · Abstufungen
+	Number of Colors	Anzahl der Farben
+	Detail Level	Detailgrad
+	Sharp Corners	Scharfe Ecken
+	Remove the Background	Hintergrund entfernen
+	read on the visual's edge	am Rand des Motivs gelesen
+	No background found: the visual is already cut out.	Kein Hintergrund gefunden: Das Motiv ist bereits freigestellt.
+	Palette	Palette
+	{n} colors · {k} in the SVG	{n} Farben · {k} im SVG
+	Edge Background	Hintergrund
+	Keep {hex} in the SVG	{hex} im SVG behalten
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Nicht markiert: Die Farbe wird aus dem SVG entfernt; ihre Formen werden gelöscht, nicht zusammengeführt.
+	SVG · cut-out shapes	SVG · ausgeschnittene Formen
+	{w} × {h} mm (document size)	{w} × {h} mm (Dokumentgröße)
+	Open the SVG in DTF Craft after the export	SVG nach dem Export in DTF Craft öffnen
+	Export SVG…	SVG exportieren…
+	Cut-out shapes at the document's print size, saved as SVG.	Ausgeschnittene Formen in der Druckgröße des Dokuments, als SVG gespeichert.
+	SVG saved: {path}	SVG gespeichert: {path}
+	No visible pixels to vectorize.	Keine sichtbaren Pixel zum Vektorisieren.
+	Nothing to export: every color is left out.	Nichts zu exportieren: Alle Farben sind ausgeschlossen.
+	Low Detail	Gering
+	Medium Detail	Mittel
+	High Detail	Hoch
+	Close the Seams between Colors	Fugen zwischen Farben schließen
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Jede Form überlappt ihre Nachbarn um einen halben Pixel, damit beim Druck keine transparente Haarlinie zwischen zwei Farben entsteht. Deaktivieren für streng ausgeschnittene Formen (Schneideplotter).

@@ -3967,3 +3967,41 @@ curves	Smooth	Wygładź
 	With the sheet margin	Z marginesem arkusza
 	copy	kopia
 	{n} images	Obrazy: {n}
+# DTF Craft (14)
+	Vectorization…	Wektoryzacja…
+	Vectorization	Wektoryzacja
+	Vectorized	Po wektoryzacji
+	Side by Side	Obok siebie
+	Show Contours	Pokaż kontury
+	Checkerboard under Transparency	Szachownica pod przezroczystością
+	{colors} colors · {shapes} shapes · {points} points	Kolory: {colors} · kształty: {shapes} · punkty: {points}
+	Cut-out shapes, no overlap	Wycięte kształty, bez nakładania
+	Open document, flattened	Otwarty dokument, spłaszczony
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm przy {dpi} ppi
+	Type of Visual	Rodzaj obrazu
+	Logo · flat colors	Logo · jednolite kolory
+	Illustration · shades	Ilustracja · odcienie
+	Number of Colors	Liczba kolorów
+	Detail Level	Poziom szczegółów
+	Sharp Corners	Ostre narożniki
+	Remove the Background	Usuń tło
+	read on the visual's edge	odczytane na krawędzi obrazu
+	No background found: the visual is already cut out.	Nie znaleziono tła: obraz jest już wycięty.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	Kolory: {n} · w SVG: {k}
+	Edge Background	Tło
+	Keep {hex} in the SVG	Zachowaj {hex} w SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Niezaznaczony: kolor jest pomijany w SVG; jego kształty są usuwane, nie scalane.
+	SVG · cut-out shapes	SVG · wycięte kształty
+	{w} × {h} mm (document size)	{w} × {h} mm (rozmiar dokumentu)
+	Open the SVG in DTF Craft after the export	Otwórz SVG w DTF Craft po eksporcie
+	Export SVG…	Eksportuj SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Wycięte kształty w rozmiarze wydruku dokumentu, zapisane jako SVG.
+	SVG saved: {path}	Zapisano SVG: {path}
+	No visible pixels to vectorize.	Brak widocznych pikseli do wektoryzacji.
+	Nothing to export: every color is left out.	Nic do eksportu: wszystkie kolory są pominięte.
+	Low Detail	Niski
+	Medium Detail	Średni
+	High Detail	Wysoki
+	Close the Seams between Colors	Zamknij szczeliny między kolorami
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Każdy kształt nachodzi na sąsiednie o pół piksela, aby na wydruku nie pojawiła się przezroczysta linia między dwoma kolorami. Odznacz, aby uzyskać ściśle wycięte kształty (ploter tnący).

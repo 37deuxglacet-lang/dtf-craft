@@ -228,6 +228,7 @@ pub mod type_tool;
 mod type_transform;
 mod variables_ui;
 pub mod vector_ui;
+pub mod vectorizer_ui;
 pub mod view_cmds;
 pub mod vp_ui;
 pub mod warp_preview;
@@ -683,6 +684,8 @@ pub struct PhotocraftApp {
     pub(crate) camera_raw: Option<camera_raw_ui::CameraRawDialog>,
     /// DTF › Color Analyzer, open over the main window (DTF Craft).
     pub(crate) color_analyzer: Option<color_analyzer_ui::ColorAnalyzer>,
+    /// DTF › Vectorization (DTF Craft), while it is open.
+    pub(crate) vectorizer: Option<vectorizer_ui::Vectorizer>,
     /// A raw file just opened interactively, waiting for the open-time Camera Raw dialog (shown
     /// on the next frame, which has the egui context).
     pub(crate) pending_raw_open: Option<camera_raw_ui::RawOpen>,
@@ -882,6 +885,7 @@ impl PhotocraftApp {
             gradient: Default::default(),
             camera_raw: None,
             color_analyzer: None,
+            vectorizer: None,
             pending_raw_open: None,
             raw_redevelop: None,
             wide_angle: None,
@@ -1902,6 +1906,7 @@ impl eframe::App for PhotocraftApp {
         distort_ui::show(self, &ctx);
         camera_raw_ui::show(self, &ctx);
         color_analyzer_ui::show(self, &ctx);
+        vectorizer_ui::show(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         gang_sheet_ui::show(self, &ctx);
         canvas::extra_windows(self, &ctx);

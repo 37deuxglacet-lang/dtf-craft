@@ -2974,3 +2974,43 @@ curves	Smooth	平滑
 	With the sheet margin	使用版面邊界
 	copy	副本
 	{n} images	{n} 張圖片
+# DTF Craft (14)
+	Vectorization…	向量化…
+	Vectorization	向量化
+	Vectorized	向量化結果
+	Side by Side	並排
+	Show Contours	顯示輪廓
+	Checkerboard under Transparency	透明區域顯示棋盤格
+	{colors} colors · {shapes} shapes · {points} points	{colors} 種顏色 · {shapes} 個形狀 · {points} 個點
+	Cut-out shapes, no overlap	切割形狀，無重疊
+	Open document, flattened	開啟的文件，已平面化
+	{w} × {h} mm at {dpi} ppi	{w} × {h} 公釐，{dpi} ppi
+	Type of Visual	影像類型
+	Logo · flat colors	標誌 · 平塗色
+	Illustration · shades	插圖 · 色調層次
+	Number of Colors	顏色數量
+	Detail Level	細節層級
+	Sharp Corners	尖角
+	Remove the Background	移除背景
+	read on the visual's edge	從影像邊緣讀取
+	No background found: the visual is already cut out.	找不到背景：影像已去背。
+	Palette	調色盤
+	{n} colors · {k} in the SVG	{n} 種顏色 · SVG 中 {k} 種
+	Edge Background	背景
+	Keep {hex} in the SVG	在 SVG 中保留 {hex}
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	未勾選：該顏色從 SVG 中排除；其形狀會被刪除，而非合併。
+	SVG · cut-out shapes	SVG · 切割形狀
+	{w} × {h} mm (document size)	{w} × {h} 公釐（文件尺寸）
+	Open the SVG in DTF Craft after the export	轉存後在 DTF Craft 中開啟 SVG
+	Export SVG…	轉存 SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	依文件列印尺寸的切割形狀，儲存為 SVG。
+	SVG saved: {path}	SVG 已儲存：{path}
+	No visible pixels to vectorize.	沒有可向量化的可見像素。
+	Nothing to export: every color is left out.	沒有可轉存的內容：所有顏色皆已排除。
+	High	高
+	Low	低
+	Low Detail	低
+	Medium Detail	中
+	High Detail	高
+	Close the Seams between Colors	閉合顏色間的接縫
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	每個形狀與相鄰形狀重疊半個像素，列印時兩種顏色之間不會出現透明細線。取消勾選可得到嚴格切割的形狀（割字機）。

@@ -3363,3 +3363,41 @@ curves	Smooth	Haluskan
 	With the sheet margin	Dengan margin lembar
 	copy	salinan
 	{n} images	{n} gambar
+# DTF Craft (14)
+	Vectorization…	Vektorisasi…
+	Vectorization	Vektorisasi
+	Vectorized	Hasil vektor
+	Side by Side	Berdampingan
+	Show Contours	Tampilkan Kontur
+	Checkerboard under Transparency	Papan Catur di Bawah Transparansi
+	{colors} colors · {shapes} shapes · {points} points	{colors} warna · {shapes} bentuk · {points} titik
+	Cut-out shapes, no overlap	Bentuk terpotong, tanpa tumpang tindih
+	Open document, flattened	Dokumen terbuka, diratakan
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm pada {dpi} ppi
+	Type of Visual	Jenis Visual
+	Logo · flat colors	Logo · warna datar
+	Illustration · shades	Ilustrasi · gradasi
+	Number of Colors	Jumlah Warna
+	Detail Level	Tingkat Detail
+	Sharp Corners	Sudut Tajam
+	Remove the Background	Hapus Latar Belakang
+	read on the visual's edge	dibaca di tepi visual
+	No background found: the visual is already cut out.	Latar belakang tidak ditemukan: visual sudah terpotong.
+	Palette	Palet
+	{n} colors · {k} in the SVG	{n} warna · {k} di SVG
+	Edge Background	Latar
+	Keep {hex} in the SVG	Pertahankan {hex} di SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Tidak dicentang: warna dikeluarkan dari SVG; bentuknya dihapus, tidak digabung.
+	SVG · cut-out shapes	SVG · bentuk terpotong
+	{w} × {h} mm (document size)	{w} × {h} mm (ukuran dokumen)
+	Open the SVG in DTF Craft after the export	Buka SVG di DTF Craft setelah ekspor
+	Export SVG…	Ekspor SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Bentuk terpotong pada ukuran cetak dokumen, disimpan sebagai SVG.
+	SVG saved: {path}	SVG disimpan: {path}
+	No visible pixels to vectorize.	Tidak ada piksel terlihat untuk divektorisasi.
+	Nothing to export: every color is left out.	Tidak ada yang diekspor: semua warna dikeluarkan.
+	Low Detail	Rendah
+	Medium Detail	Sedang
+	High Detail	Tinggi
+	Close the Seams between Colors	Tutup Sambungan antar Warna
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Setiap bentuk menumpuk setengah piksel pada tetangganya, sehingga tidak ada garis tipis transparan di antara dua warna saat dicetak. Hapus centang untuk bentuk yang terpotong persis (plotter pemotong).

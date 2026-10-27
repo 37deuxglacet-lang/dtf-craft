@@ -83,6 +83,7 @@ mod stylize2;
 pub mod tone;
 pub mod transform;
 pub mod upscale;
+pub mod vectorize;
 pub mod trap;
 pub mod vanishing;
 pub mod vectorscope;

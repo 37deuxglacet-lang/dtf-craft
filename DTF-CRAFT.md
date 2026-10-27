@@ -21,6 +21,7 @@ produit officiel du projet PhotoCraft.
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
 | Gang sheet… | Fenêtre plein écran claire : import, réglages, plusieurs planches, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
+| Vectorisation… | Module plein écran (comme Camera Raw) : le visuel est réduit à une palette (8 couleurs par défaut, 2 à 16) puis tracé en formes vectorielles découpées, une couleur unie par forme, sans superposition. Réglages : type de visuel (logo · aplats / illustration · nuances), niveau de détail, lissage (courbes / angles vifs), suppression du fond lu au bord du visuel, joints fermés entre couleurs (chaque forme déborde d'un demi-pixel sur ses voisines ; à décocher pour un traceur de découpe). Aperçu original / vectorisé / côte à côte, contours, palette où décocher une couleur la retire du SVG. Export SVG à la taille d'impression du document, ouvert en option dans un nouvel onglet en calques de forme ; le document n'est pas modifié. Traceur : visioncortex (MIT OR Apache-2.0) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 

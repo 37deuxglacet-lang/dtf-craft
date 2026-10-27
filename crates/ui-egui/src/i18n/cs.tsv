@@ -3974,3 +3974,41 @@ navigator	Zoom	Zvětšení
 	With the sheet margin	S okrajem archu
 	copy	kopie
 	{n} images	Obrázky: {n}
+# DTF Craft (14)
+	Vectorization…	Vektorizace…
+	Vectorization	Vektorizace
+	Vectorized	Vektorizováno
+	Side by Side	Vedle sebe
+	Show Contours	Zobrazit obrysy
+	Checkerboard under Transparency	Šachovnice pod průhledností
+	{colors} colors · {shapes} shapes · {points} points	Barvy: {colors} · tvary: {shapes} · body: {points}
+	Cut-out shapes, no overlap	Vyříznuté tvary bez překrývání
+	Open document, flattened	Otevřený dokument, sloučený
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm při {dpi} ppi
+	Type of Visual	Typ obrázku
+	Logo · flat colors	Logo · plné barvy
+	Illustration · shades	Ilustrace · odstíny
+	Number of Colors	Počet barev
+	Detail Level	Úroveň detailů
+	Sharp Corners	Ostré rohy
+	Remove the Background	Odstranit pozadí
+	read on the visual's edge	zjištěno na okraji obrázku
+	No background found: the visual is already cut out.	Pozadí nenalezeno: obrázek je již vyříznutý.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	Barvy: {n} · v SVG: {k}
+	Edge Background	Pozadí
+	Keep {hex} in the SVG	Ponechat {hex} v SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Nezaškrtnuto: barva se z SVG vynechá; její tvary se odstraní, nesloučí.
+	SVG · cut-out shapes	SVG · vyříznuté tvary
+	{w} × {h} mm (document size)	{w} × {h} mm (velikost dokumentu)
+	Open the SVG in DTF Craft after the export	Po exportu otevřít SVG v DTF Craft
+	Export SVG…	Exportovat SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Vyříznuté tvary ve velikosti tisku dokumentu, uložené jako SVG.
+	SVG saved: {path}	SVG uloženo: {path}
+	No visible pixels to vectorize.	Žádné viditelné pixely k vektorizaci.
+	Nothing to export: every color is left out.	Není co exportovat: všechny barvy jsou vynechány.
+	Low Detail	Nízká
+	Medium Detail	Střední
+	High Detail	Vysoká
+	Close the Seams between Colors	Uzavřít spáry mezi barvami
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Každý tvar přesahuje sousední o půl pixelu, aby se při tisku mezi dvěma barvami neobjevila průhledná linka. Zrušte zaškrtnutí pro přesně vyříznuté tvary (řezací plotr).

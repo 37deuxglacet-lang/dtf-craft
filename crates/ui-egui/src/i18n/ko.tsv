@@ -3545,3 +3545,41 @@ curves	Smooth	매끄럽게
 	With the sheet margin	시트 여백 포함
 	copy	사본
 	{n} images	{n}장
+# DTF Craft (14)
+	Vectorization…	벡터화…
+	Vectorization	벡터화
+	Vectorized	벡터화 결과
+	Side by Side	나란히 보기
+	Show Contours	윤곽선 표시
+	Checkerboard under Transparency	투명 영역에 바둑판 표시
+	{colors} colors · {shapes} shapes · {points} points	색상 {colors}개 · 도형 {shapes}개 · 점 {points}개
+	Cut-out shapes, no overlap	잘린 도형, 겹침 없음
+	Open document, flattened	열린 문서, 병합됨
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm, {dpi} ppi
+	Type of Visual	이미지 유형
+	Logo · flat colors	로고 · 단색 면
+	Illustration · shades	일러스트 · 음영
+	Number of Colors	색상 수
+	Detail Level	세부 수준
+	Sharp Corners	날카로운 모서리
+	Remove the Background	배경 제거
+	read on the visual's edge	이미지 가장자리에서 감지
+	No background found: the visual is already cut out.	배경을 찾을 수 없음: 이미지가 이미 잘려 있습니다.
+	Palette	팔레트
+	{n} colors · {k} in the SVG	색상 {n}개 · SVG에 {k}개
+	Edge Background	배경
+	Keep {hex} in the SVG	SVG에 {hex} 유지
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	선택 해제: 해당 색상은 SVG에서 제외되며, 도형은 병합되지 않고 삭제됩니다.
+	SVG · cut-out shapes	SVG · 잘린 도형
+	{w} × {h} mm (document size)	{w} × {h} mm (문서 크기)
+	Open the SVG in DTF Craft after the export	내보낸 후 DTF Craft에서 SVG 열기
+	Export SVG…	SVG 내보내기…
+	Cut-out shapes at the document's print size, saved as SVG.	문서의 인쇄 크기로 잘린 도형을 SVG로 저장합니다.
+	SVG saved: {path}	SVG 저장됨: {path}
+	No visible pixels to vectorize.	벡터화할 보이는 픽셀이 없습니다.
+	Nothing to export: every color is left out.	내보낼 항목 없음: 모든 색상이 제외되었습니다.
+	Low Detail	낮음
+	Medium Detail	중간
+	High Detail	높음
+	Close the Seams between Colors	색상 사이 이음새 닫기
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	각 도형이 이웃 도형과 반 픽셀 겹쳐 인쇄 시 두 색상 사이에 투명한 가는 선이 생기지 않습니다. 정확히 잘린 도형(커팅 플로터)이 필요하면 선택 해제하세요.
