@@ -32,7 +32,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
         "dtf.controlBackground" => Sheet {
             what: "Placer sous l'image un calque de couleur unie nommé « backfill », de la couleur du textile, pour juger le rendu : liserés, pixels clairs, contraste.",
             when: "Après le détourage et les retouches, pour contrôler le visuel avant export.",
-            advice: "#231c1c pour un textile foncé, la couleur réelle du textile sinon. Supprimez le fond avant l'export, sinon il sera imprimé.",
+            advice: "#231c1c pour un textile foncé, la couleur réelle du textile sinon. Supprimez le fond avant l'export (DTF › Suppression fond de contrôle), sinon il sera imprimé.",
         },
         "filter.dtf.removeSemiTransparent" => Sheet {
             what: "Rendre opaques ou transparents les pixels semi-transparents de la frange du visuel : le bord extérieur et le bord des trous, sur la largeur choisie. Ces pixels s'impriment mal en DTF. L'intérieur du visuel (ombres, dégradés, lissage entre deux couleurs) n'est pas touché.",
@@ -74,7 +74,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
 }
 
 /// The tooltip of a setting (`key` as in the command's spec), or of a tab's own control
-/// (`apply`, `cancel`, `showBefore`, `showBackground`, `deleteBackground`, `previewColor`,
+/// (`apply`, `cancel`, `showBefore`, `showBackground`, `previewColor`,
 /// `holeEraser`, `removeLastHole`, `backgroundPicker`, `upscale`).
 pub fn tip(command: &str, key: &str) -> Option<&'static str> {
     Some(match (command, key) {
@@ -103,7 +103,6 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("filter.dtf.removeSemiTransparent", "width") => "Largeur de la frange traitée, en px, autour de la transparence (bord du visuel et trous). Les pixels semi-transparents plus à l'intérieur (ombres, dégradés, lissage entre deux couleurs) ne changent pas.",
         ("dtf.controlBackground", "color") => "Couleur du textile. Cliquez sur la pastille pour la choisir.",
         ("dtf.controlBackground", "showBackground") => "Ajoute le fond sous tous les calques ; un fond déjà présent est remplacé.",
-        ("dtf.controlBackground", "deleteBackground") => "Retire le calque « backfill ». À faire avant l'export.",
         ("filter.dtf.removeSemiTransparent", "threshold") => "Opacité, en %, à partir de laquelle un pixel devient opaque ; en dessous, il devient transparent. Plus bas : plus de matière gardée.",
         ("dtf.defringe", "width") => "Épaisseur du bord recoloré, en px. 1 à 2 px suffisent le plus souvent.",
         ("dtf.sharpen", "amount") => "Force de l'accentuation, en %.",

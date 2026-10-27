@@ -111,15 +111,9 @@ pub struct DtfPanelUi {
     pub beta_notice: bool,
 }
 
-/// The section title: the tool's DTF menu label without its "…".
-fn title(command: &str) -> String {
-    let label = photocraft_engine::commands::find(command).map_or(command, |c| c.label);
-    tl!(label).trim_end_matches('…').to_string()
-}
-
 /// The layout version DTF Craft last set up (remembered with the preferences): raising it
 /// brings the DTF default layout back once, over a layout saved by an older version.
-const LAYOUT_VERSION: u64 = 5;
+const LAYOUT_VERSION: u64 = 6;
 const LAYOUT_PREF: &str = "dtfCraft.layoutVersion";
 
 /// The DTF workspace (Window › Workspace › DTF): Layers alone in the right column (the DTF tools
@@ -132,6 +126,8 @@ pub(crate) fn dtf_layout() -> craft_ui::docking::Layout<String> {
 /// DTF Craft's start: the DTF tools, and on the first launch of this layout the DTF workspace.
 pub fn dtf_craft_startup(app: &mut PhotocraftApp) {
     app.dtf_craft = true;
+    // The DTF tools are windows of the DTF menu: never a dock group on the right.
+    app.ui.panels.dtf = false;
     app.ui.dtf_panel.beta_notice = true;
     let seen = app.session.prefs().dialogs.get(LAYOUT_PREF).and_then(Value::as_u64).unwrap_or(0);
     if seen < LAYOUT_VERSION {
@@ -544,9 +540,21 @@ pub fn close_window(app: &mut PhotocraftApp) {
     }
 }
 
+/// No DTF tool on the right, whatever a saved layout or panel state says: the DTF dock group is
+/// off and the old DTF tabs (`dtf…` panels) leave a docking layout. Run every frame (cheap).
+pub fn keep_dtf_out_of_the_dock(app: &mut PhotocraftApp) {
+    app.ui.panels.dtf = false;
+    let Some(layout) = app.ui.docking.as_mut() else { return };
+    let old: Vec<String> = layout.panels().into_iter().filter(|p| p.starts_with("dtf")).cloned().collect();
+    for panel in old {
+        let _ = layout.apply(craft_ui::docking::Action::Close { panel });
+    }
+}
+
 /// The DTF window, when one is open: the tool's title, its settings (scrolled when taller than
 /// the screen), closed by its × or Esc, and after Apply or Cancel.
 pub fn window(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    keep_dtf_out_of_the_dock(app);
     let Some(cmd) = app.ui.dtf_panel.window.clone() else { return };
     let Some(tab) = TOOLS.iter().position(|t| *t == cmd) else {
         app.ui.dtf_panel.window = None;
@@ -555,7 +563,8 @@ pub fn window(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let mut open = true;
     let mut done = false;
     let max_h = (ctx.content_rect().height() - 120.0).max(240.0);
-    egui::Window::new(title(&cmd))
+    // The window's title is the tool's name, as in the DTF menu.
+    egui::Window::new(tl!(TABS[tab]))
         .id(egui::Id::new("dtf-tool-window"))
         .open(&mut open)
         .collapsible(false)
@@ -769,9 +778,7 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         Some(n) => f.insert("__note".into(), json!(n)),
         None => f.remove("__note"),
     };
-    let (mut apply_it, mut cancel, mut remove_bg) = (false, false, false);
-    let has_backfill =
-        cmd == "dtf.controlBackground" && app.session.active().is_some_and(|st| st.doc.walk().into_iter().any(|(_, _, l)| l.name == "backfill"));
+    let (mut apply_it, mut cancel) = (false, false);
     ui.add_space(4.0);
     if !have_doc {
         ui.weak(tl!("Open a document to use the DTF settings."));
@@ -871,9 +878,6 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             ui.add_enabled_ui(enabled, |ui| {
                 apply_it = help(crate::widgets::primary_button(ui, tl!("Show Background"), 130.0), cmd, "showBackground").clicked();
             });
-            ui.add_enabled_ui(have_doc && has_backfill, |ui| {
-                remove_bg = help(crate::widgets::secondary_button(ui, tl!("Delete Background"), 130.0), cmd, "deleteBackground").clicked();
-            });
         } else {
             ui.add_enabled_ui(enabled, |ui| {
                 apply_it = help(crate::widgets::primary_button(ui, tl!("Apply"), 110.0), cmd, "apply").clicked();
@@ -899,13 +903,6 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             clear_cutout_history(app);
         }
         apply(app, cmd);
-    } else if remove_bg {
-        if app.ui.dtf_panel.previewing.as_deref() == Some(cmd) {
-            stop_preview(app);
-        }
-        if let Err(error) = app.run("dtf.removeControlBackground", json!({})) {
-            crate::notices::error(app, error);
-        }
     } else if cancel {
         stop_preview(app);
         // Cancel drops the holes clicked for this cut-out.
@@ -928,7 +925,6 @@ mod tests {
     fn every_tool_is_a_command_with_a_title() {
         for cmd in TOOLS {
             assert!(photocraft_engine::commands::find(cmd).is_some(), "{cmd}");
-            assert!(!title(cmd).ends_with('…'), "{cmd}");
         }
     }
 
@@ -967,6 +963,33 @@ mod tests {
         close_window(&mut app);
         crate::menus::invoke(&mut app, &ctx, "dtf.saturation", json!({"saturation": 10})).unwrap();
         assert!(app.ui.dtf_panel.window.is_none());
+    }
+
+    /// Every DTF tool is in the DTF menu under its window's title, and a click opens that window
+    /// (never the old settings dialog), as the menu bar runs it.
+    #[test]
+    fn the_dtf_menu_opens_each_tool_window_under_its_title() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        let ctx = egui::Context::default();
+        let dtf: Vec<(&str, &str)> = crate::menu_catalog::CATALOG.iter().filter(|(path, _, _, id)| path == &["DTF"] && *id != "---").map(|(_, label, _, id)| (*label, *id)).collect();
+        for (cmd, tab) in TOOLS.iter().zip(TABS) {
+            let label = dtf.iter().find(|(_, id)| id == cmd).map(|(l, _)| *l);
+            assert_eq!(label, Some(format!("{tab}…").as_str()), "{cmd}");
+            crate::shortcut_dispatch::dispatch(&mut app, &ctx, cmd);
+            assert_eq!(app.ui.dtf_panel.window.as_deref(), Some(*cmd), "{cmd}");
+            assert!(app.ui.dialogs.is_empty(), "{cmd}: no settings dialog");
+            close_window(&mut app);
+        }
+        // The right column never shows the DTF tools again, even from an old saved layout.
+        app.ui.panels.dtf = true;
+        app.ui.docking = Some(craft_ui::docking::Layout {
+            root: Some(craft_ui::docking::Node::Tabs { panels: vec!["layers".into(), "dtfConformity".into()], active: 1 }),
+            floating: Vec::new(),
+        });
+        keep_dtf_out_of_the_dock(&mut app);
+        assert!(!app.ui.panels.dtf);
+        assert_eq!(app.ui.docking.as_ref().unwrap().panels(), vec![&"layers".to_string()]);
     }
 
     /// The DTF specs carry descriptions in parentheses (with commas): their keys and defaults
@@ -1547,7 +1570,8 @@ mod tests {
             hole_click(app, 20.0, 20.0);
         });
         shot(visual(), "conformite", &|app| {
-            open_window(app, "dtf.conformity");
+            // As the menu bar runs it.
+            crate::shortcut_dispatch::dispatch(app, &egui::Context::default(), "dtf.conformity");
         });
         // Saturation opened: its preview shows without moving the slider.
         shot(visual(), "saturation", &|app| {

@@ -11,13 +11,13 @@ produit officiel du projet PhotoCraft.
 
 | Commande | Rôle |
 |---|---|
-| Conformité impression… | Calque « origin », hauteur d'impression (cm) à la résolution voulue, 8/16 bits, rognage de la transparence |
-| Suppression fond blanc… | Copie du calque « Sans fond » au-dessus de la source (masquée, intacte) ; le fond uni (couleur lue sur les bords, ou choisie) est supprimé depuis les bords, le blanc intérieur au visuel reste. Tolérance (bruit JPEG), contour décontaminé (pas de liseré clair), trous intérieurs en option (désactivés par défaut, taille minimale en px). Aperçu sur fond #231c1c |
+| Conformité… | Calque « origin », hauteur d'impression (cm) à la résolution voulue, 8/16 bits, rognage de la transparence |
+| Détourage… | Copie du calque « Sans fond » au-dessus de la source (masquée, intacte) ; le fond uni (couleur lue sur les bords, ou choisie) est supprimé depuis les bords, le blanc intérieur au visuel reste. Tolérance (bruit JPEG), contour décontaminé (pas de liseré clair), trous intérieurs en option (désactivés par défaut, taille minimale en px). Aperçu sur fond #231c1c |
 | Fond de contrôle… | Calque de remplissage « backfill » sous l'image, couleur du textile, avec aperçu ; remplace un fond de contrôle déjà présent |
 | Suppression fond de contrôle | Supprime les calques « backfill » |
 | Pixels transparents… | Supprime les pixels semi-transparents (seuil d'opacité, 62 % par défaut) |
-| Suppression frange… | Supprime les franges de couleur sur les bords |
-| Netteté optimisée… | Netteté optimisée avec aperçu |
+| Supprimer franges… | Supprime les franges de couleur sur les bords |
+| Netteté… | Netteté optimisée avec aperçu |
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
 | Gang sheet… | Fenêtre plein écran claire : import, réglages, plusieurs planches, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
@@ -27,16 +27,16 @@ Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans 
 
 ## Fenêtres DTF
 
-Chaque outil DTF s'ouvre depuis le menu DTF dans sa fenêtre, comme Halftone DTF (Conformité
-impression, Suppression fond blanc, Fond de contrôle, Pixels semi-transparents, Supprimer les
-franges, Netteté intelligente, Saturation) ; une fenêtre à la fois. Chaque fenêtre a un bouton « ? »
+Chaque outil DTF s'ouvre depuis le menu DTF dans sa fenêtre, comme Halftone DTF (Conformité,
+Détourage, Fond de contrôle, Pixels transparents, Supprimer franges, Netteté, Saturation : le
+menu porte le titre de la fenêtre) ; une fenêtre à la fois. Chaque fenêtre a un bouton « ? »
 qui ouvre la fiche d'aide de l'outil (à quoi il sert, quand l'utiliser, réglages conseillés) ;
 chaque réglage a une infobulle au survol. « Appliquer » applique et ferme ; « Annuler », la croix
 ou Échap ferment sans appliquer. L'aperçu s'affiche sur l'image dès qu'un réglage bouge (sauf
-Conformité), tant que la fenêtre est ouverte. La fenêtre Fond de contrôle a deux boutons :
-« Afficher le fond » (remplace un fond déjà présent) et « Supprimer le fond ».
+Conformité), tant que la fenêtre est ouverte. La fenêtre Fond de contrôle a le bouton
+« Afficher le fond » (remplace un fond déjà présent) ; DTF › Suppression fond de contrôle le retire.
 
-Les fenêtres sont modales (l'image et les autres menus attendent), sauf Suppression fond blanc :
+Les fenêtres sont modales (l'image et les autres menus attendent), sauf Détourage :
 l'image reste cliquable pour ajouter des trous et prendre la couleur du fond à la pipette.
 
 Espace de travail DTF (Fenêtre › Espace de travail › DTF, ouvert au démarrage) : Calques seul
@@ -53,7 +53,7 @@ indiquent la taille obtenue (cm et px). La transparence est rognée avant le red
 Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès
 l'ouverture de la fenêtre ; « Afficher l'avant » montre l'image d'origine pour comparer.
 
-Suppression fond blanc : l'aperçu s'affiche dès l'ouverture de la fenêtre, sur la dernière
+Détourage : l'aperçu s'affiche dès l'ouverture de la fenêtre, sur la dernière
 couleur utilisée (Fond de contrôle ou « Fond d'aperçu »). La couleur du fond est détectée sur les
 bords si elle est unie, ou prise à la pipette. « Ajouter des trous » et « Couleur du fond à la
 pipette » sont deux boutons à bascule exclusifs ; sans bouton enfoncé, un clic sur l'image ne fait

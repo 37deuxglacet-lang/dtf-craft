@@ -198,6 +198,10 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     if let Some(result) = crate::panel_docking::command(app, id, &params) {
         return result;
     }
+    // DTF Craft: the DTF tools open their windows, before any settings dialog of theirs.
+    if let Some(r) = crate::dtf_panel::menu(app, id, &params) {
+        return r;
+    }
     // Help › Discord, website, GitHub, Report an Issue.
     if let Some(url) = crate::links::url_for(id) {
         return Ok(crate::links::open(app, ctx, url));
@@ -264,10 +268,6 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     }
     // DTF › Vectorization (DTF Craft).
     if let Some(r) = crate::vectorizer_ui::menu(app, id, &params) {
-        return r;
-    }
-    // DTF Craft: the DTF tools open their windows.
-    if let Some(r) = crate::dtf_panel::menu(app, id, &params) {
         return r;
     }
     // Camera Raw Filter dialog (and its control params).

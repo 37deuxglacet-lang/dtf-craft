@@ -1719,7 +1719,6 @@ fn dock_panels(app: &mut PhotocraftApp, ui: &mut egui::Ui, p: &crate::state::Pan
         (Group::Character, p.character),
         (Group::Navigator, p.navigator),
         (Group::History, p.history),
-        (Group::Dtf, p.dtf),
         (Group::Layers, p.layers),
     ]
     .into_iter()
