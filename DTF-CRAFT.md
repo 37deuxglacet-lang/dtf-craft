@@ -25,37 +25,40 @@ produit officiel du projet PhotoCraft.
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
 
-## Onglets DTF
+## Fenêtres DTF
 
-Chaque onglet DTF et la fenêtre Halftone DTF ont un bouton « ? » qui ouvre la fiche d'aide de l'outil
-(à quoi il sert, quand l'utiliser, réglages conseillés) ; chaque réglage a une infobulle au survol.
+Chaque outil DTF s'ouvre depuis le menu DTF dans sa fenêtre, comme Halftone DTF (Conformité
+impression, Suppression fond blanc, Fond de contrôle, Pixels semi-transparents, Supprimer les
+franges, Netteté intelligente, Saturation) ; une fenêtre à la fois. Chaque fenêtre a un bouton « ? »
+qui ouvre la fiche d'aide de l'outil (à quoi il sert, quand l'utiliser, réglages conseillés) ;
+chaque réglage a une infobulle au survol. « Appliquer » applique et ferme ; « Annuler », la croix
+ou Échap ferment sans appliquer. L'aperçu s'affiche sur l'image dès qu'un réglage bouge (sauf
+Conformité), tant que la fenêtre est ouverte. La fenêtre Fond de contrôle a deux boutons :
+« Afficher le fond » (remplace un fond déjà présent) et « Supprimer le fond ».
 
-Chaque outil DTF a son onglet (Conformité, Détourage, Fond de contrôle, Pixels transparents,
-Supprimer franges, Netteté, Saturation). Ils se déplacent, se regroupent, se détachent et
-s'ancrent comme les autres panneaux ; Fenêtre › Conformité impression (et les autres outils) les
-affiche. Chaque onglet a ses réglages et « Appliquer » ; l'aperçu s'affiche sur l'image dès qu'un
-réglage bouge (sauf Conformité), tant que l'onglet de l'outil est visible. L'onglet Fond de
-contrôle a deux boutons : « Afficher le fond » (remplace un fond déjà présent) et « Supprimer le fond ».
+Les fenêtres sont modales (l'image et les autres menus attendent), sauf Suppression fond blanc :
+l'image reste cliquable pour ajouter des trous et prendre la couleur du fond à la pipette.
 
-Espace de travail DTF (Fenêtre › Espace de travail › DTF, ouvert au démarrage) : la colonne de
-droite en trois groupes de trois onglets au plus — Fond de contrôle, Netteté, Saturation ;
-Pixels transparents, Supprimer franges ; Calques, Conformité, Détourage. Canaux et Tracés n'y
-sont pas (menu Fenêtre). L'accueil donne le lien du projet GitHub de DTF Craft.
+Espace de travail DTF (Fenêtre › Espace de travail › DTF, ouvert au démarrage) : Calques seul
+dans la colonne de droite. Canaux et Tracés n'y sont pas (menu Fenêtre). L'accueil donne le lien du
+projet GitHub de DTF Craft.
 
-Conformité impression : l'onglet part de la taille actuelle du visuel (rogné si « Rogner la
+Conformité impression : la fenêtre part de la taille actuelle du visuel (rogné si « Rogner la
 transparence » est coché) et de la résolution du document ; changer la largeur met à jour la
 hauteur, et inversement ; changer la résolution recalcule la taille en cm sans rééchantillonner les
-pixels. Les boutons ×2, ×3, ×4 lancent l'Agrandissement IA à la résolution de l'onglet et
+pixels. Les boutons ×2, ×3, ×4 lancent l'Agrandissement IA à la résolution de la fenêtre et
 indiquent la taille obtenue (cm et px). La transparence est rognée avant le redimensionnement, en laissant
 2 px transparents autour du visuel. Le calque est renommé « origin » (champ Nom du calque).
 
 Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès
-que l'onglet est ouvert ou cliqué ; « Afficher l'avant » montre l'image d'origine pour comparer.
+l'ouverture de la fenêtre ; « Afficher l'avant » montre l'image d'origine pour comparer.
 
-Détourage : l'aperçu s'affiche dès l'ouverture de l'onglet, sur la dernière couleur utilisée
-(Fond de contrôle ou « Fond d'aperçu ») ; « Ajouter des trous (gomme magique) » active la gomme magique (en mode contigu), avec sa tolérance
-réglable dans l'onglet : chaque clic dans une zone fermée du calque « Sans fond » l'efface (une
-annulation par clic) ; décocher rend l'outil précédent.
+Suppression fond blanc : l'aperçu s'affiche dès l'ouverture de la fenêtre, sur la dernière
+couleur utilisée (Fond de contrôle ou « Fond d'aperçu »). La couleur du fond est détectée sur les
+bords si elle est unie, ou prise à la pipette. « Ajouter des trous » et « Couleur du fond à la
+pipette » sont deux boutons à bascule exclusifs ; sans bouton enfoncé, un clic sur l'image ne fait
+rien. Chaque trou cliqué s'ajoute à l'aperçu et est percé avec le fond à l'application ;
+Ctrl+Alt+Z annule puis rétablit le dernier changement avant « Appliquer ».
 
 ## Gang sheet
 
@@ -109,7 +112,7 @@ retournements), elle reprend la mise en place donnée. Marges : `edgeMargin` (bo
 
 ## Agrandissement IA
 
-Lancé depuis l'onglet Conformité (boutons ×2, ×3, ×4) ; il n'est plus dans le menu DTF.
+Lancé depuis la fenêtre Conformité impression (boutons ×2, ×3, ×4) ; il n'est plus dans le menu DTF.
 
 Le modèle `realesr-general-x4v3` de Real-ESRGAN (© 2021 Xintao Wang, licence BSD 3-Clause, voir
 `LICENSE-Real-ESRGAN.txt`) est intégré à l'application. Le calcul se fait sur le processeur,

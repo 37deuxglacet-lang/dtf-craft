@@ -1,11 +1,11 @@
 // DTF Craft — Copyright (c) 2026 Stéphane Glacet. Licensed under MIT OR Apache-2.0.
-//! DTF Craft's DTF tools as dock panels: the DTF group (`dock::Group::Dtf`) has one tab per DTF
-//! preparation tool, which drags, groups, floats and docks like every other panel (Window ›
-//! Print Conformity…, one entry per tool). Each tab shows the tool's settings (the same schema as
-//! its DTF menu dialog) and an Apply button; moving a setting previews the result on the canvas,
-//! through the filter-dialog preview (`canvas::ensure_filter_preview`), until Apply or Cancel.
+//! DTF Craft's DTF tools as windows opened from the DTF menu (Print Conformity…, Remove White
+//! Background…, …), one at a time, like DTF Halftone's: each shows the tool's settings, its help
+//! and an Apply button; moving a setting previews the result on the canvas, through the
+//! filter-dialog preview (`canvas::ensure_filter_preview`), until Apply, Cancel or closing it.
 //!
-//! The menu entries and their dialogs stay in the DTF menu: the tabs run the same commands.
+//! The cut-out's window leaves the image clickable (Add Holes, the background eyedropper); the
+//! others are modal, as a filter dialog is: the canvas and the other menu commands wait.
 
 use std::collections::BTreeMap;
 
@@ -103,6 +103,9 @@ pub struct DtfPanelUi {
     /// Whether a plain background was detected, for (document, revision, layer, tolerance × 10).
     #[serde(skip)]
     detected: Option<((photocraft_doc::DocId, u64, u64, i64), bool)>,
+    /// The DTF tool whose window is open (its command id).
+    #[serde(skip)]
+    pub window: Option<String>,
     /// The beta notice is on screen (shown at every start of DTF Craft until OK).
     #[serde(skip)]
     pub beta_notice: bool,
@@ -116,29 +119,14 @@ fn title(command: &str) -> String {
 
 /// The layout version DTF Craft last set up (remembered with the preferences): raising it
 /// brings the DTF default layout back once, over a layout saved by an older version.
-const LAYOUT_VERSION: u64 = 4;
+const LAYOUT_VERSION: u64 = 5;
 const LAYOUT_PREF: &str = "dtfCraft.layoutVersion";
 
-/// The DTF workspace (Window › Workspace › DTF): the DTF tools and Layers in the right column,
-/// three tabs at most per group; every other panel (Channels and Paths included) in the Window menu.
+/// The DTF workspace (Window › Workspace › DTF): Layers alone in the right column (the DTF tools
+/// open from the DTF menu); every other panel (Channels and Paths included) in the Window menu.
 pub(crate) fn dtf_layout() -> craft_ui::docking::Layout<String> {
     use craft_ui::docking::{Layout, Node};
-    use craft_ui::layout::{SplitAxis, SplitSize};
-    let tabs = |panels: &[&str]| Node::Tabs { panels: panels.iter().map(|p| p.to_string()).collect(), active: 0 };
-    let split = |height: f32, first: Node<String>, second: Node<String>| Node::Split {
-        axis: SplitAxis::Vertical,
-        size: SplitSize::FixedFirst(height),
-        first: Box::new(first),
-        second: Box::new(second),
-    };
-    Layout {
-        root: Some(split(
-            300.0,
-            tabs(&["dtfBackground", "dtfSharpness", "dtfSaturation"]),
-            split(210.0, tabs(&["dtfTransparency", "dtfFringe"]), tabs(&["layers", "dtfConformity", "dtfCutout"])),
-        )),
-        floating: Vec::new(),
-    }
+    Layout { root: Some(Node::Tabs { panels: vec!["layers".to_string()], active: 0 }), floating: Vec::new() }
 }
 
 /// DTF Craft's start: the DTF tools, and on the first launch of this layout the DTF workspace.
@@ -212,13 +200,9 @@ fn initial_fields(app: &PhotocraftApp, command: &str) -> Map<String, Value> {
 /// Is a section previewed on the canvas now? Gives the preview's dialog id and fields to
 /// `canvas::ensure_filter_preview` when no command dialog is open.
 pub(crate) fn preview_source(app: &PhotocraftApp) -> Option<(u64, Map<String, Value>)> {
-    if !app.ui.panels.dtf {
-        return None;
-    }
     let cmd = app.ui.dtf_panel.previewing.as_ref()?;
-    // Only while the tool's tab is on screen (several DTF tabs can be, in separate groups).
-    let tab = TOOLS.iter().position(|t| t == cmd)?;
-    if !crate::panel_docking::dtf_tab_shown(app, tab) {
+    // Only while the tool's window is open.
+    if app.ui.dtf_panel.window.as_ref() != Some(cmd) {
         return None;
     }
     let f = app.ui.dtf_panel.fields.get(cmd)?;
@@ -411,8 +395,8 @@ fn conformity_params(f: &Map<String, Value>, params: &mut Value) {
 
 /// Print Conformity's AI Upscale buttons: ×2, ×3, ×4 of the document, each with the size it gives
 /// at the tab's resolution. A click enlarges a copy (`dtf.upscale`) at that resolution.
-fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, Value>) {
-    let Some(st) = app.session.active() else { return };
+fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, Value>) -> bool {
+    let Some(st) = app.session.active() else { return false };
     let (w, h) = (st.doc.size.width, st.doc.size.height);
     let dpi = f.get("resolution").and_then(Value::as_f64).unwrap_or(f64::from(st.doc.resolution_dpi)).clamp(72.0, 1200.0);
     let enabled = app.session.is_enabled(photocraft_engine::dtf_cmds::UPSCALE) && app.session.job_on(st.doc.id).is_none();
@@ -442,6 +426,7 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     {
         crate::notices::error(app, error);
     }
+    run.is_some()
 }
 
 /// The cut-out's settings without the panel's own keys (`__…`): what Toggle Last State compares
@@ -496,11 +481,105 @@ pub(crate) fn is_enabled(app: &PhotocraftApp, id: &str) -> Option<bool> {
 
 /// While the cut-out is previewed with neither Add Holes nor the background eyedropper on, a
 /// click on the visual does nothing (the Hand and Zoom tools still work).
+/// A DTF window other than the cut-out's is modal: the canvas waits too.
 pub(crate) fn blocks_canvas(app: &PhotocraftApp) -> bool {
+    if matches!(app.ui.tool, crate::state::Tool::Hand | crate::state::Tool::Zoom) {
+        return false;
+    }
+    if modal_window(app) {
+        return true;
+    }
     app.ui.dtf_panel.previewing.as_deref() == Some(photocraft_engine::dtf_cmds::REMOVE_WHITE)
         && app.ui.dtf_panel.hole_eraser.is_none()
         && app.ui.dtf_panel.background_picker.is_none()
-        && !matches!(app.ui.tool, crate::state::Tool::Hand | crate::state::Tool::Zoom)
+}
+
+/// Is a modal DTF window open (any but the cut-out's)?
+pub(crate) fn modal_window(app: &PhotocraftApp) -> bool {
+    app.ui.dtf_panel.window.as_deref().is_some_and(|w| w != photocraft_engine::dtf_cmds::REMOVE_WHITE)
+}
+
+/// DTF menu: a DTF tool opens its window (with no parameters; with parameters the command runs,
+/// for automation). `None` for other commands.
+pub fn menu(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Value, String>> {
+    if !TOOLS.contains(&id) || params.as_object().is_some_and(|o| !o.is_empty()) {
+        return None;
+    }
+    open_window(app, id);
+    Some(Ok(json!({"window": id})))
+}
+
+/// Opens tool `cmd`'s window, closing another DTF window first. The retouching tools and the
+/// cut-out preview at once.
+pub fn open_window(app: &mut PhotocraftApp, cmd: &str) {
+    if app.ui.dtf_panel.window.as_deref() == Some(cmd) {
+        return;
+    }
+    close_window(app);
+    if !app.ui.dtf_panel.fields.contains_key(cmd) {
+        let f = initial_fields(app, cmd);
+        app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
+    }
+    app.ui.dtf_panel.window = Some(cmd.to_string());
+    let auto = RETOUCH.contains(&cmd) || cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE;
+    if auto && app.session.active().is_some() && app.session.is_enabled(cmd) {
+        app.ui.dtf_panel.previewing = Some(cmd.to_string());
+    }
+}
+
+/// Closes the DTF window, as its Cancel does: the preview stops, the cut-out's holes and its
+/// modes (Add Holes, eyedropper) go.
+pub fn close_window(app: &mut PhotocraftApp) {
+    let Some(cmd) = app.ui.dtf_panel.window.take() else { return };
+    if app.ui.dtf_panel.previewing.as_deref() == Some(cmd.as_str()) {
+        stop_preview(app);
+    }
+    if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
+        if let Some(f) = app.ui.dtf_panel.fields.get_mut(&cmd) {
+            f.remove(HOLES);
+        }
+        set_hole_eraser(app, false);
+        set_background_picker(app, false);
+        clear_cutout_history(app);
+    }
+}
+
+/// The DTF window, when one is open: the tool's title, its settings (scrolled when taller than
+/// the screen), closed by its × or Esc, and after Apply or Cancel.
+pub fn window(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let Some(cmd) = app.ui.dtf_panel.window.clone() else { return };
+    let Some(tab) = TOOLS.iter().position(|t| *t == cmd) else {
+        app.ui.dtf_panel.window = None;
+        return;
+    };
+    let mut open = true;
+    let mut done = false;
+    let max_h = (ctx.content_rect().height() - 120.0).max(240.0);
+    egui::Window::new(title(&cmd))
+        .id(egui::Id::new("dtf-tool-window"))
+        .open(&mut open)
+        .collapsible(false)
+        .resizable(false)
+        .default_width(340.0)
+        .default_pos(ctx.content_rect().right_top() + egui::vec2(-380.0, 60.0))
+        .show(ctx, |ui| {
+            ui.set_width(330.0);
+            // As tall as its settings, scrolled only past the screen's height.
+            egui::ScrollArea::vertical().max_height(max_h).min_scrolled_height(max_h).auto_shrink([false, true]).show(ui, |ui| {
+                done = tool_body(app, ui, tab);
+            });
+        });
+    let escape = ctx.memory(|m| m.focused().is_none()) && ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape));
+    if !open || escape {
+        close_window(app);
+    } else if done {
+        // Applied (the preview became the result) or cancelled: the window closes.
+        let cmd = app.ui.dtf_panel.window.take();
+        if cmd.as_deref() == Some(photocraft_engine::dtf_cmds::REMOVE_WHITE) {
+            set_hole_eraser(app, false);
+            set_background_picker(app, false);
+        }
+    }
 }
 
 /// The cut-out's holes clicked by hand, kept in its settings (`holePoints`, document px): they
@@ -656,9 +735,10 @@ fn mode_button(ui: &mut egui::Ui, icon: &str, label: &str, on: bool) -> egui::Re
     ui.add(button)
 }
 
-/// One DTF tool's tab (`tab` indexes [`TOOLS`]): its settings, Apply, and Cancel while previewed.
-pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) {
-    let Some(&cmd) = TOOLS.get(tab) else { return };
+/// One DTF tool's settings (`tab` indexes [`TOOLS`]), in its window. True when the window is
+/// done: applied, cancelled, or an AI upscale started.
+pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) -> bool {
+    let Some(&cmd) = TOOLS.get(tab) else { return false };
     if !app.ui.dtf_panel.fields.contains_key(cmd) {
         let f = initial_fields(app, cmd);
         app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
@@ -681,11 +761,10 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
     }
     let note = if cmd == "dtf.conformity" { current_size_note(app) } else { None };
-    let Some(mut f) = app.ui.dtf_panel.fields.remove(cmd) else { return };
+    let Some(mut f) = app.ui.dtf_panel.fields.remove(cmd) else { return false };
     if cmd == "dtf.conformity" {
         sync_conformity(app, &mut f);
     }
-    let previewing = app.ui.dtf_panel.previewing.as_deref() == Some(cmd);
     match note {
         Some(n) => f.insert("__note".into(), json!(n)),
         None => f.remove("__note"),
@@ -717,10 +796,11 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     } else {
         crate::filter_dialog::body(ui, &mut f);
     }
+    let mut upscaled = false;
     if cmd == "dtf.conformity" {
         link_dimensions(app, &before, &mut f);
         if have_doc {
-            upscale_buttons(app, ui, &f);
+            upscaled = upscale_buttons(app, ui, &f);
         }
     }
     let mut eraser = app.ui.dtf_panel.hole_eraser.is_some();
@@ -799,9 +879,8 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
                 apply_it = help(crate::widgets::primary_button(ui, tl!("Apply"), 110.0), cmd, "apply").clicked();
             });
         }
-        if previewing {
-            cancel = help(crate::widgets::secondary_button(ui, tl!("Cancel"), 110.0), cmd, "cancel").clicked();
-        }
+        // The window's Cancel: stops a preview and closes it.
+        cancel = help(crate::widgets::secondary_button(ui, tl!("Cancel"), 110.0), cmd, "cancel").clicked();
     });
     app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
@@ -837,6 +916,7 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
             clear_cutout_history(app);
         }
     }
+    apply_it || cancel || upscaled
 }
 
 #[cfg(test)]
@@ -853,7 +933,7 @@ mod tests {
     }
 
     #[test]
-    fn dtf_craft_opens_on_the_dtf_workspace_and_a_preview_stops_with_its_tab() {
+    fn dtf_craft_opens_on_layers_alone_and_the_tools_open_in_windows_from_the_menu() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         let ctx = egui::Context::default();
         dtf_craft_startup(&mut app);
@@ -861,39 +941,32 @@ mod tests {
         let layout = app.ui.docking.clone().expect("the DTF workspace's layout");
         assert_eq!(layout, dtf_layout());
         assert!(crate::panel_docking::valid(&layout));
-        // Groups of three tabs at most; Channels and Paths stay out of the right column.
-        let mut pending: Vec<_> = layout.root.iter().collect();
-        let mut groups = Vec::new();
-        while let Some(node) = pending.pop() {
-            match node {
-                craft_ui::docking::Node::Split { first, second, .. } => pending.extend([first.as_ref(), second.as_ref()]),
-                craft_ui::docking::Node::Tabs { panels, .. } => groups.push(panels.clone()),
-                _ => {}
-            }
-        }
-        assert_eq!(groups.len(), 3);
-        assert!(groups.iter().all(|g| g.len() <= 3), "{groups:?}");
-        let all: Vec<&String> = groups.iter().flatten().collect();
-        assert_eq!(all.len(), TOOLS.len() + 1, "every DTF tool and Layers: {all:?}");
-        assert!(!all.iter().any(|p| *p == "channels" || *p == "paths"));
+        assert!(matches!(&layout.root, Some(craft_ui::docking::Node::Tabs { panels, .. }) if panels == &["layers".to_string()]), "{layout:?}");
         let p = &app.ui.panels;
-        assert!(p.dtf && p.layers && !p.color && !p.properties && !p.history && !p.navigator);
+        assert!(!p.dtf && p.layers && !p.color && !p.properties && !p.history && !p.navigator);
+        // The Window menu no longer lists the DTF tools.
+        assert!(!crate::menu_catalog::CATALOG.iter().any(|(path, _, _, id)| path.first() == Some(&"Window") && id.starts_with("window.panel.dtf")));
         // Essentials keeps Channels and Paths out too.
         crate::menus::invoke(&mut app, &ctx, "window.workspace.essentials", json!({})).unwrap();
         let shown: Vec<&str> = app.ui.dock.visible_tabs(crate::dock::Group::Layers, false).into_iter().map(|(_, n)| n).collect();
         assert_eq!(shown, ["Layers"]);
         crate::menus::invoke(&mut app, &ctx, "window.workspace.dtf", json!({})).unwrap();
         assert_eq!(app.ui.docking, Some(dtf_layout()));
-        // A preview shows while its tool's tab is the active one of its group.
+        // DTF › Saturation… opens its window, which previews at once and is modal.
         app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        app.ui.dtf_panel.fields.insert("dtf.saturation".into(), initial_fields(&app, "dtf.saturation"));
-        app.ui.dtf_panel.previewing = Some("dtf.saturation".into());
-        assert!(preview_source(&app).is_none(), "Saturation is behind Control Background");
-        app.run("window.panel.activate", json!({"panel": "Saturation"})).unwrap();
+        crate::menus::invoke(&mut app, &ctx, "dtf.saturation", json!({})).unwrap();
+        assert_eq!(app.ui.dtf_panel.window.as_deref(), Some("dtf.saturation"));
         assert_eq!(preview_source(&app).map(|p| p.0), Some(PREVIEW_DIALOG));
-        // Window › Saturation closes its tab, and the preview with it.
-        crate::menus::invoke(&mut app, &ctx, "window.panel.dtfSaturation", json!({})).unwrap();
-        assert!(preview_source(&app).is_none());
+        assert!(!crate::menus::modal_allows(&app, "image.imageSize") && crate::menus::modal_allows(&app, "view.zoomIn"));
+        // Another DTF tool takes its place; the cut-out's window leaves the menus free.
+        close_window(&mut app);
+        assert!(preview_source(&app).is_none() && app.ui.dtf_panel.previewing.is_none(), "closing stops the preview");
+        crate::menus::invoke(&mut app, &ctx, photocraft_engine::dtf_cmds::REMOVE_WHITE, json!({})).unwrap();
+        assert!(crate::menus::modal_allows(&app, "image.imageSize"));
+        // With parameters the command still runs (automation), without a window.
+        close_window(&mut app);
+        crate::menus::invoke(&mut app, &ctx, "dtf.saturation", json!({"saturation": 10})).unwrap();
+        assert!(app.ui.dtf_panel.window.is_none());
     }
 
     /// The DTF specs carry descriptions in parentheses (with commas): their keys and defaults
@@ -945,10 +1018,9 @@ mod tests {
             })
             .unwrap();
         let ctx = egui::Context::default();
-        app.ui.panels.dtf = true;
         let cmd = "filter.dtf.removeSemiTransparent";
         // The tool's tab is the one on screen.
-        app.ui.dock_tabs.dtf = TOOLS.iter().position(|c| *c == cmd).unwrap();
+        app.ui.dtf_panel.window = Some(cmd.into());
         let mut f = initial_fields(&app, cmd);
         f.insert("threshold".into(), json!(50));
         app.ui.dtf_panel.fields.insert(cmd.into(), f);
@@ -986,11 +1058,10 @@ mod tests {
             })
             .unwrap();
         let ctx = egui::Context::default();
-        app.ui.panels.dtf = true;
         let cmd = "filter.dtf.removeWhiteBackground";
         app.ui.dtf_panel.fields.insert(cmd.into(), initial_fields(&app, cmd));
         // The tool's tab is the one on screen.
-        app.ui.dock_tabs.dtf = TOOLS.iter().position(|c| *c == cmd).unwrap();
+        app.ui.dtf_panel.window = Some(cmd.into());
         assert_eq!(app.ui.dtf_panel.fields[cmd].get("color"), Some(&json!("#ffffff")));
         app.ui.dtf_panel.previewing = Some(cmd.into());
         assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
@@ -1012,7 +1083,6 @@ mod tests {
     fn a_preview_survives_other_dtf_tabs_on_screen() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        app.ui.panels.dtf = true;
         let cutout = TOOLS.iter().position(|c| *c == "filter.dtf.removeWhiteBackground").unwrap();
         let saturation = TOOLS.iter().position(|c| *c == "dtf.saturation").unwrap();
         app.ui.dtf_panel.fields.insert(TOOLS[cutout].into(), initial_fields(&app, TOOLS[cutout]));
@@ -1130,9 +1200,8 @@ mod tests {
                 Ok(())
             })
             .unwrap();
-        app.ui.panels.dtf = true;
         let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
-        app.ui.dock_tabs.dtf = tab_of(cmd);
+        app.ui.dtf_panel.window = Some(cmd.into());
         app.ui.tool = crate::state::Tool::Brush;
         assert!(!hole_click(&mut app, 20.0, 20.0), "off: the click is the tool's");
         set_hole_eraser(&mut app, true);
@@ -1275,9 +1344,8 @@ mod tests {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.background_jobs = false;
         app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        app.ui.panels.dtf = true;
         let cmd = photocraft_engine::dtf_cmds::REMOVE_WHITE;
-        app.ui.dock_tabs.dtf = tab_of(cmd);
+        app.ui.dtf_panel.window = Some(cmd.into());
         let mut f = initial_fields(&app, cmd);
         f.insert("previewColor".into(), json!("#0000ff"));
         app.ui.dtf_panel.fields.insert(cmd.into(), f);
@@ -1298,7 +1366,6 @@ mod tests {
     fn a_retouching_tab_previews_when_opened_and_shows_before_on_demand() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        app.ui.panels.dtf = true;
         let sat = tab_of("dtf.saturation");
         let shown = std::rc::Rc::new(std::cell::Cell::new(false));
         let on = shown.clone();
@@ -1311,7 +1378,7 @@ mod tests {
         h.run_steps(4);
         assert_eq!(h.state().ui.dtf_panel.previewing, None, "nothing previews on its own");
         shown.set(true);
-        h.state_mut().ui.dock_tabs.dtf = sat;
+        h.state_mut().ui.dtf_panel.window = Some("dtf.saturation".into());
         h.run_steps(2);
         assert_eq!(h.state().ui.dtf_panel.previewing.as_deref(), Some("dtf.saturation"), "opening the tab previews");
         assert!(preview_source(h.state()).is_some());
@@ -1326,10 +1393,11 @@ mod tests {
         use egui_kittest::kittest::Queryable;
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        app.ui.panels.dtf = true;
         let sat = tab_of("dtf.saturation");
-        app.ui.dock_tabs.dtf = sat;
-        let mut h = tabs_harness(app, move |ui, app| tool_body(app, ui, sat));
+        app.ui.dtf_panel.window = Some("dtf.saturation".into());
+        let mut h = tabs_harness(app, move |ui, app| {
+            tool_body(app, ui, sat);
+        });
         h.run_steps(4);
         // The slider runs under the "Saturation" label, across the tab.
         let label = h.get_by_label("Saturation").rect();
@@ -1362,11 +1430,12 @@ mod tests {
     fn the_cutout_previews_on_the_last_colour_picked() {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
         app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        app.ui.panels.dtf = true;
         set_last_color(&mut app, "#112233");
         let cut = tab_of(photocraft_engine::dtf_cmds::REMOVE_WHITE);
-        app.ui.dock_tabs.dtf = cut;
-        let mut h = tabs_harness(app, move |ui, app| tool_body(app, ui, cut));
+        app.ui.dtf_panel.window = Some(photocraft_engine::dtf_cmds::REMOVE_WHITE.into());
+        let mut h = tabs_harness(app, move |ui, app| {
+            tool_body(app, ui, cut);
+        });
         h.run_steps(3);
         assert_eq!(h.state().ui.dtf_panel.fields[photocraft_engine::dtf_cmds::REMOVE_WHITE]["previewColor"], json!("#112233"));
         // A colour applied as Control Background becomes the cut-out's.
@@ -1434,7 +1503,7 @@ mod tests {
         };
         shot(visual(), "panneau", &|_| {});
         shot(visual(), "apercu", &|app| {
-            app.run("window.panel.activate", json!({"panel": "Transparent Pixels"})).unwrap();
+            open_window(app, "filter.dtf.removeSemiTransparent");
             let mut f = initial_fields(app, "filter.dtf.removeSemiTransparent");
             f.insert("threshold".into(), json!(80));
             app.ui.dtf_panel.fields.insert("filter.dtf.removeSemiTransparent".into(), f);
@@ -1461,7 +1530,7 @@ mod tests {
             s
         };
         shot(on_white(), "detourage", &|app| {
-            app.run("window.panel.activate", json!({"panel": "Cutout"})).unwrap();
+            open_window(app, "filter.dtf.removeWhiteBackground");
             let cmd = "filter.dtf.removeWhiteBackground";
             let mut f = initial_fields(app, cmd);
             f.insert("tolerance".into(), json!(12));
@@ -1470,7 +1539,7 @@ mod tests {
         });
         // Add Holes pressed, two holes clicked: the toggle buttons, the counter.
         shot(on_white(), "detourage_trous", &|app| {
-            app.run("window.panel.activate", json!({"panel": "Cutout"})).unwrap();
+            open_window(app, "filter.dtf.removeWhiteBackground");
             let cmd = "filter.dtf.removeWhiteBackground";
             app.ui.dtf_panel.fields.insert(cmd.into(), initial_fields(app, cmd));
             set_hole_eraser(app, true);
@@ -1478,7 +1547,7 @@ mod tests {
             hole_click(app, 20.0, 20.0);
         });
         shot(visual(), "conformite", &|app| {
-            app.run("window.panel.activate", json!({"panel": "Conformity"})).unwrap();
+            open_window(app, "dtf.conformity");
         });
         // Saturation opened: its preview shows without moving the slider.
         shot(visual(), "saturation", &|app| {
@@ -1486,11 +1555,11 @@ mod tests {
             f.insert("saturation".into(), json!(-100));
             app.ui.dtf_panel.fields.insert("dtf.saturation".into(), f);
             app.ui.dtf_panel.first_pass = Some(0);
-            app.run("window.panel.activate", json!({"panel": "Saturation"})).unwrap();
+            open_window(app, "dtf.saturation");
         });
         // The help sheet open in the cut-out's tab.
         shot(on_white(), "aide", &|app| {
-            app.run("window.panel.activate", json!({"panel": "Cutout"})).unwrap();
+            open_window(app, "filter.dtf.removeWhiteBackground");
             let cmd = "filter.dtf.removeWhiteBackground";
             let mut f = initial_fields(app, cmd);
             f.insert("__help".into(), json!(true));

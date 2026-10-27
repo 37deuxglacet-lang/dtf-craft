@@ -15,6 +15,10 @@ pub(crate) fn modal_allows(app: &PhotocraftApp, id: &str) -> bool {
     if app.camera_raw.is_some() || app.color_analyzer.is_some() || app.vectorizer.is_some() || crate::crop_ui::blocks(app, id) {
         return false;
     }
+    // A modal DTF window (any but the cut-out's) blocks the menus but navigation.
+    if crate::dtf_panel::modal_window(app) && !crate::shortcuts::NAV_COMMANDS.contains(&id) {
+        return false;
+    }
     (app.ui.dialogs.is_empty() && app.discard.is_none()) || crate::shortcuts::NAV_COMMANDS.contains(&id)
 }
 
@@ -260,6 +264,10 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     }
     // DTF › Vectorization (DTF Craft).
     if let Some(r) = crate::vectorizer_ui::menu(app, id, &params) {
+        return r;
+    }
+    // DTF Craft: the DTF tools open their windows.
+    if let Some(r) = crate::dtf_panel::menu(app, id, &params) {
         return r;
     }
     // Camera Raw Filter dialog (and its control params).
@@ -1574,7 +1582,8 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
     p.history = history;
     p.properties = props;
     p.character = app.ui.workspace == "Graphic and Web";
-    p.dtf = app.dtf_craft;
+    // The DTF tools open from the DTF menu, in windows (`dtf_panel::window`): no dock group.
+    p.dtf = false;
     if app.dtf_craft {
         // DTF Craft keeps Channels and Paths out of the right column (Window menu only).
         let pro = matches!(app.ui.theme, crate::theme::ThemeKind::Pro | crate::theme::ThemeKind::ProMedium);
@@ -1583,7 +1592,7 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
                 app.ui.dock.hide_tab(crate::dock::Group::Layers, index, pro);
             }
         }
-        // The DTF workspace: the DTF tools and Layers in groups of three tabs at most.
+        // The DTF workspace: Layers alone in the right column.
         if app.ui.workspace == "DTF" {
             app.ui.docking = Some(crate::dtf_panel::dtf_layout());
             crate::panel_docking::sync_visibility(app);

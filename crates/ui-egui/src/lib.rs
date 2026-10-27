@@ -1902,6 +1902,8 @@ impl eframe::App for PhotocraftApp {
         tiff_options_ui::show(self, &ctx);
         // DTF Craft: the beta notice at every start.
         dtf_panel::beta_notice(self, &ctx);
+        // DTF Craft: the DTF tool window opened from the DTF menu.
+        dtf_panel::window(self, &ctx);
         targa_options_ui::show(self, &ctx);
         distort_ui::show(self, &ctx);
         camera_raw_ui::show(self, &ctx);
