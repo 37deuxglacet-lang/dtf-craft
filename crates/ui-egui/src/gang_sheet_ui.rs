@@ -36,6 +36,7 @@
 //! `null`), `selectAll`, `group`, `ungroup`, `move` (the selection's box corner), `rotate`
 //! (quarters), `mirror` (`"h"`/`"v"`), `stretch`, `center`, `align`, `duplicate`, `delete`,
 //! `fill`, `copy`, `paste`, `undo`, `redo`, `newSheet`, `sheet` (active), `duplicateSheet`,
+//! `alignSelection` (`left`/`hcenter`/`right`/`top`/`vcenter`/`bottom`), `distribute` (`h`/`v`),
 //! `deleteSheet`, `sheetCopies`, `renameSheet`, `startOver`, `tab` (`home`/`settings`), `autoView`,
 //! `export` (path), `cancel`.
 
@@ -1037,6 +1038,104 @@ impl GangSheetDialog {
         self.shift(list, r.x - b.x, r.y - b.y);
     }
 
+    /// The selection as the blocks that move apart: each group whole, each other visual alone.
+    fn units(&self, list: &[usize]) -> Vec<Vec<usize>> {
+        let mut out: Vec<Vec<usize>> = Vec::new();
+        for i in list {
+            if out.iter().any(|u| u.contains(i)) {
+                continue;
+            }
+            let members: Vec<usize> = self.members(*i).into_iter().filter(|j| list.contains(j)).collect();
+            out.push(if members.is_empty() { vec![*i] } else { members });
+        }
+        out
+    }
+
+    /// Moves each block of `units` by its own (dx, dy), unless one of their visuals would then
+    /// come closer than their spacing to another visual, selected or not: then nothing moves.
+    fn move_units(&mut self, units: &[Vec<usize>], moves: &[(i64, i64)]) -> bool {
+        let mut list = Vec::new();
+        let mut rects = Vec::new();
+        let mut unit_of = Vec::new();
+        for (k, (u, (dx, dy))) in units.iter().zip(moves).enumerate() {
+            for i in u {
+                let r = self.item(*i);
+                list.push(*i);
+                rects.push(Item { x: r.x + dx, y: r.y + dy, ..r });
+                unit_of.push(k);
+            }
+        }
+        if self.block_collides(&list, &rects) {
+            return false;
+        }
+        let gap = |i: usize| self.placed().get(i).map_or(self.gap(), |p| self.gap_of(p.source));
+        for a in 0..rects.len() {
+            for b in a + 1..rects.len() {
+                if unit_of[a] != unit_of[b] && rects[a].too_close(&rects[b], gap(list[a]).max(gap(list[b]))) {
+                    return false;
+                }
+            }
+        }
+        for (u, (dx, dy)) in units.iter().zip(moves) {
+            self.shift(u, *dx, *dy);
+        }
+        true
+    }
+
+    /// Aligns the blocks of the selection on the selection's box: `edge` 0 / 1 / 2 = left edges,
+    /// centres, right edges (`horizontal`), or top edges, centres, bottom edges. Refused (false)
+    /// when two visuals would come closer than their spacing: nothing moves then.
+    pub fn align_units(&mut self, list: &[usize], horizontal: bool, edge: u8) -> bool {
+        let units = self.units(list);
+        if units.len() < 2 {
+            return false;
+        }
+        let b = self.bbox(list);
+        let moves: Vec<(i64, i64)> = units
+            .iter()
+            .map(|u| {
+                let r = self.bbox(u);
+                let (start, len, box_start, box_len) = if horizontal { (r.x, r.w, b.x, b.w) } else { (r.y, r.h, b.y, b.h) };
+                let to = match edge {
+                    0 => box_start,
+                    1 => box_start + (box_len - len) / 2,
+                    _ => box_start + box_len - len,
+                };
+                if horizontal { (to - start, 0) } else { (0, to - start) }
+            })
+            .collect();
+        self.move_units(&units, &moves)
+    }
+
+    /// Spaces the blocks of the selection evenly across (`horizontal`) or along the film, the
+    /// first and last staying where they are. Refused (false) when the room left between them is
+    /// less than their spacing: nothing moves then.
+    pub fn distribute(&mut self, list: &[usize], horizontal: bool) -> bool {
+        let mut units = self.units(list);
+        if units.len() < 3 {
+            return false;
+        }
+        let pos = |r: Item| if horizontal { (r.x, r.w) } else { (r.y, r.h) };
+        units.sort_by_key(|u| {
+            let (p, l) = pos(self.bbox(u));
+            2 * p + l
+        });
+        let spans: Vec<(i64, i64)> = units.iter().map(|u| pos(self.bbox(u))).collect();
+        let (Some(first), Some(last)) = (spans.first(), spans.last()) else { return false };
+        let total = last.0 + last.1 - first.0;
+        let room = total - spans.iter().map(|s| s.1).sum::<i64>();
+        let n = (units.len() - 1) as i64;
+        let mut at = first.0;
+        let mut moves = Vec::new();
+        for (k, (p, l)) in spans.iter().enumerate() {
+            // The rounding goes to the gaps in turn, so the last block stays exactly in place.
+            let to = if k == spans.len() - 1 { *p } else { at };
+            moves.push(if horizontal { (to - p, 0) } else { (0, to - p) });
+            at = to + l + (room * (k as i64 + 1)) / n - (room * k as i64) / n;
+        }
+        self.move_units(&units, &moves)
+    }
+
     /// The visuals of `list`, ready to paste.
     fn copy_block(&self, list: &[usize]) -> Option<Clip> {
         if list.is_empty() {
@@ -1550,6 +1649,31 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         d.checkpoint(None);
         d.align_block(&list, side);
     }
+    // `alignSelection`: left, hcenter, right, top, vcenter, bottom; `distribute`: h, v.
+    if let Some(m) = ui.get("alignSelection").and_then(Value::as_str) {
+        let list = target(d, None)?;
+        let (horizontal, edge) = match m {
+            "left" => (true, 0),
+            "hcenter" => (true, 1),
+            "right" => (true, 2),
+            "top" => (false, 0),
+            "vcenter" => (false, 1),
+            _ => (false, 2),
+        };
+        d.checkpoint(None);
+        if !d.align_units(&list, horizontal, edge) {
+            d.undo.pop();
+            return Err(tl!("Too close to another visual").to_string());
+        }
+    }
+    if let Some(m) = ui.get("distribute").and_then(Value::as_str) {
+        let list = target(d, None)?;
+        d.checkpoint(None);
+        if !d.distribute(&list, m != "v") {
+            d.undo.pop();
+            return Err(tl!("Too close to another visual").to_string());
+        }
+    }
     if ui.get("duplicate").and_then(Value::as_bool) == Some(true)
         && let Ok(list) = target(d, None)
     {
@@ -1687,6 +1811,9 @@ fn tool_button(ui: &mut egui::Ui, icon: &str, tip: &str, enabled: bool, angle: f
 fn drawn_icon(name: &str, r: ERect, c: Color32) -> Option<Vec<Shape>> {
     let stroke = Stroke::new(1.5, c);
     let turn = |p: Pos2| -> Pos2 { pos2(r.center().x - (p.y - r.center().y), r.center().y + (p.x - r.center().x)) };
+    if let Some(shapes) = align_icon(name, r, c) {
+        return Some(shapes);
+    }
     let (base, vertical) = match name {
         "flip-h" => ("flip", false),
         "flip-v" => ("flip", true),
@@ -1711,6 +1838,25 @@ fn drawn_icon(name: &str, r: ERect, c: Color32) -> Option<Vec<Shape>> {
         out.push(Shape::line(vec![at(0.65, 0.33), at(0.82, 0.5), at(0.65, 0.67)], stroke));
     }
     Some(out)
+}
+
+/// Align and distribute icons: a guide line and two bars set against it (`al-*`), or three bars
+/// evenly spaced (`dist-*`).
+fn align_icon(name: &str, r: ERect, c: Color32) -> Option<Vec<Shape>> {
+    let at = |x: f32, y: f32| pos2(r.left() + x * r.width(), r.top() + y * r.height());
+    let bar = |x0: f32, y0: f32, x1: f32, y1: f32| Shape::rect_filled(ERect::from_min_max(at(x0, y0), at(x1, y1)), 1.0, c);
+    let line = |x0: f32, y0: f32, x1: f32, y1: f32| Shape::line_segment([at(x0, y0), at(x1, y1)], Stroke::new(1.5, c));
+    Some(match name {
+        "al-left" => vec![line(0.08, 0.0, 0.08, 1.0), bar(0.2, 0.18, 0.95, 0.42), bar(0.2, 0.58, 0.65, 0.82)],
+        "al-hcenter" => vec![line(0.5, 0.0, 0.5, 1.0), bar(0.1, 0.18, 0.9, 0.42), bar(0.25, 0.58, 0.75, 0.82)],
+        "al-right" => vec![line(0.92, 0.0, 0.92, 1.0), bar(0.05, 0.18, 0.8, 0.42), bar(0.35, 0.58, 0.8, 0.82)],
+        "al-top" => vec![line(0.0, 0.08, 1.0, 0.08), bar(0.18, 0.2, 0.42, 0.95), bar(0.58, 0.2, 0.82, 0.65)],
+        "al-vcenter" => vec![line(0.0, 0.5, 1.0, 0.5), bar(0.18, 0.1, 0.42, 0.9), bar(0.58, 0.25, 0.82, 0.75)],
+        "al-bottom" => vec![line(0.0, 0.92, 1.0, 0.92), bar(0.18, 0.05, 0.42, 0.8), bar(0.58, 0.35, 0.82, 0.8)],
+        "dist-h" => vec![bar(0.02, 0.2, 0.22, 0.8), bar(0.4, 0.2, 0.6, 0.8), bar(0.78, 0.2, 0.98, 0.8)],
+        "dist-v" => vec![bar(0.2, 0.02, 0.8, 0.22), bar(0.2, 0.4, 0.8, 0.6), bar(0.2, 0.78, 0.8, 0.98)],
+        _ => return None,
+    })
 }
 
 /// A switch on the right of a labelled row (Settings).
@@ -2095,6 +2241,51 @@ fn multi_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, list: &[usize], t: &T
             ui.end_row();
         }
     });
+    // Align on the selection's box, distribute evenly (a group counts as one block).
+    let blocks = d.units(list).len();
+    let mut op: Option<(bool, Option<u8>)> = None;
+    card_frame(t).show(ui, |ui| {
+        ui.set_width(ui.available_width());
+        ui.label(egui::RichText::new(tl!("Align")).color(t.text));
+        ui.horizontal(|ui| {
+            ui.spacing_mut().item_spacing.x = 2.0;
+            for (icon, tip, horizontal, edge) in [
+                ("al-left", tl!("Left Edges"), true, 0),
+                ("al-hcenter", tl!("Horizontal Centers"), true, 1),
+                ("al-right", tl!("Right Edges"), true, 2),
+                ("al-top", tl!("Top Edges"), false, 0),
+                ("al-vcenter", tl!("Vertical Centers"), false, 1),
+                ("al-bottom", tl!("Bottom Edges"), false, 2),
+            ] {
+                if tool_button(ui, icon, tip, blocks >= 2, 0.0, false).clicked() {
+                    op = Some((horizontal, Some(edge)));
+                }
+                if edge == 2 && horizontal {
+                    widgets::vline(ui, 22.0);
+                }
+            }
+        });
+        ui.label(egui::RichText::new(tl!("Distribute")).color(t.text));
+        ui.horizontal(|ui| {
+            ui.spacing_mut().item_spacing.x = 2.0;
+            for (icon, tip, horizontal) in [("dist-h", tl!("Horizontally"), true), ("dist-v", tl!("Vertically"), false)] {
+                if tool_button(ui, icon, tip, blocks >= 3, 0.0, false).clicked() {
+                    op = Some((horizontal, None));
+                }
+            }
+        });
+    });
+    if let Some((horizontal, edge)) = op {
+        d.checkpoint(None);
+        let ok = match edge {
+            Some(e) => d.align_units(list, horizontal, e),
+            None => d.distribute(list, horizontal),
+        };
+        if !ok {
+            d.undo.pop();
+            d.status = tl!("Too close to another visual").to_string();
+        }
+    }
     card_frame(t).show(ui, |ui| {
         ui.set_width(ui.available_width());
         ui.vertical(|ui| {
@@ -3378,6 +3569,50 @@ mod tests {
         reset_settings();
     }
 
+    /// Aligning on the selection's box and distributing evenly; a group moves as one block; an
+    /// alignment that would bring two visuals too close moves nothing.
+    #[test]
+    fn the_selection_aligns_and_distributes() {
+        reset_settings();
+        let dir = std::env::temp_dir().join(format!("gang-align-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        // 5 × 2.5 cm.
+        let a = png(&dir, "a.png", 591, 295);
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        invoke(&mut app, &ctx, json!({"addFiles": [a], "set": {"rotate": false}}));
+        invoke(&mut app, &ctx, json!({"source": {"index": 0, "onSheet": 3}}));
+        // Three in a staircase: x 1, 10, 30 cm; y 1, 6, 12 cm.
+        for (i, (x, y)) in [(1.0, 1.0), (10.0, 6.0), (30.0, 12.0)].iter().enumerate() {
+            invoke(&mut app, &ctx, json!({"move": {"index": i, "x": x, "y": y}}));
+        }
+        let xy = |r: &Value, i: usize| (r["placements"][i]["x"].as_f64().unwrap(), r["placements"][i]["y"].as_f64().unwrap());
+        // Top edges: all at 1 cm, side by side.
+        let r = invoke(&mut app, &ctx, json!({"selectAll": true, "alignSelection": "top"}));
+        assert_eq!((xy(&r, 0).1, xy(&r, 1).1, xy(&r, 2).1), (1.0, 1.0, 1.0));
+        // Distributed across: equal gaps, the first and last in place.
+        let r = invoke(&mut app, &ctx, json!({"distribute": "h"}));
+        let (x0, x1, x2) = (xy(&r, 0).0, xy(&r, 1).0, xy(&r, 2).0);
+        assert_eq!((x0, x2), (1.0, 30.0));
+        assert!(((x1 - x0) - (x2 - x1)).abs() < 0.02, "{x0} {x1} {x2}");
+        // Left edges would stack them on each other: refused, nothing moves.
+        assert!(menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({"ui": {"alignSelection": "left"}})).unwrap().is_err());
+        let r = invoke(&mut app, &ctx, json!({}));
+        assert_eq!(xy(&r, 0).0, x0);
+        assert_eq!(xy(&r, 1).0, x1);
+        // A group is one block: 0 and 1 grouped, aligned on the bottom with 2 pushed lower.
+        invoke(&mut app, &ctx, json!({"move": {"index": 2, "x": 30, "y": 20}}));
+        invoke(&mut app, &ctx, json!({"select": [0, 1], "group": true}));
+        let before = xy(&invoke(&mut app, &ctx, json!({})), 1).0 - xy(&invoke(&mut app, &ctx, json!({})), 0).0;
+        let r = invoke(&mut app, &ctx, json!({"selectAll": true, "alignSelection": "bottom"}));
+        assert_eq!((xy(&r, 0).1, xy(&r, 1).1, xy(&r, 2).1), (20.0, 20.0, 20.0));
+        assert_eq!(xy(&r, 1).0 - xy(&r, 0).0, before, "the group keeps its layout");
+        // Distributing takes three blocks: a group and one visual are only two.
+        assert!(menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({"ui": {"distribute": "h"}})).unwrap().is_err());
+        let _ = std::fs::remove_dir_all(dir);
+        reset_settings();
+    }
+
     /// Shift+click adds to the selection, a rectangle from empty film picks what it touches, and
     /// dragging one selected visual moves them all.
     #[test]
@@ -3479,6 +3714,7 @@ mod tests {
                 invoke(&mut app, &ctx, json!({"addDocument": true, "source": {"index": 0, "onSheet": 8}}));
                 invoke(&mut app, &ctx, json!({"select": [2, 3], "group": true}));
                 invoke(&mut app, &ctx, json!({"select": [0, 1], "group": true}));
+                invoke(&mut app, &ctx, json!({"select": [0, 1, 2, 3, 4]}));
                 app
             });
             h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());

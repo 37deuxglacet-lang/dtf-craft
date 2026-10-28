@@ -269,6 +269,129 @@ pub fn replace(px: &mut [[f32; 4]], centers: &[([f32; 3], Option<[f32; 3]>)]) {
     }
 }
 
+/// A colour range, as Photoshop's Select › Color Range: the colours picked on the visual (L*a*b*,
+/// and where, as fractions of its width and height), the colours taken back out, the tolerance
+/// (0–100, in ΔE) and whether only the pixels joined to a picked point count.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ColorRange {
+    pub add: Vec<([f32; 3], [f32; 2])>,
+    pub subtract: Vec<[f32; 3]>,
+    pub tolerance: f32,
+    pub contiguous: bool,
+}
+
+/// How much a colour `d` (ΔE) from the nearest picked one is taken for `tolerance`: fully up to
+/// half the tolerance, then less and less to none at the tolerance (antialiased edges are taken
+/// in part, so they stay smooth once replaced).
+fn falloff(d: f32, tolerance: f32) -> f32 {
+    let t = tolerance.max(0.0);
+    if t < 0.5 {
+        return if d < 0.5 { 1.0 } else { 0.0 };
+    }
+    ((t - d) / (t / 2.0)).clamp(0.0, 1.0)
+}
+
+impl ColorRange {
+    /// How much the colour `lab` is in the range, 0–1, whatever its place.
+    pub fn weight(&self, lab: [f32; 3]) -> f32 {
+        let near = |list: &mut dyn Iterator<Item = [f32; 3]>| list.map(|c| dist2(lab, c)).fold(f32::INFINITY, f32::min).sqrt();
+        let w = falloff(near(&mut self.add.iter().map(|a| a.0)), self.tolerance);
+        if w <= 0.0 || self.subtract.is_empty() {
+            return w;
+        }
+        w * (1.0 - falloff(near(&mut self.subtract.iter().copied()), self.tolerance))
+    }
+
+    /// The picked colour nearest `lab` (where the replacement's offset is measured from).
+    fn nearest(&self, lab: [f32; 3]) -> [f32; 3] {
+        self.add.iter().map(|a| a.0).min_by(|x, y| dist2(lab, *x).total_cmp(&dist2(lab, *y))).unwrap_or(lab)
+    }
+
+    /// Each pixel's weight in the range (`px`: `w` × `h` straight RGBA; transparent pixels 0).
+    /// Contiguous: only the pixels joined (4-connected, weight above 0) to a picked point.
+    pub fn weights(&self, px: &[[f32; 4]], w: usize, h: usize) -> Vec<f32> {
+        if self.add.is_empty() || px.len() != w * h {
+            return vec![0.0; px.len()];
+        }
+        let mut cache: std::collections::HashMap<u32, f32> = std::collections::HashMap::new();
+        let mut out: Vec<f32> = px
+            .iter()
+            .map(|q| if q[3] <= 0.0 { 0.0 } else { *cache.entry(key([q[0], q[1], q[2]])).or_insert_with_key(|k| self.weight(srgb_to_lab(unkey(*k)))) })
+            .collect();
+        if self.contiguous {
+            let mut keep = vec![false; out.len()];
+            let mut stack: Vec<usize> = self
+                .add
+                .iter()
+                .map(|(_, at)| {
+                    let x = ((at[0] * w as f32).floor() as usize).min(w.saturating_sub(1));
+                    let y = ((at[1] * h as f32).floor() as usize).min(h.saturating_sub(1));
+                    y * w + x
+                })
+                .filter(|i| out.get(*i).is_some_and(|v| *v > 0.0))
+                .collect();
+            while let Some(i) = stack.pop() {
+                if keep[i] {
+                    continue;
+                }
+                keep[i] = true;
+                let (x, y) = (i % w, i / w);
+                let mut push = |j: usize| {
+                    if !keep[j] && out[j] > 0.0 {
+                        stack.push(j);
+                    }
+                };
+                if x > 0 {
+                    push(i - 1);
+                }
+                if x + 1 < w {
+                    push(i + 1);
+                }
+                if y > 0 {
+                    push(i - w);
+                }
+                if y + 1 < h {
+                    push(i + w);
+                }
+            }
+            for (v, k) in out.iter_mut().zip(keep) {
+                if !k {
+                    *v = 0.0;
+                }
+            }
+        }
+        out
+    }
+}
+
+/// Replaces the pixels of each range by its target colour (L*a*b*), in turn, over `px` already
+/// replaced (`original`: the same pixels before any replacement, where the ranges are measured).
+/// A pixel fully in a range is shifted by the target's offset from the picked colour nearest it
+/// (flat areas take the target exactly, shading is kept); one partly in it is mixed with what it
+/// was.
+pub fn replace_ranges(px: &mut [[f32; 4]], original: &[[f32; 4]], w: usize, h: usize, ranges: &[(ColorRange, [f32; 3])]) {
+    if px.len() != original.len() || px.len() != w * h {
+        return;
+    }
+    for (range, target) in ranges {
+        let weights = range.weights(original, w, h);
+        for ((q, o), k) in px.iter_mut().zip(original).zip(weights) {
+            if k <= 0.0 {
+                continue;
+            }
+            let lab = srgb_to_lab([o[0], o[1], o[2]]);
+            let from = range.nearest(lab);
+            let moved = [0, 1, 2].map(|i| lab[i] + target[i] - from[i]);
+            let now = srgb_to_lab([q[0], q[1], q[2]]);
+            let mixed = [0, 1, 2].map(|i| now[i] + k * (moved[i] - now[i]));
+            let out = lab_to_srgb([mixed[0].clamp(0.0, 100.0), mixed[1], mixed[2]]);
+            q[0] = out[0].clamp(0.0, 1.0);
+            q[1] = out[1].clamp(0.0, 1.0);
+            q[2] = out[2].clamp(0.0, 1.0);
+        }
+    }
+}
+
 /// `#rrggbb` of encoded sRGB 0–1.
 pub fn hex(rgb: [f32; 3]) -> String {
     let q = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
@@ -457,6 +580,51 @@ pub fn parse_csv(text: &str) -> Result<Vec<Swatch>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// 4 × 1: blue, a blue-white half mix, white, blue again (apart from the first).
+    fn strip() -> Vec<[f32; 4]> {
+        let blue = [31.0 / 255.0, 58.0 / 255.0, 147.0 / 255.0, 1.0];
+        let mix = [143.0 / 255.0, 156.0 / 255.0, 201.0 / 255.0, 1.0];
+        vec![blue, mix, [1.0, 1.0, 1.0, 1.0], blue]
+    }
+
+    #[test]
+    fn a_colour_range_takes_the_picked_colour_its_edges_in_part_and_can_be_contiguous() {
+        let px = strip();
+        let blue = srgb_to_lab([px[0][0], px[0][1], px[0][2]]);
+        let mut r = ColorRange { add: vec![(blue, [0.1, 0.5])], subtract: Vec::new(), tolerance: 20.0, contiguous: false };
+        let w = r.weights(&px, 4, 1);
+        assert_eq!((w[0], w[2], w[3]), (1.0, 0.0, 1.0));
+        // The mix is far from blue at 20; a wide tolerance takes it in part.
+        assert_eq!(w[1], 0.0);
+        r.tolerance = 100.0;
+        let w = r.weights(&px, 4, 1);
+        assert!(w[1] > 0.0, "{w:?}");
+        // Contiguous: the last blue is cut off by the white.
+        r.tolerance = 20.0;
+        r.contiguous = true;
+        assert_eq!(r.weights(&px, 4, 1), vec![1.0, 0.0, 0.0, 0.0]);
+        // Taken back out.
+        r.contiguous = false;
+        r.subtract = vec![blue];
+        assert!(r.weights(&px, 4, 1).iter().all(|v| *v == 0.0));
+        // Tolerance 0: the exact colour only.
+        let exact = ColorRange { add: vec![(blue, [0.0, 0.0])], tolerance: 0.0, ..Default::default() };
+        assert_eq!(exact.weights(&px, 4, 1), vec![1.0, 0.0, 0.0, 1.0]);
+    }
+
+    #[test]
+    fn a_colour_range_is_replaced_by_its_target() {
+        let original = strip();
+        let mut px = original.clone();
+        let blue = srgb_to_lab([px[0][0], px[0][1], px[0][2]]);
+        let green = srgb_to_lab([47.0 / 255.0, 139.0 / 255.0, 87.0 / 255.0]);
+        let r = ColorRange { add: vec![(blue, [0.1, 0.5])], tolerance: 20.0, contiguous: true, ..Default::default() };
+        replace_ranges(&mut px, &original, 4, 1, &[(r, green)]);
+        assert_eq!(hex([px[0][0], px[0][1], px[0][2]]), "#2F8B57");
+        assert_eq!(px[2], original[2], "white is not in the range");
+        assert_eq!(px[3], original[3], "contiguous: the far blue stays");
+    }
 
     #[test]
     fn ciede2000_matches_the_published_pairs() {

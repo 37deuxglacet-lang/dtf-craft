@@ -3391,3 +3391,12 @@ curves	Smooth	Сгладить
 	Duplicate (Ctrl+D)	Дублировать (Ctrl+D)
 	{n} visuals selected	Выбрано изображений: {n}
 	Colors kept: {n}	Сохранённые цвета: {n}
+# DTF Craft (16)
+	Applied Ranges	Применённые диапазоны
+	Click: a color · Shift+click: add · Alt+click: remove	Щелчок: цвет · Shift+щелчок: добавить · Alt+щелчок: убрать
+	Contiguous Pixels	Смежные пикселы
+	Pick a color on the visual.	Выберите цвет на изображении.
+	Remove this range	Убрать этот диапазон
+	Replacement Color	Цвет замены
+	Turn on Color Range above the visual, then click a color.	Включите «Цветовой диапазон» над изображением и щёлкните цвет.
+	{p} % of the visible pixels	{p} % видимых пикселов

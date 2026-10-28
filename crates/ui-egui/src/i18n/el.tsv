@@ -4117,3 +4117,12 @@ curves	Smooth	Εξομάλυνση
 	Duplicate (Ctrl+D)	Αντιγραφή (Ctrl+D)
 	{n} visuals selected	{n} επιλεγμένα γραφικά
 	Colors kept: {n}	Χρώματα που διατηρήθηκαν: {n}
+# DTF Craft (16)
+	Applied Ranges	Εφαρμοσμένα εύρη
+	Click: a color · Shift+click: add · Alt+click: remove	Κλικ: ένα χρώμα · Shift+κλικ: προσθήκη · Alt+κλικ: αφαίρεση
+	Contiguous Pixels	Συνεχόμενα εικονοστοιχεία
+	Pick a color on the visual.	Επιλέξτε ένα χρώμα στο γραφικό.
+	Remove this range	Αφαίρεση αυτού του εύρους
+	Replacement Color	Χρώμα αντικατάστασης
+	Turn on Color Range above the visual, then click a color.	Ενεργοποιήστε το Εύρος χρωμάτων πάνω από το γραφικό και κάντε κλικ σε ένα χρώμα.
+	{p} % of the visible pixels	{p} % των ορατών εικονοστοιχείων

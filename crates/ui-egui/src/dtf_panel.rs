@@ -1480,7 +1480,7 @@ mod tests {
         let _fr = crate::i18n::language_scope(crate::i18n::Lang::from_pref("fr"));
         let shot = |session: photocraft_engine::Session, name: &str, setup: &dyn Fn(&mut PhotocraftApp)| {
             // The cut-out's tab is long: its shots are taller.
-            let height = if name.starts_with("detourage") { 1300.0 } else { 900.0 };
+            let height = if name.starts_with("detourage") || name.starts_with("analyseur_plage") { 1300.0 } else { 900.0 };
             let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, height)).with_max_steps(64).wgpu().build_eframe(move |cc| {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
                 let mut app = PhotocraftApp::new(session, crate::Services::default());
@@ -1635,9 +1635,22 @@ mod tests {
         };
         shot(logo(), "analyseur", &|app| analyzer(app, crate::color_analyzer_ui::View::Original));
         shot(logo(), "analyseur_remplace", &|app| analyzer(app, crate::color_analyzer_ui::View::Replaced));
-        // The colour sheet, as a PDF beside the shots.
+        // Color Range: the sun picked (the rest greyed), then turned orange.
+        let sun = |app: &mut PhotocraftApp, view: crate::color_analyzer_ui::View, apply: bool| {
+            analyzer(app, view);
+            let a = app.color_analyzer.as_mut().unwrap();
+            a.range_tool = true;
+            a.range_click(0.5, 0.375, false, false);
+            if apply {
+                a.range_swatch = Some(2);
+                a.apply_range();
+            }
+        };
+        shot(logo(), "analyseur_plage", &|app| sun(app, crate::color_analyzer_ui::View::Original, false));
+        shot(logo(), "analyseur_plage_appliquee", &|app| sun(app, crate::color_analyzer_ui::View::Replaced, true));
+        // The colour sheet, as a PDF beside the shots, with the range.
         let mut app = PhotocraftApp::new(logo(), crate::Services::default());
-        analyzer(&mut app, crate::color_analyzer_ui::View::Original);
+        sun(&mut app, crate::color_analyzer_ui::View::Original, true);
         std::fs::write(dir.join("fiche.pdf"), crate::color_sheet::pdf(&app.color_analyzer.as_ref().unwrap().sheet())).unwrap();
     }
 }

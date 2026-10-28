@@ -4025,3 +4025,12 @@ navigator	Zoom	Zvětšení
 	Duplicate (Ctrl+D)	Duplikovat (Ctrl+D)
 	{n} visuals selected	Vybrané vizuály: {n}
 	Colors kept: {n}	Ponechané barvy: {n}
+# DTF Craft (16)
+	Applied Ranges	Použité rozsahy
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: barva · Shift+klik: přidat · Alt+klik: odebrat
+	Contiguous Pixels	Souvislé pixely
+	Pick a color on the visual.	Vyberte barvu na motivu.
+	Remove this range	Odebrat tento rozsah
+	Replacement Color	Náhradní barva
+	Turn on Color Range above the visual, then click a color.	Zapněte Rozsah barev nad motivem a klikněte na barvu.
+	{p} % of the visible pixels	{p} % viditelných pixelů

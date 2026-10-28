@@ -4337,3 +4337,12 @@ cameraRaw	Yellow	Sárga
 	Duplicate (Ctrl+D)	Kettőzés (Ctrl+D)
 	{n} visuals selected	{n} kijelölt kép
 	Colors kept: {n}	Megtartott színek: {n}
+# DTF Craft (16)
+	Applied Ranges	Alkalmazott tartományok
+	Click: a color · Shift+click: add · Alt+click: remove	Kattintás: egy szín · Shift+kattintás: hozzáadás · Alt+kattintás: eltávolítás
+	Contiguous Pixels	Összefüggő képpontok
+	Pick a color on the visual.	Válasszon egy színt a képen.
+	Remove this range	Tartomány eltávolítása
+	Replacement Color	Csereszín
+	Turn on Color Range above the visual, then click a color.	Kapcsolja be a Színtartományt a kép felett, majd kattintson egy színre.
+	{p} % of the visible pixels	A látható képpontok {p} %-a

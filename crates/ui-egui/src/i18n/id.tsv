@@ -3415,3 +3415,12 @@ curves	Smooth	Haluskan
 	Duplicate (Ctrl+D)	Duplikat (Ctrl+D)
 	{n} visuals selected	{n} visual dipilih
 	Colors kept: {n}	Warna yang dipertahankan: {n}
+# DTF Craft (16)
+	Applied Ranges	Rentang diterapkan
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: satu warna · Shift+klik: tambah · Alt+klik: hapus
+	Contiguous Pixels	Piksel berdekatan
+	Pick a color on the visual.	Pilih warna pada visual.
+	Remove this range	Hapus rentang ini
+	Replacement Color	Warna pengganti
+	Turn on Color Range above the visual, then click a color.	Aktifkan Rentang Warna di atas visual, lalu klik satu warna.
+	{p} % of the visible pixels	{p} % dari piksel terlihat

@@ -4379,3 +4379,12 @@ navigator	Zoom	Zoom
 	Duplicate (Ctrl+D)	Duplica (Ctrl+D)
 	{n} visuals selected	{n} grafiche selezionate
 	Colors kept: {n}	Colori mantenuti: {n}
+# DTF Craft (16)
+	Applied Ranges	Intervalli applicati
+	Click: a color · Shift+click: add · Alt+click: remove	Clic: un colore · Maiusc+clic: aggiungi · Alt+clic: togli
+	Contiguous Pixels	Pixel contigui
+	Pick a color on the visual.	Scegliete un colore sulla grafica.
+	Remove this range	Togli questo intervallo
+	Replacement Color	Colore di sostituzione
+	Turn on Color Range above the visual, then click a color.	Attivate Intervallo colori sopra la grafica, poi cliccate un colore.
+	{p} % of the visible pixels	{p} % dei pixel visibili

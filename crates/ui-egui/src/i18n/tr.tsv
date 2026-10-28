@@ -4148,3 +4148,12 @@ cameraData	Lens	Lens
 	Duplicate (Ctrl+D)	Çoğalt (Ctrl+D)
 	{n} visuals selected	{n} görsel seçildi
 	Colors kept: {n}	Korunan renkler: {n}
+# DTF Craft (16)
+	Applied Ranges	Uygulanan aralıklar
+	Click: a color · Shift+click: add · Alt+click: remove	Tıkla: bir renk · Shift+tıkla: ekle · Alt+tıkla: çıkar
+	Contiguous Pixels	Bitişik pikseller
+	Pick a color on the visual.	Görselde bir renk seçin.
+	Remove this range	Bu aralığı kaldır
+	Replacement Color	Yerine geçecek renk
+	Turn on Color Range above the visual, then click a color.	Görselin üstündeki Renk Aralığı'nı açın, ardından bir renge tıklayın.
+	{p} % of the visible pixels	Görünür piksellerin %{p}'i

@@ -3426,3 +3426,12 @@ curves	Smooth	Glätten
 	Duplicate (Ctrl+D)	Duplizieren (Strg+D)
 	{n} visuals selected	{n} Motive ausgewählt
 	Colors kept: {n}	Übernommene Farben: {n}
+# DTF Craft (16)
+	Applied Ranges	Angewendete Bereiche
+	Click: a color · Shift+click: add · Alt+click: remove	Klick: eine Farbe · Umschalt+Klick: hinzufügen · Alt+Klick: entfernen
+	Contiguous Pixels	Benachbarte Pixel
+	Pick a color on the visual.	Wählen Sie eine Farbe im Motiv.
+	Remove this range	Diesen Bereich entfernen
+	Replacement Color	Ersatzfarbe
+	Turn on Color Range above the visual, then click a color.	Aktivieren Sie Farbbereich über dem Motiv und klicken Sie auf eine Farbe.
+	{p} % of the visible pixels	{p} % der sichtbaren Pixel

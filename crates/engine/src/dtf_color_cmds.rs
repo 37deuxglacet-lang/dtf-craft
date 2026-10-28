@@ -170,6 +170,40 @@ pub fn replacements_param(cmd: &str, p: &Value) -> Result<Vec<([f32; 3], Option<
     list.iter().map(|c| Ok((lab(c.get("from"), "from")?.ok_or_else(|| bad(cmd, "each colour needs `from`"))?, lab(c.get("to"), "to")?))).collect()
 }
 
+/// The colour ranges and their targets: `[{"add": [{"hex", "x", "y"}], "subtract": ["#rrggbb"],
+/// "tolerance": 0..100, "contiguous": bool, "to": "#rrggbb"}]` (`x`, `y`: where the colour was
+/// picked, as fractions of the visual's width and height).
+pub fn ranges_param(cmd: &str, p: &Value) -> Result<Vec<(dtf_color::ColorRange, [f32; 3])>> {
+    let Some(list) = p.get("ranges").filter(|v| !v.is_null()) else { return Ok(Vec::new()) };
+    let list = list.as_array().ok_or_else(|| bad(cmd, "`ranges` must be a list"))?;
+    let lab = |v: Option<&Value>, what: &str| -> Result<[f32; 3]> {
+        let h = v.and_then(Value::as_str).ok_or_else(|| bad(cmd, format!("`{what}` must be #rrggbb")))?;
+        hex_rgb(h).map(photocraft_color::convert::srgb_to_lab).ok_or_else(|| bad(cmd, format!("`{what}`: bad colour {h}")))
+    };
+    list.iter()
+        .map(|r| {
+            let add = r
+                .get("add")
+                .and_then(Value::as_array)
+                .ok_or_else(|| bad(cmd, "each range needs `add`: [{hex, x, y}]"))?
+                .iter()
+                .map(|a| {
+                    let f = |k: &str| a.get(k).and_then(Value::as_f64).filter(|v| v.is_finite()).unwrap_or(0.5).clamp(0.0, 1.0) as f32;
+                    Ok((lab(a.get("hex"), "add.hex")?, [f("x"), f("y")]))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let subtract = match r.get("subtract") {
+                None | Some(Value::Null) => Vec::new(),
+                Some(Value::Array(l)) => l.iter().map(|h| lab(Some(h), "subtract")).collect::<Result<Vec<_>>>()?,
+                Some(_) => return Err(bad(cmd, "`subtract` must be a list of #rrggbb")),
+            };
+            let tolerance = r.get("tolerance").and_then(Value::as_f64).filter(|v| v.is_finite()).unwrap_or(20.0).clamp(0.0, 100.0) as f32;
+            let contiguous = r.get("contiguous").and_then(Value::as_bool).unwrap_or(false);
+            Ok((dtf_color::ColorRange { add, subtract, tolerance, contiguous }, lab(r.get("to"), "to")?))
+        })
+        .collect()
+}
+
 /// "logo" for "logo.png" (a known image extension is dropped).
 fn stem(name: &str) -> &str {
     match std::path::Path::new(name).extension().and_then(|e| e.to_str()) {
@@ -191,12 +225,17 @@ pub fn replaced_name(doc_name: &str, path: Option<&str>) -> (String, String) {
 
 fn replace(s: &mut Session, p: &Value) -> Result<Value> {
     let centers = replacements_param(REPLACE, p)?;
+    let ranges = ranges_param(REPLACE, p)?;
     let st = s.active().ok_or(EngineError::NoDocument)?;
     let (name, hint) = replaced_name(&st.doc.name, st.path.as_deref());
     let name = p.get("name").and_then(Value::as_str).filter(|n| !n.trim().is_empty()).map_or(name, str::to_string);
     let mut doc = rgb_document(&st.doc)?;
     let mut px = photocraft_compose::flatten(&doc).px;
+    let original = (!ranges.is_empty()).then(|| px.clone());
     dtf_color::replace(&mut px, &centers);
+    if let Some(original) = original {
+        dtf_color::replace_ranges(&mut px, &original, doc.size.width as usize, doc.size.height as usize, &ranges);
+    }
     let fmt = doc.pixel_format();
     let mut surf = Surface::new(fmt);
     let vals: Vec<f32> = px.iter().flat_map(|q| photocraft_raster::from_rgba(&fmt, *q)).collect();
@@ -234,7 +273,7 @@ pub fn specs() -> Vec<CommandSpec> {
             // Run from the Color Analyzer's PNG export.
             menu: &[],
             shortcut: None,
-            params: r##"{"colors":json ([{from: "#rrggbb", to: "#rrggbb" | null}]: every main colour of the analysis, with the swatch colour it becomes or null to keep it),"name":str (optional; "<name> nuancier")} → {document,name,width,height,saveAs}. A new document: the merged visual, each pixel shifted by the colours near it, so flat areas take the swatch colour exactly and contours stay smooth; same size, resolution and transparency. The original is not changed"##,
+            params: r##"{"colors":json ([{from: "#rrggbb", to: "#rrggbb" | null}]: every main colour of the analysis, with the swatch colour it becomes or null to keep it),"ranges":json (optional colour ranges, applied after: [{add: [{hex, x, y}] colours picked and where (fractions of the size), subtract: [#rrggbb], tolerance: 0..100 (ΔE, default 20), contiguous: bool, to: #rrggbb}]),"name":str (optional; "<name> nuancier")} → {document,name,width,height,saveAs}. A new document: the merged visual, each pixel shifted by the colours near it, so flat areas take the swatch colour exactly and contours stay smooth; then the pixels of each range (measured on the original) take its colour; same size, resolution and transparency. The original is not changed"##,
             enabled: has_doc,
             run: replace,
             journal: true,
@@ -304,6 +343,24 @@ mod tests {
         let (_, _, orig) = visual_pixels(&s.documents()[0].doc).unwrap();
         assert_eq!(hex(orig[30 * 100 + 10]), "#1F3A93");
         assert!(s.execute(REPLACE, json!({"colors": [{"to": "#000000"}]})).is_err());
+    }
+
+    #[test]
+    fn a_colour_range_is_replaced_in_the_copy() {
+        let mut s = session();
+        // The orange half becomes green; the blue half stays.
+        let r = s
+            .execute(
+                REPLACE,
+                json!({"colors": [{"from": "#1F3A93", "to": null}], "ranges": [{"add": [{"hex": "#E4572E", "x": 0.9, "y": 0.5}], "tolerance": 20, "contiguous": true, "to": "#2F8B57"}]}),
+            )
+            .unwrap();
+        let copy = &s.documents()[r["document"].as_u64().unwrap() as usize];
+        let (_, _, px) = visual_pixels(&copy.doc).unwrap();
+        let hex = |q: [f32; 4]| dtf_color::hex([q[0], q[1], q[2]]);
+        assert_eq!(hex(px[30 * 100 + 90]), "#2F8B57");
+        assert_eq!(hex(px[30 * 100 + 10]), "#1F3A93");
+        assert!(s.execute(REPLACE, json!({"colors": [], "ranges": [{"add": [{"hex": "#E4572E"}]}]})).is_err(), "a range needs `to`");
     }
 
     #[test]

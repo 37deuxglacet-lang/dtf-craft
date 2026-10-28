@@ -4019,3 +4019,12 @@ curves	Smooth	Wygładź
 	Duplicate (Ctrl+D)	Duplikuj (Ctrl+D)
 	{n} visuals selected	Zaznaczone grafiki: {n}
 	Colors kept: {n}	Zachowane kolory: {n}
+# DTF Craft (16)
+	Applied Ranges	Zastosowane zakresy
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: kolor · Shift+klik: dodaj · Alt+klik: usuń
+	Contiguous Pixels	Sąsiadujące piksele
+	Pick a color on the visual.	Wybierz kolor na grafice.
+	Remove this range	Usuń ten zakres
+	Replacement Color	Kolor zastępczy
+	Turn on Color Range above the visual, then click a color.	Włącz Zakres kolorów nad grafiką, a następnie kliknij kolor.
+	{p} % of the visible pixels	{p} % widocznych pikseli

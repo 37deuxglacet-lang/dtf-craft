@@ -4176,3 +4176,12 @@ curves	Smooth	Vloeiend maken
 	Duplicate (Ctrl+D)	Dupliceren (Ctrl+D)
 	{n} visuals selected	{n} ontwerpen geselecteerd
 	Colors kept: {n}	Behouden kleuren: {n}
+# DTF Craft (16)
+	Applied Ranges	Toegepaste bereiken
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: een kleur · Shift+klik: toevoegen · Alt+klik: verwijderen
+	Contiguous Pixels	Aaneengesloten pixels
+	Pick a color on the visual.	Kies een kleur in het ontwerp.
+	Remove this range	Dit bereik verwijderen
+	Replacement Color	Vervangende kleur
+	Turn on Color Range above the visual, then click a color.	Zet Kleurbereik boven het ontwerp aan en klik op een kleur.
+	{p} % of the visible pixels	{p} % van de zichtbare pixels

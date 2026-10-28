@@ -78,7 +78,12 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
   largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
   d'images sur la planche, marge propre (interrupteur), Remplissage automatique (remplit la place
   restante), Dupliquer l'image. Plusieurs visuels sélectionnés (ou un groupe) : leur nombre, la
-  taille de leur cadre, Grouper, Dégrouper, Dupliquer, Supprimer.
+  taille de leur cadre, Aligner (bords gauches, centres horizontaux, bords droits, bords hauts,
+  centres verticaux, bords bas, sur le cadre de la sélection ; 2 blocs au moins), Répartir
+  (horizontalement ou verticalement, à espacement égal, le premier et le dernier restant en place ;
+  3 blocs au moins), Grouper, Dégrouper, Dupliquer, Supprimer. Un groupe compte comme un seul bloc ;
+  un alignement ou une répartition qui rapprocherait deux visuels à moins de la marge est refusé
+  (rien ne bouge).
 - **Champs numériques** : ils se saisissent au clavier ; glisser la souris dessus ne change rien.
 - **Paramètres** : lignes de résolution, lignes en chevauchement, alignement automatique pendant
   le déplacement, avertissement sur l'arrière-plan (coins opaques : fond non détouré),

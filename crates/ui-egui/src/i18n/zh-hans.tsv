@@ -3043,3 +3043,13 @@ curves	Smooth	平滑
 	Duplicate (Ctrl+D)	复制（Ctrl+D）
 	{n} visuals selected	已选择 {n} 个图案
 	Colors kept: {n}	保留的颜色：{n}
+# DTF Craft (16)
+	Applied Ranges	已应用的范围
+	Click: a color · Shift+click: add · Alt+click: remove	单击：一种颜色 · Shift+单击：添加 · Alt+单击：移除
+	Contiguous Pixels	连续像素
+	Pick a color on the visual.	在图案上选择一种颜色。
+	Remove this range	移除此范围
+	Replacement Color	替换颜色
+	Turn on Color Range above the visual, then click a color.	打开图案上方的“色彩范围”，然后单击一种颜色。
+	{p} % of the visible pixels	可见像素的 {p} %
+	Color Range	色彩范围

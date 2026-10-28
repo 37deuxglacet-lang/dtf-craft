@@ -3905,3 +3905,12 @@ curves	Smooth	Làm mượt
 	Duplicate (Ctrl+D)	Nhân bản (Ctrl+D)
 	{n} visuals selected	Đã chọn {n} hình
 	Colors kept: {n}	Màu được giữ: {n}
+# DTF Craft (16)
+	Applied Ranges	Phạm vi đã áp dụng
+	Click: a color · Shift+click: add · Alt+click: remove	Nhấp: một màu · Shift+nhấp: thêm · Alt+nhấp: bớt
+	Contiguous Pixels	Điểm ảnh liền kề
+	Pick a color on the visual.	Chọn một màu trên hình.
+	Remove this range	Bỏ phạm vi này
+	Replacement Color	Màu thay thế
+	Turn on Color Range above the visual, then click a color.	Bật Phạm vi màu phía trên hình, rồi nhấp vào một màu.
+	{p} % of the visible pixels	{p} % điểm ảnh hiển thị

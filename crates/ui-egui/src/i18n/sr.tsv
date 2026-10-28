@@ -4490,3 +4490,12 @@ shape	Appearance	Izgled
 	Duplicate (Ctrl+D)	Dupliraj (Ctrl+D)
 	{n} visuals selected	Izabranih vizuala: {n}
 	Colors kept: {n}	Zadržane boje: {n}
+# DTF Craft (16)
+	Applied Ranges	Primenjeni opsezi
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: boja · Shift+klik: dodaj · Alt+klik: ukloni
+	Contiguous Pixels	Susedni pikseli
+	Pick a color on the visual.	Izaberite boju na vizualu.
+	Remove this range	Ukloni ovaj opseg
+	Replacement Color	Boja zamene
+	Turn on Color Range above the visual, then click a color.	Uključite Opseg boja iznad vizuala, pa kliknite boju.
+	{p} % of the visible pixels	{p} % vidljivih piksela

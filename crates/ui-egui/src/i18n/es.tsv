@@ -3118,3 +3118,12 @@ curves	Smooth	Suavizar
 	Duplicate (Ctrl+D)	Duplicar (Ctrl+D)
 	{n} visuals selected	{n} diseños seleccionados
 	Colors kept: {n}	Colores conservados: {n}
+# DTF Craft (16)
+	Applied Ranges	Gamas aplicadas
+	Click: a color · Shift+click: add · Alt+click: remove	Clic: un color · Mayús+clic: añadir · Alt+clic: quitar
+	Contiguous Pixels	Píxeles contiguos
+	Pick a color on the visual.	Elija un color en el diseño.
+	Remove this range	Quitar esta gama
+	Replacement Color	Color de sustitución
+	Turn on Color Range above the visual, then click a color.	Active Gama de colores sobre el diseño y haga clic en un color.
+	{p} % of the visible pixels	{p} % de los píxeles visibles

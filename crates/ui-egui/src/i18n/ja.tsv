@@ -4095,3 +4095,12 @@ curves	Smooth	スムーズ
 	Duplicate (Ctrl+D)	複製（Ctrl+D）
 	{n} visuals selected	{n} 個のビジュアルを選択
 	Colors kept: {n}	採用した色：{n}
+# DTF Craft (16)
+	Applied Ranges	適用した色域
+	Click: a color · Shift+click: add · Alt+click: remove	クリック：色 · Shift+クリック：追加 · Alt+クリック：除外
+	Contiguous Pixels	隣接ピクセル
+	Pick a color on the visual.	ビジュアル上の色をクリックしてください。
+	Remove this range	この色域を削除
+	Replacement Color	置換カラー
+	Turn on Color Range above the visual, then click a color.	ビジュアルの上の「色域指定」をオンにして、色をクリックします。
+	{p} % of the visible pixels	表示ピクセルの {p} %

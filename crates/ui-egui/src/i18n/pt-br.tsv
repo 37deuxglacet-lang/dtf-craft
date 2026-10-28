@@ -4206,3 +4206,12 @@ layerLabel	No Color	Sem cor
 	Duplicate (Ctrl+D)	Duplicar (Ctrl+D)
 	{n} visuals selected	{n} artes selecionadas
 	Colors kept: {n}	Cores mantidas: {n}
+# DTF Craft (16)
+	Applied Ranges	Intervalos aplicados
+	Click: a color · Shift+click: add · Alt+click: remove	Clique: uma cor · Shift+clique: adicionar · Alt+clique: remover
+	Contiguous Pixels	Pixels contíguos
+	Pick a color on the visual.	Escolha uma cor na arte.
+	Remove this range	Remover este intervalo
+	Replacement Color	Cor de substituição
+	Turn on Color Range above the visual, then click a color.	Ative Intervalo de cores acima da arte e clique em uma cor.
+	{p} % of the visible pixels	{p} % dos pixels visíveis

@@ -1,6 +1,7 @@
 // DTF Craft — Copyright (c) 2026 Stéphane Glacet. Licensed under MIT OR Apache-2.0.
-//! The Color Analyzer's colour sheet: an A4 PDF with the visual, its colours (hex, RGB, share)
-//! and the swatch-book references found for them, with their ΔE 2000.
+//! The Color Analyzer's colour sheet: an A4 PDF with the visual (and, when colours are replaced,
+//! the recoloured visual beside it), its colours (hex, RGB, share) and the swatch-book references
+//! found for them, with their ΔE 2000.
 //!
 //! Written directly (no PDF library): standard Helvetica, Helvetica-Bold and Courier fonts in
 //! WinAnsi encoding (Western European text; other characters print as "?"), the Δ as a path, the
@@ -14,6 +15,8 @@ pub struct SheetRow {
     pub rgb: [u8; 3],
     /// Share of the visible pixels, in %.
     pub share: f32,
+    /// A colour range's row (its first picked colour), not a colour of the analysis.
+    pub range: bool,
     pub reference: Option<SheetRef>,
 }
 
@@ -38,6 +41,8 @@ pub struct ColorSheet {
     pub dpi: f32,
     /// The visual as straight RGBA, 8 bits: width, height, pixels.
     pub image: (usize, usize, Vec<u8>),
+    /// The visual with its colours replaced, the same way (`None`: nothing replaced).
+    pub replaced: Option<(usize, usize, Vec<u8>)>,
     pub rows: Vec<SheetRow>,
 }
 
@@ -283,7 +288,9 @@ fn table_row(page: &mut Page, y: f64, r: &SheetRow) {
     let mid = y + ROW_H / 2.0;
     page.patch(c[0].0, top, PATCH, PATCH, r.rgb);
     page.text(Font::Mono, 9.0, c[1].0, mid - 2.0, INK, &hex(r.rgb));
-    page.text(Font::Mono, 8.0, c[1].0, mid + 9.0, DIM, &format!("{} {} · {} · {}", tl!("RGB"), r.rgb[0], r.rgb[1], r.rgb[2]));
+    let second = if r.range { tl!("Color Range").to_string() } else { format!("{} {} · {} · {}", tl!("RGB"), r.rgb[0], r.rgb[1], r.rgb[2]) };
+    let font = if r.range { Font::Regular } else { Font::Mono };
+    page.text(font, 8.0, c[1].0, mid + 9.0, DIM, &fit(font, 8.0, &second, c[1].1 + 6.0));
     page.text_right(Font::Mono, 9.0, c[2].0 + c[2].1, mid + 3.0, INK, &format!("{} %", decimal(f64::from(r.share), 1)));
     match &r.reference {
         Some(s) => {
@@ -369,38 +376,76 @@ pub fn pdf(sheet: &ColorSheet) -> Vec<u8> {
     }
     let rule = MARGIN + 62.0;
     p.line(MARGIN, PAGE_W - MARGIN, rule, 1.5, 0.11);
-    // The visual, fitted in a square, and the summary beside it.
     let top = rule + 21.0;
-    let side = 195.0;
-    let (iw, ih, _) = &sheet.image;
-    if *iw > 0 && *ih > 0 {
-        let k = side / (*iw.max(ih) as f64);
-        let (w, h) = (*iw as f64 * k, *ih as f64 * k);
-        let (x, y) = (MARGIN + (side - w) / 2.0, top + (side - h) / 2.0);
-        p.ops.push_str(&format!("q {w:.3} 0 0 {h:.3} {x:.3} {:.3} cm /Im0 Do Q\n", PAGE_H - y - h));
-    }
-    let sx = MARGIN + side + 24.0;
-    let sw = PAGE_W - MARGIN - sx;
-    let (title, text) = summary(sheet);
-    let mut y = top + 50.0;
-    p.text(Font::Bold, 12.0, sx, y, INK, &fit(Font::Bold, 12.0, &title, sw));
-    y += 18.0;
-    for line in wrap(Font::Regular, 9.5, &text, sw) {
-        p.text(Font::Regular, 9.5, sx, y, INK, &line);
-        y += 13.5;
-    }
-    y += 2.0;
-    let mut x = sx;
-    for r in &sheet.rows {
-        if x + 30.0 > PAGE_W - MARGIN {
-            break;
+    // `Im{k}` fitted in a `w` × `h` box at (`x`, `y`).
+    let place = |p: &mut Page, k: usize, image: &(usize, usize, Vec<u8>), x: f64, y: f64, bw: f64, bh: f64| {
+        let (iw, ih, _) = image;
+        if *iw > 0 && *ih > 0 {
+            let s = (bw / *iw as f64).min(bh / *ih as f64);
+            let (w, h) = (*iw as f64 * s, *ih as f64 * s);
+            let (x, y) = (x + (bw - w) / 2.0, y + (bh - h) / 2.0);
+            p.ops.push_str(&format!("q {w:.3} 0 0 {h:.3} {x:.3} {:.3} cm /Im{k} Do Q\n", PAGE_H - y - h));
         }
-        p.patch(x, y, 30.0, 30.0, r.reference.as_ref().map_or(r.rgb, |s| s.rgb));
-        x += 34.5;
-    }
+    };
+    let (title, text) = summary(sheet);
+    let table_top = match &sheet.replaced {
+        // The original and the recoloured visual side by side, the summary below them.
+        Some(replaced) => {
+            let gap = 24.0;
+            let bw = (PAGE_W - 2.0 * MARGIN - gap) / 2.0;
+            let bh = 190.0;
+            for (k, (label, image)) in [(tl!("Original Colors"), &sheet.image), (tl!("Replaced Colors"), replaced)].into_iter().enumerate() {
+                let x = MARGIN + k as f64 * (bw + gap);
+                p.text(Font::Bold, 10.0, x, top + 2.0, INK, &fit(Font::Bold, 10.0, label, bw));
+                place(p, k, image, x, top + 12.0, bw, bh);
+            }
+            let sw = PAGE_W - 2.0 * MARGIN;
+            let mut y = top + 12.0 + bh + 26.0;
+            p.text(Font::Bold, 12.0, MARGIN, y, INK, &fit(Font::Bold, 12.0, &title, sw));
+            y += 18.0;
+            for line in wrap(Font::Regular, 9.5, &text, sw) {
+                p.text(Font::Regular, 9.5, MARGIN, y, INK, &line);
+                y += 13.5;
+            }
+            y += 2.0;
+            let mut x = MARGIN;
+            for r in &sheet.rows {
+                if x + 30.0 > PAGE_W - MARGIN {
+                    break;
+                }
+                p.patch(x, y, 30.0, 30.0, r.reference.as_ref().map_or(r.rgb, |s| s.rgb));
+                x += 34.5;
+            }
+            y + 30.0 + 21.0
+        }
+        // The visual, fitted in a square, and the summary beside it.
+        None => {
+            let side = 195.0;
+            place(p, 0, &sheet.image, MARGIN, top, side, side);
+            let sx = MARGIN + side + 24.0;
+            let sw = PAGE_W - MARGIN - sx;
+            let mut y = top + 50.0;
+            p.text(Font::Bold, 12.0, sx, y, INK, &fit(Font::Bold, 12.0, &title, sw));
+            y += 18.0;
+            for line in wrap(Font::Regular, 9.5, &text, sw) {
+                p.text(Font::Regular, 9.5, sx, y, INK, &line);
+                y += 13.5;
+            }
+            y += 2.0;
+            let mut x = sx;
+            for r in &sheet.rows {
+                if x + 30.0 > PAGE_W - MARGIN {
+                    break;
+                }
+                p.patch(x, y, 30.0, 30.0, r.reference.as_ref().map_or(r.rgb, |s| s.rgb));
+                x += 34.5;
+            }
+            top + side + 21.0
+        }
+    };
     // The table, continued on further pages as needed; the footer on every page.
     let bottom = PAGE_H - MARGIN - FOOTER_H;
-    let mut y = table_header(&mut pages[0], top + side + 21.0);
+    let mut y = table_header(&mut pages[0], table_top);
     for r in &sheet.rows {
         if y + ROW_H > bottom {
             pages.push(Page::default());
@@ -414,10 +459,12 @@ pub fn pdf(sheet: &ColorSheet) -> Vec<u8> {
     for page in &mut pages {
         footer(page);
     }
-    write_pdf(&pages, &sheet.image)
+    let mut images = vec![&sheet.image];
+    images.extend(sheet.replaced.as_ref());
+    write_pdf(&pages, &images)
 }
 
-fn write_pdf(pages: &[Page], image: &(usize, usize, Vec<u8>)) -> Vec<u8> {
+fn write_pdf(pages: &[Page], images: &[&(usize, usize, Vec<u8>)]) -> Vec<u8> {
     let mut out: Vec<u8> = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n".to_vec();
     let mut offsets: Vec<usize> = Vec::new();
     let mut obj = |out: &mut Vec<u8>, body: &[u8]| {
@@ -426,32 +473,36 @@ fn write_pdf(pages: &[Page], image: &(usize, usize, Vec<u8>)) -> Vec<u8> {
         out.extend_from_slice(body);
         out.extend_from_slice(b"\nendobj\n");
     };
-    // 1 catalog, 2 pages, 3–5 fonts, 6 image, 7 its mask, then a page and its contents per page.
-    let first_page = 8;
+    // 1 catalog, 2 pages, 3–5 fonts, then each image and its mask (6, 7; 8, 9), then a page and
+    // its contents per page.
+    let first_page = 6 + 2 * images.len();
     let kids: Vec<String> = (0..pages.len()).map(|i| format!("{} 0 R", first_page + 2 * i)).collect();
     obj(&mut out, b"<< /Type /Catalog /Pages 2 0 R >>");
     obj(&mut out, format!("<< /Type /Pages /Kids [{}] /Count {} >>", kids.join(" "), pages.len()).as_bytes());
     for base in ["Helvetica", "Helvetica-Bold", "Courier"] {
         obj(&mut out, format!("<< /Type /Font /Subtype /Type1 /BaseFont /{base} /Encoding /WinAnsiEncoding >>").as_bytes());
     }
-    let (w, h, px) = image;
-    let (w, h) = ((*w).max(1), (*h).max(1));
-    let mut rgb = Vec::with_capacity(w * h * 3);
-    let mut alpha = Vec::with_capacity(w * h);
-    for q in px.chunks_exact(4).take(w * h) {
-        rgb.extend_from_slice(&q[..3]);
-        alpha.push(q[3]);
+    for (k, (w, h, px)) in images.iter().map(|i| (i.0, i.1, &i.2)).enumerate() {
+        let (w, h) = (w.max(1), h.max(1));
+        let mut rgb = Vec::with_capacity(w * h * 3);
+        let mut alpha = Vec::with_capacity(w * h);
+        for q in px.chunks_exact(4).take(w * h) {
+            rgb.extend_from_slice(&q[..3]);
+            alpha.push(q[3]);
+        }
+        rgb.resize(w * h * 3, 255);
+        alpha.resize(w * h, 0);
+        let mask = 7 + 2 * k;
+        obj(&mut out, &stream(&format!("/Type /XObject /Subtype /Image /Width {w} /Height {h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /SMask {mask} 0 R"), &rgb));
+        obj(&mut out, &stream(&format!("/Type /XObject /Subtype /Image /Width {w} /Height {h} /ColorSpace /DeviceGray /BitsPerComponent 8"), &alpha));
     }
-    rgb.resize(w * h * 3, 255);
-    alpha.resize(w * h, 0);
-    obj(&mut out, &stream(&format!("/Type /XObject /Subtype /Image /Width {w} /Height {h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /SMask 7 0 R"), &rgb));
-    obj(&mut out, &stream(&format!("/Type /XObject /Subtype /Image /Width {w} /Height {h} /ColorSpace /DeviceGray /BitsPerComponent 8"), &alpha));
+    let xobjects: String = (0..images.len()).map(|k| format!("/Im{k} {} 0 R ", 6 + 2 * k)).collect();
     for (i, page) in pages.iter().enumerate() {
         let contents = first_page + 2 * i + 1;
         obj(
             &mut out,
             format!(
-                "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PAGE_W:.2} {PAGE_H:.2}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> /XObject << /Im0 6 0 R >> >> /Contents {contents} 0 R >>"
+                "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PAGE_W:.2} {PAGE_H:.2}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> /XObject << {xobjects}>> >> /Contents {contents} 0 R >>"
             )
             .as_bytes(),
         );
@@ -499,10 +550,12 @@ mod tests {
             size_px: (2400, 2400),
             dpi: 300.0,
             image: (2, 1, vec![255, 0, 0, 255, 0, 0, 255, 0]),
+            replaced: None,
             rows: (0..rows)
                 .map(|i| SheetRow {
                     rgb: [31, 58, 147],
                     share: 38.2,
+                    range: i == 1,
                     reference: (i % 2 == 0).then(|| SheetRef { name: format!("EX-{i} Bleu roi"), rgb: [30, 59, 150], delta_e: 1.2 }),
                 })
                 .collect(),
@@ -515,6 +568,10 @@ mod tests {
         assert!(bytes.starts_with(b"%PDF-1.4") && bytes.ends_with(b"%%EOF\n"));
         let text = String::from_utf8_lossy(&bytes);
         assert!(text.contains("/Count 1") && text.contains("/SMask 7 0 R") && !text.contains("/Symbol"));
+        // With the recoloured visual: a second image, the pages after it.
+        let two = pdf(&ColorSheet { replaced: Some((2, 1, vec![0, 0, 255, 255, 0, 0, 255, 0])), ..sheet(5) });
+        let t2 = String::from_utf8_lossy(&two);
+        assert!(t2.contains("/SMask 9 0 R") && t2.contains("/Im0 6 0 R /Im1 8 0 R") && t2.contains("/Kids [10 0 R]"), "{}", &t2[..t2.len().min(2000)]);
         // Many colours continue on a second page.
         assert!(String::from_utf8_lossy(&pdf(&sheet(20))).contains("/Count 2"));
         // The xref offsets point at their objects.
