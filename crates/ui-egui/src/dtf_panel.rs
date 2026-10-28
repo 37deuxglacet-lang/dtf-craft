@@ -1634,7 +1634,6 @@ mod tests {
             a.view = view;
         };
         shot(logo(), "analyseur", &|app| analyzer(app, crate::color_analyzer_ui::View::Original));
-        shot(logo(), "analyseur_patchs", &|app| analyzer(app, crate::color_analyzer_ui::View::Patches));
         shot(logo(), "analyseur_remplace", &|app| analyzer(app, crate::color_analyzer_ui::View::Replaced));
         // The colour sheet, as a PDF beside the shots.
         let mut app = PhotocraftApp::new(logo(), crate::Services::default());

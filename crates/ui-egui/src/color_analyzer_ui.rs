@@ -32,12 +32,11 @@ const BOOK_PREF: &str = "dtfCraft.swatchBook";
 /// The profile the RGB values are read in.
 pub const PROFILE: &str = "sRGB IEC61966-2.1";
 
-/// What the preview shows.
+/// What the preview shows: the visual as it is, or with the swatch colours and their patches.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum View {
     Original,
     Replaced,
-    Patches,
 }
 
 /// The module's settings, remembered with the preferences.
@@ -238,6 +237,13 @@ impl ColorAnalyzer {
         self.revision += 1;
     }
 
+    /// The rows with a patch on screen: the colours replaced (checked, with a reference), or every
+    /// colour when no swatch book is loaded.
+    pub fn patch_rows(&self) -> Vec<Row> {
+        let rows = self.rows();
+        if self.book.is_none() { rows } else { rows.into_iter().filter(|r| r.replace && r.swatch.is_some()).collect() }
+    }
+
     pub fn rows(&self) -> Vec<Row> {
         let main = self.colors.len() - self.extra.len().min(self.colors.len());
         self.colors
@@ -340,12 +346,12 @@ impl ColorAnalyzer {
         self.changed();
     }
 
-    /// The colour sheet of the analysis.
+    /// The colour sheet of the analysis: the colours with a patch on screen.
     pub fn sheet(&self) -> ColorSheet {
         let (w, h, px) = downsample(self.w, self.h, &self.px, SHEET_IMAGE_MAX);
         let image: Vec<u8> = px.iter().flat_map(|q| [to8(q[0]), to8(q[1]), to8(q[2]), to8(q[3])]).collect();
         let rows = self
-            .rows()
+            .patch_rows()
             .iter()
             .map(|r| SheetRow {
                 rgb: r.rgb,
@@ -619,7 +625,7 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
     let t = Tokens::get(ui.ctx());
     let bar = Rect::from_min_size(area.min + vec2(16.0, 10.0), vec2(area.width() - 32.0, 30.0));
     let mut tools = ui.new_child(egui::UiBuilder::new().max_rect(bar).layout(egui::Layout::left_to_right(egui::Align::Center)));
-    for (view, label) in [(View::Original, tl!("Original Colors")), (View::Replaced, tl!("Replaced Colors")), (View::Patches, tl!("With Patches"))] {
+    for (view, label) in [(View::Original, tl!("Original Colors")), (View::Replaced, tl!("Replaced Colors"))] {
         if tools.add(egui::Button::new(label).selected(a.view == view)).clicked() {
             a.view = view;
         }
@@ -642,8 +648,9 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
         let k = (space.width() / iw).min(space.height() / ih);
         Rect::from_center_size(space.center(), vec2(iw * k, ih * k))
     };
-    let rows = a.rows();
-    let (image_rect, patches) = if a.view == View::Patches && !rows.is_empty() {
+    let rows = a.patch_rows();
+    // The replaced colours come with their patches.
+    let (image_rect, patches) = if a.view == View::Replaced && !rows.is_empty() {
         let size = a.settings.patch_size.clamp(16.0, 120.0);
         if a.settings.patches_below {
             let cell = vec2(size + 150.0, size + 12.0);
@@ -1032,8 +1039,11 @@ mod tests {
         assert!(b.rows().iter().all(|r| r.swatch.is_some() && !r.replace));
         b.set_swatch("#1F3A93", Some(0));
         assert!(b.rows()[0].replace && !b.rows()[1].replace);
+        // Only the replaced colours get a patch on screen.
+        assert_eq!(b.patch_rows().iter().map(|r| r.hex.as_str()).collect::<Vec<_>>(), ["#1F3A93"]);
         b.set_replace("#E4572E", true);
         assert!(b.rows()[1].replace);
+        assert_eq!(b.patch_rows().len(), 2);
         // Another reference, then not replaced.
         a.set_swatch("#1F3A93", Some(2));
         assert_eq!(a.rows()[0].swatch.unwrap().0, 2);
@@ -1169,7 +1179,7 @@ mod tests {
     fn the_module_draws_over_the_window_and_closes_with_escape() {
         let (mut app, _) = app();
         open(&mut app).unwrap();
-        app.color_analyzer.as_mut().unwrap().view = View::Patches;
+        app.color_analyzer.as_mut().unwrap().view = View::Replaced;
         let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
             |ui, app: &mut PhotocraftApp| {
                 let ready = egui::Id::new("analyzer-test-fonts");
@@ -1197,5 +1207,9 @@ mod tests {
         assert_eq!((s.rows.len(), s.size_px, s.image.0, s.image.1), (2, (40, 20), 40, 20));
         assert_eq!(s.rows[0].reference.as_ref().unwrap().name, "EX-201 Bleu roi");
         assert_eq!(s.swatch_book.as_deref(), Some("Ex.csv"));
+        // An unchecked colour leaves the sheet, as it leaves the patches.
+        let mut a = a;
+        a.set_replace("#E4572E", false);
+        assert_eq!(a.sheet().rows.len(), 1);
     }
 }

@@ -8,6 +8,11 @@
 //!
 //! The module works on the same copy the command traces (at most [`vectorize::MAX_SIDE`] px a
 //! side), so the exported SVG is the one previewed.
+//!
+//! The preview zooms from 100 % (fitted) to 800 % (Ctrl+wheel about the pointer, the − / + buttons,
+//! a double-click), and pans by dragging or with the wheel; side by side, both images follow. Once
+//! the view rests, the visible part of the vectorized result is drawn again at the screen's
+//! resolution, so its contours are judged sharp at any zoom.
 
 use std::collections::HashSet;
 
@@ -26,6 +31,11 @@ const SETTINGS_PREF: &str = "dtfCraft.vectorizer";
 const PREVIEW_SIDE: f32 = 1600.0;
 /// The contours drawn by "Show Contours", in preview px.
 const CONTOUR_PX: f32 = 1.2;
+/// The preview's zoom steps (1 = fitted).
+const ZOOMS: [f32; 8] = [1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0];
+const MAX_ZOOM: f32 = 8.0;
+/// How long the view rests before its visible part is drawn sharp, in seconds.
+const SHARP_DELAY: f64 = 0.2;
 
 /// What the preview shows.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -75,6 +85,15 @@ struct Tex {
     handle: egui::TextureHandle,
 }
 
+/// The visible part of the vectorized result drawn at the screen's resolution: what it shows
+/// (revision, region of the traced copy in px, size in screen px) and its texture.
+struct Sharp {
+    revision: u64,
+    region: [f32; 4],
+    size: [usize; 2],
+    handle: egui::TextureHandle,
+}
+
 pub struct Vectorizer {
     pub doc: photocraft_doc::DocId,
     pub name: String,
@@ -100,6 +119,15 @@ pub struct Vectorizer {
     original: Option<egui::TextureHandle>,
     vectorized: Option<Tex>,
     contours: Option<Tex>,
+    /// The preview's zoom (1 = fitted, at most [`MAX_ZOOM`]) and the point of the visual at the
+    /// centre of the view (fractions of its width and height).
+    pub zoom: f32,
+    pub center: [f32; 2],
+    /// When the view last moved (seconds), and what it last showed (zoom, centre, frame).
+    moved_at: f64,
+    last_view: [f32; 6],
+    sharp: Option<Sharp>,
+    sharp_contours: Option<Sharp>,
     /// The palette settings changed: reduce the colours again (once the pointer is released).
     requantize: bool,
     /// The tracing settings changed: trace again.
@@ -172,6 +200,12 @@ impl Vectorizer {
             original: None,
             vectorized: None,
             contours: None,
+            zoom: 1.0,
+            center: [0.5, 0.5],
+            moved_at: 0.0,
+            last_view: [0.0; 6],
+            sharp: None,
+            sharp_contours: None,
             requantize: false,
             retrace: false,
             help: false,
@@ -307,6 +341,67 @@ impl Vectorizer {
         let buf = photocraft_io::svg::rasterize(svg.as_bytes(), k).ok()?;
         let (w, h) = (buf.rect.width() as usize, buf.rect.height() as usize);
         (w * h == buf.px.len() && w > 0 && h > 0).then(|| egui::ColorImage::from_rgba_unmultiplied([w, h], &rgba8(&buf.px)))
+    }
+
+    /// The part `region` (traced px: x0, y0, x1, y1) of the result drawn `size` screen px: filled,
+    /// or its contours only.
+    fn render_region(&self, contours: bool, region: [f32; 4], size: [usize; 2]) -> Option<egui::ColorImage> {
+        let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
+        let (rw, rh) = (region[2] - region[0], region[3] - region[1]);
+        if rw <= 0.0 || rh <= 0.0 || size[0] == 0 || size[1] == 0 {
+            return None;
+        }
+        let k = size[0] as f32 / rw;
+        let style = if contours { Style::Contours(f64::from(CONTOUR_PX / k)) } else { Style::Fill { seal: self.settings.seal } };
+        let svg = vectorize::svg(t, &q.palette, SvgSize::Px(f64::from(rw), f64::from(rh)), style);
+        // The same drawing, its view box narrowed to the region.
+        let whole = format!("viewBox=\"0 0 {} {}\"", t.width, t.height);
+        if !svg.contains(&whole) {
+            return None;
+        }
+        let svg = svg.replacen(&whole, &format!("viewBox=\"{} {} {} {}\"", region[0], region[1], rw, rh), 1);
+        let buf = photocraft_io::svg::rasterize(svg.as_bytes(), k).ok()?;
+        let (w, h) = (buf.rect.width() as usize, buf.rect.height() as usize);
+        (w * h == buf.px.len() && w > 0 && h > 0).then(|| egui::ColorImage::from_rgba_unmultiplied([w, h], &rgba8(&buf.px)))
+    }
+
+    /// The sharp texture of `region` at `size`, drawn when the view has rested; `None` until then
+    /// (the preview texture shows meanwhile).
+    fn sharp_texture(&mut self, ctx: &egui::Context, contours: bool, region: [f32; 4], size: [usize; 2], rested: bool) -> Option<egui::TextureHandle> {
+        let slot = if contours { &self.sharp_contours } else { &self.sharp };
+        if let Some(s) = slot
+            && s.revision == self.revision
+            && s.region == region
+            && s.size == size
+        {
+            return Some(s.handle.clone());
+        }
+        if !rested {
+            return None;
+        }
+        let image = self.render_region(contours, region, size)?;
+        let name = if contours { "dtf-vectorizer-sharp-contours" } else { "dtf-vectorizer-sharp" };
+        let handle = ctx.load_texture(name, image, egui::TextureOptions::LINEAR);
+        let sharp = Some(Sharp { revision: self.revision, region, size, handle: handle.clone() });
+        if contours {
+            self.sharp_contours = sharp;
+        } else {
+            self.sharp = sharp;
+        }
+        Some(handle)
+    }
+
+    /// Zooms to `zoom` (kept between 1 and [`MAX_ZOOM`]) keeping the visual's point under `at`
+    /// (screen) in place, for an image `base` wide and high at 100 % centred in `frame`.
+    fn zoom_at(&mut self, zoom: f32, at: egui::Pos2, frame: Rect, base: egui::Vec2) {
+        let zoom = zoom.clamp(1.0, MAX_ZOOM);
+        let (w0, h0) = (base.x * self.zoom, base.y * self.zoom);
+        let (w1, h1) = (base.x * zoom, base.y * zoom);
+        let d = at - frame.center();
+        let u = self.center[0] + d.x / w0.max(1.0);
+        let v = self.center[1] + d.y / h0.max(1.0);
+        self.center = [u - d.x / w1.max(1.0), v - d.y / h1.max(1.0)];
+        self.zoom = zoom;
     }
 
     fn original_texture(&mut self, ctx: &egui::Context) -> egui::TextureHandle {
@@ -562,43 +657,147 @@ fn preview(ui: &mut egui::Ui, v: &mut Vectorizer, area: Rect) {
         let k = (space.width() / iw).min(space.height() / ih);
         Rect::from_center_size(space.center(), vec2(iw * k, ih * k))
     };
+    // The frames, each with the image fitted in it at 100 %.
     let frames: Vec<(Rect, bool)> = match v.view {
-        View::Original => vec![(fit(inner), false)],
-        View::Vectorized => vec![(fit(inner), true)],
+        View::Original => vec![(inner, false)],
+        View::Vectorized => vec![(inner, true)],
         View::SideBySide => {
             let half = (inner.width() - 24.0) / 2.0;
             let l = Rect::from_min_size(inner.min + vec2(0.0, 22.0), vec2(half, inner.height() - 22.0));
             let r = Rect::from_min_size(pos2(inner.right() - half, inner.top() + 22.0), vec2(half, inner.height() - 22.0));
-            vec![(fit(l), false), (fit(r), true)]
+            vec![(l, false), (r, true)]
         }
     };
+    let Some(&(frame0, _)) = frames.first() else { return };
+    let base = fit(frame0).size();
+    // Zoom and pan: the pointer over either frame moves both.
+    for (k, (frame, _)) in frames.iter().enumerate() {
+        let resp = ui.interact(*frame, ui.id().with(("dtf-vectorizer-view", k)), Sense::click_and_drag());
+        if resp.hovered() {
+            let (zoom_delta, scroll) = ui.input(|i| (i.zoom_delta(), i.smooth_scroll_delta));
+            if (zoom_delta - 1.0).abs() > 1e-4
+                && let Some(p) = resp.hover_pos()
+            {
+                v.zoom_at(v.zoom * zoom_delta, p, *frame, base);
+            } else if v.zoom > 1.0 && scroll != egui::Vec2::ZERO {
+                v.center[0] -= scroll.x / (base.x * v.zoom);
+                v.center[1] -= scroll.y / (base.y * v.zoom);
+            }
+            if v.zoom > 1.0 {
+                ui.ctx().set_cursor_icon(if resp.dragged() { egui::CursorIcon::Grabbing } else { egui::CursorIcon::Grab });
+            }
+        }
+        if resp.dragged() {
+            let d = resp.drag_delta();
+            v.center[0] -= d.x / (base.x * v.zoom);
+            v.center[1] -= d.y / (base.y * v.zoom);
+        }
+        if resp.double_clicked()
+            && let Some(p) = resp.interact_pointer_pos()
+        {
+            if v.zoom > 1.0 {
+                v.zoom = 1.0;
+            } else {
+                v.zoom_at(2.0, p, *frame, base);
+            }
+        }
+    }
+    // The visual stays in the frame: centred on an axis it doesn't fill.
+    let (zw, zh) = (base.x * v.zoom, base.y * v.zoom);
+    let keep = |c: f32, image: f32, room: f32| if image <= room { 0.5 } else { c.clamp(room / 2.0 / image, 1.0 - room / 2.0 / image) };
+    v.center = [keep(v.center[0], zw, frame0.width()), keep(v.center[1], zh, frame0.height())];
+    // The view rests: its visible part is drawn sharp.
+    let now = ui.input(|i| i.time);
+    let key = [v.zoom, v.center[0], v.center[1], frame0.width(), frame0.height(), if v.view == View::SideBySide { 1.0 } else { 0.0 }];
+    if key != v.last_view {
+        v.last_view = key;
+        v.moved_at = now;
+    }
+    let rested = now - v.moved_at >= SHARP_DELAY;
+    if !rested {
+        ui.ctx().request_repaint_after(std::time::Duration::from_secs_f64(SHARP_DELAY));
+    }
     let uv = Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0));
-    for (rect, vectorized) in frames {
+    let ppp = ui.ctx().pixels_per_point();
+    for (frame, vectorized) in frames {
+        let rect = Rect::from_min_size(frame.center() - vec2(v.center[0] * zw, v.center[1] * zh), vec2(zw, zh));
+        let shown = rect.intersect(frame);
         if v.view == View::SideBySide {
             let (label, detail) = if vectorized {
                 (tl!("Vectorized"), format!("SVG · {} × {} mm", decimal(v.size_mm.0), decimal(v.size_mm.1)))
             } else {
                 (tl!("Original"), format!("{} · {} × {} px", file_kind(&v.name), v.size.0, v.size.1))
             };
-            let y = rect.top() - 10.0;
-            ui.painter().text(pos2(rect.left(), y), Align2::LEFT_BOTTOM, label, crate::theme::semibold(12.5), t.text);
-            ui.painter().text(pos2(rect.right(), y), Align2::RIGHT_BOTTOM, detail, crate::theme::mono(11.0), t.text_faint);
+            let y = frame.top() - 10.0;
+            ui.painter().text(pos2(frame.left(), y), Align2::LEFT_BOTTOM, label, crate::theme::semibold(12.5), t.text);
+            ui.painter().text(pos2(frame.right(), y), Align2::RIGHT_BOTTOM, detail, crate::theme::mono(11.0), t.text_faint);
         }
+        if shown.width() <= 0.0 || shown.height() <= 0.0 {
+            continue;
+        }
+        let painter = ui.painter_at(frame);
         if v.settings.checker {
-            crate::widgets::checker(ui.painter(), rect, 8.0);
+            crate::widgets::checker(&painter, shown, 8.0);
         } else {
-            ui.painter().rect_filled(rect, 0.0, Color32::WHITE);
+            painter.rect_filled(shown, 0.0, Color32::WHITE);
         }
-        let tex = if vectorized { v.result_texture(ui.ctx(), false) } else { Some(v.original_texture(ui.ctx())) };
-        if let Some(tex) = tex {
-            ui.painter().image(tex.id(), rect, uv, Color32::WHITE);
+        // The visible part, in traced px and in screen px, for the sharp drawing.
+        let region = [
+            ((shown.left() - rect.left()) / zw * iw).max(0.0),
+            ((shown.top() - rect.top()) / zh * ih).max(0.0),
+            ((shown.right() - rect.left()) / zw * iw).min(iw),
+            ((shown.bottom() - rect.top()) / zh * ih).min(ih),
+        ];
+        let region = region.map(|x| (x * 4.0).round() / 4.0);
+        let size = [(shown.width() * ppp).round() as usize, (shown.height() * ppp).round() as usize];
+        // Past the preview texture's own resolution, the result is drawn again for the screen.
+        let sharp = v.zoom > 1.0 && zw * ppp > iw * v.preview_scale();
+        let layer = |ui: &egui::Ui, v: &mut Vectorizer, contours: bool| {
+            let fine = if sharp { v.sharp_texture(ui.ctx(), contours, region, size, rested) } else { None };
+            match fine {
+                Some(tex) => {
+                    painter.image(tex.id(), shown, uv, Color32::WHITE);
+                }
+                None => {
+                    if let Some(tex) = v.result_texture(ui.ctx(), contours) {
+                        painter.image(tex.id(), rect, uv, Color32::WHITE);
+                    }
+                }
+            }
+        };
+        if vectorized {
+            layer(ui, v, false);
+        } else {
+            let tex = v.original_texture(ui.ctx());
+            painter.image(tex.id(), rect, uv, Color32::WHITE);
         }
-        if v.settings.contours
-            && (vectorized || v.view == View::Original)
-            && let Some(tex) = v.result_texture(ui.ctx(), true)
-        {
-            ui.painter().image(tex.id(), rect, uv, Color32::WHITE);
+        if v.settings.contours && (vectorized || v.view == View::Original) {
+            layer(ui, v, true);
         }
+    }
+    zoom_controls(ui, v, view, frame0, base);
+}
+
+/// − / zoom / + / fit, at the bottom right of the preview.
+fn zoom_controls(ui: &mut egui::Ui, v: &mut Vectorizer, view: Rect, frame: Rect, base: egui::Vec2) {
+    let t = Tokens::get(ui.ctx());
+    let r = Rect::from_min_size(pos2(view.right() - 230.0, view.bottom() - 40.0), vec2(220.0, 30.0));
+    ui.painter().rect_filled(r, 6.0, t.card);
+    let mut bar = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(6.0, 2.0))).layout(egui::Layout::right_to_left(egui::Align::Center)));
+    bar.spacing_mut().item_spacing.x = 4.0;
+    let step = |up: bool, z: f32| -> f32 {
+        if up { ZOOMS.iter().copied().find(|s| *s > z + 1e-3).unwrap_or(MAX_ZOOM) } else { ZOOMS.iter().rev().copied().find(|s| *s < z - 1e-3).unwrap_or(1.0) }
+    };
+    if bar.add_enabled(v.zoom < MAX_ZOOM, egui::Button::new("+")).on_hover_text(tl!("Zoom In")).clicked() {
+        v.zoom_at(step(true, v.zoom), frame.center(), frame, base);
+    }
+    bar.add(egui::Label::new(RichText::new(format!("{:.0} %", v.zoom * 100.0)).color(t.text)).wrap_mode(egui::TextWrapMode::Extend));
+    if bar.add_enabled(v.zoom > 1.0, egui::Button::new("−")).on_hover_text(tl!("Zoom Out")).clicked() {
+        v.zoom_at(step(false, v.zoom), frame.center(), frame, base);
+    }
+    if bar.add_enabled(v.zoom > 1.0, egui::Button::new(tl!("Fit on Screen"))).clicked() {
+        v.zoom = 1.0;
+        v.center = [0.5, 0.5];
     }
 }
 
@@ -991,6 +1190,72 @@ mod tests {
         h.state_mut().vectorizer.as_mut().unwrap().view = View::Vectorized;
         h.run_steps(6);
         h.render().unwrap().save(dir.join("vectorisation_contours.png")).unwrap();
+        // Side by side at 400 %, on the sun's edge, once drawn sharp.
+        let v = h.state_mut().vectorizer.as_mut().unwrap();
+        v.settings.contours = false;
+        v.view = View::SideBySide;
+        v.zoom = 4.0;
+        v.center = [0.62, 0.36];
+        h.run_steps(30);
+        h.render().unwrap().save(dir.join("vectorisation_zoom.png")).unwrap();
+    }
+
+    /// Zoomed in, the visible part of the result is drawn again at the screen's resolution;
+    /// zooming keeps the point under the pointer in place.
+    #[test]
+    fn the_zoomed_preview_draws_the_visible_part_sharp() {
+        let (mut app, _) = app();
+        open(&mut app).unwrap();
+        let v = app.vectorizer.as_mut().unwrap();
+        // Traced px 8..14 × 10..14 drawn 60 × 40: 10 screen px a traced px.
+        let img = v.render_region(false, [8.0, 10.0, 14.0, 14.0], [60, 40]).unwrap();
+        assert_eq!(img.size, [60, 40]);
+        let blue = img.pixels[25 * 60 + 25];
+        assert_eq!((blue.r(), blue.g(), blue.b()), (31, 79, 181));
+        let frame = Rect::from_min_size(pos2(0.0, 0.0), vec2(600.0, 400.0));
+        let base = vec2(600.0, 400.0);
+        let at = pos2(450.0, 100.0);
+        let point = |v: &Vectorizer| [v.center[0] + (at.x - 300.0) / (base.x * v.zoom), v.center[1] + (at.y - 200.0) / (base.y * v.zoom)];
+        let before = point(v);
+        v.zoom_at(4.0, at, frame, base);
+        let after = point(v);
+        assert_eq!(v.zoom, 4.0);
+        assert!((before[0] - after[0]).abs() < 1e-5 && (before[1] - after[1]).abs() < 1e-5);
+        v.zoom_at(20.0, at, frame, base);
+        assert_eq!(v.zoom, MAX_ZOOM, "800 % at most");
+    }
+
+    /// Ctrl+wheel over the preview zooms in; once the view rests the sharp drawing replaces the
+    /// preview texture; Fit on Screen comes back to 100 %.
+    #[test]
+    fn the_wheel_zooms_the_preview_and_fit_comes_back() {
+        let (mut app, _) = app();
+        open(&mut app).unwrap();
+        app.vectorizer.as_mut().unwrap().view = View::Vectorized;
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
+            |ui, app: &mut PhotocraftApp| {
+                let ready = egui::Id::new("vectorizer-zoom-fonts");
+                if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
+                    PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
+                    ui.ctx().data_mut(|d| d.insert_temp(ready, true));
+                    return;
+                }
+                show(app, ui.ctx());
+            },
+            app,
+        );
+        h.run_steps(3);
+        h.hover_at(pos2(300.0, 400.0));
+        h.run();
+        h.event(egui::Event::Zoom(3.0));
+        h.run_steps(2);
+        let zoom = h.state().vectorizer.as_ref().unwrap().zoom;
+        assert!(zoom > 2.5, "{zoom}");
+        h.run_steps(30);
+        assert!(h.state().vectorizer.as_ref().unwrap().sharp.is_some(), "drawn sharp once the view rests");
+        h.get_by_label("Fit on Screen").click();
+        h.run_steps(2);
+        assert_eq!(h.state().vectorizer.as_ref().unwrap().zoom, 1.0);
     }
 
     #[test]

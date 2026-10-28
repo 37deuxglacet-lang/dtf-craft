@@ -314,7 +314,7 @@ fn footer(page: &mut Page) {
 /// The summary under the title: number of colours, how close the references are, the size.
 fn summary(sheet: &ColorSheet) -> (String, String) {
     let n = sheet.rows.len().to_string();
-    let title = crate::i18n::fmt(tl!("Colors detected: {n}"), &[("n", &n)]);
+    let title = crate::i18n::fmt(tl!("Colors kept: {n}"), &[("n", &n)]);
     let des: Vec<f32> = sheet.rows.iter().filter_map(|r| r.reference.as_ref().map(|s| s.delta_e)).collect();
     let mut text = if sheet.swatch_book.is_none() || des.is_empty() {
         tl!("No swatch book loaded: the colors have no reference.").to_string()

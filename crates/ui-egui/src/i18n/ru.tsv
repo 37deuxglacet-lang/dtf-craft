@@ -3390,3 +3390,4 @@ curves	Smooth	Сгладить
 	Ungroup (Ctrl+Shift+G)	Разгруппировать (Ctrl+Shift+G)
 	Duplicate (Ctrl+D)	Дублировать (Ctrl+D)
 	{n} visuals selected	Выбрано изображений: {n}
+	Colors kept: {n}	Сохранённые цвета: {n}
