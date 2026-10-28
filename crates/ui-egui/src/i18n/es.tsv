@@ -3110,3 +3110,10 @@ curves	Smooth	Suavizar
 	Transparent Pixels…	Píxeles transparentes…
 	Remove Fringe…	Eliminar halos…
 	Sharpness…	Nitidez…
+# DTF Craft (15)
+	Group the Selection	Agrupar
+	Ungroup	Desagrupar
+	Group (Ctrl+G)	Agrupar (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Desagrupar (Ctrl+Mayús+G)
+	Duplicate (Ctrl+D)	Duplicar (Ctrl+D)
+	{n} visuals selected	{n} diseños seleccionados

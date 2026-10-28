@@ -3383,3 +3383,10 @@ curves	Smooth	Сгладить
 	Transparent Pixels…	Прозрачные пиксели…
 	Remove Fringe…	Удалить кайму…
 	Sharpness…	Резкость…
+# DTF Craft (15)
+	Group the Selection	Сгруппировать
+	Ungroup	Разгруппировать
+	Group (Ctrl+G)	Сгруппировать (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Разгруппировать (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Дублировать (Ctrl+D)
+	{n} visuals selected	Выбрано изображений: {n}

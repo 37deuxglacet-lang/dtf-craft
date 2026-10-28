@@ -67,16 +67,19 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
 
 - **En-tête** : Annuler, Exporter le PNG… (ou Exporter les planches quand il y en a plusieurs).
 - **Barre d'outils** : format de la planche (laize × longueur), annuler / rétablir, grille, marge
-  de l'image, outils du visuel sélectionné (rotation 90° dans les deux sens, retournement
-  horizontal et vertical, étirement à la laize ou à la longueur, centrage horizontal, vertical ou
-  sur la planche, pousser à gauche, à droite, en haut, en bas, supprimer) et Construction auto.
+  de l'image (masquée sur un écran étroit, toujours dans Paramètres), outils de la sélection
+  (rotation 90° dans les deux sens, retournement horizontal et vertical, étirement à la laize ou à
+  la longueur pour un visuel seul, centrage horizontal, vertical ou sur la planche, pousser à
+  gauche, à droite, en haut, en bas, grouper, dégrouper, supprimer) et Construction auto.
 - **Accueil** (colonne de gauche) : zone d'import (« Importer des images », PNG uniquement, ou
   fichiers glissés sur la fenêtre ; « Ajouter le document ouvert », aplati). Chaque visuel est
   rogné à ses pixels visibles et apparaît en vignette avec son nombre d'exemplaires sur la planche
   (clic : un exemplaire de plus ; × : retirer le visuel). Le visuel sélectionné se règle :
   largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
   d'images sur la planche, marge propre (interrupteur), Remplissage automatique (remplit la place
-  restante), Dupliquer l'image.
+  restante), Dupliquer l'image. Plusieurs visuels sélectionnés (ou un groupe) : leur nombre, la
+  taille de leur cadre, Grouper, Dégrouper, Dupliquer, Supprimer.
+- **Champs numériques** : ils se saisissent au clavier ; glisser la souris dessus ne change rien.
 - **Paramètres** : lignes de résolution, lignes en chevauchement, alignement automatique pendant
   le déplacement, avertissement sur l'arrière-plan (coins opaques : fond non détouré),
   avertissement de transparence (plus de 0,5 % de pixels semi-transparents), grille 1 cm, fond de
@@ -89,17 +92,27 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
   hauteur, résolution, avertissements). Contours : vert ≥ 300 ppp, jaune ≥ 250, rouge ≥ 200, noir
   en dessous ; bleu pour un visuel en chevauchement ou trop proche. Molette : défilement ;
   Ctrl + molette : zoom ; boutons de zoom en bas à droite.
-- **Déplacement** : glisser au millimètre ; le visuel reste sur le film, marge du plan de travail
-  comprise. Lâché à moins de la marge d'un autre visuel (la plus grande des deux marges), il revient
-  à sa place. Flèches : 1 mm (Maj : 1 cm) ; Suppr, Ctrl+C / Ctrl+V, Ctrl+D, Ctrl+Z / Ctrl+Y ; clic
-  droit : copier, coller, supprimer, dupliquer, remplissage automatique, rotation.
+- **Sélection** : clic sur un visuel ; Maj+clic (ou Ctrl+clic) ajoute ou retire un visuel ; un
+  rectangle tracé depuis une zone vide du film prend tous les visuels qu'il touche (Maj : ajoutés à
+  la sélection) ; Ctrl+A : tous ; Échap : plus rien.
+- **Groupes** : Ctrl+G groupe la sélection, Ctrl+Maj+G dégroupe (aussi dans la barre d'outils, le
+  clic droit et la colonne de gauche). Un clic sur un visuel du groupe prend tout le groupe ; un
+  groupe est entouré d'un cadre pointillé et garde les écarts entre ses visuels. Annuler revient
+  sur un groupage.
+- **Déplacement** : glisser au millimètre ; la sélection se déplace d'un bloc et reste sur le
+  film, marge du plan de travail comprise. Lâchée à moins de la marge d'un autre visuel (la plus
+  grande des deux marges), elle revient à sa place. Rotation : le bloc tourne autour de son centre,
+  chaque visuel tourne avec lui ; retournement : le bloc est retourné. Flèches : 1 mm (Maj : 1 cm) ;
+  Suppr, Ctrl+C / Ctrl+X / Ctrl+V, Ctrl+D, Ctrl+Z / Ctrl+Y ; clic droit : copier, coller,
+  supprimer, dupliquer, grouper, dégrouper, tout sélectionner, remplissage automatique, rotation.
 - **Gang sheets actives** (colonne de droite) : une carte par planche (format, nom modifiable,
   nombre d'images, quantité à imprimer, dupliquer, supprimer) ; Ajouter une nouvelle planche,
   Construction auto, Recommencer ; longueur utilisée.
 - **Construction auto** : tous les visuels avec largeur, hauteur, verrou des proportions,
   résolution et nombre d'exemplaires (dupliquer : même image, autre taille) ; marges et rotation ;
   Appliquer replace tout, les plus grands d'abord, et ouvre une nouvelle planche quand une est
-  pleine.
+  pleine. Chaque groupe est conservé tel quel, en un seul bloc placé en premier ; ses visuels
+  comptent dans le nombre d'exemplaires de leur image.
 - **Export** : chaque planche avec des visuels est rendue à 300 ppp (laize × longueur utilisée,
   un calque par visuel), enregistrée en PNG (résolution inscrite) et ouverte comme nouveau
   document. Plusieurs planches : « nom 1.png », « nom 2.png »… ; une quantité supérieure à 1 est

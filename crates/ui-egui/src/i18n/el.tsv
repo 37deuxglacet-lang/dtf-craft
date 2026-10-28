@@ -4110,3 +4110,9 @@ curves	Smooth	Εξομάλυνση
 	Transparent Pixels…	Διαφανή εικονοστοιχεία…
 	Remove Fringe…	Αφαίρεση περιγράμματος…
 	Sharpness…	Οξύτητα…
+# DTF Craft (15)
+	Group the Selection	Ομαδοποίηση
+	Group (Ctrl+G)	Ομαδοποίηση (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Κατάργηση ομαδοποίησης (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Αντιγραφή (Ctrl+D)
+	{n} visuals selected	{n} επιλεγμένα γραφικά

@@ -4141,3 +4141,9 @@ cameraData	Lens	Lens
 	Transparent Pixels…	Saydam pikseller…
 	Remove Fringe…	Saçakları kaldır…
 	Sharpness…	Keskinlik…
+# DTF Craft (15)
+	Group the Selection	Grupla
+	Group (Ctrl+G)	Grupla (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Grubu çöz (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Çoğalt (Ctrl+D)
+	{n} visuals selected	{n} görsel seçildi

@@ -3442,3 +3442,10 @@ curves	Smooth	Lisser
 	Transparent Pixels…	Pixels transparents…
 	Remove Fringe…	Supprimer franges…
 	Sharpness…	Netteté…
+# DTF Craft (15)
+	Group the Selection	Grouper
+	Ungroup	Dégrouper
+	Group (Ctrl+G)	Grouper (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Dégrouper (Ctrl+Maj+G)
+	Duplicate (Ctrl+D)	Dupliquer (Ctrl+D)
+	{n} visuals selected	{n} visuels sélectionnés

@@ -4483,3 +4483,9 @@ shape	Appearance	Izgled
 	Transparent Pixels…	Providni pikseli…
 	Remove Fringe…	Ukloni ivice…
 	Sharpness…	Oštrina…
+# DTF Craft (15)
+	Group the Selection	Grupiši
+	Group (Ctrl+G)	Grupiši (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Razgrupiši (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Dupliraj (Ctrl+D)
+	{n} visuals selected	Izabranih vizuala: {n}

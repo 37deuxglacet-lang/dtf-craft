@@ -4018,3 +4018,9 @@ navigator	Zoom	Zvětšení
 	Transparent Pixels…	Průhledné pixely…
 	Remove Fringe…	Odstranit lemy…
 	Sharpness…	Ostrost…
+# DTF Craft (15)
+	Group the Selection	Seskupit
+	Group (Ctrl+G)	Seskupit (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Zrušit seskupení (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Duplikovat (Ctrl+D)
+	{n} visuals selected	Vybrané vizuály: {n}

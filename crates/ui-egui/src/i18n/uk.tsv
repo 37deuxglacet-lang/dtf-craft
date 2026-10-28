@@ -4111,3 +4111,10 @@ curves	Smooth	Згладити
 	Transparent Pixels…	Прозорі пікселі…
 	Remove Fringe…	Видалити облямівку…
 	Sharpness…	Різкість…
+# DTF Craft (15)
+	Group the Selection	Згрупувати
+	Ungroup	Розгрупувати
+	Group (Ctrl+G)	Згрупувати (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Розгрупувати (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Дублювати (Ctrl+D)
+	{n} visuals selected	Вибрано зображень: {n}

@@ -3897,3 +3897,10 @@ curves	Smooth	Làm mượt
 	Transparent Pixels…	Điểm ảnh trong suốt…
 	Remove Fringe…	Xóa viền…
 	Sharpness…	Độ nét…
+# DTF Craft (15)
+	Group the Selection	Nhóm
+	Ungroup	Bỏ nhóm
+	Group (Ctrl+G)	Nhóm (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Bỏ nhóm (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Nhân bản (Ctrl+D)
+	{n} visuals selected	Đã chọn {n} hình

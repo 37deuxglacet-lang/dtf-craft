@@ -2,8 +2,9 @@
 //! DTF › Gang Sheet…: a full-window, light, uncluttered builder to lay visuals out on DTF film.
 //!
 //! * Header: title, Cancel, Export.
-//! * Toolbar: film size, undo/redo, grid, the spacing between visuals, the selected visual's tools
-//!   (turn, mirror, stretch to the film, centre, push to a side, delete) and Auto Build.
+//! * Toolbar: film size, undo/redo, grid, the spacing between visuals, the selection's tools
+//!   (turn, mirror, stretch to the film, centre, push to a side, delete, group, ungroup) and Auto
+//!   Build.
 //! * Left rail and panel: **Home** (drop zone, the visuals as thumbnails with their copies on the
 //!   sheet, and the selected visual's size, copies, own spacing, fill and duplicate) and
 //!   **Settings** (lines shown, snapping, warnings, sheet background, margins, film).
@@ -15,7 +16,15 @@
 //!   lays them all out again, opening new sheets when one is full.
 //!
 //! Visuals keep a margin from the film edges and a spacing between them (each visual may ask for
-//! its own); a visual dropped closer than that to another goes back where it was. Export writes
+//! its own); a visual dropped closer than that to another goes back where it was.
+//!
+//! Selection: a click picks a visual, Shift+click (or Ctrl+click) adds or removes one, a rectangle
+//! drawn from an empty part of the film picks every visual it touches, Ctrl+A picks them all. The
+//! selection moves, turns (as one block, about its centre), mirrors, centres, pushes, copies,
+//! duplicates and deletes together. Ctrl+G groups it, Ctrl+Shift+G ungroups: a group is picked
+//! with one click, keeps its inner spacing and stays one block in Auto Build.
+//!
+//! Number fields are typed: dragging the mouse across them changes nothing. Export writes
 //! every sheet as a 300 ppi PNG through `dtf.gangSheet` and opens it as a new document.
 //!
 //! The window is always light, whatever the app's theme: [`light_scope`] swaps the tokens and the
@@ -23,7 +32,8 @@
 //!
 //! Control channel: `ui.menu.invoke {"id":"dtf.gangSheet","params":{"ui":{…}}}` with `addFiles`,
 //! `addDocument`, `set` (film and display settings), `source` (`index`, `widthCm`, `heightCm`,
-//! `lock`, `quantity`, `marginMm`/`null`), `removeSource`, `autoBuild`, `select`, `move`, `rotate`
+//! `lock`, `quantity`, `marginMm`/`null`), `removeSource`, `autoBuild`, `select` (index, list or
+//! `null`), `selectAll`, `group`, `ungroup`, `move` (the selection's box corner), `rotate`
 //! (quarters), `mirror` (`"h"`/`"v"`), `stretch`, `center`, `align`, `duplicate`, `delete`,
 //! `fill`, `copy`, `paste`, `undo`, `redo`, `newSheet`, `sheet` (active), `duplicateSheet`,
 //! `deleteSheet`, `sheetCopies`, `renameSheet`, `startOver`, `tab` (`home`/`settings`), `autoView`,
@@ -254,13 +264,49 @@ enum Tab {
     Settings,
 }
 
-/// A visual being dragged: which one, where it was grabbed (units from its corner) and where it
-/// was before.
-#[derive(Clone, Copy, Debug)]
+/// The selection being dragged: where it was grabbed (units from its box's corner), its box and
+/// where each of its visuals was before.
+#[derive(Clone, Debug)]
 struct Drag {
-    index: usize,
     grab: (i64, i64),
+    bbox: Item,
+    from: Vec<(usize, i64, i64)>,
+}
+
+/// A rectangle drawn from an empty part of the film: its corners (units) and the selection it adds
+/// to (Shift held).
+#[derive(Clone, Debug)]
+struct Marquee {
     from: (i64, i64),
+    to: (i64, i64),
+    base: Vec<usize>,
+}
+
+/// Copied visuals: each one's source, orientation, place in the copied box and group (0: none),
+/// and the box's size.
+#[derive(Clone, Debug, PartialEq)]
+struct Clip {
+    members: Vec<(usize, Orientation, i64, i64, u32)>,
+    w: i64,
+    h: i64,
+}
+
+/// The box around `items` (empty when there are none).
+fn bounds(items: &[Item]) -> Item {
+    let Some(first) = items.first() else { return Item::default() };
+    let (mut x0, mut y0, mut x1, mut y1) = (first.x, first.y, first.x + first.w, first.y + first.h);
+    for r in items {
+        x0 = x0.min(r.x);
+        y0 = y0.min(r.y);
+        x1 = x1.max(r.x + r.w);
+        y1 = y1.max(r.y + r.h);
+    }
+    Item::new(x0, y0, x1 - x0, y1 - y0)
+}
+
+/// `r`, inside a `bw × bh` box, after the box turns 90° clockwise.
+fn turn_cw(r: Item, bh: i64) -> Item {
+    Item::new(bh - (r.y + r.h), r.x, r.h, r.w)
 }
 
 fn cm_units(v: f32) -> i64 {
@@ -276,9 +322,11 @@ pub struct GangSheetDialog {
     pub sources: Vec<Source>,
     pub sheets: Vec<SheetDoc>,
     pub active: usize,
-    pub selected: Option<usize>,
+    /// The selected visuals of the active sheet (indices, sorted).
+    pub selected: Vec<usize>,
     hovered: Option<usize>,
     drag: Option<Drag>,
+    marquee: Option<Marquee>,
     tab: Tab,
     auto_view: bool,
     /// 1 = the whole sheet fits; more zooms in.
@@ -288,7 +336,7 @@ pub struct GangSheetDialog {
     redo: Vec<Snapshot>,
     /// The last edit's key: edits of the same field in a row make one undo step.
     last_edit: Option<String>,
-    clipboard: Option<(usize, Orientation)>,
+    clipboard: Option<Clip>,
     renaming: Option<(usize, String)>,
     confirm_export: bool,
     pub status: String,
@@ -318,9 +366,10 @@ impl GangSheetDialog {
             sources: Vec::new(),
             sheets: vec![SheetDoc::new(1)],
             active: 0,
-            selected: None,
+            selected: Vec::new(),
             hovered: None,
             drag: None,
+            marquee: None,
             tab: Tab::Home,
             auto_view: false,
             zoom: 1.0,
@@ -435,8 +484,9 @@ impl GangSheetDialog {
         self.sources = s.sources;
         self.sheets = s.sheets;
         self.active = s.active.min(self.sheets.len().saturating_sub(1));
-        self.selected = None;
+        self.selected.clear();
         self.drag = None;
+        self.marquee = None;
         self.last_edit = None;
     }
 
@@ -469,7 +519,7 @@ impl GangSheetDialog {
         for sp in spots.into_iter().flatten() {
             let orientation = Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() };
             if let Some(list) = self.placed_mut() {
-                list.push(Placed { source, x: sp.x, y: sp.y, orientation });
+                list.push(Placed { source, x: sp.x, y: sp.y, orientation, group: 0 });
                 n += 1;
             }
         }
@@ -493,7 +543,8 @@ impl GangSheetDialog {
                     list.remove(i);
                 }
             }
-            self.selected = None;
+            self.tidy_groups();
+            self.selected.clear();
         }
     }
 
@@ -510,13 +561,33 @@ impl GangSheetDialog {
     }
 
     /// Auto Build: every visual's copies laid out again from the first sheet on, a new sheet
-    /// opened whenever one is full. Returns the copies that fit nowhere.
+    /// opened whenever one is full. Each group stays as it is, one block (its visuals count among
+    /// their source's copies). Returns the copies that fit nowhere.
     pub fn auto_build(&mut self) -> usize {
         let names: Vec<(String, usize)> = self.sheets.iter().map(|s| (s.name.clone(), s.copies)).collect();
+        // The groups of every sheet.
+        let mut blocks: Vec<Clip> = Vec::new();
+        for k in 0..self.sheets.len() {
+            let mut d = self.shadow();
+            d.active = k;
+            let mut ids: Vec<u32> = d.placed().iter().map(|p| p.group).filter(|g| *g != 0).collect();
+            ids.sort_unstable();
+            ids.dedup();
+            for g in ids {
+                let list: Vec<usize> = (0..d.placed().len()).filter(|i| d.placed().get(*i).is_some_and(|p| p.group == g)).collect();
+                blocks.extend(d.copy_block(&list));
+            }
+        }
+        let mut want: Vec<usize> = self.sources.iter().map(|s| s.quantity).collect();
+        for m in blocks.iter().flat_map(|b| &b.members) {
+            if let Some(n) = want.get_mut(m.0) {
+                *n = n.saturating_sub(1);
+            }
+        }
         self.sheets.clear();
         let mut queue: Vec<usize> = Vec::new();
-        for (i, s) in self.sources.iter().enumerate() {
-            queue.extend(std::iter::repeat_n(i, s.quantity));
+        for (i, n) in want.iter().enumerate() {
+            queue.extend(std::iter::repeat_n(i, *n));
         }
         let sheet = self.sheet().with_gap(self.widest_gap());
         loop {
@@ -526,12 +597,34 @@ impl GangSheetDialog {
                 doc.name = name.clone();
                 doc.copies = *copies;
             }
+            // Groups first, as they stand, then the single visuals around them.
+            let block_spots = sheet.pack(&blocks.iter().map(|b| (b.w, b.h)).collect::<Vec<_>>(), &[], false);
+            let mut left_blocks = Vec::new();
+            let mut occupied = Vec::new();
+            for (b, spot) in blocks.iter().zip(block_spots) {
+                match spot {
+                    Some(sp) => {
+                        let g = doc.placed.iter().map(|p| p.group).max().unwrap_or(0) + 1;
+                        for (source, orientation, rx, ry, _) in &b.members {
+                            doc.placed.push(Placed { source: *source, x: sp.x + rx, y: sp.y + ry, orientation: *orientation, group: g });
+                        }
+                        occupied.push(Item::new(sp.x, sp.y, b.w, b.h));
+                    }
+                    None => left_blocks.push(b.clone()),
+                }
+            }
             let sizes: Vec<(i64, i64)> = queue.iter().map(|s| self.size_of(*s)).collect();
-            let spots = sheet.pack(&sizes, &[], self.settings.rotate);
+            let spots = sheet.pack(&sizes, &occupied, self.settings.rotate);
             let mut left = Vec::new();
             for (s, spot) in queue.iter().zip(spots) {
                 match spot {
-                    Some(sp) => doc.placed.push(Placed { source: *s, x: sp.x, y: sp.y, orientation: Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() } }),
+                    Some(sp) => doc.placed.push(Placed {
+                        source: *s,
+                        x: sp.x,
+                        y: sp.y,
+                        orientation: Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() },
+                        group: 0,
+                    }),
                     None => left.push(*s),
                 }
             }
@@ -540,13 +633,14 @@ impl GangSheetDialog {
                 self.sheets.push(doc);
             }
             queue = left;
-            if queue.is_empty() || !progress || self.sheets.len() >= MAX_SHEETS {
+            blocks = left_blocks;
+            if (queue.is_empty() && blocks.is_empty()) || !progress || self.sheets.len() >= MAX_SHEETS {
                 break;
             }
         }
         self.active = 0;
-        self.selected = None;
-        queue.len()
+        self.selected.clear();
+        queue.len() + blocks.iter().map(|b| b.members.len()).sum::<usize>()
     }
 
     /// Every visual kept on the film (moved, not resized) after a size or film change.
@@ -610,7 +704,7 @@ impl GangSheetDialog {
         if self.add_copies(s, 1) == 0 {
             self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
         } else {
-            self.selected = Some(self.placed().len() - 1);
+            self.selected = vec![self.placed().len() - 1];
         }
     }
 
@@ -628,61 +722,265 @@ impl GangSheetDialog {
             }
         }
         self.sources.remove(source);
-        self.selected = None;
+        self.tidy_groups();
+        self.selected.clear();
         self.drag = None;
-        if self.clipboard.is_some_and(|c| c.0 >= self.sources.len()) {
-            self.clipboard = None;
+        // The clipboard loses the visual too; the others keep their sources.
+        if let Some(clip) = self.clipboard.as_mut() {
+            clip.members.retain(|m| m.0 != source);
+            for m in &mut clip.members {
+                if m.0 > source {
+                    m.0 -= 1;
+                }
+            }
+            if clip.members.is_empty() {
+                self.clipboard = None;
+            }
         }
     }
 
-    /// Moves visual `i` to (`x`, `y`), kept on the film; refused (false) when it would come
-    /// closer to another visual than their spacing.
-    pub fn move_to(&mut self, i: usize, x: i64, y: i64) -> bool {
-        let sheet = self.sheet();
-        let r = sheet.clamp(Item { x, y, ..self.item(i) });
-        let gap = self.placed().get(i).map_or(self.gap(), |p| self.gap_of(p.source));
-        if sheet.collides(&self.items(), &self.gaps(), i, &r, gap) {
+    // ---------------------------------------------------------------- selection and groups
+
+    /// The selected visuals that are on the active sheet, sorted.
+    pub fn sel(&self) -> Vec<usize> {
+        let n = self.placed().len();
+        let mut v: Vec<usize> = self.selected.iter().copied().filter(|i| *i < n).collect();
+        v.sort_unstable();
+        v.dedup();
+        v
+    }
+
+    /// The one visual selected on its own (not several, not a group).
+    pub fn single(&self) -> Option<usize> {
+        match self.sel().as_slice() {
+            [i] => Some(*i),
+            _ => None,
+        }
+    }
+
+    /// Visual `i` and the visuals grouped with it.
+    fn members(&self, i: usize) -> Vec<usize> {
+        let list = self.placed();
+        match list.get(i).map(|p| p.group) {
+            None => Vec::new(),
+            Some(0) => vec![i],
+            Some(g) => (0..list.len()).filter(|j| list.get(*j).is_some_and(|p| p.group == g)).collect(),
+        }
+    }
+
+    /// `list` with every group it touches made whole, sorted.
+    fn whole(&self, list: &[usize]) -> Vec<usize> {
+        let mut v: Vec<usize> = list.iter().flat_map(|i| self.members(*i)).collect();
+        v.sort_unstable();
+        v.dedup();
+        v
+    }
+
+    /// Selects visual `i` and its group (`None`: nothing).
+    pub fn select_one(&mut self, i: Option<usize>) {
+        self.selected = i.map_or_else(Vec::new, |i| self.members(i));
+    }
+
+    /// Adds visual `i` and its group to the selection, or takes them out when already in it.
+    fn toggle(&mut self, i: usize) {
+        let group = self.members(i);
+        let mut sel = self.sel();
+        if sel.contains(&i) {
+            sel.retain(|j| !group.contains(j));
+        } else {
+            sel.extend(group);
+        }
+        self.selected = self.whole(&sel);
+    }
+
+    pub fn select_all(&mut self) {
+        self.selected = (0..self.placed().len()).collect();
+    }
+
+    /// Whether the selection is exactly one group.
+    fn is_one_group(&self, list: &[usize]) -> bool {
+        let g = list.first().and_then(|i| self.placed().get(*i)).map_or(0, |p| p.group);
+        g != 0 && self.members(list.first().copied().unwrap_or(0)) == list
+    }
+
+    /// Whether any selected visual is in a group.
+    fn any_grouped(&self, list: &[usize]) -> bool {
+        list.iter().any(|i| self.placed().get(*i).is_some_and(|p| p.group != 0))
+    }
+
+    /// A group number no visual of the active sheet uses.
+    fn new_group_id(&self) -> u32 {
+        self.placed().iter().map(|p| p.group).max().unwrap_or(0) + 1
+    }
+
+    /// Groups the selection (several visuals) into one; false when there is nothing to group.
+    pub fn group(&mut self) -> bool {
+        let list = self.sel();
+        if list.len() < 2 || self.is_one_group(&list) {
             return false;
         }
-        if let Some(p) = self.placed_mut().and_then(|l| l.get_mut(i)) {
-            (p.x, p.y) = (r.x, r.y);
+        let g = self.new_group_id();
+        if let Some(placed) = self.placed_mut() {
+            for i in &list {
+                if let Some(p) = placed.get_mut(*i) {
+                    p.group = g;
+                }
+            }
         }
         true
     }
 
-    /// Turns visual `i` by `quarters` × 90° (negative: anticlockwise), in place when there is
-    /// room, else wherever there is.
-    pub fn rotate(&mut self, i: usize, quarters: i32) -> bool {
-        let Some(old) = self.placed().get(i).copied() else { return false };
-        let sheet = self.sheet();
-        let (w, h) = self.size_of(old.source);
-        let turned = Placed { orientation: old.orientation.rotated(quarters), ..old };
-        let gap = self.gap_of(old.source);
-        let r = sheet.clamp(cmd::footprint(&turned, w, h));
-        if !sheet.fits(r.w, r.h) {
+    /// Ungroups the selected visuals (they stay selected); false when none was grouped.
+    pub fn ungroup(&mut self) -> bool {
+        let list = self.sel();
+        if !self.any_grouped(&list) {
             return false;
         }
-        if !sheet.collides(&self.items(), &self.gaps(), i, &r, gap) {
-            if let Some(p) = self.placed_mut().and_then(|l| l.get_mut(i)) {
-                *p = Placed { x: r.x, y: r.y, ..turned };
-            }
-            return true;
-        }
-        let others: Vec<Item> = self.items().into_iter().enumerate().filter(|(j, _)| *j != i).map(|(_, r)| r).collect();
-        match sheet.with_gap(self.widest_gap()).pack(&[(r.w, r.h)], &others, false).first().copied().flatten() {
-            Some(sp) => {
-                if let Some(p) = self.placed_mut().and_then(|l| l.get_mut(i)) {
-                    *p = Placed { x: sp.x, y: sp.y, ..turned };
+        if let Some(placed) = self.placed_mut() {
+            for i in &list {
+                if let Some(p) = placed.get_mut(*i) {
+                    p.group = 0;
                 }
-                true
             }
-            None => false,
+        }
+        true
+    }
+
+    /// A group left with a single visual (the others deleted) is no group any more.
+    fn tidy_groups(&mut self) {
+        for doc in &mut self.sheets {
+            let ids: Vec<u32> = doc.placed.iter().map(|p| p.group).collect();
+            for p in &mut doc.placed {
+                if p.group != 0 && ids.iter().filter(|g| **g == p.group).count() < 2 {
+                    p.group = 0;
+                }
+            }
         }
     }
 
-    pub fn mirror(&mut self, i: usize, horizontal: bool) {
-        if let Some(p) = self.placed_mut().and_then(|l| l.get_mut(i)) {
-            p.orientation = p.orientation.mirrored(horizontal);
+    // ---------------------------------------------------------------- moving blocks
+
+    /// The box around the visuals `list`.
+    fn bbox(&self, list: &[usize]) -> Item {
+        bounds(&list.iter().map(|i| self.item(*i)).collect::<Vec<_>>())
+    }
+
+    /// The visuals not in `list`, with their spacings.
+    fn others(&self, list: &[usize]) -> (Vec<Item>, Vec<i64>) {
+        let gaps = self.gaps();
+        self.items().into_iter().zip(gaps).enumerate().filter(|(i, _)| !list.contains(i)).map(|(_, x)| x).unzip()
+    }
+
+    /// The largest spacing the visuals of `list` ask for.
+    fn block_gap(&self, list: &[usize]) -> i64 {
+        list.iter().filter_map(|i| self.placed().get(*i)).map(|p| self.gap_of(p.source)).fold(self.gap(), i64::max)
+    }
+
+    /// Whether the visuals of `list`, standing at `rects`, come closer to one not in `list` than
+    /// their spacing allows.
+    fn block_collides(&self, list: &[usize], rects: &[Item]) -> bool {
+        let sheet = self.sheet();
+        let (items, gaps) = self.others(list);
+        list.iter().zip(rects).any(|(i, r)| {
+            let gap = self.placed().get(*i).map_or(self.gap(), |p| self.gap_of(p.source));
+            sheet.collides(&items, &gaps, usize::MAX, r, gap)
+        })
+    }
+
+    /// Moves the visuals of `list` by (`dx`, `dy`), whatever is there.
+    fn shift(&mut self, list: &[usize], dx: i64, dy: i64) {
+        if let Some(placed) = self.placed_mut() {
+            for i in list {
+                if let Some(p) = placed.get_mut(*i) {
+                    p.x += dx;
+                    p.y += dy;
+                }
+            }
+        }
+    }
+
+    /// Moves the visuals of `list` together so their box's corner lands at (`x`, `y`), kept on the
+    /// film; refused (false) when one would come closer to another visual than their spacing.
+    pub fn move_block(&mut self, list: &[usize], x: i64, y: i64) -> bool {
+        if list.is_empty() {
+            return false;
+        }
+        let b = self.bbox(list);
+        let nb = self.sheet().clamp(Item { x, y, ..b });
+        let (dx, dy) = (nb.x - b.x, nb.y - b.y);
+        let rects: Vec<Item> = list
+            .iter()
+            .map(|i| {
+                let r = self.item(*i);
+                Item { x: r.x + dx, y: r.y + dy, ..r }
+            })
+            .collect();
+        if self.block_collides(list, &rects) {
+            return false;
+        }
+        self.shift(list, dx, dy);
+        true
+    }
+
+    /// Turns the visuals of `list` by `quarters` × 90° (negative: anticlockwise) as one block about
+    /// its centre, in place when there is room, else wherever there is.
+    pub fn rotate_block(&mut self, list: &[usize], quarters: i32) -> bool {
+        if list.is_empty() {
+            return false;
+        }
+        let q = quarters.rem_euclid(4);
+        let b = self.bbox(list);
+        let (mut bw, mut bh) = (b.w, b.h);
+        let mut rel: Vec<Item> = list
+            .iter()
+            .map(|i| {
+                let r = self.item(*i);
+                Item { x: r.x - b.x, y: r.y - b.y, ..r }
+            })
+            .collect();
+        for _ in 0..q {
+            rel = rel.into_iter().map(|r| turn_cw(r, bh)).collect();
+            (bw, bh) = (bh, bw);
+        }
+        let sheet = self.sheet();
+        if !sheet.fits(bw, bh) {
+            return false;
+        }
+        let mut nb = sheet.clamp(Item::new(b.x + (b.w - bw) / 2, b.y + (b.h - bh) / 2, bw, bh));
+        let at = |nb: Item| -> Vec<Item> { rel.iter().map(|r| Item { x: nb.x + r.x, y: nb.y + r.y, ..*r }).collect() };
+        if self.block_collides(list, &at(nb)) {
+            let (others, _) = self.others(list);
+            match sheet.with_gap(self.widest_gap()).pack(&[(bw, bh)], &others, false).first().copied().flatten() {
+                Some(sp) => nb = Item { x: sp.x, y: sp.y, ..nb },
+                None => return false,
+            }
+        }
+        let rects = at(nb);
+        if let Some(placed) = self.placed_mut() {
+            for (i, r) in list.iter().zip(rects) {
+                if let Some(p) = placed.get_mut(*i) {
+                    *p = Placed { x: r.x, y: r.y, orientation: p.orientation.rotated(quarters), ..*p };
+                }
+            }
+        }
+        true
+    }
+
+    /// Mirrors the visuals of `list` as one block, left-right (`horizontal`) or top-bottom.
+    pub fn mirror_block(&mut self, list: &[usize], horizontal: bool) {
+        let b = self.bbox(list);
+        let rects: Vec<Item> = list.iter().map(|i| self.item(*i)).collect();
+        if let Some(placed) = self.placed_mut() {
+            for (i, r) in list.iter().zip(rects) {
+                if let Some(p) = placed.get_mut(*i) {
+                    if horizontal {
+                        p.x = b.x + b.w - (r.x - b.x) - r.w;
+                    } else {
+                        p.y = b.y + b.h - (r.y - b.y) - r.h;
+                    }
+                    p.orientation = p.orientation.mirrored(horizontal);
+                }
+            }
         }
     }
 
@@ -694,7 +992,11 @@ impl GangSheetDialog {
         let target = if horizontal { iw } else { il };
         // The source's own axis that lies along the sheet's.
         let along_width = horizontal != p.orientation.turned();
-        if along_width { self.set_size(p.source, Some(target), None) } else { self.set_size(p.source, None, Some(target)) }
+        if along_width {
+            self.set_size(p.source, Some(target), None)
+        } else {
+            self.set_size(p.source, None, Some(target))
+        }
         // Too long for the film once stretched with its proportions: shrink back to fit.
         let (w, h) = self.size_of(p.source);
         let (fw, fh) = if p.orientation.turned() { (h, w) } else { (w, h) };
@@ -712,55 +1014,98 @@ impl GangSheetDialog {
         self.clamp_all();
     }
 
-    /// Centres visual `i` across the film (`h`), along it (`v`) or both.
-    pub fn center(&mut self, i: usize, h: bool, v: bool) -> bool {
-        let r = self.item(i);
+    /// Centres the visuals of `list` as one block across the film (`h`), along it (`v`) or both.
+    pub fn center_block(&mut self, list: &[usize], h: bool, v: bool) -> bool {
+        let r = self.bbox(list);
         let sheet = self.sheet();
         let used = sheet.used_length(&self.items());
         let x = if h { (sheet.width - r.w) / 2 } else { r.x };
         let y = if v { (used.max(r.y + r.h + sheet.edge) - r.h) / 2 } else { r.y };
-        self.move_to(i, x, y)
+        self.move_block(list, x, y)
     }
 
-    pub fn align(&mut self, i: usize, side: Side) {
-        let r = self.sheet().slide(&self.items(), &self.gaps(), i, side);
-        if let Some(p) = self.placed_mut().and_then(|l| l.get_mut(i)) {
-            (p.x, p.y) = (r.x, r.y);
+    /// Pushes the visuals of `list` as one block towards `side`.
+    pub fn align_block(&mut self, list: &[usize], side: Side) {
+        if list.is_empty() {
+            return;
+        }
+        let b = self.bbox(list);
+        let (mut items, mut gaps) = self.others(list);
+        items.push(b);
+        gaps.push(self.block_gap(list));
+        let r = self.sheet().slide(&items, &gaps, items.len() - 1, side);
+        self.shift(list, r.x - b.x, r.y - b.y);
+    }
+
+    /// The visuals of `list`, ready to paste.
+    fn copy_block(&self, list: &[usize]) -> Option<Clip> {
+        if list.is_empty() {
+            return None;
+        }
+        let b = self.bbox(list);
+        let members = list
+            .iter()
+            .filter_map(|i| {
+                let p = self.placed().get(*i)?;
+                let r = self.item(*i);
+                Some((p.source, p.orientation, r.x - b.x, r.y - b.y, p.group))
+            })
+            .collect();
+        Some(Clip { members, w: b.w, h: b.h })
+    }
+
+    /// Puts `clip` where there is room on the active sheet (its groups as new groups) and selects
+    /// it.
+    fn paste(&mut self, clip: &Clip) -> bool {
+        let spot = self.sheet().with_gap(self.widest_gap()).pack(&[(clip.w, clip.h)], &self.items(), false).first().copied().flatten();
+        let Some(sp) = spot else {
+            self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", &clip.members.len().to_string())]);
+            return false;
+        };
+        let mut next = self.new_group_id();
+        let mut renamed: Vec<(u32, u32)> = Vec::new();
+        let first = self.placed().len();
+        for (source, orientation, rx, ry, g) in &clip.members {
+            let group = match *g {
+                0 => 0,
+                g => match renamed.iter().find(|(old, _)| *old == g) {
+                    Some((_, new)) => *new,
+                    None => {
+                        renamed.push((g, next));
+                        next += 1;
+                        next - 1
+                    }
+                },
+            };
+            if let Some(list) = self.placed_mut() {
+                list.push(Placed { source: *source, x: sp.x + rx, y: sp.y + ry, orientation: *orientation, group });
+            }
+        }
+        self.selected = (first..self.placed().len()).collect();
+        true
+    }
+
+    /// One more copy of the visuals of `list`, where there is room.
+    pub fn duplicate_block(&mut self, list: &[usize]) -> bool {
+        match self.copy_block(list) {
+            Some(clip) => self.paste(&clip),
+            None => false,
         }
     }
 
-    /// One more copy of visual `i`, where there is room.
-    pub fn duplicate(&mut self, i: usize) -> bool {
-        let Some(p) = self.placed().get(i).copied() else { return false };
-        self.paste_one(p.source, p.orientation)
-    }
-
-    fn paste_one(&mut self, source: usize, orientation: Orientation) -> bool {
-        let (w, h) = self.size_of(source);
-        let (fw, fh) = if orientation.turned() { (h, w) } else { (w, h) };
-        let spot = self.sheet().with_gap(self.widest_gap()).pack(&[(fw, fh)], &self.items(), false).first().copied().flatten();
-        match spot {
-            Some(sp) => {
-                if let Some(list) = self.placed_mut() {
-                    list.push(Placed { source, x: sp.x, y: sp.y, orientation });
+    pub fn delete_block(&mut self, list: &[usize]) {
+        let mut list = list.to_vec();
+        list.sort_unstable();
+        list.dedup();
+        if let Some(placed) = self.placed_mut() {
+            for i in list.into_iter().rev() {
+                if i < placed.len() {
+                    placed.remove(i);
                 }
-                self.selected = Some(self.placed().len().saturating_sub(1));
-                true
-            }
-            None => {
-                self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
-                false
             }
         }
-    }
-
-    pub fn delete(&mut self, i: usize) {
-        if let Some(list) = self.placed_mut()
-            && i < list.len()
-        {
-            list.remove(i);
-        }
-        self.selected = None;
+        self.tidy_groups();
+        self.selected.clear();
         self.drag = None;
     }
 
@@ -771,7 +1116,7 @@ impl GangSheetDialog {
         let n = self.sheets.len() + 1;
         self.sheets.push(SheetDoc::new(n));
         self.active = self.sheets.len() - 1;
-        self.selected = None;
+        self.selected.clear();
     }
 
     fn duplicate_sheet(&mut self, k: usize) {
@@ -781,7 +1126,7 @@ impl GangSheetDialog {
         if let Some(doc) = self.sheets.get(k).cloned() {
             self.sheets.insert(k + 1, SheetDoc { name: format!("{} ({})", doc.name, tl!("copy")), ..doc });
             self.active = k + 1;
-            self.selected = None;
+            self.selected.clear();
         }
     }
 
@@ -793,20 +1138,21 @@ impl GangSheetDialog {
             self.sheets.push(SheetDoc::new(1));
         }
         self.active = self.active.min(self.sheets.len() - 1);
-        self.selected = None;
+        self.selected.clear();
     }
 
     fn start_over(&mut self) {
         self.sheets = vec![SheetDoc::new(1)];
         self.active = 0;
-        self.selected = None;
+        self.selected.clear();
     }
 
     fn set_settings(&mut self, s: Settings) {
         if s == self.settings {
             return;
         }
-        let film_changed = (s.width_cm, s.max_length_cm, s.edge_on, s.edge_cm) != (self.settings.width_cm, self.settings.max_length_cm, self.settings.edge_on, self.settings.edge_cm);
+        let film_changed = (s.width_cm, s.max_length_cm, s.edge_on, s.edge_cm)
+            != (self.settings.width_cm, self.settings.max_length_cm, self.settings.edge_on, self.settings.edge_cm);
         self.settings = s;
         if let Ok(mut last) = LAST_SETTINGS.lock() {
             *last = Some(s);
@@ -838,7 +1184,12 @@ impl GangSheetDialog {
             let mut v = match &s.origin {
                 Origin::File(path) => json!({"path": path}),
                 Origin::Document(id) => {
-                    let i = app.session.documents().iter().position(|d| d.doc.id == *id).ok_or_else(|| format!("{}: {}", s.name, tl!("the document was closed")))?;
+                    let i = app
+                        .session
+                        .documents()
+                        .iter()
+                        .position(|d| d.doc.id == *id)
+                        .ok_or_else(|| format!("{}: {}", s.name, tl!("the document was closed")))?;
                     json!({"document": i})
                 }
             };
@@ -892,9 +1243,9 @@ impl GangSheetDialog {
             "active": self.active,
             "placements": self.placed().iter().zip(&conflicts).map(|(p, c)| json!({
                 "source": p.source, "x": units_cm(p.x), "y": units_cm(p.y), "rotation": u32::from(p.orientation.quarter) * 90,
-                "flipH": p.orientation.flip_h, "flipV": p.orientation.flip_v, "conflict": c,
+                "flipH": p.orientation.flip_h, "flipV": p.orientation.flip_v, "conflict": c, "group": p.group,
             })).collect::<Vec<_>>(),
-            "selected": self.selected,
+            "selected": self.sel(),
             "usedLengthCm": units_cm(self.sheet().used_length(&items)),
             "conflicts": conflicts.iter().filter(|c| **c).count(),
             "undo": self.undo.len(), "redo": self.redo.len(),
@@ -1121,46 +1472,75 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
     }
     if let Some(k) = index(ui.get("sheet")).filter(|k| *k < d.sheets.len()) {
         d.active = k;
-        d.selected = None;
+        d.selected.clear();
     }
     if let Some(v) = ui.get("select") {
-        d.selected = index(Some(v)).filter(|i| *i < d.placed().len());
+        let n = d.placed().len();
+        let picked: Vec<usize> = match v {
+            Value::Array(list) => list.iter().filter_map(|v| index(Some(v))).filter(|i| *i < n).collect(),
+            v => index(Some(v)).filter(|i| *i < n).into_iter().collect(),
+        };
+        d.selected = d.whole(&picked);
     }
-    let sel = |d: &GangSheetDialog, v: Option<&Value>| index(v).or(d.selected).filter(|i| *i < d.placed().len());
+    if ui.get("selectAll").and_then(Value::as_bool) == Some(true) {
+        d.select_all();
+    }
+    if ui.get("group").and_then(Value::as_bool) == Some(true) {
+        d.checkpoint(None);
+        if !d.group() {
+            d.undo.pop();
+            return Err("select at least two visuals to group".into());
+        }
+    }
+    if ui.get("ungroup").and_then(Value::as_bool) == Some(true) {
+        d.checkpoint(None);
+        if !d.ungroup() {
+            d.undo.pop();
+        }
+    }
+    // The visuals a tool works on: `index`'s (with its group), else the selection.
+    let target = |d: &GangSheetDialog, v: Option<&Value>| -> Result<Vec<usize>, String> {
+        let list = match index(v) {
+            Some(i) if i < d.placed().len() => d.members(i),
+            Some(_) => return Err("no such visual".into()),
+            None => d.sel(),
+        };
+        if list.is_empty() { Err("select a visual first".into()) } else { Ok(list) }
+    };
     if let Some(m) = ui.get("move") {
-        let i = sel(d, m.get("index")).ok_or("`move` needs a valid index")?;
+        let list = target(d, m.get("index"))?;
         let (Some(x), Some(y)) = (m.get("x").and_then(cm), m.get("y").and_then(cm)) else { return Err("`move` needs x and y (cm)".into()) };
         d.checkpoint(None);
-        if !d.move_to(i, x, y) {
+        if !d.move_block(&list, x, y) {
             return Err(tl!("Too close to another visual").to_string());
         }
     }
     if let Some(q) = ui.get("rotate").and_then(Value::as_i64) {
-        let i = sel(d, None).ok_or("select a visual first")?;
+        let list = target(d, None)?;
         d.checkpoint(None);
-        if !d.rotate(i, q as i32) {
+        if !d.rotate_block(&list, q as i32) {
             return Err(tl!("No room to turn this visual").to_string());
         }
     }
     if let Some(m) = ui.get("mirror").and_then(Value::as_str) {
-        let i = sel(d, None).ok_or("select a visual first")?;
+        let list = target(d, None)?;
         d.checkpoint(None);
-        d.mirror(i, m == "h");
+        d.mirror_block(&list, m == "h");
     }
     if let Some(m) = ui.get("stretch").and_then(Value::as_str) {
-        let i = sel(d, None).ok_or("select a visual first")?;
+        let i = d.single().ok_or("select one visual alone to stretch it")?;
         d.checkpoint(None);
         d.stretch(i, m == "h");
     }
     if let Some(m) = ui.get("center").and_then(Value::as_str) {
-        let i = sel(d, None).ok_or("select a visual first")?;
+        let list = target(d, None)?;
         d.checkpoint(None);
-        if !d.center(i, m != "v", m != "h") {
+        if !d.center_block(&list, m != "v", m != "h") {
             return Err(tl!("Too close to another visual").to_string());
         }
     }
     if let Some(m) = ui.get("align").and_then(Value::as_str) {
-        let i = sel(d, None).ok_or("select a visual first")?;
+        let list = target(d, None)?;
         let side = match m {
             "left" => Side::Left,
             "right" => Side::Right,
@@ -1168,34 +1548,34 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
             _ => Side::Bottom,
         };
         d.checkpoint(None);
-        d.align(i, side);
+        d.align_block(&list, side);
     }
     if ui.get("duplicate").and_then(Value::as_bool) == Some(true)
-        && let Some(i) = sel(d, None)
+        && let Ok(list) = target(d, None)
     {
         d.checkpoint(None);
-        d.duplicate(i);
+        d.duplicate_block(&list);
     }
     if ui.get("copy").and_then(Value::as_bool) == Some(true)
-        && let Some(p) = sel(d, None).and_then(|i| d.placed().get(i).copied())
+        && let Ok(list) = target(d, None)
     {
-        d.clipboard = Some((p.source, p.orientation));
+        d.clipboard = d.copy_block(&list);
     }
     if ui.get("paste").and_then(Value::as_bool) == Some(true)
-        && let Some((s, o)) = d.clipboard
+        && let Some(clip) = d.clipboard.clone()
     {
         d.checkpoint(None);
-        d.paste_one(s, o);
+        d.paste(&clip);
     }
     if let Some(s) = index(ui.get("fill")) {
         d.checkpoint(None);
         d.fill(s);
     }
     if ui.get("delete").and_then(Value::as_bool) == Some(true)
-        && let Some(i) = sel(d, None)
+        && let Ok(list) = target(d, None)
     {
         d.checkpoint(None);
-        d.delete(i);
+        d.delete_block(&list);
     }
     if let Some(k) = index(ui.get("duplicateSheet")) {
         d.checkpoint(None);
@@ -1371,13 +1751,13 @@ fn switch(ui: &mut egui::Ui, on: &mut bool) -> bool {
     false
 }
 
-/// A labelled number row: label on the left, field and unit on the right.
+/// A labelled number row: label on the left, field (typed) and unit on the right.
 fn number_row(ui: &mut egui::Ui, label: &str, value: &mut f32, range: std::ops::RangeInclusive<f32>, unit: &str, decimals: u32) -> bool {
     let t = Tokens::get(ui.ctx());
     let mut changed = false;
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(label).color(t.text), 128.0, 24.0);
-        changed = widgets::value_field_prec(ui, value, range, unit, 120.0, decimals).changed();
+        changed = widgets::typed_value_field(ui, value, range, unit, 120.0, decimals).changed();
     });
     changed
 }
@@ -1508,7 +1888,13 @@ fn rail_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens)
         let r = ERect::from_min_size(pos2(rect.left() + 5.0, y), vec2(RAIL_W - 10.0, 52.0));
         let resp = ui.interact(r, ui.id().with(("gang-rail", label)), Sense::click());
         let on = d.tab == tab;
-        let (bg, fg) = if on { (t.primary_bg, t.primary_text) } else if resp.hovered() { (t.hover, t.text) } else { (Color32::TRANSPARENT, t.text) };
+        let (bg, fg) = if on {
+            (t.primary_bg, t.primary_text)
+        } else if resp.hovered() {
+            (t.hover, t.text)
+        } else {
+            (Color32::TRANSPARENT, t.text)
+        };
         ui.painter().rect_filled(r, 8.0, bg);
         crate::icons::image(icon, 18.0, fg).paint_at(ui, ERect::from_center_size(r.center() - vec2(0.0, 8.0), vec2(18.0, 18.0)));
         ui.painter().text(r.center() + vec2(0.0, 13.0), Align2::CENTER_CENTER, label, FontId::proportional(10.0), fg);
@@ -1587,11 +1973,16 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
         if d.add_copies(i, 1) == 0 {
             d.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
         } else {
-            d.selected = Some(d.placed().len() - 1);
+            d.selected = vec![d.placed().len() - 1];
         }
     }
     widgets::hairline(&mut panel);
-    let Some(i) = d.selected.filter(|i| *i < d.placed().len()) else {
+    let list = d.sel();
+    if list.len() > 1 {
+        multi_panel(&mut panel, d, &list, t);
+        return;
+    }
+    let Some(i) = list.first().copied() else {
         panel.add_space(30.0);
         panel.vertical_centered(|ui| {
             let (r, _) = ui.allocate_exact_size(vec2(90.0, 90.0), Sense::hover());
@@ -1649,7 +2040,7 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, i: usize, t: &Tok
         let mut q = d.copies_on_sheet(source) as f32;
         ui.horizontal(|ui| {
             fixed_label(ui, egui::RichText::new(tl!("Number of Images:")).color(t.text), 128.0, 24.0);
-            if widgets::value_field_prec(ui, &mut q, 0.0..=999.0, "", 70.0, 0).changed() {
+            if widgets::typed_value_field(ui, &mut q, 0.0..=999.0, "", 70.0, 0).changed() {
                 d.checkpoint(Some(format!("q{source}")));
                 d.set_copies_on_sheet(source, q.round().max(0.0) as usize);
             }
@@ -1658,7 +2049,7 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, i: usize, t: &Tok
         let mut m = units_cm(src.margin.unwrap_or_else(|| d.gap()));
         ui.horizontal(|ui| {
             fixed_label(ui, egui::RichText::new(tl!("Margin (cm)")).color(t.text), 128.0, 24.0);
-            let changed = ui.add_enabled_ui(own, |ui| widgets::value_field_prec(ui, &mut m, 0.0..=10.0, "", 70.0, 2)).inner.changed();
+            let changed = ui.add_enabled_ui(own, |ui| widgets::typed_value_field(ui, &mut m, 0.0..=10.0, "", 70.0, 2)).inner.changed();
             if changed {
                 d.checkpoint(Some(format!("m{source}")));
                 if let Some(s) = d.sources.get_mut(source) {
@@ -1684,7 +2075,55 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, i: usize, t: &Tok
             }
             if widgets::primary_button(ui, tl!("Duplicate Image"), bw).clicked() {
                 d.checkpoint(None);
-                d.duplicate(i);
+                d.duplicate_block(&[i]);
+            }
+        });
+    });
+}
+
+/// Several visuals selected: their count and box, Group / Ungroup, Duplicate, Delete.
+fn multi_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, list: &[usize], t: &Tokens) {
+    let one_group = d.is_one_group(list);
+    let title = if one_group { tl!("Group") } else { tl!("Selection") };
+    ui.label(egui::RichText::new(title).font(crate::theme::medium(13.0)).color(t.text));
+    ui.label(egui::RichText::new(crate::i18n::fmt(tl!("{n} visuals selected"), &[("n", &list.len().to_string())])).color(t.text_dim));
+    let b = d.bbox(list);
+    egui::Grid::new("gang-multi").num_columns(2).spacing(vec2(24.0, 2.0)).show(ui, |ui| {
+        for (k, v) in [(tl!("Width"), format!("{} cm", cm_text(b.w))), (tl!("Height"), format!("{} cm", cm_text(b.h)))] {
+            ui.label(egui::RichText::new(k).color(t.text));
+            ui.label(egui::RichText::new(v).color(t.text));
+            ui.end_row();
+        }
+    });
+    card_frame(t).show(ui, |ui| {
+        ui.set_width(ui.available_width());
+        ui.vertical(|ui| {
+            let bw = ui.available_width();
+            if ui
+                .add_enabled_ui(!one_group, |ui| widgets::primary_button(ui, tl!("Group the Selection"), bw))
+                .inner
+                .on_hover_text(tl!("Group (Ctrl+G)"))
+                .clicked()
+            {
+                d.checkpoint(None);
+                d.group();
+            }
+            if ui
+                .add_enabled_ui(d.any_grouped(list), |ui| widgets::secondary_button(ui, tl!("Ungroup"), bw))
+                .inner
+                .on_hover_text(tl!("Ungroup (Ctrl+Shift+G)"))
+                .clicked()
+            {
+                d.checkpoint(None);
+                d.ungroup();
+            }
+            if widgets::secondary_button(ui, tl!("Duplicate"), bw).on_hover_text(tl!("Duplicate (Ctrl+D)")).clicked() {
+                d.checkpoint(None);
+                d.duplicate_block(list);
+            }
+            if widgets::secondary_button(ui, tl!("Delete"), bw).on_hover_text(tl!("Delete (Del)")).clicked() {
+                d.checkpoint(None);
+                d.delete_block(list);
             }
         });
     });
@@ -1795,17 +2234,22 @@ fn toolbar_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Toke
     if tool_button(&mut bar, "grid-2x2", tl!("Grid (1 cm)"), true, 0.0, false).clicked() {
         s.grid = !s.grid;
     }
-    widgets::vline(&mut bar, 22.0);
-    widgets::checkbox(&mut bar, &mut s.gap_on, tl!("Image Margin"));
-    bar.add_space(4.0);
-    bar.add_enabled_ui(s.gap_on, |ui| widgets::value_field_prec(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 64.0, 2));
+    // A narrow window leaves the spacing to Settings and Auto Build, so every tool keeps its room.
+    let narrow = rect.width() < 1160.0;
+    if !narrow {
+        widgets::vline(&mut bar, 22.0);
+        widgets::checkbox(&mut bar, &mut s.gap_on, tl!("Image Margin"));
+        bar.add_space(4.0);
+        bar.add_enabled_ui(s.gap_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 64.0, 2));
+    }
     d.set_settings(s);
     widgets::vline(&mut bar, 22.0);
-    let sel = d.selected.filter(|i| *i < d.placed().len());
-    let on = sel.is_some();
+    let list = d.sel();
+    let on = !list.is_empty();
+    let single = d.single();
     let q = std::f32::consts::FRAC_PI_2;
     type Op = (&'static str, &'static str, f32, bool, u8);
-    let ops: [Op; 14] = [
+    let ops: [Op; 16] = [
         ("rotate-cw", tl!("Rotate 90° Counterclockwise"), 0.0, true, 0),
         ("rotate-cw", tl!("Rotate 90° Clockwise"), 0.0, false, 1),
         ("flip-h", tl!("Flip Horizontally"), 0.0, false, 2),
@@ -1819,65 +2263,84 @@ fn toolbar_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Toke
         ("align-right", tl!("Push Right"), 0.0, false, 10),
         ("align-left", tl!("Push Up"), q, false, 11),
         ("align-right", tl!("Push Down"), q, false, 12),
+        ("link", tl!("Group (Ctrl+G)"), 0.0, false, 14),
+        ("unlink", tl!("Ungroup (Ctrl+Shift+G)"), 0.0, false, 15),
         ("trash", tl!("Delete (Del)"), 0.0, false, 13),
     ];
     let mut op = None;
     for (icon, tip, angle, mirror, id) in ops {
-        if tool_button(&mut bar, icon, tip, on, angle, mirror).clicked() {
+        // Stretching resizes the visual's source (all its copies): one visual alone only.
+        let enabled = match id {
+            4 | 5 => single.is_some(),
+            14 => list.len() > 1 && !d.is_one_group(&list),
+            15 => d.any_grouped(&list),
+            _ => on,
+        };
+        if tool_button(&mut bar, icon, tip, enabled, angle, mirror).clicked() {
             op = Some(id);
         }
-        if matches!(id, 3 | 5 | 8) {
+        if matches!(id, 3 | 5 | 8 | 12 | 15) {
             widgets::vline(&mut bar, 22.0);
         }
     }
-    if let (Some(op), Some(i)) = (op, sel) {
+    if let Some(op) = op
+        && on
+    {
         d.checkpoint(None);
         let ok = match op {
-            0 => d.rotate(i, -1),
-            1 => d.rotate(i, 1),
+            0 => d.rotate_block(&list, -1),
+            1 => d.rotate_block(&list, 1),
             2 => {
-                d.mirror(i, true);
+                d.mirror_block(&list, true);
                 true
             }
             3 => {
-                d.mirror(i, false);
+                d.mirror_block(&list, false);
                 true
             }
             4 | 5 => {
-                d.stretch(i, op == 4);
+                if let Some(i) = single {
+                    d.stretch(i, op == 4);
+                }
                 true
             }
-            6 => d.center(i, true, false),
-            7 => d.center(i, false, true),
-            8 => d.center(i, true, true),
+            6 => d.center_block(&list, true, false),
+            7 => d.center_block(&list, false, true),
+            8 => d.center_block(&list, true, true),
             9 => {
-                d.align(i, Side::Left);
+                d.align_block(&list, Side::Left);
                 true
             }
             10 => {
-                d.align(i, Side::Right);
+                d.align_block(&list, Side::Right);
                 true
             }
             11 => {
-                d.align(i, Side::Top);
+                d.align_block(&list, Side::Top);
                 true
             }
             12 => {
-                d.align(i, Side::Bottom);
+                d.align_block(&list, Side::Bottom);
                 true
             }
+            14 => d.group(),
+            15 => d.ungroup(),
             _ => {
-                d.delete(i);
+                d.delete_block(&list);
                 true
             }
         };
         if !ok {
-            d.status = if op <= 1 { tl!("No room to turn this visual") } else { tl!("Too close to another visual") }.to_string();
+            if op >= 14 {
+                d.undo.pop();
+            } else {
+                d.status = if op <= 1 { tl!("No room to turn this visual") } else { tl!("Too close to another visual") }.to_string();
+            }
         }
     }
     bar.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
         let label = tl!("Auto Build");
-        let (r, resp) = ui.allocate_exact_size(vec2(widgets::button_width(ui, &[label]).max(150.0), 28.0), Sense::click());
+        let (r, resp) = ui.allocate_exact_size(vec2(widgets::button_width(ui, &[label]).max(if narrow { 0.0 } else { 150.0 }), 28.0), Sense::click());
         let fill = if d.auto_view { t.primary_bg } else { BLUE };
         ui.painter().rect_filled(r, 6.0, if resp.hovered() { fill.gamma_multiply(0.9) } else { fill });
         ui.painter().text(r.center(), Align2::CENTER_CENTER, label, FontId::proportional(12.5), Color32::WHITE);
@@ -1903,10 +2366,10 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
     let mut s = d.settings;
     panel.horizontal(|ui| {
         widgets::checkbox(ui, &mut s.edge_on, tl!("With the sheet margin"));
-        ui.add_enabled_ui(s.edge_on, |ui| widgets::value_field_prec(ui, &mut s.edge_cm, 0.0..=10.0, "cm", 70.0, 2));
+        ui.add_enabled_ui(s.edge_on, |ui| widgets::typed_value_field(ui, &mut s.edge_cm, 0.0..=10.0, "cm", 70.0, 2));
         ui.add_space(16.0);
         widgets::checkbox(ui, &mut s.gap_on, tl!("With the image margin"));
-        ui.add_enabled_ui(s.gap_on, |ui| widgets::value_field_prec(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 70.0, 2));
+        ui.add_enabled_ui(s.gap_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 70.0, 2));
         ui.add_space(16.0);
         widgets::checkbox(ui, &mut s.rotate, tl!("Allow Rotation"));
     });
@@ -1947,7 +2410,12 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
                     widgets::checker(ui.painter(), img.shrink(6.0), 5.0);
                     if let Some(tex) = &src.tex {
                         let k = ((img.width() - 12.0) / src.px.0.max(1) as f32).min((img.height() - 12.0) / src.px.1.max(1) as f32);
-                        ui.painter().image(tex.id(), ERect::from_center_size(img.center(), vec2(src.px.0 as f32 * k, src.px.1 as f32 * k)), ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
+                        ui.painter().image(
+                            tex.id(),
+                            ERect::from_center_size(img.center(), vec2(src.px.0 as f32 * k, src.px.1 as f32 * k)),
+                            ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
+                            Color32::WHITE,
+                        );
                     }
                     // Fields.
                     let fields = ERect::from_min_max(pos2(img.right() + 10.0, inner.top()), pos2(inner.right(), img.bottom()));
@@ -1956,14 +2424,14 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
                     let (mut w, mut h) = (units_cm(src.w), units_cm(src.h));
                     f.horizontal(|ui| {
                         fixed_label(ui, egui::RichText::new(tl!("Width:")).color(t.text).size(11.5), 60.0, 22.0);
-                        if widgets::value_field_prec(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                        if widgets::typed_value_field(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).changed() {
                             d.checkpoint(Some(format!("w{i}")));
                             d.set_size(i, Some(cm_units(w)), None);
                         }
                     });
                     f.horizontal(|ui| {
                         fixed_label(ui, egui::RichText::new(tl!("Height:")).color(t.text).size(11.5), 60.0, 22.0);
-                        if widgets::value_field_prec(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                        if widgets::typed_value_field(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).changed() {
                             d.checkpoint(Some(format!("h{i}")));
                             d.set_size(i, None, Some(cm_units(h)));
                         }
@@ -1992,7 +2460,7 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
                     if tool_button(&mut b, "minus", tl!("One copy less"), src.quantity > 0, 0.0, false).clicked() {
                         q -= 1.0;
                     }
-                    let typed = widgets::value_field_prec(&mut b, &mut q, 0.0..=999.0, "", 48.0, 0).changed();
+                    let typed = widgets::typed_value_field(&mut b, &mut q, 0.0..=999.0, "", 48.0, 0).changed();
                     if tool_button(&mut b, "plus", tl!("One copy more"), src.quantity < 999, 0.0, false).clicked() {
                         q += 1.0;
                     }
@@ -2104,13 +2572,17 @@ fn sheets_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tok
                     ui.horizontal(|ui| {
                         ui.label(egui::RichText::new(tl!("Qty:")).color(t.text));
                         let mut q = doc.copies as f32;
-                        if widgets::value_field_prec(ui, &mut q, 1.0..=999.0, "", 56.0, 0).on_hover_text(tl!("Copies of this sheet to print")).changed()
+                        if widgets::typed_value_field(ui, &mut q, 1.0..=999.0, "", 56.0, 0).on_hover_text(tl!("Copies of this sheet to print")).changed()
                             && let Some(s) = d.sheets.get_mut(k)
                         {
                             s.copies = q.round().clamp(1.0, 999.0) as usize;
                         }
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            if ui.add(egui::Label::new(egui::RichText::new(tl!("Duplicate")).color(t.text)).sense(Sense::click())).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
+                            if ui
+                                .add(egui::Label::new(egui::RichText::new(tl!("Duplicate")).color(t.text)).sense(Sense::click()))
+                                .on_hover_cursor(egui::CursorIcon::PointingHand)
+                                .clicked()
+                            {
                                 dup = Some(k);
                             }
                         });
@@ -2132,7 +2604,7 @@ fn sheets_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tok
     }
     if let Some(k) = pick {
         d.active = k;
-        d.selected = None;
+        d.selected.clear();
     }
     if let Some(k) = dup {
         d.checkpoint(None);
@@ -2173,55 +2645,81 @@ fn sheets_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tok
 fn keys(d: &mut GangSheetDialog, ctx: &egui::Context, act: &mut Actions) {
     use egui::{Key, Modifiers};
     let take = |m: Modifiers, k: Key| ctx.input_mut(|i| i.consume_key(m, k));
-    if take(Modifiers::COMMAND, Key::Z) {
-        d.undo();
+    // egui ignores an extra Shift when matching, so the Shift chords come first.
+    if take(Modifiers::COMMAND | Modifiers::SHIFT, Key::Z) || take(Modifiers::COMMAND, Key::Y) {
+        d.redo();
         return;
     }
-    if take(Modifiers::COMMAND, Key::Y) || take(Modifiers::COMMAND | Modifiers::SHIFT, Key::Z) {
-        d.redo();
+    if take(Modifiers::COMMAND, Key::Z) {
+        d.undo();
         return;
     }
     if take(Modifiers::NONE, Key::Escape) {
         if d.auto_view {
             d.auto_view = false;
-        } else if d.selected.is_some() {
-            d.selected = None;
+        } else if !d.sel().is_empty() {
+            d.selected.clear();
         } else {
             act.cancel = true;
         }
         return;
     }
-    if take(Modifiers::COMMAND, Key::V)
-        && let Some((s, o)) = d.clipboard
-    {
-        d.checkpoint(None);
-        d.paste_one(s, o);
+    if take(Modifiers::COMMAND, Key::A) {
+        d.select_all();
         return;
     }
-    let Some(i) = d.selected.filter(|i| *i < d.placed().len()) else { return };
-    if take(Modifiers::COMMAND, Key::C) {
-        if let Some(p) = d.placed().get(i).copied() {
-            d.clipboard = Some((p.source, p.orientation));
+    if take(Modifiers::COMMAND, Key::V)
+        && let Some(clip) = d.clipboard.clone()
+    {
+        d.checkpoint(None);
+        d.paste(&clip);
+        return;
+    }
+    let list = d.sel();
+    if list.is_empty() {
+        return;
+    }
+    if take(Modifiers::COMMAND | Modifiers::SHIFT, Key::G) {
+        d.checkpoint(None);
+        if !d.ungroup() {
+            d.undo.pop();
         }
+        return;
+    }
+    if take(Modifiers::COMMAND, Key::G) {
+        d.checkpoint(None);
+        if !d.group() {
+            d.undo.pop();
+        }
+        return;
+    }
+    if take(Modifiers::COMMAND, Key::C) {
+        d.clipboard = d.copy_block(&list);
         return;
     }
     if take(Modifiers::COMMAND, Key::D) {
         d.checkpoint(None);
-        d.duplicate(i);
+        d.duplicate_block(&list);
         return;
     }
-    if take(Modifiers::NONE, Key::Delete) || take(Modifiers::NONE, Key::Backspace) || take(Modifiers::COMMAND, Key::X) {
+    let cut = take(Modifiers::COMMAND, Key::X);
+    if cut || take(Modifiers::NONE, Key::Delete) || take(Modifiers::NONE, Key::Backspace) {
+        if cut {
+            d.clipboard = d.copy_block(&list);
+        }
         d.checkpoint(None);
-        d.delete(i);
+        d.delete_block(&list);
         return;
     }
-    let (shift, l, r, u, dn) = ctx.input(|i| (i.modifiers.shift, i.key_pressed(Key::ArrowLeft), i.key_pressed(Key::ArrowRight), i.key_pressed(Key::ArrowUp), i.key_pressed(Key::ArrowDown)));
+    let (shift, l, r, u, dn) = ctx.input(|i| {
+        (i.modifiers.shift, i.key_pressed(Key::ArrowLeft), i.key_pressed(Key::ArrowRight), i.key_pressed(Key::ArrowUp), i.key_pressed(Key::ArrowDown))
+    });
     let step = if shift { NUDGE_SHIFT } else { NUDGE };
     let (dx, dy) = (i64::from(r) - i64::from(l), i64::from(dn) - i64::from(u));
     if dx != 0 || dy != 0 {
-        d.checkpoint(Some(format!("nudge{i}")));
-        let it = d.item(i);
-        if !d.move_to(i, it.x + dx * step, it.y + dy * step) {
+        d.checkpoint(Some(format!("nudge{list:?}")));
+        let b = d.bbox(&list);
+        if !d.move_block(&list, b.x + dx * step, b.y + dy * step) {
             d.status = tl!("Too close to another visual").to_string();
         }
     }
@@ -2241,7 +2739,10 @@ fn confirm_dialog(app: &mut PhotocraftApp, ctx: &egui::Context, act: &mut Action
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             if let Some(role) = widgets::dialog_buttons(
                 ui,
-                &[widgets::DialogButton::new(widgets::ButtonRole::Default, tl!("Export"), 90.0), widgets::DialogButton::new(widgets::ButtonRole::Cancel, tl!("Cancel"), 90.0)],
+                &[
+                    widgets::DialogButton::new(widgets::ButtonRole::Default, tl!("Export"), 90.0),
+                    widgets::DialogButton::new(widgets::ButtonRole::Cancel, tl!("Cancel"), 90.0),
+                ],
             ) {
                 answer = Some(role == widgets::ButtonRole::Default);
             }
@@ -2304,7 +2805,9 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     clip.rect_stroke(film_r, 0.0, Stroke::new(1.0, t.field_border), StrokeKind::Outside);
     let px_per_cm = UNITS_PER_CM as f32 * s;
     if d.settings.grid && px_per_cm >= 4.0 {
-        let line = |strong: bool| Stroke::new(1.0, if strong { Color32::from_rgba_unmultiplied(29, 155, 240, 90) } else { Color32::from_rgba_unmultiplied(29, 155, 240, 40) });
+        let line = |strong: bool| {
+            Stroke::new(1.0, if strong { Color32::from_rgba_unmultiplied(29, 155, 240, 90) } else { Color32::from_rgba_unmultiplied(29, 155, 240, 40) })
+        };
         for c in 1..(sheet.width / UNITS_PER_CM) {
             let x = origin.x + c as f32 * px_per_cm;
             clip.line_segment([pos2(x, film_r.top()), pos2(x, film_r.bottom())], line(c % 5 == 0));
@@ -2316,137 +2819,210 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     }
     let m = sheet.edge as f32 * s;
     if m >= 2.0 {
-        let dash = Shape::dashed_line(&{
-            let r = film_r.shrink(m);
-            [r.left_top(), r.right_top(), r.right_bottom(), r.left_bottom(), r.left_top()]
-        }, Stroke::new(1.0, t.text_faint.gamma_multiply(0.6)), 4.0, 4.0);
+        let dash = Shape::dashed_line(
+            &{
+                let r = film_r.shrink(m);
+                [r.left_top(), r.right_top(), r.right_bottom(), r.left_bottom(), r.left_top()]
+            },
+            Stroke::new(1.0, t.text_faint.gamma_multiply(0.6)),
+            4.0,
+            4.0,
+        );
         clip.extend(dash);
     }
     let items = d.items();
-    let gaps = d.gaps();
-    let conflicts = sheet.conflicts(&items, &gaps);
     let used = sheet.used_length(&items);
     if used > 0 {
         let y = origin.y + used as f32 * s;
         clip.extend(Shape::dashed_line(&[pos2(film_r.left(), y), pos2(film_r.right(), y)], Stroke::new(1.5, BLUE), 6.0, 4.0));
         clip.text(pos2(film_r.right() - 4.0, y - 3.0), Align2::RIGHT_BOTTOM, format!("{} cm", cm_text(used)), FontId::proportional(11.0), BLUE);
     }
-    // Pointer: pick, drag, drop.
+    // Pointer: pick (Shift or Ctrl adds), drag the selection, draw a rectangle from empty film.
     let hit = |p: Pos2| -> Option<usize> {
         let (ux, uy) = to_units(p);
         items.iter().rposition(|r| ux >= r.x && ux < r.x + r.w && uy >= r.y && uy < r.y + r.h)
     };
     d.hovered = resp.hover_pos().and_then(hit);
+    let adding = ui.input(|i| i.modifiers.shift || i.modifiers.command);
     if resp.drag_started()
         && let Some(p) = resp.interact_pointer_pos()
     {
-        match hit(p) {
+        let at = ui.input(|i| i.pointer.press_origin()).unwrap_or(p);
+        match hit(at) {
             Some(i) => {
-                let r = items.get(i).copied().unwrap_or_default();
-                let (ux, uy) = to_units(p);
+                if !d.sel().contains(&i) {
+                    if adding { d.toggle(i) } else { d.select_one(Some(i)) }
+                }
+                let list = d.sel();
+                let b = d.bbox(&list);
+                let (ux, uy) = to_units(at);
                 d.checkpoint(None);
-                d.selected = Some(i);
-                d.drag = Some(Drag { index: i, grab: (ux - r.x, uy - r.y), from: (r.x, r.y) });
+                let from = list
+                    .iter()
+                    .map(|i| {
+                        let r = d.item(*i);
+                        (*i, r.x, r.y)
+                    })
+                    .collect();
+                d.drag = Some(Drag { grab: (ux - b.x, uy - b.y), bbox: b, from });
             }
-            None => d.selected = None,
+            None => {
+                let base = if adding { d.sel() } else { Vec::new() };
+                d.selected = base.clone();
+                d.marquee = Some(Marquee { from: to_units(at), to: to_units(p), base });
+            }
         }
     }
-    if (resp.clicked() || resp.secondary_clicked())
+    if resp.clicked()
         && let Some(p) = resp.interact_pointer_pos()
     {
-        d.selected = hit(p);
+        match (hit(p), adding) {
+            (Some(i), true) => d.toggle(i),
+            (Some(i), false) => d.select_one(Some(i)),
+            (None, true) => {}
+            (None, false) => d.selected.clear(),
+        }
     }
-    if let Some(dr) = d.drag
+    // A right-click keeps the selection it lands in, so the menu acts on all of it.
+    if resp.secondary_clicked()
+        && let Some(p) = resp.interact_pointer_pos()
+    {
+        match hit(p) {
+            Some(i) if d.sel().contains(&i) => {}
+            other => d.select_one(other),
+        }
+    }
+    if let Some(dr) = d.drag.clone()
         && let Some(p) = resp.interact_pointer_pos()
         && resp.dragged()
     {
         let (ux, uy) = to_units(p);
         let mmr = |v: i64| (v as f64 / 10.0).round() as i64 * 10;
-        let mut r = sheet.clamp(Item { x: mmr(ux - dr.grab.0), y: mmr(uy - dr.grab.1), ..d.item(dr.index) });
+        let list: Vec<usize> = dr.from.iter().map(|f| f.0).collect();
+        let mut b = sheet.clamp(Item { x: mmr(ux - dr.grab.0), y: mmr(uy - dr.grab.1), ..dr.bbox });
         if d.settings.snap {
-            let gap = d.placed().get(dr.index).map_or(d.gap(), |p| d.gap_of(p.source));
-            r = sheet.clamp(sheet.snap(&d.items(), &d.gaps(), dr.index, r, gap, (6.0 / s).round() as i64));
+            // Snapped as the box it moves as, against the visuals left where they are.
+            let (others, gaps) = d.others(&list);
+            b = sheet.clamp(sheet.snap(&others, &gaps, usize::MAX, b, d.block_gap(&list), (6.0 / s).round() as i64));
         }
-        if let Some(pl) = d.placed_mut().and_then(|l| l.get_mut(dr.index)) {
-            (pl.x, pl.y) = (r.x, r.y);
+        let (dx, dy) = (b.x - dr.bbox.x, b.y - dr.bbox.y);
+        if let Some(placed) = d.placed_mut() {
+            for (i, x, y) in &dr.from {
+                if let Some(pl) = placed.get_mut(*i) {
+                    (pl.x, pl.y) = (x + dx, y + dy);
+                }
+            }
         }
     }
     if resp.drag_stopped()
         && let Some(dr) = d.drag.take()
     {
-        let r = d.item(dr.index);
-        let gap = d.placed().get(dr.index).map_or(d.gap(), |p| d.gap_of(p.source));
-        if sheet.collides(&d.items(), &d.gaps(), dr.index, &r, gap) {
+        let list: Vec<usize> = dr.from.iter().map(|f| f.0).collect();
+        let rects: Vec<Item> = list.iter().map(|i| d.item(*i)).collect();
+        let moved = dr.from.iter().zip(&rects).any(|(f, r)| (r.x, r.y) != (f.1, f.2));
+        if d.block_collides(&list, &rects) {
             // Dropped too close to another visual: back where it was.
-            if let Some(pl) = d.placed_mut().and_then(|l| l.get_mut(dr.index)) {
-                (pl.x, pl.y) = dr.from;
+            if let Some(placed) = d.placed_mut() {
+                for (i, x, y) in &dr.from {
+                    if let Some(pl) = placed.get_mut(*i) {
+                        (pl.x, pl.y) = (*x, *y);
+                    }
+                }
             }
             d.status = tl!("Too close to another visual").to_string();
-        } else if (r.x, r.y) == dr.from {
+        } else if !moved {
             // A click without a move: nothing to undo.
             d.undo.pop();
         }
     }
+    // The rectangle picks every visual it touches.
+    if let Some(m) = d.marquee.as_mut()
+        && let Some(p) = resp.interact_pointer_pos()
+        && resp.dragged()
+    {
+        m.to = to_units(p);
+    }
+    if let Some(m) = d.marquee.clone() {
+        let (x0, x1) = (m.from.0.min(m.to.0), m.from.0.max(m.to.0));
+        let (y0, y1) = (m.from.1.min(m.to.1), m.from.1.max(m.to.1));
+        let touched: Vec<usize> =
+            items.iter().enumerate().filter(|(_, r)| r.x <= x1 && x0 <= r.x + r.w && r.y <= y1 && y0 <= r.y + r.h).map(|(i, _)| i).collect();
+        let mut all = m.base.clone();
+        all.extend(touched);
+        d.selected = d.whole(&all);
+        if resp.drag_stopped() || !resp.is_pointer_button_down_on() {
+            d.marquee = None;
+        }
+    }
     // Right-click menu.
     resp.context_menu(|ui| {
-        let sel = d.selected.filter(|i| *i < d.placed().len());
+        let list = d.sel();
+        let on = !list.is_empty();
         let item = |ui: &mut egui::Ui, label: &str, on: bool| ui.add_enabled(on, egui::Button::new(label)).clicked();
-        if item(ui, tl!("Copy"), sel.is_some())
-            && let Some(p) = sel.and_then(|i| d.placed().get(i).copied())
-        {
-            d.clipboard = Some((p.source, p.orientation));
+        if item(ui, tl!("Copy"), on) {
+            d.clipboard = d.copy_block(&list);
             ui.close();
         }
         if item(ui, tl!("Paste"), d.clipboard.is_some())
-            && let Some((s, o)) = d.clipboard
+            && let Some(clip) = d.clipboard.clone()
         {
             d.checkpoint(None);
-            d.paste_one(s, o);
+            d.paste(&clip);
             ui.close();
         }
-        if item(ui, tl!("Delete"), sel.is_some())
-            && let Some(i) = sel
-        {
+        if item(ui, tl!("Delete"), on) {
             d.checkpoint(None);
-            d.delete(i);
+            d.delete_block(&list);
             ui.close();
         }
-        if item(ui, tl!("Duplicate"), sel.is_some())
-            && let Some(i) = sel
-        {
+        if item(ui, tl!("Duplicate"), on) {
             d.checkpoint(None);
-            d.duplicate(i);
+            d.duplicate_block(&list);
             ui.close();
         }
-        if item(ui, tl!("Auto Fill"), sel.is_some())
-            && let Some(src) = sel.and_then(|i| d.placed().get(i)).map(|p| p.source)
+        ui.separator();
+        if item(ui, tl!("Group the Selection"), list.len() > 1 && !d.is_one_group(&list)) {
+            d.checkpoint(None);
+            d.group();
+            ui.close();
+        }
+        if item(ui, tl!("Ungroup"), d.any_grouped(&list)) {
+            d.checkpoint(None);
+            d.ungroup();
+            ui.close();
+        }
+        if item(ui, tl!("Select All"), !d.placed().is_empty()) {
+            d.select_all();
+            ui.close();
+        }
+        ui.separator();
+        if item(ui, tl!("Auto Fill"), d.single().is_some())
+            && let Some(src) = d.single().and_then(|i| d.placed().get(i)).map(|p| p.source)
         {
             d.checkpoint(None);
             d.fill(src);
             ui.close();
         }
-        if item(ui, tl!("Rotate 90° Clockwise"), sel.is_some())
-            && let Some(i) = sel
-        {
+        if item(ui, tl!("Rotate 90° Clockwise"), on) {
             d.checkpoint(None);
-            if !d.rotate(i, 1) {
+            if !d.rotate_block(&list, 1) {
                 d.status = tl!("No room to turn this visual").to_string();
             }
             ui.close();
         }
     });
-    // Visuals (positions re-read: the drag may have moved one).
+    // Visuals (positions re-read: the drag may have moved some).
     let items = d.items();
-    let gaps = d.gaps();
     let overlaps = sheet.overlaps(&items);
-    let dragging = d.drag.map(|dr| dr.index);
+    let conflicts = sheet.conflicts(&items, &d.gaps());
+    let list = d.sel();
     for (i, (r, p)) in items.iter().zip(d.placed()).enumerate() {
         let rect = ERect::from_min_max(to_screen(r.x, r.y), to_screen(r.x + r.w, r.y + r.h));
         if !rect.intersects(area) {
             continue;
         }
         let Some(src) = d.sources.get(p.source) else { continue };
-        let close = conflicts.get(i).copied().unwrap_or(false) || (dragging == Some(i) && sheet.collides(&items, &gaps, i, r, d.gap_of(p.source)));
+        let close = conflicts.get(i).copied().unwrap_or(false);
         if let Some(tex) = &src.tex {
             clip.add(image_shape(tex.id(), rect, p.orientation));
         }
@@ -2462,12 +3038,38 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
             clip.circle_filled(b.center(), 8.0, Color32::WHITE);
             crate::icons::image("triangle-alert", 13.0, t.warning).paint_at(ui, b);
         }
-        if d.selected == Some(i) {
-            clip.rect_stroke(rect, 0.0, Stroke::new(1.5, t.text), StrokeKind::Outside);
-            for c in [rect.left_top(), rect.right_top(), rect.right_bottom(), rect.left_bottom()] {
-                clip.circle_filled(c, 4.0, t.text);
-            }
+        if list.len() > 1 && list.contains(&i) {
+            clip.rect_stroke(rect, 0.0, Stroke::new(1.0, t.text), StrokeKind::Outside);
         }
+    }
+    // Every group in a dashed frame.
+    let mut ids: Vec<u32> = d.placed().iter().map(|p| p.group).filter(|g| *g != 0).collect();
+    ids.sort_unstable();
+    ids.dedup();
+    let frame_of = |b: Item| ERect::from_min_max(to_screen(b.x, b.y), to_screen(b.x + b.w, b.y + b.h)).expand(3.0);
+    for g in ids {
+        let members: Vec<usize> = (0..d.placed().len()).filter(|i| d.placed().get(*i).is_some_and(|p| p.group == g)).collect();
+        let r = frame_of(d.bbox(&members));
+        clip.extend(Shape::dashed_line(
+            &[r.left_top(), r.right_top(), r.right_bottom(), r.left_bottom(), r.left_top()],
+            Stroke::new(1.0, t.text_dim),
+            5.0,
+            3.0,
+        ));
+    }
+    // The selection's box and its corners.
+    if !list.is_empty() {
+        let b = d.bbox(&list);
+        let rect = if list.len() > 1 { frame_of(b) } else { ERect::from_min_max(to_screen(b.x, b.y), to_screen(b.x + b.w, b.y + b.h)) };
+        clip.rect_stroke(rect, 0.0, Stroke::new(1.5, t.text), StrokeKind::Outside);
+        for c in [rect.left_top(), rect.right_top(), rect.right_bottom(), rect.left_bottom()] {
+            clip.circle_filled(c, 4.0, t.text);
+        }
+    }
+    if let Some(m) = &d.marquee {
+        let r = ERect::from_two_pos(to_screen(m.from.0, m.from.1), to_screen(m.to.0, m.to.1));
+        clip.rect_filled(r, 0.0, BLUE.gamma_multiply(0.08));
+        clip.rect_stroke(r, 0.0, Stroke::new(1.0, BLUE), StrokeKind::Inside);
     }
     // Rulers in centimetres.
     let top = ERect::from_min_max(pos2(area.left(), view.top()), pos2(view.right(), area.top()));
@@ -2535,7 +3137,26 @@ fn overlay_card(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tok
                 });
             }
         }
-        let shown = d.hovered.or(d.selected).filter(|i| *i < d.placed().len());
+        let list = d.sel();
+        let shown = d.hovered.or(d.single()).filter(|i| *i < d.placed().len());
+        if shown.is_none() && list.len() > 1 {
+            // Several selected: their box.
+            let b = d.bbox(&list);
+            widgets::hairline(ui);
+            ui.label(egui::RichText::new(crate::i18n::fmt(tl!("{n} visuals selected"), &[("n", &list.len().to_string())])).size(11.0).color(t.text));
+            egui::Grid::new("gang-info-multi").num_columns(2).spacing(vec2(24.0, 2.0)).show(ui, |ui| {
+                for (k, v) in [
+                    (tl!("Left"), format!("{} cm", cm_text(b.x))),
+                    (tl!("Top"), format!("{} cm", cm_text(b.y))),
+                    (tl!("Width"), format!("{} cm", cm_text(b.w))),
+                    (tl!("Height"), format!("{} cm", cm_text(b.h))),
+                ] {
+                    ui.label(egui::RichText::new(k).size(11.0).color(t.text));
+                    ui.label(egui::RichText::new(v).size(11.0).color(t.text));
+                    ui.end_row();
+                }
+            });
+        }
         if let Some(i) = shown
             && let Some(src) = d.placed().get(i).and_then(|p| d.sources.get(p.source)).cloned()
         {
@@ -2678,6 +3299,195 @@ mod tests {
         let _ = std::fs::remove_dir_all(dir);
     }
 
+    /// Several visuals picked at once, grouped and ungrouped; a group moves, turns, mirrors,
+    /// copies and deletes as one block and stays one in Auto Build.
+    #[test]
+    fn selection_and_groups_work_as_one_block() {
+        reset_settings();
+        let dir = std::env::temp_dir().join(format!("gang-groups-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let a = png(&dir, "a.png", 1181, 591);
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        invoke(&mut app, &ctx, json!({"addFiles": [a], "set": {"rotate": false}}));
+        let r = invoke(&mut app, &ctx, json!({"source": {"index": 0, "onSheet": 4}}));
+        assert_eq!(r["placements"].as_array().unwrap().len(), 4);
+        let at = |r: &Value, i: usize| (r["placements"][i]["x"].as_f64().unwrap(), r["placements"][i]["y"].as_f64().unwrap());
+        let offset = |r: &Value| {
+            let (a, b) = (at(r, 0), at(r, 1));
+            ((b.0 - a.0) * 100.0).round() / 100.0 + ((b.1 - a.1) * 100.0).round() / 100.0 * 1000.0
+        };
+        // Grouping takes two at least.
+        assert!(menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({"ui": {"select": 0, "group": true}})).unwrap().is_err());
+        let r = invoke(&mut app, &ctx, json!({"select": [0, 1], "group": true}));
+        let g = r["placements"][0]["group"].as_u64().unwrap();
+        assert!(g > 0 && r["placements"][1]["group"] == g && r["placements"][2]["group"] == 0);
+        // One member picks the whole group.
+        let r = invoke(&mut app, &ctx, json!({"select": 1}));
+        assert_eq!(r["selected"], json!([0, 1]));
+        let before = offset(&r);
+        // Pushed down as one block: the two keep their places to each other.
+        let r = invoke(&mut app, &ctx, json!({"align": "bottom"}));
+        assert_eq!(offset(&r), before);
+        assert!(at(&r, 0).1 > 30.0, "{r}");
+        assert_eq!(r["conflicts"], 0);
+        // Turned as a block: the box's sides swap, each visual turns too.
+        let d = app.gang_sheet.as_ref().unwrap();
+        let b = d.bbox(&[0, 1]);
+        let r = invoke(&mut app, &ctx, json!({"rotate": 1}));
+        let d = app.gang_sheet.as_ref().unwrap();
+        let t = d.bbox(&[0, 1]);
+        assert_eq!((t.w, t.h), (b.h, b.w));
+        assert_eq!((r["placements"][0]["rotation"].as_u64(), r["placements"][1]["rotation"].as_u64()), (Some(90), Some(90)));
+        assert_eq!(r["conflicts"], 0);
+        // Mirrored as a block: the two swap ends, each one mirrored.
+        let y0 = at(&r, 0).1;
+        let r = invoke(&mut app, &ctx, json!({"mirror": "v"}));
+        assert!(at(&r, 0).1 > y0 && r["placements"][0]["flipV"] == true);
+        // Stretching resizes the source of every copy: not for a group.
+        assert!(menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({"ui": {"stretch": "h"}})).unwrap().is_err());
+        // Copy and paste: two more, in a new group of their own.
+        let r = invoke(&mut app, &ctx, json!({"copy": true, "paste": true}));
+        let p = r["placements"].as_array().unwrap();
+        assert_eq!(p.len(), 6);
+        assert!(p[4]["group"] == p[5]["group"] && p[4]["group"] != g && p[4]["group"].as_u64() > Some(0));
+        assert_eq!(r["selected"], json!([4, 5]));
+        // Delete the pasted group, then ungroup the first.
+        let r = invoke(&mut app, &ctx, json!({"delete": true}));
+        assert_eq!(r["placements"].as_array().unwrap().len(), 4);
+        let r = invoke(&mut app, &ctx, json!({"select": 0, "ungroup": true}));
+        assert!(r["placements"].as_array().unwrap().iter().all(|p| p["group"] == 0));
+        assert_eq!(r["selected"], json!([0, 1]), "still selected");
+        invoke(&mut app, &ctx, json!({"undo": true}));
+        let r = invoke(&mut app, &ctx, json!({"select": 0}));
+        assert_eq!(r["selected"], json!([0, 1]), "undo brings the group back");
+        let kept = offset(&r);
+        // Select all and delete, then undo.
+        let r = invoke(&mut app, &ctx, json!({"selectAll": true, "delete": true}));
+        assert_eq!(r["placements"].as_array().unwrap().len(), 0);
+        let r = invoke(&mut app, &ctx, json!({"undo": true}));
+        assert_eq!(r["placements"].as_array().unwrap().len(), 4);
+        // Auto Build: the group stays as it is, its two visuals among the five copies.
+        let r = invoke(&mut app, &ctx, json!({"source": {"index": 0, "quantity": 5}, "autoBuild": true}));
+        let p = r["placements"].as_array().unwrap();
+        assert_eq!(p.len(), 5, "{r}");
+        assert_eq!(p.iter().filter(|p| p["group"] != 0).count(), 2);
+        assert_eq!(offset(&r), kept, "the group first, as it was");
+        assert_eq!(r["conflicts"], 0);
+        let _ = std::fs::remove_dir_all(dir);
+        reset_settings();
+    }
+
+    /// Shift+click adds to the selection, a rectangle from empty film picks what it touches, and
+    /// dragging one selected visual moves them all.
+    #[test]
+    fn the_pointer_picks_several_and_drags_them_together() {
+        use egui_kittest::Harness;
+        reset_settings();
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        app.run("file.new", json!({"width": 1181, "height": 1181, "resolution": 300, "background": "transparent"})).unwrap();
+        app.run("edit.fill", json!({"color": "#c03020"})).unwrap();
+        let ctx = egui::Context::default();
+        invoke(&mut app, &ctx, json!({"set": {"rotate": false}, "addDocument": true, "source": {"index": 0, "onSheet": 3}}));
+        let mut h = Harness::builder().with_size(egui::vec2(1600.0, 1000.0)).build_ui_state(
+            |ui, s: &mut (PhotocraftApp, bool)| {
+                // Drawn once the app's fonts are in.
+                if s.1 {
+                    show(&mut s.0, ui.ctx());
+                }
+            },
+            (app, false),
+        );
+        PhotocraftApp::setup_context(&h.ctx, Default::default());
+        h.state_mut().1 = true;
+        h.run_steps(3);
+        // Where each visual is on screen: the film fits the canvas, so read it back from a frame.
+        let screen = |h: &Harness<'_, (PhotocraftApp, bool)>, i: usize| -> Pos2 {
+            let d = h.state().0.gang_sheet.as_ref().unwrap();
+            let r = d.item(i);
+            let view = ERect::from_min_max(pos2(RAIL_W + LEFT_W, HEADER_H + TOOLBAR_H), pos2(1600.0 - RIGHT_W, 1000.0));
+            let area = ERect::from_min_max(view.min + vec2(RULER, RULER), view.max);
+            let sheet = d.sheet();
+            let beside = if area.width() > CARD_W + 320.0 { CARD_W + 20.0 } else { 0.0 };
+            let fit = ((area.width() - beside - 40.0) / sheet.width as f32).min((area.height() - 40.0) / sheet.max_length as f32);
+            let origin = area.min + d.scroll;
+            pos2(origin.x + (r.x + r.w / 2) as f32 * fit, origin.y + (r.y + r.h / 2) as f32 * fit)
+        };
+        let click = |h: &mut Harness<'_, (PhotocraftApp, bool)>, at: Pos2, mods: egui::Modifiers| {
+            h.event(egui::Event::ModifiersChanged(mods));
+            h.event(egui::Event::PointerMoved(at));
+            h.event(egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed: true, modifiers: mods });
+            h.event(egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed: false, modifiers: mods });
+            h.run_steps(2);
+            h.event(egui::Event::ModifiersChanged(egui::Modifiers::NONE));
+        };
+        let (p0, p1, p2) = (screen(&h, 0), screen(&h, 1), screen(&h, 2));
+        click(&mut h, p0, egui::Modifiers::NONE);
+        click(&mut h, p1, egui::Modifiers::SHIFT);
+        assert_eq!(h.state().0.gang_sheet.as_ref().unwrap().sel(), vec![0, 1]);
+        click(&mut h, p0, egui::Modifiers::SHIFT);
+        assert_eq!(h.state().0.gang_sheet.as_ref().unwrap().sel(), vec![1], "Shift+click takes one out");
+        // A rectangle from the empty film below the visuals up over the first two.
+        let below = pos2(p0.x - 40.0, p0.y.max(p1.y).max(p2.y) + 300.0);
+        let over = p1;
+        h.drag_at(below);
+        h.run();
+        for k in 1..=6 {
+            h.event(egui::Event::PointerMoved(below + (over - below) * (k as f32 / 6.0)));
+            h.run();
+        }
+        h.drop_at(over);
+        h.run_steps(2);
+        let sel = h.state().0.gang_sheet.as_ref().unwrap().sel();
+        assert!(sel.contains(&0) && sel.contains(&1) && !sel.contains(&2), "{sel:?}");
+        // Dragging one of them moves both by the same amount; the third stays.
+        let before: Vec<Item> = (0..3).map(|i| h.state().0.gang_sheet.as_ref().unwrap().item(i)).collect();
+        let from = screen(&h, 0);
+        h.drag_at(from);
+        h.run();
+        for k in 1..=6 {
+            h.event(egui::Event::PointerMoved(from + vec2(0.0, 40.0 * k as f32)));
+            h.run();
+        }
+        h.drop_at(from + vec2(0.0, 240.0));
+        h.run_steps(2);
+        let d = h.state().0.gang_sheet.as_ref().unwrap();
+        let after: Vec<Item> = (0..3).map(|i| d.item(i)).collect();
+        assert!(after[0].y > before[0].y, "{before:?} {after:?}");
+        assert_eq!(after[0].y - before[0].y, after[1].y - before[1].y);
+        assert_eq!(after[2], before[2]);
+        reset_settings();
+    }
+
+    /// Screenshots for review (`GANG_VISUALS=<folder>`): a group selected beside another, in
+    /// French, at two window widths.
+    #[test]
+    fn capture_gang_sheet_groups() {
+        let Some(dir) = std::env::var_os("GANG_VISUALS").map(std::path::PathBuf::from) else { return };
+        std::fs::create_dir_all(&dir).unwrap();
+        let _fr = crate::i18n::language_scope(crate::i18n::Lang::from_pref("fr"));
+        for width in [1366.0, 1600.0] {
+            reset_settings();
+            let mut h = egui_kittest::Harness::builder().with_size(vec2(width, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
+                PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
+                let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+                crate::dtf_panel::dtf_craft_startup(&mut app);
+                app.ui.dtf_panel.beta_notice = false;
+                app.run("file.new", json!({"width": 900, "height": 600, "resolution": 300, "background": "transparent"})).unwrap();
+                app.run("edit.fill", json!({"color": "#f2c200"})).unwrap();
+                let ctx = cc.egui_ctx.clone();
+                invoke(&mut app, &ctx, json!({"addDocument": true, "source": {"index": 0, "onSheet": 8}}));
+                invoke(&mut app, &ctx, json!({"select": [2, 3], "group": true}));
+                invoke(&mut app, &ctx, json!({"select": [0, 1], "group": true}));
+                app
+            });
+            h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());
+            h.run_steps(8);
+            h.render().unwrap().save(dir.join(format!("gang_groupes_{width}.png"))).unwrap();
+        }
+        reset_settings();
+    }
+
     #[test]
     fn open_document_settings_and_params() {
         reset_settings();
@@ -2712,11 +3522,15 @@ mod tests {
     #[test]
     fn image_orientation_uv() {
         // 90° clockwise: the top-left corner shows the source's bottom-left.
-        let Shape::Mesh(m) = image_shape(egui::TextureId::default(), ERect::from_min_size(Pos2::ZERO, vec2(10.0, 10.0)), Orientation { quarter: 1, ..Default::default() }) else {
+        let Shape::Mesh(m) =
+            image_shape(egui::TextureId::default(), ERect::from_min_size(Pos2::ZERO, vec2(10.0, 10.0)), Orientation { quarter: 1, ..Default::default() })
+        else {
             panic!("a mesh")
         };
         assert_eq!(m.vertices[0].uv, pos2(0.0, 1.0));
-        let Shape::Mesh(m) = image_shape(egui::TextureId::default(), ERect::from_min_size(Pos2::ZERO, vec2(10.0, 10.0)), Orientation { flip_h: true, ..Default::default() }) else {
+        let Shape::Mesh(m) =
+            image_shape(egui::TextureId::default(), ERect::from_min_size(Pos2::ZERO, vec2(10.0, 10.0)), Orientation { flip_h: true, ..Default::default() })
+        else {
             panic!("a mesh")
         };
         assert_eq!(m.vertices[0].uv, pos2(1.0, 0.0));
@@ -2734,7 +3548,7 @@ mod tests {
         for tab in [Tab::Home, Tab::Settings] {
             if let Some(d) = app.gang_sheet.as_mut() {
                 d.tab = tab;
-                d.selected = Some(0);
+                d.selected = vec![0];
             }
             ctx.run_ui(Default::default(), |ui| show(&mut app, ui.ctx())).textures_delta.clear();
         }

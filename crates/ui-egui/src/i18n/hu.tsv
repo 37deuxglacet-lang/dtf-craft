@@ -4330,3 +4330,9 @@ cameraRaw	Yellow	Sárga
 	Transparent Pixels…	Átlátszó képpontok…
 	Remove Fringe…	Szegély eltávolítása…
 	Sharpness…	Élesség…
+# DTF Craft (15)
+	Group the Selection	Csoportosítás
+	Group (Ctrl+G)	Csoportosítás (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Csoport bontása (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Kettőzés (Ctrl+D)
+	{n} visuals selected	{n} kijelölt kép

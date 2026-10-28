@@ -332,6 +332,12 @@ pub fn value_field_prec(ui: &mut Ui, value: &mut f32, range: std::ops::RangeIncl
     value_field_in(ui, value, range, suffix, width, 0.0, FieldOpts { decimals: Some(decimals), ..Default::default() }).0
 }
 
+/// A [`value_field_prec`] set from the keyboard only: a click puts the number up for typing and
+/// dragging the mouse across it changes nothing (DTF Craft's Gang Sheet).
+pub fn typed_value_field(ui: &mut Ui, value: &mut f32, range: std::ops::RangeInclusive<f32>, suffix: &str, width: f32, decimals: u32) -> Response {
+    value_field_in(ui, value, range, suffix, width, 0.0, FieldOpts { decimals: Some(decimals), typed_only: true, ..Default::default() }).0
+}
+
 /// A field's unit and the resolution a typed unit converts at (`1in` in a px field).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FieldUnits {
@@ -474,6 +480,8 @@ struct FieldOpts {
     /// The unit typed units convert into (default: the suffix's, at [`set_field_resolution`]).
     units: Option<FieldUnits>,
     wrap_drag: bool,
+    /// Typed only: no mouse scrub on the number or its label ([`typed_value_field`]).
+    typed_only: bool,
 }
 
 /// A [`value_field`] that leaves `trailing` points free inside its box, right of the suffix, and
@@ -500,10 +508,10 @@ fn value_field_box(
     trailing: f32,
     opts: FieldOpts,
 ) -> (Response, Rect) {
-    let FieldOpts { decimals, units, wrap_drag } = opts;
+    let FieldOpts { units, typed_only, .. } = opts;
     let t = Tokens::get(ui.ctx());
     let (rect, slot) = ui.allocate_exact_size(size, Sense::hover());
-    let scrub = take_label_scrub(ui, rect);
+    let scrub = take_label_scrub(ui, rect).filter(|_| !typed_only);
     let (dpi, ppi) = ui.data(|d| d.get_temp::<(f64, f64)>(field_resolution_id())).unwrap_or((72.0, 72.0));
     // Typed text loses its spaces before parsing, so a " pt" suffix reads as "pt".
     let typed_suffix = suffix.trim();
@@ -548,7 +556,7 @@ fn value_field_box(
             ui.spacing_mut().button_padding = Vec2::ZERO;
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 let layout = egui::Layout::centered_and_justified(ui.layout().main_dir());
-                ui.allocate_ui_with_layout(field.size(), layout, |ui| number_edit(ui, value, range, fine, decimals, units, wrap_drag)).inner
+                ui.allocate_ui_with_layout(field.size(), layout, |ui| number_edit(ui, value, range, fine, units, opts)).inner
             })
             .inner
         }
@@ -754,10 +762,10 @@ fn number_edit(
     value: &mut f32,
     range: std::ops::RangeInclusive<f32>,
     fine: bool,
-    decimals: Option<u32>,
     units: crate::numeric_expression::Units,
-    wrap_drag: bool,
+    opts: FieldOpts,
 ) -> Response {
+    let FieldOpts { decimals, wrap_drag, typed_only, .. } = opts;
     let (id, ctx) = (ui.next_auto_id(), ui.ctx().clone());
     // Focused before the DragValue is drawn, so it gains focus this frame and selects its text.
     if ui.data_mut(|d| d.remove_temp::<bool>(first_field_id())).unwrap_or(false) {
@@ -771,7 +779,14 @@ fn number_edit(
     let math = ui.memory(|m| m.has_focus(id)) && ui.data(|d| d.get_temp(held)).unwrap_or(false);
     ui.data_mut(|d| d.insert_temp(held, math));
     let before = *value;
-    let speed = if fine { 0.01 } else { 0.5 };
+    // Typed only: a drag moves nothing (a click still opens the number for typing).
+    let speed = if typed_only {
+        0.0
+    } else if fine {
+        0.01
+    } else {
+        0.5
+    };
     let wrapping = wrap_drag && crate::scrub_wrap::active(ui);
     let wrapped_drag = wrapping && ui.input(|i| i.pointer.primary_down());
     let mut resp = ui.add(
@@ -800,7 +815,7 @@ fn number_edit(
         crate::scrub_wrap::update(ui, &resp, value, before, range, speed, wrapping);
     }
     resp.flags.set(egui::response::Flags::CHANGED, *value != before);
-    resp
+    if typed_only { resp.on_hover_cursor(egui::CursorIcon::Text) } else { resp }
 }
 
 /// Increments a numerical field with the up/down arrow keys. Increments by 1 by default, 10 with shift, and 0.1 with ctrl/cmd.
@@ -2024,6 +2039,47 @@ mod tests {
         assert_eq!(h.state().0, 90.0);
         drag(&mut h, "Mode:", 20.0, Modifiers::NONE);
         assert_eq!(h.state().1, 100.0, "the field isn't right after the label");
+    }
+
+    /// DTF Craft's Gang Sheet: a typed field takes what is typed, and a drag across it (or across
+    /// a scrubby label before it) changes nothing.
+    #[test]
+    fn a_typed_field_ignores_the_mouse_drag_and_takes_typing() {
+        let mut h = Harness::new_ui_state(
+            |ui, s: &mut f32| {
+                ui.horizontal(|ui| {
+                    let l = ui.label("Width:");
+                    super::scrub_label(ui, &l);
+                    super::typed_value_field(ui, s, 0.0..=300.0, "cm", 90.0, 2);
+                });
+            },
+            10.0,
+        );
+        h.run();
+        let field = h.query_all_by_role(egui::accesskit::Role::SpinButton).next().unwrap().rect().center();
+        let label = h.get_by_label("Width:").rect().center();
+        for at in [field, label] {
+            h.hover_at(at);
+            h.run();
+            h.drag_at(at);
+            h.run();
+            for i in 1..=4 {
+                h.event(egui::Event::PointerMoved(at + egui::vec2(15.0 * i as f32, 0.0)));
+                h.run();
+            }
+            h.drop_at(at + egui::vec2(60.0, 0.0));
+            h.run();
+            assert_eq!(*h.state(), 10.0, "a drag moves nothing");
+        }
+        h.query_all_by_role(egui::accesskit::Role::SpinButton).next().unwrap().click();
+        h.run_steps(2);
+        h.key_press_modifiers(Modifiers::COMMAND, egui::Key::A);
+        h.run();
+        h.event(egui::Event::Text("24.5".into()));
+        h.run();
+        h.key_press(egui::Key::Enter);
+        h.run_steps(2);
+        assert_eq!(*h.state(), 24.5);
     }
 
     /// A right-aligned OK / Cancel / Apply row as `os` draws it: labels left to right, and the

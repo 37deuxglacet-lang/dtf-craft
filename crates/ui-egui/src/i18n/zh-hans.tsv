@@ -3035,3 +3035,10 @@ curves	Smooth	平滑
 	Transparent Pixels…	透明像素…
 	Remove Fringe…	去除边缘…
 	Sharpness…	锐化…
+# DTF Craft (15)
+	Group the Selection	编组
+	Ungroup	取消编组
+	Group (Ctrl+G)	编组（Ctrl+G）
+	Ungroup (Ctrl+Shift+G)	取消编组（Ctrl+Shift+G）
+	Duplicate (Ctrl+D)	复制（Ctrl+D）
+	{n} visuals selected	已选择 {n} 个图案

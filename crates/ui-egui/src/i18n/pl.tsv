@@ -4011,3 +4011,10 @@ curves	Smooth	Wygładź
 	Transparent Pixels…	Piksele przezroczyste…
 	Remove Fringe…	Usuń obwódki…
 	Sharpness…	Ostrość…
+# DTF Craft (15)
+	Group the Selection	Grupuj
+	Ungroup	Rozgrupuj
+	Group (Ctrl+G)	Grupuj (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Rozgrupuj (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Duplikuj (Ctrl+D)
+	{n} visuals selected	Zaznaczone grafiki: {n}

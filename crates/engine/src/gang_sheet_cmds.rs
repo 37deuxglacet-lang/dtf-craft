@@ -279,6 +279,8 @@ pub struct Placed {
     pub x: i64,
     pub y: i64,
     pub orientation: Orientation,
+    /// The group it belongs to in the Gang Sheet window (0: none). Rendering ignores it.
+    pub group: u32,
 }
 
 /// The visual's footprint on the sheet for a source printed `w × h` (unturned).
@@ -369,7 +371,7 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
                 }
                 let flag = |k: &str| pl.get(k).and_then(Value::as_bool).unwrap_or(false);
                 let orientation = Orientation { quarter: ((degrees / 90.0) as i64).rem_euclid(4) as u8, flip_h: flag("flipH"), flip_v: flag("flipV") };
-                let one = Placed { source, x: cm(x), y: cm(y), orientation };
+                let one = Placed { source, x: cm(x), y: cm(y), orientation, group: 0 };
                 let (w, h) = visuals.get(source).map_or((0, 0), |v| (v.1, v.2));
                 let r = footprint(&one, w, h);
                 if r.x < 0 || r.y < 0 || r.x + r.w > sheet.width || r.y + r.h > sheet.max_length {
@@ -392,7 +394,7 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
             let widest = visuals.iter().map(|v| v.4).fold(spacing, i64::max);
             for (slot, spot) in slots.iter().zip(sheet.with_gap(widest).pack(&sizes, &[], rotate)) {
                 match spot {
-                    Some(sp) => placed.push(Placed { source: *slot, x: sp.x, y: sp.y, orientation: Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() } }),
+                    Some(sp) => placed.push(Placed { source: *slot, x: sp.x, y: sp.y, orientation: Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() }, group: 0 }),
                     None => unplaced += 1,
                 }
             }

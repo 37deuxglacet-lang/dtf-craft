@@ -4087,3 +4087,10 @@ curves	Smooth	スムーズ
 	Transparent Pixels…	透明ピクセル…
 	Remove Fringe…	フリンジを削除…
 	Sharpness…	シャープネス…
+# DTF Craft (15)
+	Group the Selection	グループ化
+	Ungroup	グループ解除
+	Group (Ctrl+G)	グループ化（Ctrl+G）
+	Ungroup (Ctrl+Shift+G)	グループ解除（Ctrl+Shift+G）
+	Duplicate (Ctrl+D)	複製（Ctrl+D）
+	{n} visuals selected	{n} 個のビジュアルを選択

@@ -3418,3 +3418,10 @@ curves	Smooth	Glätten
 	Transparent Pixels…	Transparente Pixel…
 	Remove Fringe…	Farbsaum entfernen…
 	Sharpness…	Schärfe…
+# DTF Craft (15)
+	Group the Selection	Gruppieren
+	Ungroup	Gruppierung aufheben
+	Group (Ctrl+G)	Gruppieren (Strg+G)
+	Ungroup (Ctrl+Shift+G)	Gruppierung aufheben (Strg+Umschalt+G)
+	Duplicate (Ctrl+D)	Duplizieren (Strg+D)
+	{n} visuals selected	{n} Motive ausgewählt
