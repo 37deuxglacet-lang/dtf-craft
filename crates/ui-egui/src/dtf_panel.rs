@@ -1620,7 +1620,7 @@ mod tests {
             a.settings.client = "Atelier (exemple)".into();
             a.view = view;
         };
-        shot(logo(), "analyseur", &|app| analyzer(app, crate::color_analyzer_ui::View::Original));
+        shot(logo(), "analyseur", &|app| analyzer(app, crate::color_analyzer_ui::View::Replaced));
         shot(logo(), "analyseur_remplace", &|app| analyzer(app, crate::color_analyzer_ui::View::Replaced));
         // Color Range: the sun picked (the rest greyed), then turned orange.
         let sun = |app: &mut PhotocraftApp, view: crate::color_analyzer_ui::View, apply: bool| {

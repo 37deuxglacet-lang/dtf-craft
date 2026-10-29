@@ -4130,3 +4130,11 @@ curves	Smooth	Εξομάλυνση
 	Hide the image	Απόκρυψη εικόνας
 	Illustration: {user} on Pixabay	Εικονογράφηση: {user} στο Pixabay
 	Show an illustration	Εμφάνιση εικονογράφησης
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Φύλλο A4 με το γραφικό, το διανυσματοποιημένο αποτέλεσμα, τα χρώματά του και τις αναφορές τους.
+	Detected Colors	Χρώματα που εντοπίστηκαν
+	Replaced by the reference in the SVG	Αντικαθίσταται από την αναφορά στο SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG χωρίς επιλογή: το χρώμα παραλείπεται από το SVG· τα σχήματά του αφαιρούνται, δεν συγχωνεύονται.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Κοινό με τον Αναλυτή χρωμάτων. Μορφές: .ase, .aco, .csv· διαφορά σε ΔE 2000.
+	{name} vectorized color sheet	{name} φύλλο χρωμάτων διανυσματοποίησης
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ επιλεγμένο: τα σχήματα παίρνουν το χρώμα της αναφοράς και φέρουν το όνομά της στο SVG. ΔE: έως 2 = ανεπαίσθητη · 2 έως 5 = ορατή από κοντά · πάνω = άλλη απόχρωση

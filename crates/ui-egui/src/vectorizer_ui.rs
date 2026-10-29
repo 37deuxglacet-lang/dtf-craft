@@ -14,7 +14,7 @@
 //! the view rests, the visible part of the vectorized result is drawn again at the screen's
 //! resolution, so its contours are judged sharp at any zoom.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use egui::{Align2, Color32, FontId, Rect, RichText, Sense, Stroke, pos2, vec2};
 use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Smoothing, Style, SvgSize, TraceOptions, Traced};
@@ -23,6 +23,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::PhotocraftApp;
+use crate::color_analyzer_ui::{self as analyzer, Book, Choice, Pick};
+use crate::color_sheet::{self, ColorSheet, SheetRef, SheetRow};
 use crate::theme::Tokens;
 
 const PANEL_W: f32 = 420.0;
@@ -36,6 +38,8 @@ const ZOOMS: [f32; 8] = [1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0];
 const MAX_ZOOM: f32 = 8.0;
 /// How long the view rests before its visible part is drawn sharp, in seconds.
 const SHARP_DELAY: f64 = 0.2;
+/// The colour sheet's visuals, longest side in px.
+const SHEET_IMAGE_MAX: usize = 800;
 
 /// What the preview shows.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -115,6 +119,13 @@ pub struct Vectorizer {
     pub traced: Option<Traced>,
     /// Why the last analysis or tracing failed.
     pub error: Option<String>,
+    /// The reference swatch book, shared with the Color Analyzer; each colour's choices (swatch
+    /// picked, replaced or not) by hex.
+    pub book: Option<Book>,
+    choices: HashMap<String, Choice>,
+    /// The palette colour whose reference is being changed, and the picker's search.
+    changing: Option<usize>,
+    search: String,
     revision: u64,
     original: Option<egui::TextureHandle>,
     vectorized: Option<Tex>,
@@ -177,6 +188,7 @@ impl Vectorizer {
         mode: String,
         px: &[[f32; 4]],
         settings: Settings,
+        book: Option<Book>,
     ) -> Self {
         let (w, h, px) = vectorize::reduce(size.0 as usize, size.1 as usize, px, vectorize::MAX_SIDE);
         let mut v = Self {
@@ -196,6 +208,10 @@ impl Vectorizer {
             quantized: None,
             traced: None,
             error: None,
+            book,
+            choices: HashMap::new(),
+            changing: None,
+            search: String::new(),
             revision: 0,
             original: None,
             vectorized: None,
@@ -295,6 +311,61 @@ impl Vectorizer {
         q.background.and_then(|i| q.palette.get(i)).map(|c| c.rgb)
     }
 
+    /// Each palette colour's reference: the swatch (picked, or the nearest), its ΔE 2000 and
+    /// whether the colour takes it in the SVG.
+    pub fn matches(&self) -> Vec<Option<(usize, f32, bool)>> {
+        let Some(q) = self.quantized.as_ref() else { return Vec::new() };
+        q.palette
+            .iter()
+            .map(|c| {
+                let choice = self.choices.get(&vectorize::hex(c.rgb)).copied().unwrap_or_default();
+                let (swatch, replace) = choice.resolve(self.book.as_ref(), analyzer::lab8(c.rgb));
+                swatch.map(|(k, de)| (k, de, replace))
+            })
+            .collect()
+    }
+
+    fn swatch(&self, k: usize) -> Option<&photocraft_algo::dtf_color::Swatch> {
+        self.book.as_ref().and_then(|b| b.swatches.get(k))
+    }
+
+    /// The palette as the SVG draws it (the swatch colours replacing the colours checked) and each
+    /// colour's name (its swatch reference when replaced).
+    pub fn svg_palette(&self) -> (Vec<vectorize::PaletteColor>, Vec<Option<String>>) {
+        let Some(q) = self.quantized.as_ref() else { return (Vec::new(), Vec::new()) };
+        let mut palette = q.palette.clone();
+        let mut names = vec![None; palette.len()];
+        for (i, m) in self.matches().into_iter().enumerate() {
+            if let Some((k, _, true)) = m
+                && let Some(s) = self.swatch(k)
+            {
+                palette[i].rgb = analyzer::swatch8(s);
+                names[i] = Some(s.name.clone());
+            }
+        }
+        (palette, names)
+    }
+
+    pub fn set_swatch(&mut self, hex: &str, swatch: Option<usize>) {
+        self.choices.entry(hex.to_string()).or_default().swatch = swatch;
+        self.revision += 1;
+    }
+
+    pub fn set_replace(&mut self, hex: &str, on: bool) {
+        self.choices.entry(hex.to_string()).or_default().replace = Some(on);
+        self.revision += 1;
+    }
+
+    pub fn set_book(&mut self, book: Option<Book>) {
+        self.book = book;
+        // Picked references belong to the previous book.
+        for c in self.choices.values_mut() {
+            c.swatch = None;
+        }
+        self.changing = None;
+        self.revision += 1;
+    }
+
     /// The parameters `dtf.vectorize` takes to trace what the module shows.
     pub fn params(&self) -> Value {
         let s = &self.settings;
@@ -318,13 +389,27 @@ impl Vectorizer {
             .map(|q| q.palette.iter().map(|c| vectorize::hex(c.rgb)).filter(|h| self.excluded.contains(h)).collect())
             .unwrap_or_default();
         exclude.sort();
-        json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "sealSeams": s.seal, "exclude": exclude})
+        // The colours that take their swatch, and its reference.
+        let (palette, names) = self.svg_palette();
+        let replace: Vec<Value> = self
+            .quantized
+            .as_ref()
+            .map(|q| {
+                q.palette
+                    .iter()
+                    .zip(palette.iter().zip(&names))
+                    .filter_map(|(c, (to, name))| name.as_ref().map(|n| json!({"from": vectorize::hex(c.rgb), "to": vectorize::hex(to.rgb), "name": n})))
+                    .collect()
+            })
+            .unwrap_or_default();
+        json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "sealSeams": s.seal, "exclude": exclude, "replace": replace})
     }
 
     /// The SVG as it is exported (print size in mm).
     pub fn svg(&self) -> Option<String> {
-        let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
-        Some(vectorize::svg(t, &q.palette, SvgSize::Mm(self.size_mm.0, self.size_mm.1), Style::Fill { seal: self.settings.seal }))
+        let t = self.traced.as_ref()?;
+        let (palette, names) = self.svg_palette();
+        Some(vectorize::svg_named(t, &palette, &names, SvgSize::Mm(self.size_mm.0, self.size_mm.1), Style::Fill { seal: self.settings.seal }))
     }
 
     /// The scale of the vectorized preview against the traced copy.
@@ -334,10 +419,16 @@ impl Vectorizer {
 
     /// The traced shapes drawn at preview size: filled, or their contours only.
     fn render(&self, contours: bool) -> Option<egui::ColorImage> {
-        let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
         let k = self.preview_scale();
+        self.render_at(contours, k)
+    }
+
+    /// The traced shapes drawn `k` times the traced copy's size.
+    fn render_at(&self, contours: bool, k: f32) -> Option<egui::ColorImage> {
+        let t = self.traced.as_ref()?;
         let style = if contours { Style::Contours(f64::from(CONTOUR_PX / k)) } else { Style::Fill { seal: self.settings.seal } };
-        let svg = vectorize::svg(t, &q.palette, SvgSize::Px(self.w as f64, self.h as f64), style);
+        let (palette, _) = self.svg_palette();
+        let svg = vectorize::svg(t, &palette, SvgSize::Px(self.w as f64, self.h as f64), style);
         let buf = photocraft_io::svg::rasterize(svg.as_bytes(), k).ok()?;
         let (w, h) = (buf.rect.width() as usize, buf.rect.height() as usize);
         (w * h == buf.px.len() && w > 0 && h > 0).then(|| egui::ColorImage::from_rgba_unmultiplied([w, h], &rgba8(&buf.px)))
@@ -346,14 +437,15 @@ impl Vectorizer {
     /// The part `region` (traced px: x0, y0, x1, y1) of the result drawn `size` screen px: filled,
     /// or its contours only.
     fn render_region(&self, contours: bool, region: [f32; 4], size: [usize; 2]) -> Option<egui::ColorImage> {
-        let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
+        let t = self.traced.as_ref()?;
         let (rw, rh) = (region[2] - region[0], region[3] - region[1]);
         if rw <= 0.0 || rh <= 0.0 || size[0] == 0 || size[1] == 0 {
             return None;
         }
         let k = size[0] as f32 / rw;
         let style = if contours { Style::Contours(f64::from(CONTOUR_PX / k)) } else { Style::Fill { seal: self.settings.seal } };
-        let svg = vectorize::svg(t, &q.palette, SvgSize::Px(f64::from(rw), f64::from(rh)), style);
+        let (palette, _) = self.svg_palette();
+        let svg = vectorize::svg(t, &palette, SvgSize::Px(f64::from(rw), f64::from(rh)), style);
         // The same drawing, its view box narrowed to the region.
         let whole = format!("viewBox=\"0 0 {} {}\"", t.width, t.height);
         if !svg.contains(&whole) {
@@ -402,6 +494,48 @@ impl Vectorizer {
         let v = self.center[1] + d.y / h0.max(1.0);
         self.center = [u - d.x / w1.max(1.0), v - d.y / h1.max(1.0)];
         self.zoom = zoom;
+    }
+
+    /// The colour sheet of the vectorized visual: the original and the vectorized result side by
+    /// side, the SVG's colours with their references.
+    pub fn sheet(&self) -> Option<ColorSheet> {
+        let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
+        let (w, h, px) = analyzer::downsample(self.w, self.h, &self.px, SHEET_IMAGE_MAX);
+        let image = (w, h, rgba8(&px));
+        let k = w as f32 / self.w.max(1) as f32;
+        let drawn = self.render_at(false, k)?;
+        let [dw, dh] = drawn.size;
+        let vectorized = (dw, dh, drawn.pixels.iter().flat_map(|c| c.to_srgba_unmultiplied()).collect());
+        // The colours in the SVG, in the palette's order.
+        let used: HashSet<usize> = t.paths.iter().map(|p| p.color).collect();
+        let matches = self.matches();
+        let rows = q
+            .palette
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| used.contains(i))
+            .map(|(i, c)| SheetRow {
+                rgb: c.rgb,
+                share: c.share * 100.0,
+                range: false,
+                reference: matches.get(i).copied().flatten().filter(|m| m.2).and_then(|(k, de, _)| {
+                    self.swatch(k).map(|s| SheetRef { name: s.name.clone(), rgb: analyzer::swatch8(s), delta_e: de })
+                }),
+            })
+            .collect();
+        Some(ColorSheet {
+            file_name: self.name.clone(),
+            client: String::new(),
+            date: color_sheet::today(),
+            profile: analyzer::PROFILE.into(),
+            swatch_book: self.book.as_ref().map(|b| b.name.clone()),
+            size_px: self.size,
+            dpi: self.dpi as f32,
+            image,
+            replaced: Some(vectorized),
+            replaced_label: Some(tl!("Vectorized").to_string()),
+            rows,
+        })
     }
 
     fn original_texture(&mut self, ctx: &egui::Context) -> egui::TextureHandle {
@@ -466,7 +600,7 @@ pub fn open(app: &mut PhotocraftApp) -> Result<Value, String> {
     let mode = crate::i18n::fmt(tl!("RGB {bits} bits"), &[("bits", &bits.to_string())]);
     let (doc, name, path) = (st.doc.id, st.doc.name.clone(), st.path.clone());
     let (dpi, mm) = (cmds::dpi(&st.doc), cmds::size_mm(&st.doc));
-    let v = Vectorizer::new(doc, &name, path, (w, h), dpi, mm, mode, &px, load_settings(app));
+    let v = Vectorizer::new(doc, &name, path, (w, h), dpi, mm, mode, &px, load_settings(app), analyzer::load_book(app));
     let colors = v.quantized.as_ref().map_or(0, |q| q.palette.len());
     app.vectorizer = Some(v);
     Ok(json!({"colors": colors}))
@@ -511,11 +645,29 @@ pub fn export_svg(app: &mut PhotocraftApp) -> Result<Value, String> {
     })
 }
 
+/// "PDF Sheet…": the colour sheet of the vectorized visual, written where the user chooses.
+pub fn export_pdf(app: &mut PhotocraftApp) -> Result<Value, String> {
+    let v = app.vectorizer.as_ref().ok_or("the Vectorization module is not open")?;
+    let sheet = v.sheet().ok_or_else(|| v.error.clone().unwrap_or_else(|| tl!("Nothing to export: every color is left out.").to_string()))?;
+    let stem = std::path::Path::new(&v.name).file_stem().and_then(|s| s.to_str()).unwrap_or(&v.name).to_string();
+    let suggested = format!("{}.pdf", crate::i18n::fmt(tl!("{name} vectorized color sheet"), &[("name", &stem)]));
+    app.pick_save(&suggested, move |app, path| {
+        let path = std::path::Path::new(&path).with_extension("pdf").to_string_lossy().into_owned();
+        let bytes = color_sheet::pdf(&sheet);
+        let write = app.services.write.as_mut().ok_or("no writer configured")?;
+        write(&path, &bytes)?;
+        app.ui.status = crate::i18n::fmt(tl!("Color sheet saved: {path}"), &[("path", &path)]);
+        Ok(json!({"path": path}))
+    })
+}
+
 // ---------------------------------------------------------------- drawing
 
 enum Action {
     Close,
     Export,
+    LoadBook,
+    Pdf,
 }
 
 /// The module, over the main window while it is open.
@@ -534,6 +686,11 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         action = draw(ui, v, screen);
     });
     if let Some(v) = app.vectorizer.as_mut()
+        && v.changing.is_some()
+    {
+        change_reference(ctx, v);
+    }
+    if let Some(v) = app.vectorizer.as_mut()
         && (v.requantize || v.retrace)
     {
         if ctx.input(|i| i.pointer.any_down()) {
@@ -543,7 +700,9 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             ctx.request_repaint();
         }
     }
-    let escape = app.file_dialog.is_none() && ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape));
+    let escape = app.vectorizer.as_ref().is_some_and(|v| v.changing.is_none())
+        && app.file_dialog.is_none()
+        && ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape));
     if escape {
         action = Some(Action::Close);
     }
@@ -560,6 +719,8 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             return;
         }
         Some(Action::Export) => export_svg(app),
+        Some(Action::LoadBook) => analyzer::load_swatch_book(app),
+        Some(Action::Pdf) => export_pdf(app),
     };
     if let Err(e) = result {
         app.ui.status = e;
@@ -588,16 +749,18 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
     painter.rect_filled(right, 0.0, t.dock);
     painter.line_segment([right.left_top(), right.left_bottom()], Stroke::new(1.0, t.separator));
     preview(ui, v, left);
+    let mut action = None;
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(right.shrink2(vec2(0.0, 8.0))));
     egui::ScrollArea::vertical().id_salt("dtf-vectorizer-panel").auto_shrink([false, false]).show(&mut panel, |ui| {
         ui.add_space(4.0);
         egui::Frame::NONE.inner_margin(egui::Margin::symmetric(16, 0)).show(ui, |ui| {
             ui.set_width(PANEL_W - 40.0);
-            settings_ui(ui, v);
+            if settings_ui(ui, v) {
+                action = Some(Action::LoadBook);
+            }
         });
     });
     // Footer.
-    let mut action = None;
     let foot = Rect::from_min_max(pos2(full.left(), body.bottom()), full.max);
     painter.rect_filled(foot, 0.0, t.dock);
     painter.line_segment([foot.left_top(), foot.right_top()], Stroke::new(1.0, t.separator));
@@ -609,6 +772,12 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
         .on_hover_text(tl!("Cut-out shapes at the document's print size, saved as SVG."));
     if export.clicked() {
         action = Some(Action::Export);
+    }
+    let pdf = buttons
+        .add_enabled(ready, egui::Button::new(tl!("PDF Sheet…")))
+        .on_hover_text(tl!("An A4 sheet with the visual, the vectorized result, its colors and their references."));
+    if pdf.clicked() {
+        action = Some(Action::Pdf);
     }
     if buttons.button(tl!("Close")).clicked() {
         action = Some(Action::Close);
@@ -828,8 +997,9 @@ fn patch(ui: &mut egui::Ui, rgb: [u8; 3], size: f32) -> egui::Response {
     resp
 }
 
-/// The settings panel: source, settings, palette, export.
-fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) {
+/// The settings panel: source, settings, swatch book, palette, export. True when "Load…" was
+/// clicked.
+fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
     let t = Tokens::get(ui.ctx());
     let section = |ui: &mut egui::Ui, title: &str| {
         ui.add_space(10.0);
@@ -897,6 +1067,19 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) {
         v.revision += 1;
     }
     v.redo(redo);
+    section(ui, tl!("Reference Swatch Book"));
+    let mut load = false;
+    ui.horizontal(|ui| {
+        let text = match &v.book {
+            Some(b) => crate::i18n::fmt(tl!("{name} · {n} colors"), &[("name", &b.name), ("n", &b.swatches.len().to_string())]),
+            None => tl!("None loaded").to_string(),
+        };
+        ui.add(egui::Label::new(text).truncate()).on_hover_text(v.book.as_ref().map_or("", |b| b.name.as_str()));
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            load = ui.button(tl!("Load…")).clicked();
+        });
+    });
+    ui.label(RichText::new(tl!("Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.")).small().color(t.text_faint));
     palette_ui(ui, v, &section);
     section(ui, tl!("Export"));
     egui::Grid::new("dtf-vectorizer-export").num_columns(2).spacing(vec2(12.0, 4.0)).show(ui, |ui| {
@@ -910,10 +1093,12 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) {
     ui.add_space(4.0);
     ui.checkbox(&mut v.settings.open_after, tl!("Open the SVG in DTF Craft after the export"));
     ui.add_space(12.0);
+    load
 }
 
-/// The palette: each colour with its share, the background marked; unchecked colours are left out
-/// of the SVG.
+/// The palette: each colour with its share, the background marked, and its swatch-book reference;
+/// unchecked colours are left out of the SVG, colours checked in ⇄ take their reference's colour
+/// and name in the SVG.
 fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui::Ui, &str)) {
     let t = Tokens::get(ui.ctx());
     let Some(q) = v.quantized.as_ref() else { return };
@@ -922,17 +1107,22 @@ fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui:
         ui,
         &format!(
             "{} · {}",
-            tl!("Palette"),
+            tl!("Detected Colors"),
             crate::i18n::fmt(tl!("{n} colors · {k} in the SVG"), &[("n", &q.palette.len().to_string()), ("k", &in_svg.to_string())])
         ),
     );
+    let matches = v.matches();
     let mut toggled: Option<(String, bool)> = None;
-    egui::Grid::new("dtf-vectorizer-palette").num_columns(4).spacing(vec2(8.0, 5.0)).show(ui, |ui| {
+    let mut replace: Option<(String, bool)> = None;
+    let mut change = None;
+    egui::Grid::new("dtf-vectorizer-palette").num_columns(6).spacing(vec2(6.0, 6.0)).show(ui, |ui| {
         ui.style_mut().wrap_mode = Some(egui::TextWrapMode::Extend);
         ui.label(RichText::new("SVG").small().color(t.text_dim));
+        ui.add(crate::icons::image("arrow-left-right", 14.0, t.text_dim)).on_hover_text(tl!("Replaced by the reference in the SVG"));
         ui.label(RichText::new(tl!("Color")).small().color(t.text_dim));
         ui.label(RichText::new(tl!("Area")).small().color(t.text_dim));
-        ui.label("");
+        ui.label(RichText::new(tl!("Match")).small().color(t.text_dim));
+        ui.label(RichText::new("ΔE").small().color(t.text_dim));
         ui.end_row();
         for (i, c) in q.palette.iter().enumerate() {
             let hex = vectorize::hex(c.rgb);
@@ -941,25 +1131,88 @@ fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui:
             if check.changed() {
                 toggled = Some((hex.clone(), !keep));
             }
+            let m = matches.get(i).copied().flatten();
+            let mut on = m.is_some_and(|m| m.2);
+            if ui.add_enabled(m.is_some(), egui::Checkbox::without_text(&mut on)).on_hover_text(tl!("Replaced by the reference in the SVG")).changed() {
+                replace = Some((hex.clone(), on));
+            }
+            // The RGB values on hover: the reference's name keeps the room.
             ui.horizontal(|ui| {
-                patch(ui, c.rgb, 22.0);
-                ui.label(RichText::new(&hex).font(crate::theme::mono(11.5)));
-                ui.label(RichText::new(format!("{} · {} · {}", c.rgb[0], c.rgb[1], c.rgb[2])).font(crate::theme::mono(10.0)).color(t.text_faint));
+                patch(ui, c.rgb, 22.0).on_hover_text(format!("RGB {} · {} · {}", c.rgb[0], c.rgb[1], c.rgb[2]));
+                ui.vertical(|ui| {
+                    ui.label(RichText::new(&hex).font(crate::theme::mono(11.5)));
+                    if q.background == Some(i) {
+                        ui.label(RichText::new(tl!("Edge Background")).small().color(t.warning));
+                    }
+                });
             });
             ui.label(RichText::new(format!("{} %", decimal(f64::from(c.share) * 100.0))).font(crate::theme::mono(11.5)));
-            if q.background == Some(i) {
-                ui.label(RichText::new(tl!("Edge Background")).small().color(t.warning));
-            } else {
-                ui.label("");
+            match m.and_then(|(k, de, _)| v.swatch(k).map(|s| (s, de))) {
+                Some((s, de)) => {
+                    ui.horizontal(|ui| {
+                        patch(ui, analyzer::swatch8(s), 22.0);
+                        ui.vertical(|ui| {
+                            // Long swatch names are cut so the ΔE column stays in the panel.
+                            ui.set_max_width(122.0);
+                            ui.add(egui::Label::new(RichText::new(&s.name).strong()).truncate()).on_hover_text(&s.name);
+                            if ui.link(RichText::new(tl!("Change…")).small()).clicked() {
+                                change = Some(i);
+                            }
+                        });
+                    });
+                    let (bg, fg) = analyzer::de_badge(de);
+                    let galley = ui.painter().layout_no_wrap(color_sheet::decimal(f64::from(de), 1), crate::theme::mono(11.0), fg);
+                    let (r, _) = ui.allocate_exact_size(galley.size() + vec2(10.0, 4.0), Sense::hover());
+                    ui.painter().rect_filled(r, 3.0, bg);
+                    ui.painter().galley(r.center() - galley.size() / 2.0, galley, fg);
+                }
+                None => {
+                    ui.label(RichText::new("—").color(t.text_faint));
+                    ui.label("");
+                }
             }
             ui.end_row();
         }
     });
+    if v.book.is_none() {
+        ui.label(RichText::new(tl!("Load a swatch book to find the references.")).color(t.warning));
+    }
     ui.add_space(4.0);
-    ui.label(RichText::new(tl!("Unchecked: the color is left out of the SVG; its shapes are removed, not merged.")).small().color(t.text_faint));
+    ui.label(RichText::new(tl!("SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.")).small().color(t.text_faint));
+    ui.label(
+        RichText::new(tl!("⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue"))
+            .small()
+            .color(t.text_faint),
+    );
     if let Some((hex, excluded)) = toggled {
         v.set_excluded(&hex, excluded);
     }
+    if let Some((hex, on)) = replace {
+        v.set_replace(&hex, on);
+    }
+    if change.is_some() {
+        v.changing = change;
+        v.search.clear();
+    }
+}
+
+/// "Change…": the reference of a palette colour.
+fn change_reference(ctx: &egui::Context, v: &mut Vectorizer) {
+    let target = v.changing.and_then(|i| v.quantized.as_ref()?.palette.get(i).map(|c| (i, c.rgb)));
+    let (Some((i, rgb)), Some(book)) = (target, v.book.as_ref()) else {
+        v.changing = None;
+        return;
+    };
+    let current = v.matches().get(i).copied().flatten().map(|m| m.0);
+    let mut search = std::mem::take(&mut v.search);
+    let pick = analyzer::swatch_picker(ctx, "dtf-vectorizer-change", rgb, analyzer::lab8(rgb), current, book, &mut search);
+    v.search = search;
+    match pick {
+        Pick::Open => return,
+        Pick::Close => {}
+        Pick::Chosen(choice) => v.set_swatch(&vectorize::hex(rgb), choice),
+    }
+    v.changing = None;
 }
 
 #[cfg(test)]
@@ -1084,7 +1337,7 @@ mod tests {
             }
         }
         let settings = Settings { remove_background: false, ..Settings::default() };
-        let mut v = Vectorizer::new(photocraft_doc::DocId::fresh(), "vague.png", None, (w as u32, h as u32), 300.0, (7.62, 5.08), "RVB 8 bits".into(), &px, settings);
+        let mut v = Vectorizer::new(photocraft_doc::DocId::fresh(), "vague.png", None, (w as u32, h as u32), 300.0, (7.62, 5.08), "RVB 8 bits".into(), &px, settings, None);
         let holes = |img: &egui::ColorImage| {
             let [iw, ih] = img.size;
             // Inside only: the outer edge is antialiased whatever the seams.
@@ -1197,6 +1450,17 @@ mod tests {
         v.center = [0.62, 0.36];
         h.run_steps(30);
         h.render().unwrap().save(dir.join("vectorisation_zoom.png")).unwrap();
+        // With the swatch book, and its PDF sheet.
+        let csv = b"Ref;R;V;B\nPANTONE 2768 C;20;36;84\nPANTONE 2905 C;141;200;232\nPANTONE 7404 C;244;196;76\nPANTONE 2728 C;30;77;180\nPANTONE Warm Red C;228;84;48\nBlanc;255;255;255\n";
+        let book = Book { name: "Pantone DTF.csv".into(), swatches: photocraft_algo::dtf_color::parse_swatch_book("x.csv", csv).unwrap() };
+        let v = h.state_mut().vectorizer.as_mut().unwrap();
+        v.zoom = 1.0;
+        v.center = [0.5, 0.5];
+        v.set_book(Some(book));
+        h.run_steps(6);
+        h.render().unwrap().save(dir.join("vectorisation_nuancier.png")).unwrap();
+        let sheet = h.state().vectorizer.as_ref().unwrap().sheet().unwrap();
+        std::fs::write(dir.join("vectorisation_fiche.pdf"), crate::color_sheet::pdf(&sheet)).unwrap();
     }
 
     /// Zoomed in, the visible part of the result is drawn again at the screen's resolution;
@@ -1281,5 +1545,107 @@ mod tests {
         assert!(h.state().vectorizer.is_none());
         // The settings are remembered.
         assert!(h.state().session.prefs().dialogs.contains_key(SETTINGS_PREF));
+    }
+
+    /// A swatch book with a blue and an orange close to the visual's, and black.
+    fn book() -> Book {
+        let csv = b"Ref;R;V;B\nEX-201 Bleu roi;30;80;180\nEX-114 Orange vif;226;90;48\nNoir;0;0;0\n";
+        Book { name: "Ex.csv".into(), swatches: photocraft_algo::dtf_color::parse_swatch_book("Ex.csv", csv).unwrap() }
+    }
+
+    /// The Color Analyzer's swatch book is the module's: the close colours take their references'
+    /// colours and names in the SVG; unchecked or picked by hand, they follow the choice.
+    #[test]
+    fn the_swatch_book_recolours_and_names_the_svg() {
+        let (mut app, written) = app();
+        crate::color_analyzer_ui::save_book(&mut app, &book());
+        open(&mut app).unwrap();
+        let v = app.vectorizer.as_mut().unwrap();
+        assert_eq!(v.book.as_ref().map(|b| b.swatches.len()), Some(3), "shared with the Color Analyzer");
+        let q = v.quantized.as_ref().unwrap();
+        let blue = q.palette.iter().position(|c| vectorize::hex(c.rgb) == "#1F4FB5").unwrap();
+        let m = v.matches();
+        assert!(m[blue].is_some_and(|(k, de, on)| k == 0 && de < 2.0 && on), "{m:?}");
+        let svg = v.svg().unwrap();
+        assert!(svg.contains("id=\"EX-201_Bleu_roi\"") && svg.contains("#1E50B4") && !svg.contains("#1F4FB5"), "{svg}");
+        assert!(svg.contains("id=\"EX-114_Orange_vif\""), "{svg}");
+        // Unchecked: the colour stays as it is.
+        v.set_replace("#E4572E", false);
+        let svg = v.svg().unwrap();
+        assert!(svg.contains("couleur-E4572E") && svg.contains("#E4572E"), "{svg}");
+        // Picked by hand: replaced, even far away.
+        v.set_swatch("#1F4FB5", Some(2));
+        let svg = v.svg().unwrap();
+        assert!(svg.contains("id=\"Noir\"") && svg.contains("#000000"), "{svg}");
+        assert_eq!(v.params()["replace"], json!([{"from": "#1F4FB5", "to": "#000000", "name": "Noir"}]));
+        // The export writes the same SVG and names the layers of the new tab.
+        let (dialog, _) = crate::file_dialog::fake(vec![Some(crate::file_dialog::FileDialogAnswer::SaveTo("out/logo vectorisé.svg".into()))]);
+        app.services.file_dialog = Some(dialog);
+        export_svg(&mut app).unwrap();
+        app.poll_file_dialog(&egui::Context::default(), None);
+        let svg = String::from_utf8(written.borrow()[0].1.clone()).unwrap();
+        assert!(svg.contains("id=\"Noir\"") && svg.contains("couleur-E4572E"), "{svg}");
+        assert!(app.session.active().unwrap().doc.layers.iter().any(|l| l.name == "Noir"));
+    }
+
+    #[test]
+    fn the_pdf_sheet_shows_the_vectorized_visual_and_its_references() {
+        let (mut app, written) = app();
+        crate::color_analyzer_ui::save_book(&mut app, &book());
+        open(&mut app).unwrap();
+        let v = app.vectorizer.as_mut().unwrap();
+        v.set_excluded("#E4572E", true);
+        v.update();
+        let sheet = v.sheet().unwrap();
+        assert_eq!(sheet.replaced_label.as_deref(), Some("Vectorized"));
+        let (w, h, _) = &sheet.image;
+        let (vw, vh, vpx) = sheet.replaced.as_ref().unwrap();
+        assert!((w.abs_diff(*vw), h.abs_diff(*vh)) <= (1, 1) && vpx.len() == vw * vh * 4);
+        // Only the colours in the SVG; the blue with its reference.
+        assert!(sheet.rows.iter().all(|r| r.rgb != [228, 87, 46]), "{:?}", sheet.rows);
+        let blue = sheet.rows.iter().find(|r| r.rgb == [31, 79, 181]).unwrap();
+        assert_eq!(blue.reference.as_ref().map(|r| r.name.as_str()), Some("EX-201 Bleu roi"));
+        let (dialog, _) = crate::file_dialog::fake(vec![Some(crate::file_dialog::FileDialogAnswer::SaveTo("out/fiche".into()))]);
+        app.services.file_dialog = Some(dialog);
+        export_pdf(&mut app).unwrap();
+        app.poll_file_dialog(&egui::Context::default(), None);
+        let files = written.borrow();
+        assert_eq!(files[0].0, "out/fiche.pdf");
+        assert!(files[0].1.starts_with(b"%PDF"));
+        assert!(app.vectorizer.is_some(), "the module stays open");
+    }
+
+    #[test]
+    fn change_picks_another_reference_in_the_list() {
+        let (mut app, _) = app();
+        crate::color_analyzer_ui::save_book(&mut app, &book());
+        open(&mut app).unwrap();
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
+            |ui, app: &mut PhotocraftApp| {
+                let ready = egui::Id::new("vectorizer-test-fonts");
+                if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
+                    PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
+                    ui.ctx().data_mut(|d| d.insert_temp(ready, true));
+                    return;
+                }
+                show(app, ui.ctx());
+            },
+            app,
+        );
+        h.run_steps(3);
+        assert!(h.query_by_label("EX-201 Bleu roi").is_some() && h.query_by_label("PDF Sheet…").is_some());
+        let q = h.state().vectorizer.as_ref().unwrap().quantized.as_ref().unwrap();
+        let blue = q.palette.iter().position(|c| vectorize::hex(c.rgb) == "#1F4FB5").unwrap();
+        h.state_mut().vectorizer.as_mut().unwrap().changing = Some(blue);
+        h.run_steps(3);
+        h.get_by_label("Noir").click();
+        h.run_steps(3);
+        let v = h.state().vectorizer.as_ref().unwrap();
+        assert!(v.changing.is_none());
+        assert_eq!(v.matches()[blue].map(|m| m.0), Some(2));
+        // Escape closes the module, not a picker that is no longer there.
+        h.key_press(egui::Key::Escape);
+        h.run_steps(2);
+        assert!(h.state().vectorizer.is_none());
     }
 }

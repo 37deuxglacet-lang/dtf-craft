@@ -637,6 +637,23 @@ pub const SEAM: f64 = 1.0;
 
 /// The SVG document: one `<path>` per colour, named by its colour.
 pub fn svg(t: &Traced, palette: &[PaletteColor], size: SvgSize, style: Style) -> String {
+    svg_named(t, palette, &[], size, style)
+}
+
+/// An SVG `id` from a swatch reference: letters, digits, `-` and `_` (spaces and others as `_`),
+/// never starting with a digit.
+pub fn svg_id(name: &str) -> String {
+    let mut id: String = name.trim().chars().map(|c| if c.is_ascii_alphanumeric() || c == '-' { c } else { '_' }).collect();
+    while id.contains("__") {
+        id = id.replace("__", "_");
+    }
+    let id = id.trim_matches('_').to_string();
+    if id.is_empty() || id.starts_with(|c: char| c.is_ascii_digit() || c == '-') { format!("ref-{id}") } else { id }
+}
+
+/// [`svg`] with each colour's path named by `names` (a swatch reference; `None` or missing: its
+/// hex), each name once (a second use gets `-2`, `-3`…).
+pub fn svg_named(t: &Traced, palette: &[PaletteColor], names: &[Option<String>], size: SvgSize, style: Style) -> String {
     let (w, h) = match size {
         SvgSize::Mm(w, h) if w.is_finite() && h.is_finite() && w > 0.0 && h > 0.0 => (format!("{}mm", num(w)), format!("{}mm", num(h))),
         SvgSize::Px(w, h) if w.is_finite() && h.is_finite() && w > 0.0 && h > 0.0 => (num(w), num(h)),
@@ -648,10 +665,21 @@ pub fn svg(t: &Traced, palette: &[PaletteColor], size: SvgSize, style: Style) ->
         "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"{w}\" height=\"{h}\" viewBox=\"0 0 {} {}\">\n",
         t.width, t.height
     ));
+    let mut used: Vec<String> = Vec::new();
     for p in &t.paths {
         let Some(c) = palette.get(p.color) else { continue };
         let colour = hex(c.rgb);
-        let id = format!("couleur-{}", colour.trim_start_matches('#'));
+        let base = match names.get(p.color).and_then(|n| n.as_deref()) {
+            Some(n) => svg_id(n),
+            None => format!("couleur-{}", colour.trim_start_matches('#')),
+        };
+        let mut id = base.clone();
+        let mut k = 2;
+        while used.contains(&id) {
+            id = format!("{base}-{k}");
+            k += 1;
+        }
+        used.push(id.clone());
         match style {
             Style::Contours(width) => out.push_str(&format!(
                 "<path id=\"{id}\" d=\"{}\" fill=\"none\" stroke=\"#FF2FA0\" stroke-width=\"{}\" stroke-linejoin=\"round\"/>\n",
@@ -673,6 +701,15 @@ pub fn svg(t: &Traced, palette: &[PaletteColor], size: SvgSize, style: Style) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn swatch_names_make_svg_ids() {
+        assert_eq!(svg_id("EX-201 Bleu roi"), "EX-201_Bleu_roi");
+        assert_eq!(svg_id("PANTONE 286 C"), "PANTONE_286_C");
+        assert_eq!(svg_id("286 C"), "ref-286_C");
+        assert_eq!(svg_id("Rouge/Été"), "Rouge_t");
+        assert_eq!(svg_id("  "), "ref-");
+    }
 
     const BLUE: [f32; 4] = [31.0 / 255.0, 79.0 / 255.0, 181.0 / 255.0, 1.0];
     const ORANGE: [f32; 4] = [228.0 / 255.0, 87.0 / 255.0, 46.0 / 255.0, 1.0];

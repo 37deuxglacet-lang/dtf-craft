@@ -4350,3 +4350,11 @@ cameraRaw	Yellow	Sárga
 	Hide the image	Kép elrejtése
 	Illustration: {user} on Pixabay	Illusztráció: {user}, Pixabay
 	Show an illustration	Illusztráció megjelenítése
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	A4-es lap a grafikával, a vektorizált eredménnyel, a színeivel és azok referenciáival.
+	Detected Colors	Észlelt színek
+	Replaced by the reference in the SVG	Az SVG-ben a referencia váltja fel
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG bejelöletlen: a szín kimarad az SVG-ből; alakzatai törlődnek, nem olvadnak össze.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Közös a Színelemzővel. Formátumok: .ase, .aco, .csv; eltérés ΔE 2000-ben.
+	{name} vectorized color sheet	{name} vektorizált színlap
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ bejelölve: az alakzatok a referencia színét veszik fel, és az SVG-ben annak nevét viselik. ΔE: 2-ig = észrevehetetlen · 2–5 = közelről látható · felette = más árnyalat

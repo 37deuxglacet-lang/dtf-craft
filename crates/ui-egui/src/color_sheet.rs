@@ -43,6 +43,8 @@ pub struct ColorSheet {
     pub image: (usize, usize, Vec<u8>),
     /// The visual with its colours replaced, the same way (`None`: nothing replaced).
     pub replaced: Option<(usize, usize, Vec<u8>)>,
+    /// The second visual's title (`None`: "Replaced Colors").
+    pub replaced_label: Option<String>,
     pub rows: Vec<SheetRow>,
 }
 
@@ -394,7 +396,8 @@ pub fn pdf(sheet: &ColorSheet) -> Vec<u8> {
             let gap = 24.0;
             let bw = (PAGE_W - 2.0 * MARGIN - gap) / 2.0;
             let bh = 190.0;
-            for (k, (label, image)) in [(tl!("Original Colors"), &sheet.image), (tl!("Replaced Colors"), replaced)].into_iter().enumerate() {
+            let second = sheet.replaced_label.as_deref().unwrap_or(tl!("Replaced Colors"));
+            for (k, (label, image)) in [(tl!("Original Colors"), &sheet.image), (second, replaced)].into_iter().enumerate() {
                 let x = MARGIN + k as f64 * (bw + gap);
                 p.text(Font::Bold, 10.0, x, top + 2.0, INK, &fit(Font::Bold, 10.0, label, bw));
                 place(p, k, image, x, top + 12.0, bw, bh);
@@ -551,6 +554,7 @@ mod tests {
             dpi: 300.0,
             image: (2, 1, vec![255, 0, 0, 255, 0, 0, 255, 0]),
             replaced: None,
+            replaced_label: None,
             rows: (0..rows)
                 .map(|i| SheetRow {
                     rgb: [31, 58, 147],

@@ -4032,3 +4032,11 @@ curves	Smooth	Wygładź
 	Hide the image	Ukryj obraz
 	Illustration: {user} on Pixabay	Ilustracja: {user} w Pixabay
 	Show an illustration	Pokaż ilustrację
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Arkusz A4 z grafiką, wynikiem wektoryzacji, jej kolorami i ich odniesieniami.
+	Detected Colors	Wykryte kolory
+	Replaced by the reference in the SVG	Zastąpiony odniesieniem w SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG odznaczone: kolor jest pomijany w SVG; jego kształty są usuwane, nie scalane.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Wspólny z Analizatorem kolorów. Formaty: .ase, .aco, .csv; różnica w ΔE 2000.
+	{name} vectorized color sheet	{name} karta kolorów po wektoryzacji
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ zaznaczone: kształty przyjmują kolor odniesienia i noszą jego nazwę w SVG. ΔE: do 2 = niezauważalna · od 2 do 5 = widoczna z bliska · powyżej = inny odcień

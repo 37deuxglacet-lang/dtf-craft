@@ -3131,3 +3131,11 @@ curves	Smooth	Suavizar
 	Hide the image	Ocultar la imagen
 	Illustration: {user} on Pixabay	Ilustración: {user} en Pixabay
 	Show an illustration	Mostrar una ilustración
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Una hoja A4 con el visual, el resultado vectorizado, sus colores y sus referencias.
+	Detected Colors	Colores detectados
+	Replaced by the reference in the SVG	Sustituido por la referencia en el SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG sin marcar: el color se excluye del SVG; sus formas se eliminan, no se fusionan.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Compartido con el Analizador de color. Formatos: .ase, .aco, .csv; diferencia en ΔE 2000.
+	{name} vectorized color sheet	{name} ficha de color vectorizada
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ marcado: las formas toman el color de la referencia y llevan su nombre en el SVG. ΔE: hasta 2 = imperceptible · de 2 a 5 = visible de cerca · más = otro tono

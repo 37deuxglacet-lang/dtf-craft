@@ -4219,3 +4219,11 @@ layerLabel	No Color	Sem cor
 	Hide the image	Ocultar a imagem
 	Illustration: {user} on Pixabay	Ilustração: {user} no Pixabay
 	Show an illustration	Mostrar uma ilustração
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Uma folha A4 com o visual, o resultado vetorizado, suas cores e suas referências.
+	Detected Colors	Cores detectadas
+	Replaced by the reference in the SVG	Substituída pela referência no SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG desmarcado: a cor fica fora do SVG; suas formas são removidas, não mescladas.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Compartilhado com o Analisador de cores. Formatos: .ase, .aco, .csv; diferença em ΔE 2000.
+	{name} vectorized color sheet	{name} ficha de cores vetorizada
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ marcado: as formas assumem a cor da referência e levam seu nome no SVG. ΔE: até 2 = imperceptível · de 2 a 5 = visível de perto · acima = outro tom

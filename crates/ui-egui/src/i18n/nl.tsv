@@ -4189,3 +4189,11 @@ curves	Smooth	Vloeiend maken
 	Hide the image	Afbeelding verbergen
 	Illustration: {user} on Pixabay	Illustratie: {user} op Pixabay
 	Show an illustration	Illustratie tonen
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Een A4-blad met het ontwerp, het gevectoriseerde resultaat, de kleuren en hun referenties.
+	Detected Colors	Gedetecteerde kleuren
+	Replaced by the reference in the SVG	Vervangen door de referentie in de SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG uitgevinkt: de kleur wordt uit de SVG weggelaten; de vormen worden verwijderd, niet samengevoegd.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Gedeeld met de Kleuranalyse. Formaten: .ase, .aco, .csv; verschil in ΔE 2000.
+	{name} vectorized color sheet	{name} kleurenblad gevectoriseerd
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ aangevinkt: de vormen krijgen de kleur van de referentie en dragen de naam ervan in de SVG. ΔE: tot 2 = onwaarneembaar · 2 tot 5 = zichtbaar van dichtbij · daarboven = andere tint

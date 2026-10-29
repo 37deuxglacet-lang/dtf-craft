@@ -4161,3 +4161,11 @@ cameraData	Lens	Lens
 	Hide the image	Görseli gizle
 	Illustration: {user} on Pixabay	İllüstrasyon: {user}, Pixabay
 	Show an illustration	İllüstrasyon göster
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Görseli, vektörleştirilmiş sonucu, renklerini ve referanslarını içeren bir A4 sayfa.
+	Detected Colors	Algılanan renkler
+	Replaced by the reference in the SVG	SVG'de referansla değiştirilir
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG işaretsiz: renk SVG'ye alınmaz; şekilleri birleştirilmez, kaldırılır.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Renk Analizcisi ile ortak. Biçimler: .ase, .aco, .csv; fark ΔE 2000 ile.
+	{name} vectorized color sheet	{name} vektörleştirilmiş renk sayfası
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ işaretli: şekiller referansın rengini alır ve SVG'de onun adını taşır. ΔE: 2'ye kadar = fark edilmez · 2 ile 5 arası = yakından görülür · üstü = başka ton

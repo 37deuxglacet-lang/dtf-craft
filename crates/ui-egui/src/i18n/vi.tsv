@@ -3918,3 +3918,11 @@ curves	Smooth	Làm mượt
 	Hide the image	Ẩn hình ảnh
 	Illustration: {user} on Pixabay	Minh họa: {user} trên Pixabay
 	Show an illustration	Hiện minh họa
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Một trang A4 gồm hình, kết quả vector hóa, các màu và tham chiếu của chúng.
+	Detected Colors	Màu phát hiện được
+	Replaced by the reference in the SVG	Được thay bằng tham chiếu trong SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG bỏ chọn: màu bị loại khỏi SVG; các hình của nó bị xóa, không gộp.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dùng chung với Trình phân tích màu. Định dạng: .ase, .aco, .csv; chênh lệch theo ΔE 2000.
+	{name} vectorized color sheet	{name} bảng màu vector hóa
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ được chọn: các hình lấy màu của tham chiếu và mang tên của nó trong SVG. ΔE: đến 2 = không nhận ra · 2 đến 5 = thấy khi nhìn gần · cao hơn = sắc độ khác

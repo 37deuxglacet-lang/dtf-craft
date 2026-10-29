@@ -4108,3 +4108,11 @@ curves	Smooth	スムーズ
 	Hide the image	画像を隠す
 	Illustration: {user} on Pixabay	イラスト：{user}（Pixabay）
 	Show an illustration	イラストを表示
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	ビジュアル、ベクトル化の結果、その色と参照色を載せた A4 シート。
+	Detected Colors	検出された色
+	Replaced by the reference in the SVG	SVG では参照色に置き換え
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG のチェックなし：その色は SVG から除外され、形状は統合されず削除されます。
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	カラー分析と共有。形式：.ase、.aco、.csv。差は ΔE 2000。
+	{name} vectorized color sheet	{name} ベクトル化カラーシート
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ チェック：形状は参照色になり、SVG ではその名前が付きます。ΔE：2 以下 = 知覚できない · 2〜5 = 近くで見える · それ以上 = 別の色相

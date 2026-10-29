@@ -4392,3 +4392,11 @@ navigator	Zoom	Zoom
 	Hide the image	Nascondi l'immagine
 	Illustration: {user} on Pixabay	Illustrazione: {user} su Pixabay
 	Show an illustration	Mostra un'illustrazione
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Una scheda A4 con il visual, il risultato vettorializzato, i suoi colori e i relativi riferimenti.
+	Detected Colors	Colori rilevati
+	Replaced by the reference in the SVG	Sostituito dal riferimento nell'SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG non spuntato: il colore è escluso dall'SVG; le sue forme vengono rimosse, non unite.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Condiviso con l'Analizzatore colore. Formati: .ase, .aco, .csv; differenza in ΔE 2000.
+	{name} vectorized color sheet	{name} scheda colore vettorializzata
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ spuntato: le forme prendono il colore del riferimento e ne portano il nome nell'SVG. ΔE: fino a 2 = impercettibile · da 2 a 5 = visibile da vicino · oltre = altra tinta

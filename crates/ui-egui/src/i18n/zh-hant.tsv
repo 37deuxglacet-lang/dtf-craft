@@ -3042,3 +3042,11 @@ curves	Smooth	平滑
 	Hide the image	隱藏圖片
 	Illustration: {user} on Pixabay	插圖：{user}，來自 Pixabay
 	Show an illustration	顯示插圖
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	一張 A4 色卡，含圖像、向量化結果、其顏色及參考色。
+	Detected Colors	偵測到的顏色
+	Replaced by the reference in the SVG	在 SVG 中替換為參考色
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG 未勾選：該顏色不進入 SVG；其形狀被刪除，而不是合併。
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	與顏色分析器共用。格式：.ase、.aco、.csv；差異以 ΔE 2000 計。
+	{name} vectorized color sheet	{name} 向量化色卡
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 勾選：形狀採用參考色，並在 SVG 中以其命名。ΔE：2 以內 = 難以察覺 · 2 到 5 = 近看可見 · 以上 = 另一色相

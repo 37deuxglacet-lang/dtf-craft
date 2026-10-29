@@ -3463,3 +3463,11 @@ curves	Smooth	Lisser
 	Hide the image	Masquer l'image
 	Illustration: {user} on Pixabay	Illustration : {user} sur Pixabay
 	Show an illustration	Afficher une illustration
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Une fiche A4 avec le visuel, le résultat vectorisé, ses couleurs et leurs références.
+	Detected Colors	Couleurs détectées
+	Replaced by the reference in the SVG	Remplacée par la référence dans le SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG décoché : la couleur est retirée du SVG ; ses formes sont supprimées, pas fusionnées.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Partagé avec l'Analyseur couleur. Formats : .ase, .aco, .csv ; écart en ΔE 2000.
+	{name} vectorized color sheet	{name} fiche couleur vectorisé
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ coché : les formes prennent la couleur de la référence et portent son nom dans le SVG. ΔE : jusqu'à 2 = imperceptible · de 2 à 5 = visible de près · au-delà = autre teinte

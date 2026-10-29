@@ -3428,3 +3428,11 @@ curves	Smooth	Haluskan
 	Hide the image	Sembunyikan gambar
 	Illustration: {user} on Pixabay	Ilustrasi: {user} di Pixabay
 	Show an illustration	Tampilkan ilustrasi
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Lembar A4 berisi visual, hasil vektorisasi, warnanya, dan referensinya.
+	Detected Colors	Warna terdeteksi
+	Replaced by the reference in the SVG	Diganti dengan referensi di SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG tidak dicentang: warna dikeluarkan dari SVG; bentuknya dihapus, tidak digabung.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dipakai bersama Penganalisis Warna. Format: .ase, .aco, .csv; selisih dalam ΔE 2000.
+	{name} vectorized color sheet	{name} lembar warna vektorisasi
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ dicentang: bentuk mengambil warna referensi dan diberi namanya di SVG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain

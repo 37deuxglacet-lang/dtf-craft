@@ -3610,3 +3610,11 @@ curves	Smooth	매끄럽게
 	Hide the image	이미지 숨기기
 	Illustration: {user} on Pixabay	일러스트: {user}, Pixabay
 	Show an illustration	일러스트 표시
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	비주얼, 벡터화 결과, 색상과 기준 색상을 담은 A4 시트.
+	Detected Colors	감지된 색상
+	Replaced by the reference in the SVG	SVG에서 기준 색상으로 교체
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG 선택 해제: 색상이 SVG에서 빠지며 그 도형은 병합되지 않고 삭제됩니다.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	색상 분석기와 공유. 형식: .ase, .aco, .csv; 차이는 ΔE 2000.
+	{name} vectorized color sheet	{name} 벡터화 색상 시트
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 선택: 도형이 기준 색상을 가지며 SVG에서 그 이름이 붙습니다. ΔE: 2 이하 = 인지 불가 · 2~5 = 가까이서 보임 · 그 이상 = 다른 색조

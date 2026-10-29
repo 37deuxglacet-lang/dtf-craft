@@ -4503,3 +4503,11 @@ shape	Appearance	Izgled
 	Hide the image	Sakrij sliku
 	Illustration: {user} on Pixabay	Ilustracija: {user} na Pixabay
 	Show an illustration	Prikaži ilustraciju
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	A4 лист са мотивом, векторизованим резултатом, његовим бојама и њиховим референцама.
+	Detected Colors	Пронађене боје
+	Replaced by the reference in the SVG	Замењује се референцом у SVG-у
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG није означен: боја се изоставља из SVG-а; њени облици се уклањају, не спајају.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Заједничко са Анализатором боја. Формати: .ase, .aco, .csv; разлика у ΔE 2000.
+	{name} vectorized color sheet	{name} лист боја векторизације
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ означено: облици добијају боју референце и у SVG-у носе њено име. ΔE: до 2 = неприметно · од 2 до 5 = видљиво изблиза · више = друга нијанса

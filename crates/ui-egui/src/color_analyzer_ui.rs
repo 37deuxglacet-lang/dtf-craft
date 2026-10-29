@@ -91,14 +91,26 @@ pub struct Book {
 
 /// A colour's own choices, kept across analyses by its hex.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
-struct Choice {
+pub(crate) struct Choice {
     /// The swatch picked with "Change…" (`None`: the nearest).
-    swatch: Option<usize>,
+    pub(crate) swatch: Option<usize>,
     /// Replaced by its swatch in the PNG export (`None`: when the swatch is picked by hand or
     /// within ΔE 5 — a far swatch, often an antialiased edge, is left alone unless checked).
-    replace: Option<bool>,
+    pub(crate) replace: Option<bool>,
 }
 
+impl Choice {
+    /// The swatch of `book` for the colour `lab` (picked, or the nearest) with its ΔE 2000, and
+    /// whether the colour is replaced by it.
+    pub(crate) fn resolve(&self, book: Option<&Book>, lab: [f32; 3]) -> (Option<(usize, f32)>, bool) {
+        let swatch = book.and_then(|b| match self.swatch.filter(|s| *s < b.swatches.len()) {
+            Some(s) => Some((s, dtf_color::delta_e2000(lab, b.swatches[s].lab))),
+            None => dtf_color::nearest_swatch(&b.swatches, lab),
+        });
+        let replace = swatch.is_some_and(|(_, de)| self.replace.unwrap_or(self.swatch.is_some() || de <= AUTO_REPLACE_DE));
+        (swatch, replace)
+    }
+}
 
 /// Above this difference a nearest swatch is not replaced unless asked.
 const AUTO_REPLACE_DE: f32 = 5.0;
@@ -127,6 +139,8 @@ pub struct AppliedRange {
     pub range: ColorRange,
     pub swatch: usize,
     pub share: f32,
+    /// Checked: replaced in the preview, the PNG export and on the sheet (unchecked: kept aside).
+    pub on: bool,
 }
 
 pub struct ColorAnalyzer {
@@ -144,7 +158,6 @@ pub struct ColorAnalyzer {
     pub colors: Vec<MainColor>,
     pub extra: Vec<[f32; 3]>,
     pub view: View,
-    pub pipette: bool,
     /// The Color Range tool is on (the eyedropper is then off), the range being built and the
     /// swatch it becomes (`None`: the nearest to its first colour).
     pub range_tool: bool,
@@ -184,11 +197,11 @@ fn c32(rgb: [u8; 3]) -> Color32 {
 }
 
 /// A swatch's colour as it is drawn and exported: sRGB on 8-bit steps.
-fn swatch8(s: &Swatch) -> [u8; 3] {
+pub(crate) fn swatch8(s: &Swatch) -> [u8; 3] {
     rgb8(dtf_color::swatch_rgb(s))
 }
 
-fn lab8(rgb: [u8; 3]) -> [f32; 3] {
+pub(crate) fn lab8(rgb: [u8; 3]) -> [f32; 3] {
     srgb_to_lab(rgb.map(|v| f32::from(v) / 255.0))
 }
 
@@ -244,8 +257,7 @@ impl ColorAnalyzer {
             replaced: None,
             colors: Vec::new(),
             extra: Vec::new(),
-            view: View::Original,
-            pipette: false,
+            view: View::Replaced,
             range_tool: false,
             range: ColorRange { tolerance: settings.range_tolerance, contiguous: settings.range_contiguous, ..Default::default() },
             range_swatch: None,
@@ -290,7 +302,7 @@ impl ColorAnalyzer {
         }
         let mut out: Vec<Row> = rows.into_iter().filter(|r| r.replace && r.swatch.is_some()).collect();
         // Then the colour ranges, each as its first colour and its swatch.
-        for (i, r) in self.ranges.iter().enumerate() {
+        for (i, r) in self.ranges.iter().enumerate().filter(|(_, r)| r.on) {
             let Some(((lab, _), sw)) = r.range.add.first().zip(self.swatch(r.swatch)) else { continue };
             let rgb = lab_rgb8(*lab);
             out.push(Row {
@@ -379,10 +391,20 @@ impl ColorAnalyzer {
         let Some((swatch, _)) = self.range_target() else { return false };
         let range = self.range.clone();
         let share = self.range_share(&range);
-        self.ranges.push(AppliedRange { range, swatch, share });
+        self.ranges.push(AppliedRange { range, swatch, share, on: true });
         self.clear_range();
         self.changed();
         true
+    }
+
+    /// Checks or unchecks an applied range.
+    pub fn set_range_on(&mut self, i: usize, on: bool) {
+        if let Some(r) = self.ranges.get_mut(i)
+            && r.on != on
+        {
+            r.on = on;
+            self.changed();
+        }
     }
 
     pub fn remove_range(&mut self, i: usize) {
@@ -421,17 +443,14 @@ impl ColorAnalyzer {
             .map(|(i, c)| {
                 let hex = dtf_color::hex(c.rgb);
                 let choice = self.choices.get(&hex).copied().unwrap_or_default();
-                let swatch = self.book.as_ref().and_then(|b| match choice.swatch.filter(|s| *s < b.swatches.len()) {
-                    Some(s) => Some((s, dtf_color::delta_e2000(c.lab, b.swatches[s].lab))),
-                    None => dtf_color::nearest_swatch(&b.swatches, c.lab),
-                });
+                let (swatch, replace) = choice.resolve(self.book.as_ref(), c.lab);
                 Row {
                     hex,
                     rgb: rgb8(c.rgb),
                     lab: c.lab,
                     share: c.share * 100.0,
                     swatch,
-                    replace: swatch.is_some_and(|(_, de)| choice.replace.unwrap_or(choice.swatch.is_some() || de <= AUTO_REPLACE_DE)),
+                    replace,
                     extra: (i >= main).then(|| i - main),
                     range: None,
                 }
@@ -456,6 +475,7 @@ impl ColorAnalyzer {
         let ranges: Vec<Value> = self
             .ranges
             .iter()
+            .filter(|r| r.on)
             .filter_map(|r| {
                 let to = color_sheet::hex(swatch8(self.swatch(r.swatch)?));
                 let add: Vec<Value> = r.range.add.iter().map(|(lab, at)| json!({"hex": color_sheet::hex(lab_rgb8(*lab)), "x": at[0], "y": at[1]})).collect();
@@ -467,7 +487,7 @@ impl ColorAnalyzer {
     }
 
     pub fn any_replaced(&self) -> bool {
-        self.rows().iter().any(|r| r.replace) || !self.ranges.is_empty()
+        self.rows().iter().any(|r| r.replace) || self.ranges.iter().any(|r| r.on)
     }
 
     /// `px` (`w` × `h`) with the colours replaced as the PNG export replaces them.
@@ -477,7 +497,7 @@ impl ColorAnalyzer {
         let mut out = px.to_vec();
         dtf_color::replace(&mut out, &centers);
         let ranges: Vec<(ColorRange, [f32; 3])> =
-            self.ranges.iter().filter_map(|r| self.swatch(r.swatch).map(|s| (r.range.clone(), lab8(swatch8(s))))).collect();
+            self.ranges.iter().filter(|r| r.on).filter_map(|r| self.swatch(r.swatch).map(|s| (r.range.clone(), lab8(swatch8(s))))).collect();
         dtf_color::replace_ranges(&mut out, px, w, h, &ranges);
         out
     }
@@ -564,6 +584,7 @@ impl ColorAnalyzer {
             dpi: self.dpi,
             image: (w, h, image),
             replaced,
+            replaced_label: None,
             rows,
         }
     }
@@ -601,7 +622,7 @@ fn save_settings(app: &mut PhotocraftApp, s: &Settings) {
 }
 
 /// The swatch book is remembered with the preferences: `{"name", "colors": [[ref, L, a, b]]}`.
-fn load_book(app: &PhotocraftApp) -> Option<Book> {
+pub(crate) fn load_book(app: &PhotocraftApp) -> Option<Book> {
     let v = app.session.prefs().dialogs.get(BOOK_PREF)?;
     let name = v.get("name")?.as_str()?.to_string();
     let swatches: Vec<Swatch> = v
@@ -617,7 +638,7 @@ fn load_book(app: &PhotocraftApp) -> Option<Book> {
     (!swatches.is_empty()).then_some(Book { name, swatches })
 }
 
-fn save_book(app: &mut PhotocraftApp, book: &Book) {
+pub(crate) fn save_book(app: &mut PhotocraftApp, book: &Book) {
     let colors: Vec<Value> = book.swatches.iter().map(|s| json!([s.name, s.lab[0], s.lab[1], s.lab[2]])).collect();
     let v = json!({"name": book.name, "colors": colors});
     app.session.prefs.edit(|prefs| prefs.dialogs.insert(BOOK_PREF.into(), v));
@@ -657,13 +678,18 @@ pub fn close(app: &mut PhotocraftApp) {
     }
 }
 
-fn load_swatch_book(app: &mut PhotocraftApp) -> Result<Value, String> {
+/// "Load…": a swatch book (.ase, .aco, .csv), remembered and shared by the Color Analyzer and the
+/// Vectorization module.
+pub(crate) fn load_swatch_book(app: &mut PhotocraftApp) -> Result<Value, String> {
     app.pick_file_bytes_filtered(&["ase", "aco", "csv"], |app, name, bytes| {
         let file = file_name(&name);
         let swatches = dtf_color::parse_swatch_book(&file, &bytes)?;
         let book = Book { name: file.clone(), swatches };
         save_book(app, &book);
         let n = book.swatches.len();
+        if let Some(v) = app.vectorizer.as_mut() {
+            v.set_book(Some(book.clone()));
+        }
         if let Some(a) = app.color_analyzer.as_mut() {
             a.set_book(Some(book));
         }
@@ -821,25 +847,14 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
     let t = Tokens::get(ui.ctx());
     let bar = Rect::from_min_size(area.min + vec2(16.0, 10.0), vec2(area.width() - 32.0, 30.0));
     let mut tools = ui.new_child(egui::UiBuilder::new().max_rect(bar).layout(egui::Layout::left_to_right(egui::Align::Center)));
-    for (view, label) in [(View::Original, tl!("Original Colors")), (View::Replaced, tl!("Replaced Colors"))] {
-        if tools.add(egui::Button::new(label).selected(a.view == view)).clicked() {
-            a.view = view;
-        }
-    }
+    // The replaced colours only (no view of the original, no eyedropper), and Color Range.
+    tools.add(egui::Button::new(tl!("Replaced Colors")).selected(true));
     tools.add_space(16.0);
-    let pipette = tools
-        .add(egui::Button::new(format!("✚ {}", tl!("Eyedropper"))).selected(a.pipette))
-        .on_hover_text(tl!("Add a color with the eyedropper: click the visual."));
-    if pipette.clicked() {
-        a.pipette = !a.pipette;
-        a.range_tool = false;
-    }
     let range = tools
         .add(egui::Button::new(tl!("Color Range")).selected(a.range_tool))
         .on_hover_text(tl!("Click: a color · Shift+click: add · Alt+click: remove"));
     if range.clicked() {
         a.range_tool = !a.range_tool;
-        a.pipette = false;
     }
     let view = Rect::from_min_max(pos2(area.left() + 16.0, bar.bottom() + 10.0), area.max - vec2(16.0, 16.0));
     ui.painter().rect_filled(view, 4.0, t.canvas);
@@ -893,9 +908,9 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
         FontId::proportional(11.5),
         t.text_faint,
     );
-    // The eyedropper.
+    // Color Range's clicks.
     let response = ui.interact(image_rect, ui.id().with("dtf-color-analyzer-image"), Sense::click());
-    if (a.pipette || a.range_tool) && response.hovered() {
+    if a.range_tool && response.hovered() {
         ui.ctx().set_cursor_icon(egui::CursorIcon::Crosshair);
     }
     if a.range_tool
@@ -904,16 +919,6 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
     {
         let m = ui.input(|i| i.modifiers);
         a.range_click((p.x - image_rect.left()) / image_rect.width(), (p.y - image_rect.top()) / image_rect.height(), m.shift, m.alt);
-    }
-    if a.pipette
-        && response.clicked()
-        && let Some(p) = response.interact_pointer_pos()
-    {
-        let x = ((p.x - image_rect.left()) / image_rect.width() * iw).floor().max(0.0) as usize;
-        let y = ((p.y - image_rect.top()) / image_rect.height() * ih).floor().max(0.0) as usize;
-        if let Some(rgb) = a.pick(x, y) {
-            a.add_color(rgb);
-        }
     }
 }
 
@@ -1119,9 +1124,14 @@ fn range_ui(ui: &mut egui::Ui, a: &mut ColorAnalyzer) {
     ui.add_space(6.0);
     ui.label(RichText::new(tl!("Applied Ranges")).color(t.text_dim));
     let mut remove = None;
-    egui::Grid::new("dtf-color-analyzer-ranges").num_columns(4).spacing(vec2(6.0, 6.0)).show(ui, |ui| {
+    let mut toggle = None;
+    egui::Grid::new("dtf-color-analyzer-ranges").num_columns(5).spacing(vec2(6.0, 6.0)).show(ui, |ui| {
         ui.style_mut().wrap_mode = Some(egui::TextWrapMode::Extend);
         for (i, r) in a.ranges.iter().enumerate() {
+            let mut on = r.on;
+            if ui.add(egui::Checkbox::without_text(&mut on)).on_hover_text(tl!("Replaced in the PNG export")).changed() {
+                toggle = Some((i, on));
+            }
             ui.horizontal(|ui| {
                 ui.spacing_mut().item_spacing.x = 2.0;
                 for (lab, _) in r.range.add.iter().take(3) {
@@ -1149,12 +1159,15 @@ fn range_ui(ui: &mut egui::Ui, a: &mut ColorAnalyzer) {
             ui.end_row();
         }
     });
+    if let Some((i, on)) = toggle {
+        a.set_range_on(i, on);
+    }
     if let Some(i) = remove {
         a.remove_range(i);
     }
 }
 
-fn de_badge(de: f32) -> (Color32, Color32) {
+pub(crate) fn de_badge(de: f32) -> (Color32, Color32) {
     if de <= 2.0 {
         (Color32::from_rgb(0x1e, 0x4d, 0x2b), Color32::from_rgb(0x9b, 0xe3, 0xb0))
     } else if de <= 5.0 {
@@ -1254,56 +1267,49 @@ fn colors_table(ui: &mut egui::Ui, a: &mut ColorAnalyzer) {
     }
 }
 
-/// "Change…": the swatch-book colours nearest first, with a search.
-fn change_reference(ctx: &egui::Context, a: &mut ColorAnalyzer) {
-    // The colour the reference is for: a row of the table, or the range being built.
-    let rows = a.rows();
-    let row = match a.changing {
-        Some(i) => rows.get(i).cloned(),
-        None if a.changing_range => a.range.add.first().map(|(lab, _)| {
-            let rgb = lab_rgb8(*lab);
-            Row { hex: color_sheet::hex(rgb), rgb, lab: *lab, share: 0.0, swatch: a.range_target(), replace: true, extra: None, range: None }
-        }),
-        None => return,
-    };
-    let (Some(row), Some(book)) = (row, a.book.as_ref()) else {
-        a.changing = None;
-        a.changing_range = false;
-        return;
-    };
-    let row = &row;
-    let mut picked: Option<Option<usize>> = None;
-    let search = a.search.to_lowercase();
+/// What the swatch picker came to.
+pub(crate) enum Pick {
+    /// Still open.
+    Open,
+    /// Cancelled or closed.
+    Close,
+    /// A swatch picked (`None`: the nearest, automatically).
+    Chosen(Option<usize>),
+}
+
+/// The swatch picker ("Change…"): the swatch-book colours nearest to `lab` first, with a search.
+pub(crate) fn swatch_picker(ctx: &egui::Context, id: &str, rgb: [u8; 3], lab: [f32; 3], current: Option<usize>, book: &Book, search: &mut String) -> Pick {
+    let hex = color_sheet::hex(rgb);
+    let mut pick = Pick::Open;
+    let needle = search.to_lowercase();
     let mut list: Vec<(usize, f32)> = book
         .swatches
         .iter()
         .enumerate()
-        .filter(|(_, s)| search.is_empty() || s.name.to_lowercase().contains(&search))
-        .map(|(k, s)| (k, dtf_color::delta_e2000(row.lab, s.lab)))
+        .filter(|(_, s)| needle.is_empty() || s.name.to_lowercase().contains(&needle))
+        .map(|(k, s)| (k, dtf_color::delta_e2000(lab, s.lab)))
         .collect();
     list.sort_by(|x, y| x.1.total_cmp(&y.1));
     list.truncate(200);
-    let mut search_text = a.search.clone();
-    let modal = egui::Modal::new(egui::Id::new("dtf-color-analyzer-change")).show(ctx, |ui| {
+    let modal = egui::Modal::new(egui::Id::new(id)).show(ctx, |ui| {
         ui.set_width(380.0);
         ui.horizontal(|ui| {
-            patch(ui, row.rgb, 28.0);
-            ui.label(RichText::new(crate::i18n::fmt(tl!("Reference for {hex}"), &[("hex", &row.hex)])).font(crate::theme::semibold(14.0)));
+            patch(ui, rgb, 28.0);
+            ui.label(RichText::new(crate::i18n::fmt(tl!("Reference for {hex}"), &[("hex", &hex)])).font(crate::theme::semibold(14.0)));
         });
         ui.add_space(6.0);
-        ui.add(egui::TextEdit::singleline(&mut search_text).hint_text(tl!("Search")).desired_width(f32::INFINITY));
+        ui.add(egui::TextEdit::singleline(search).hint_text(tl!("Search")).desired_width(f32::INFINITY));
         ui.add_space(4.0);
         if ui.button(tl!("Nearest (automatic)")).clicked() {
-            picked = Some(None);
+            pick = Pick::Chosen(None);
         }
         egui::ScrollArea::vertical().max_height(360.0).show(ui, |ui| {
             for (k, de) in &list {
                 let s = &book.swatches[*k];
-                let selected = row.swatch.is_some_and(|(cur, _)| cur == *k);
                 let resp = ui
                     .horizontal(|ui| {
                         patch(ui, swatch8(s), 20.0);
-                        let r = ui.selectable_label(selected, &s.name);
+                        let r = ui.selectable_label(current == Some(*k), &s.name);
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label(RichText::new(format!("ΔE {}", decimal(f64::from(*de), 1))).font(crate::theme::mono(11.0)));
                         });
@@ -1311,33 +1317,49 @@ fn change_reference(ctx: &egui::Context, a: &mut ColorAnalyzer) {
                     })
                     .inner;
                 if resp.clicked() {
-                    picked = Some(Some(*k));
+                    pick = Pick::Chosen(Some(*k));
                 }
             }
         });
         ui.add_space(6.0);
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            if ui.button(tl!("Cancel")).clicked() {
-                a.changing = None;
-                a.changing_range = false;
+            if ui.button(tl!("Cancel")).clicked() && matches!(pick, Pick::Open) {
+                pick = Pick::Close;
             }
         });
     });
-    a.search = search_text;
-    if modal.should_close() {
+    if modal.should_close() && matches!(pick, Pick::Open) {
+        pick = Pick::Close;
+    }
+    pick
+}
+
+/// "Change…": the reference of a row of the table, or of the range being built.
+fn change_reference(ctx: &egui::Context, a: &mut ColorAnalyzer) {
+    // The colour the reference is for: a row of the table, or the range being built.
+    let target = match a.changing {
+        Some(i) => a.rows().get(i).map(|r| (r.rgb, r.lab, r.swatch.map(|(k, _)| k), Some(r.hex.clone()))),
+        None if a.changing_range => a.range.add.first().map(|(lab, _)| (lab_rgb8(*lab), *lab, a.range_target().map(|(k, _)| k), None)),
+        None => return,
+    };
+    let (Some((rgb, lab, current, hex)), Some(book)) = (target, a.book.as_ref()) else {
         a.changing = None;
         a.changing_range = false;
+        return;
+    };
+    let mut search = std::mem::take(&mut a.search);
+    let pick = swatch_picker(ctx, "dtf-color-analyzer-change", rgb, lab, current, book, &mut search);
+    a.search = search;
+    match pick {
+        Pick::Open => return,
+        Pick::Close => {}
+        Pick::Chosen(choice) => match hex {
+            Some(hex) => a.set_swatch(&hex, choice),
+            None => a.range_swatch = choice,
+        },
     }
-    if let Some(choice) = picked {
-        if a.changing_range {
-            a.range_swatch = choice;
-        } else {
-            let hex = row.hex.clone();
-            a.set_swatch(&hex, choice);
-        }
-        a.changing = None;
-        a.changing_range = false;
-    }
+    a.changing = None;
+    a.changing_range = false;
 }
 
 #[cfg(test)]
@@ -1584,6 +1606,14 @@ mod tests {
         assert_eq!(p["ranges"][0]["to"], "#000000");
         assert_eq!(p["ranges"][0]["add"][0]["hex"], "#E4572E");
         assert_eq!(p["ranges"][0]["tolerance"], 20.0);
+        // Unchecked: kept in the list, out of the preview, the patches, the sheet and the export.
+        a.set_range_on(0, false);
+        assert!(a.replace_params()["ranges"].as_array().unwrap().is_empty());
+        assert!(a.patch_rows().iter().all(|r| r.range.is_none()));
+        let px = a.replaced_pixels().to_vec();
+        assert_ne!(color_sheet::hex(rgb8([px[10 * w + 30][0], px[10 * w + 30][1], px[10 * w + 30][2]])), "#000000");
+        a.set_range_on(0, true);
+        assert_eq!(a.replace_params()["ranges"].as_array().unwrap().len(), 1);
         a.remove_range(0);
         assert!(a.replace_params()["ranges"].as_array().unwrap().is_empty());
     }

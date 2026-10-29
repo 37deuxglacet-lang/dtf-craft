@@ -3439,3 +3439,11 @@ curves	Smooth	Glätten
 	Hide the image	Bild ausblenden
 	Illustration: {user} on Pixabay	Illustration: {user} auf Pixabay
 	Show an illustration	Illustration anzeigen
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Ein A4-Blatt mit dem Motiv, dem vektorisierten Ergebnis, seinen Farben und ihren Referenzen.
+	Detected Colors	Erkannte Farben
+	Replaced by the reference in the SVG	Im SVG durch die Referenz ersetzt
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG nicht markiert: Die Farbe fehlt im SVG; ihre Formen werden entfernt, nicht zusammengeführt.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Mit dem Farbanalysator geteilt. Formate: .ase, .aco, .csv; Abweichung in ΔE 2000.
+	{name} vectorized color sheet	{name} Farbdatenblatt vektorisiert
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ markiert: Die Formen übernehmen die Farbe der Referenz und tragen im SVG ihren Namen. ΔE: bis 2 = nicht wahrnehmbar · 2 bis 5 = aus der Nähe sichtbar · darüber = anderer Farbton

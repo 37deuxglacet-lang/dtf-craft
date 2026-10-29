@@ -3404,3 +3404,11 @@ curves	Smooth	Сгладить
 	Hide the image	Скрыть изображение
 	Illustration: {user} on Pixabay	Иллюстрация: {user}, Pixabay
 	Show an illustration	Показать иллюстрацию
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Лист A4 с изображением, результатом векторизации, его цветами и их эталонами.
+	Detected Colors	Найденные цвета
+	Replaced by the reference in the SVG	Заменяется эталоном в SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG снят: цвет исключается из SVG; его фигуры удаляются, а не объединяются.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Общий с Анализатором цвета. Форматы: .ase, .aco, .csv; разница в ΔE 2000.
+	{name} vectorized color sheet	{name} цветовой лист векторизации
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ отмечено: фигуры принимают цвет эталона и в SVG носят его имя. ΔE: до 2 = незаметно · от 2 до 5 = заметно вблизи · выше = другой оттенок
