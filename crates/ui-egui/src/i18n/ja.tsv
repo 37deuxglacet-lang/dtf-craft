@@ -4104,3 +4104,7 @@ curves	Smooth	スムーズ
 	Replacement Color	置換カラー
 	Turn on Color Range above the visual, then click a color.	ビジュアルの上の「色域指定」をオンにして、色をクリックします。
 	{p} % of the visible pixels	表示ピクセルの {p} %
+# DTF Craft (17)
+	Hide the image	画像を隠す
+	Illustration: {user} on Pixabay	イラスト：{user}（Pixabay）
+	Show an illustration	イラストを表示

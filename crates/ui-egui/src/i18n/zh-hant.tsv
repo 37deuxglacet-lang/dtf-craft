@@ -3038,3 +3038,7 @@ curves	Smooth	平滑
 	Turn on Color Range above the visual, then click a color.	開啟圖案上方的「顏色範圍」，然後按一下一種顏色。
 	{p} % of the visible pixels	可見像素的 {p} %
 	Color Range	顏色範圍
+# DTF Craft (17)
+	Hide the image	隱藏圖片
+	Illustration: {user} on Pixabay	插圖：{user}，來自 Pixabay
+	Show an illustration	顯示插圖

@@ -1507,6 +1507,28 @@ mod tests {
         };
         shot(photocraft_engine::Session::new(), "beta", &|_| {});
         shot(photocraft_engine::Session::new(), "accueil", &|_| {});
+        // With an illustration behind it (a drawn stand-in for a Pixabay one).
+        shot(photocraft_engine::Session::new(), "accueil_illustration", &|app| {
+            let (w, h) = (1280usize, 720usize);
+            let blobs = [(0.2, 0.3, 0.35, [124.0, 58.0, 237.0]), (0.75, 0.25, 0.3, [6.0, 182.0, 212.0]), (0.55, 0.8, 0.4, [245.0, 158.0, 11.0]), (0.9, 0.85, 0.25, [219.0, 39.0, 119.0])];
+            let mut rgba = Vec::with_capacity(w * h * 4);
+            for y in 0..h {
+                for x in 0..w {
+                    let (fx, fy) = (x as f32 / w as f32, y as f32 / h as f32 * 0.5625);
+                    let mut c = [30.0f32, 41.0, 59.0];
+                    for (bx, by, r, col) in blobs {
+                        let d = ((fx - bx).powi(2) + (fy - by * 0.5625).powi(2)).sqrt();
+                        let k = (1.0 - d / r).clamp(0.0, 1.0).powf(1.5);
+                        for i in 0..3 {
+                            c[i] += (col[i] - c[i]) * k;
+                        }
+                    }
+                    rgba.extend([c[0] as u8, c[1] as u8, c[2] as u8, 255]);
+                }
+            }
+            let hit = crate::home_image::Hit { url: String::new(), user: "Exemple".into(), page: "https://pixabay.com/".into() };
+            crate::home_image::show_image(app, [w, h], rgba, hit);
+        });
         let visual = || {
             let mut s = photocraft_engine::Session::new();
             s.execute("file.new", json!({"width": 600, "height": 400, "resolution": 300, "background": "transparent"})).unwrap();

@@ -7,7 +7,7 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (77)
+## Modified (82)
 
 - `Cargo.lock`
 - `LICENSE-MIT`
@@ -86,8 +86,13 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/titlebar.rs`
 - `crates/ui-egui/src/view_cmds.rs`
 - `crates/ui-egui/src/workspace_ui.rs`
+- `ATTRIBUTION.md`
+- `apps/photocraft/Cargo.toml`
+- `apps/photocraft/src/services.rs`
+- `crates/ui-egui/src/icon_data.rs`
+- `crates/ui-egui/src/widgets.rs`
 
-## Added (22)
+## Added (31)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -111,6 +116,15 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/gang_sheet_ui.rs`
 - `crates/engine/src/dtf_vector_cmds.rs`
 - `crates/ui-egui/src/vectorizer_ui.rs`
+- `assets/icons/external-link.svg`
+- `assets/icons/graduation-cap.svg`
+- `assets/icons/wrench.svg`
+- `crates/algo/src/dtf_color.rs`
+- `crates/engine/src/dtf_color_cmds.rs`
+- `crates/ui-egui/src/color_analyzer_ui.rs`
+- `crates/ui-egui/src/color_sheet.rs`
+- `crates/ui-egui/src/home_image.rs`
+- `crates/ui-egui/src/promo.rs`
 
 ## Removed (7)
 

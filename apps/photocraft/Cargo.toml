@@ -36,6 +36,9 @@ log = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rfd = { workspace = true }
+# DTF Craft: the start screen's Pixabay illustration (HTTPS GET, rustls).
+ureq = "3"
+
 arboard = { version = "3.6", features = ["wayland-data-control"] }
 open = "5"
 # Reads the saved window layout (eframe persistence) to drop values that would abort startup.

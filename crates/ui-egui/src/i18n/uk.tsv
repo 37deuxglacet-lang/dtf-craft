@@ -4128,3 +4128,7 @@ curves	Smooth	Згладити
 	Replacement Color	Колір заміни
 	Turn on Color Range above the visual, then click a color.	Увімкніть «Колірний діапазон» над зображенням і клацніть колір.
 	{p} % of the visible pixels	{p} % видимих пікселів
+# DTF Craft (17)
+	Hide the image	Сховати зображення
+	Illustration: {user} on Pixabay	Ілюстрація: {user}, Pixabay
+	Show an illustration	Показати ілюстрацію

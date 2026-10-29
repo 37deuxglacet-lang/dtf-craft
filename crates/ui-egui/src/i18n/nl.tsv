@@ -4185,3 +4185,7 @@ curves	Smooth	Vloeiend maken
 	Replacement Color	Vervangende kleur
 	Turn on Color Range above the visual, then click a color.	Zet Kleurbereik boven het ontwerp aan en klik op een kleur.
 	{p} % of the visible pixels	{p} % van de zichtbare pixels
+# DTF Craft (17)
+	Hide the image	Afbeelding verbergen
+	Illustration: {user} on Pixabay	Illustratie: {user} op Pixabay
+	Show an illustration	Illustratie tonen

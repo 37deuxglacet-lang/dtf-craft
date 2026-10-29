@@ -3400,3 +3400,7 @@ curves	Smooth	Сгладить
 	Replacement Color	Цвет замены
 	Turn on Color Range above the visual, then click a color.	Включите «Цветовой диапазон» над изображением и щёлкните цвет.
 	{p} % of the visible pixels	{p} % видимых пикселов
+# DTF Craft (17)
+	Hide the image	Скрыть изображение
+	Illustration: {user} on Pixabay	Иллюстрация: {user}, Pixabay
+	Show an illustration	Показать иллюстрацию

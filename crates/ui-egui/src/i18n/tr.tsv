@@ -4157,3 +4157,7 @@ cameraData	Lens	Lens
 	Replacement Color	Yerine geçecek renk
 	Turn on Color Range above the visual, then click a color.	Görselin üstündeki Renk Aralığı'nı açın, ardından bir renge tıklayın.
 	{p} % of the visible pixels	Görünür piksellerin %{p}'i
+# DTF Craft (17)
+	Hide the image	Görseli gizle
+	Illustration: {user} on Pixabay	İllüstrasyon: {user}, Pixabay
+	Show an illustration	İllüstrasyon göster

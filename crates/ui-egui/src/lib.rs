@@ -124,6 +124,10 @@ pub mod layer_tree_ui;
 mod layout_keys;
 pub mod links;
 pub mod gang_sheet_ui;
+/// DTF Craft: the start screen's strip of Stéphane Glacet's sites.
+pub mod promo;
+/// DTF Craft: the start screen's background illustration, from Pixabay.
+pub mod home_image;
 pub mod liquify_ui;
 pub mod magnetic_lasso_ui;
 mod mask_props_ui;
@@ -346,6 +350,9 @@ pub type AutomationOpenPcraftFn = Box<dyn FnMut(&str) -> Result<Option<(String, 
 pub type AutomationCommandFn = Box<dyn Fn(&str, &Value) -> Result<(), String>>;
 /// Open a URL in the system browser (native) — reliable cross-platform, unlike `ctx.open_url`.
 pub type OpenUrlFn = Box<dyn Fn(&str) -> Result<(), String>>;
+/// An HTTPS GET returning the body (DTF Craft's start-screen illustration, [`home_image`]). A
+/// plain function so a worker thread can call it.
+pub type HttpGetFn = fn(&str) -> Result<Vec<u8>, String>;
 pub type EncodePngFn = Box<dyn Fn(u32, u32, &[u8]) -> Result<Vec<u8>, String>>;
 /// Put an RGBA8 image (width, height, pixels) on the OS clipboard.
 pub type ClipboardSetFn = Box<dyn FnMut(u32, u32, &[u8]) -> Result<(), String>>;
@@ -435,6 +442,8 @@ pub struct Services {
     pub encode_png: Option<EncodePngFn>,
     /// Open a URL in the system browser (native). Falls back to `ctx.open_url` (web) when unset.
     pub open_url: Option<OpenUrlFn>,
+    /// HTTPS GET (native): the start screen's Pixabay illustration. `None`: no illustration.
+    pub http_get: Option<HttpGetFn>,
     /// Preferences ▸ General ▸ Beep When Done: the platform's default beep, played when a
     /// background job finishes successfully. `None` in the web build (and in tests).
     pub beep: Option<fn()>,
@@ -695,6 +704,8 @@ pub struct PhotocraftApp {
     pub(crate) wide_angle: Option<wide_angle_ui::WideAngleDialog>,
     /// DTF › Gang Sheet dialog (gang_sheet_ui, DTF Craft).
     pub(crate) gang_sheet: Option<gang_sheet_ui::GangSheetDialog>,
+    /// DTF Craft: the start screen's Pixabay illustration.
+    pub(crate) home_image: home_image::HomeImage,
     /// ⌘Z history of each open parameter dialog (edit_history).
     pub(crate) dialog_edits: edit_history::DialogEdits,
     /// The filter a "Rasterize?" prompt answered for, run after the dialog closes, where the
@@ -890,6 +901,7 @@ impl PhotocraftApp {
             raw_redevelop: None,
             wide_angle: None,
             gang_sheet: None,
+            home_image: home_image::HomeImage::default(),
             dialog_edits: Default::default(),
             pending_after_prompt: None,
             tone_hist: None,

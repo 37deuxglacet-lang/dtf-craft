@@ -137,6 +137,20 @@ Le modèle `realesr-general-x4v3` de Real-ESRGAN (© 2021 Xintao Wang, licence B
 sans connexion internet : compter environ une à deux minutes pour une image de 1000 × 1000 px
 sur un processeur 8 cœurs.
 
+## Accueil
+
+La page d'accueil présente, sous Nouveau document / Ouvrir, « Les services de Stéphane Glacet » :
+cinq cartes (Pixel-Net, Réparation DTF, Formation DTF, Chromilab, Stéphane Glacet) avec un visuel,
+une accroche et un bouton « Ouvrir le site » (navigateur). Le bandeau se masque quand la fenêtre est
+trop petite.
+
+En fond, une illustration Pixabay (recherche « pop art », illustrations, format paysage, tout
+public), une nouvelle à chaque ouverture, sous un voile qui garde l'accueil lisible ; la source est
+affichée en bas à droite (« Illustration : auteur sur Pixabay », lien vers sa page), avec « Masquer
+l'image » / « Afficher une illustration ». La recherche est gardée 24 heures (règle de Pixabay) et
+l'image est téléchargée. La clé API vient du secret GitHub `PIXABAY_KEY` à la compilation (ou de la
+préférence `dtfCraft.homeImage.key`) ; sans clé ni connexion, l'accueil garde son fond habituel.
+
 ## Réglages
 
 DTF Craft garde ses réglages à part de PhotoCraft : `%APPDATA%\DTF Craft` sous Windows.

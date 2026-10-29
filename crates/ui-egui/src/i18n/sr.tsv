@@ -4499,3 +4499,7 @@ shape	Appearance	Izgled
 	Replacement Color	Boja zamene
 	Turn on Color Range above the visual, then click a color.	Uključite Opseg boja iznad vizuala, pa kliknite boju.
 	{p} % of the visible pixels	{p} % vidljivih piksela
+# DTF Craft (17)
+	Hide the image	Sakrij sliku
+	Illustration: {user} on Pixabay	Ilustracija: {user} na Pixabay
+	Show an illustration	Prikaži ilustraciju

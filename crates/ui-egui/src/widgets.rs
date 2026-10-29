@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Custom widgets for the Photocraft look: cards with pill tabs, thin sliders with round knobs,
 //! monospace value fields with dimmed units, toggle switches, primary/secondary buttons.
 

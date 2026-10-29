@@ -2644,11 +2644,25 @@ pub fn mode_label(doc: &Document) -> &'static str {
 fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     let t = crate::theme::Tokens::get(ui.ctx());
     let area = ui.available_rect_before_wrap();
-    paint_dots(ui, area, app.session.prefs().interface.show_canvas_dots);
+    // DTF Craft: an illustration from Pixabay behind the start screen, else the dots.
+    crate::home_image::start(app);
+    crate::home_image::poll(app, ui.ctx());
+    if !crate::home_image::paint(app, ui, area) {
+        paint_dots(ui, area, app.session.prefs().interface.show_canvas_dots);
+    }
     // File › Open Recent, newest first (on the web there are no paths to reopen).
     let recent: Vec<String> = if cfg!(target_arch = "wasm32") { Vec::new() } else { app.ui.recent_files.iter().take(HOME_RECENT).cloned().collect() };
     let recent_h = if recent.is_empty() { 0.0 } else { 34.0 + recent.len() as f32 * HOME_RECENT_ROW };
-    let card = Rect::from_center_size(area.center(), egui::vec2(460.0, 330.0 + recent_h));
+    // DTF Craft: the sites' strip along the bottom when there is room, the card centred above it.
+    let card_h = 330.0 + recent_h;
+    let promo_w = (area.width() - 48.0).min(1160.0);
+    let promo = (area.height() >= card_h + crate::promo::HEIGHT + 80.0 && promo_w >= crate::promo::min_width())
+        .then(|| Rect::from_center_size(egui::pos2(area.center().x, area.bottom() - 28.0 - crate::promo::HEIGHT / 2.0), egui::vec2(promo_w, crate::promo::HEIGHT)));
+    let above = promo.map_or(area, |p| Rect::from_min_max(area.min, egui::pos2(area.right(), p.top() - 12.0)));
+    let card = Rect::from_center_size(above.center(), egui::vec2(460.0, card_h));
+    if let Some(p) = promo {
+        crate::promo::strip(app, ui, p);
+    }
     let new_label = crate::shortcuts::command_label(app, "New document…", "file.new");
     let open_label = crate::shortcuts::command_label(app, "Open…", "file.open");
     ui.scope_builder(egui::UiBuilder::new().max_rect(card), |ui| {
@@ -2698,6 +2712,7 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
             crate::links::link_row(app, ui);
         });
     });
+    crate::home_image::credit(app, ui, area);
 }
 
 /// Wayland has no native file drops (winit 0.30, #386), so the hint offers File › Open and paste.

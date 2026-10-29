@@ -3459,3 +3459,7 @@ curves	Smooth	Lisser
 	Replacement Color	Couleur de remplacement
 	Turn on Color Range above the visual, then click a color.	Activez « Plage de couleurs » au-dessus du visuel, puis cliquez une couleur.
 	{p} % of the visible pixels	{p} % des pixels visibles
+# DTF Craft (17)
+	Hide the image	Masquer l'image
+	Illustration: {user} on Pixabay	Illustration : {user} sur Pixabay
+	Show an illustration	Afficher une illustration

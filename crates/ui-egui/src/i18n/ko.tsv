@@ -3606,3 +3606,7 @@ curves	Smooth	매끄럽게
 	Replacement Color	대체 색상
 	Turn on Color Range above the visual, then click a color.	비주얼 위의 색상 범위를 켠 다음 색상을 클릭하세요.
 	{p} % of the visible pixels	보이는 픽셀의 {p} %
+# DTF Craft (17)
+	Hide the image	이미지 숨기기
+	Illustration: {user} on Pixabay	일러스트: {user}, Pixabay
+	Show an illustration	일러스트 표시

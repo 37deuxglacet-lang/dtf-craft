@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Native platform services: file dialogs (rfd), filesystem, codecs.
 
 use photocraft_codecs::{ChannelLayout, EncodeOptions, Image, SampleType as CS};
@@ -197,6 +199,13 @@ fn block_on<T>(future: impl Future<Output = T>) -> T {
 /// Per-user settings directory: `PHOTOCRAFT_CONFIG_DIR`, else `<exe dir>/PhotoCraftData` in
 /// portable mode, else the platform convention. Everything the app persists lives under it; see
 /// [`crate::app_dirs`].
+/// An HTTPS GET with short timeouts (the start screen's illustration): the body, at most 16 MB.
+fn http_get(url: &str) -> Result<Vec<u8>, String> {
+    let agent: ureq::Agent = ureq::Agent::config_builder().timeout_global(Some(std::time::Duration::from_secs(15))).build().into();
+    let mut resp = agent.get(url).call().map_err(|e| e.to_string())?;
+    resp.body_mut().with_config().limit(16 * 1024 * 1024).read_to_vec().map_err(|e| e.to_string())
+}
+
 pub fn config_dir() -> Option<PathBuf> {
     crate::app_dirs::config_dir()
 }
@@ -460,6 +469,7 @@ pub fn native(automation: Option<photocraft_automation::AuthorizedWorkspace>) ->
         })),
         inbox: None,
         open_url: Some(Box::new(|url: &str| open::that(url).map_err(|e| e.to_string()))),
+        http_get: Some(http_get),
         beep: Some(platform_beep),
         clipboard_set_image: Some({
             let clip = clip.clone();

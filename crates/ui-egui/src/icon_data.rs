@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Icons embedded and tinted at runtime; sources and licences are listed in `ATTRIBUTION.md`.
 
 pub static ICONS: &[(&str, &[u8])] = &[
@@ -9,6 +11,7 @@ pub static ICONS: &[(&str, &[u8])] = &[
     ("app-window", include_bytes!("../../../assets/icons/app-window.svg")),
     ("artboard", include_bytes!("../../../assets/icons/artboard.svg")),
     ("arrow-left-right", include_bytes!("../../../assets/icons/arrow-left-right.svg")),
+    ("external-link", include_bytes!("../../../assets/icons/external-link.svg")),
     ("ban", include_bytes!("../../../assets/icons/ban.svg")),
     ("bandage", include_bytes!("../../../assets/icons/bandage.svg")),
     ("bandage-sparkle", include_bytes!("../../../assets/icons/bandage-sparkle.svg")),
@@ -66,6 +69,7 @@ pub static ICONS: &[(&str, &[u8])] = &[
     ("lasso-magnetic", include_bytes!("../../../assets/icons/lasso-magnetic.svg")),
     ("lasso-select", include_bytes!("../../../assets/icons/lasso-select.svg")),
     ("layer-mask", include_bytes!("../../../assets/icons/layer-mask.svg")),
+    ("graduation-cap", include_bytes!("../../../assets/icons/graduation-cap.svg")),
     ("layers", include_bytes!("../../../assets/icons/layers.svg")),
     ("link", include_bytes!("../../../assets/icons/link.svg")),
     ("link-2", include_bytes!("../../../assets/icons/link-2.svg")),
@@ -146,6 +150,7 @@ pub static ICONS: &[(&str, &[u8])] = &[
     ("unlink", include_bytes!("../../../assets/icons/unlink.svg")),
     ("wand", include_bytes!("../../../assets/icons/wand.svg")),
     ("wand-sparkles", include_bytes!("../../../assets/icons/wand-sparkles.svg")),
+    ("wrench", include_bytes!("../../../assets/icons/wrench.svg")),
     ("x", include_bytes!("../../../assets/icons/x.svg")),
     ("zoom-in", include_bytes!("../../../assets/icons/zoom-in.svg")),
 ];

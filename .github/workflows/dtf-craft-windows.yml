@@ -29,6 +29,8 @@ jobs:
       NUXIT_FTP_USER: ${{ secrets.NUXIT_FTP_USER }}
       NUXIT_FTP_PASSWORD: ${{ secrets.NUXIT_FTP_PASSWORD }}
       NUXIT_FTP_DIR: ${{ secrets.NUXIT_FTP_DIR }}
+      # The start screen's Pixabay illustration: the API key, built into the app (empty: no illustration).
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Rust toolchain

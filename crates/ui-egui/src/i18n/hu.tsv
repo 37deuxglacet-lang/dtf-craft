@@ -4346,3 +4346,7 @@ cameraRaw	Yellow	Sárga
 	Replacement Color	Csereszín
 	Turn on Color Range above the visual, then click a color.	Kapcsolja be a Színtartományt a kép felett, majd kattintson egy színre.
 	{p} % of the visible pixels	A látható képpontok {p} %-a
+# DTF Craft (17)
+	Hide the image	Kép elrejtése
+	Illustration: {user} on Pixabay	Illusztráció: {user}, Pixabay
+	Show an illustration	Illusztráció megjelenítése
