@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Process-level tests of the `photocraft-cli` binary.
 
 use std::io::{BufRead, BufReader, Write};
@@ -40,7 +42,8 @@ fn usage_and_unknown_command() {
     let (out, _) = ok(bin().arg("--help"));
     assert!(out.contains("convert"));
     let (out, _) = ok(bin().arg("--version"));
-    assert!(out.starts_with("photocraft-cli "));
+    // DTF Craft: its own version, then the PhotoCraft base.
+    assert!(out.starts_with("dtfcraft-cli 1.0 — PhotoCraft "), "{out}");
 }
 
 /// #423: `<subcommand> --help` and `-h` print usage and return at once (no inputs read, no files

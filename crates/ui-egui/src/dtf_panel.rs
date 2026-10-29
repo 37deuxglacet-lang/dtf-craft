@@ -106,9 +106,6 @@ pub struct DtfPanelUi {
     /// The DTF tool whose window is open (its command id).
     #[serde(skip)]
     pub window: Option<String>,
-    /// The beta notice is on screen (shown at every start of DTF Craft until OK).
-    #[serde(skip)]
-    pub beta_notice: bool,
 }
 
 /// The layout version DTF Craft last set up (remembered with the preferences): raising it
@@ -128,38 +125,11 @@ pub fn dtf_craft_startup(app: &mut PhotocraftApp) {
     app.dtf_craft = true;
     // The DTF tools are windows of the DTF menu: never a dock group on the right.
     app.ui.panels.dtf = false;
-    app.ui.dtf_panel.beta_notice = true;
     let seen = app.session.prefs().dialogs.get(LAYOUT_PREF).and_then(Value::as_u64).unwrap_or(0);
     if seen < LAYOUT_VERSION {
         app.ui.workspace = "DTF".into();
         crate::menus::apply_workspace(app);
         app.session.prefs.edit(|prefs| prefs.dialogs.insert(LAYOUT_PREF.into(), json!(LAYOUT_VERSION)));
-    }
-}
-
-/// The beta notice: this build is a beta, the release is planned for 2 November 2026. Shown at
-/// every start of DTF Craft; OK, Enter or Esc closes it.
-pub fn beta_notice(app: &mut PhotocraftApp, ctx: &egui::Context) {
-    if !app.ui.dtf_panel.beta_notice {
-        return;
-    }
-    let mut ok = false;
-    let modal = egui::Modal::new(egui::Id::new("dtf-craft-beta")).show(ctx, |ui| {
-        ui.set_max_width(420.0);
-        ui.label(RichText::new(tl!("DTF Craft — Beta Version")).font(crate::theme::semibold(15.0)));
-        ui.add_space(4.0);
-        crate::widgets::hairline(ui);
-        ui.add_space(8.0);
-        ui.label(tl!("This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs."));
-        ui.add_space(4.0);
-        ui.label(RichText::new(tl!("Release planned for November 2, 2026.")).strong());
-        ui.add_space(12.0);
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            ok = crate::widgets::primary_button(ui, tl!("OK"), 84.0).clicked();
-        });
-    });
-    if ok || modal.should_close() || ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Enter)) {
-        app.ui.dtf_panel.beta_notice = false;
     }
 }
 
@@ -1493,10 +1463,6 @@ mod tests {
             });
             h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());
             h.run_steps(6);
-            // The beta notice shows on its own shot only.
-            if name != "beta" {
-                h.state_mut().ui.dtf_panel.beta_notice = false;
-            }
             setup(h.state_mut());
             // Previews compute off the UI thread: give them time to land.
             for _ in 0..40 {
@@ -1505,7 +1471,6 @@ mod tests {
             }
             h.render().unwrap().save(dir.join(format!("{name}.png"))).unwrap();
         };
-        shot(photocraft_engine::Session::new(), "beta", &|_| {});
         shot(photocraft_engine::Session::new(), "accueil", &|_| {});
         // With an illustration behind it (a drawn stand-in for a Pixabay one).
         shot(photocraft_engine::Session::new(), "accueil_illustration", &|app| {

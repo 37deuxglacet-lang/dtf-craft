@@ -1181,7 +1181,6 @@ mod tests {
         });
         h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());
         h.run_steps(4);
-        h.state_mut().ui.dtf_panel.beta_notice = false;
         open(h.state_mut()).unwrap();
         h.state_mut().vectorizer.as_mut().unwrap().settings.contours = false;
         h.run_steps(6);

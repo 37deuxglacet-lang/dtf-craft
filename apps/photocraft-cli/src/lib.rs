@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Headless Photocraft command line. `run` is the whole program, so it can be
 //! tested in-process as well as through the binary.
 
@@ -172,7 +174,7 @@ pub fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
             return 0;
         }
         "--version" | "version" => {
-            let _ = writeln!(out, "photocraft-cli {}", photocraft_engine::build_info::long_version());
+            let _ = writeln!(out, "dtfcraft-cli {}", photocraft_engine::build_info::dtf_craft_version());
             return 0;
         }
         _ => {}

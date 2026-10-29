@@ -213,7 +213,7 @@ fn main() -> eframe::Result {
             Some("--safe-gpu") => safe_gpu = true,
             Some("--in-window-menus") => in_window_menus = true,
             Some("--version") => {
-                println!("photocraft {}", photocraft_engine::build_info::long_version());
+                println!("DTF Craft {}", photocraft_engine::build_info::dtf_craft_version());
                 return Ok(());
             }
             // Old macOS passes a process serial number when launched from Finder.

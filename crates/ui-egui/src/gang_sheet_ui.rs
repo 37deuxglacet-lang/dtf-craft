@@ -3707,7 +3707,6 @@ mod tests {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
                 let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
                 crate::dtf_panel::dtf_craft_startup(&mut app);
-                app.ui.dtf_panel.beta_notice = false;
                 app.run("file.new", json!({"width": 900, "height": 600, "resolution": 300, "background": "transparent"})).unwrap();
                 app.run("edit.fill", json!({"color": "#f2c200"})).unwrap();
                 let ctx = cc.egui_ctx.clone();

@@ -20,7 +20,12 @@ fn main() {
         .set("CompanyName", "Stéphane GLACET")
         .set("LegalCopyright", "© Stéphane GLACET — basé sur PhotoCraft © the PhotoCraft authors (MIT OR Apache-2.0)")
         .set("OriginalFilename", "DTF Craft.exe")
-        .set("InternalName", "dtfcraft");
+        .set("InternalName", "dtfcraft")
+        // DTF Craft's own version, not the PhotoCraft base's (the workspace version).
+        .set("ProductVersion", "1.0")
+        .set("FileVersion", "1.0.0.0")
+        .set_version_info(winresource::VersionInfo::PRODUCTVERSION, 0x0001_0000_0000_0000)
+        .set_version_info(winresource::VersionInfo::FILEVERSION, 0x0001_0000_0000_0000);
     if let Err(e) = res.compile() {
         if std::env::var_os("PHOTOCRAFT_REQUIRE_WINRES").is_some() {
             panic!("embedding Windows resources failed: {e}");

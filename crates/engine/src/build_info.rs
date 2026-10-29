@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Version and build provenance shared by every frontend (About dialog, `--version`).
 //!
 //! The version is the workspace version (`[workspace.package] version` in the root
@@ -10,8 +12,16 @@
 //! Without them (a plain `cargo build`) the build reports itself as a dev build. Nothing here
 //! shells out to git, so builds work from a source tarball and for wasm.
 
-/// The workspace version, such as `0.1.0` or `0.2.0-rc.1`.
+/// The workspace version, such as `0.1.0` or `0.2.0-rc.1`: the PhotoCraft base.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// DTF Craft's own version (the one the subscription follows: 1.0, 2.0…; 1.1, 1.2 are updates).
+pub const DTF_CRAFT_VERSION: &str = "1.0";
+
+/// `1.0 — PhotoCraft 0.8.2 (3f2a9c1d0, 2026-10-01)`: DTF Craft's version, then its base's.
+pub fn dtf_craft_version() -> String {
+    format!("{DTF_CRAFT_VERSION} — PhotoCraft {}", long_version())
+}
 
 /// The full git commit this build was made from, when the build environment recorded it.
 pub fn git_sha() -> Option<&'static str> {

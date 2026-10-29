@@ -7,7 +7,7 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (82)
+## Modified (85)
 
 - `Cargo.lock`
 - `LICENSE-MIT`
@@ -91,6 +91,9 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `apps/photocraft/src/services.rs`
 - `crates/ui-egui/src/icon_data.rs`
 - `crates/ui-egui/src/widgets.rs`
+- `apps/photocraft-cli/src/lib.rs`
+- `apps/photocraft-cli/tests/cli.rs`
+- `crates/engine/src/build_info.rs`
 
 ## Added (31)
 

@@ -2680,7 +2680,9 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                 ui.painter().galley(egui::pos2(r.left(), r.center().y - title.size().y / 2.0), title, t.text);
             });
             ui.add_space(2.0);
-            ui.label(egui::RichText::new(tl!("based on PhotoCraft · open source")).color(t.text_faint).size(13.0));
+            // DTF Craft: its version, then its base.
+            let version = crate::i18n::fmt(tl!("Version {version}"), &[("version", crate::brand::VERSION)]);
+            ui.label(egui::RichText::new(format!("{version} · {}", tl!("based on PhotoCraft · open source"))).color(t.text_faint).size(13.0));
             ui.add_space(8.0);
             ui.label(egui::RichText::new(tl!("Create a new document or open an existing file.")).color(t.text_dim).size(14.0));
             ui.add_space(22.0);
