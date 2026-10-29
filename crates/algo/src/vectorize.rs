@@ -5,8 +5,12 @@
 //! 1. The colours are reduced to a palette of at most N colours ([`dtf_color::analyze`], a
 //!    k-means in L*a*b*) and every visible pixel takes the nearest one; transparent pixels
 //!    (alpha < 0.5) stay out.
-//! 2. Areas smaller than the detail level allows are given to the colour around them, so no gap
-//!    opens where they were.
+//! 2. The contours are cleaned, at a width set by the detail level: a strip of one colour too thin
+//!    to print between two other colours (an antialiased or blurred edge read as a third colour)
+//!    is given, pixel by pixel, to the nearer of the colours around it; then each contour pixel
+//!    takes the colour most of its neighbourhood has, so the edges come out even, without teeth or
+//!    steps. Areas smaller than the detail level allows are given to the colour around them, so
+//!    no gap opens where they were.
 //! 3. The background is the colour on the visual's edge: on the image border when the visual
 //!    reaches it, else on the border of its visible area when that area is a full rectangle (a
 //!    visual with a transparent margin). Removing it drops the background areas joined to that
@@ -86,6 +90,26 @@ impl Detail {
             Detail::Low => 40.0,
             Detail::Medium => 12.0,
             Detail::High => 3.0,
+        }
+    }
+
+    /// Strips of one colour between two others thinner than this many px are given to them, at
+    /// 1000 px a side (the width grows with the visual's size).
+    fn thin_strip(self) -> f64 {
+        match self {
+            Detail::Low => 3.0,
+            Detail::Medium => 2.0,
+            Detail::High => 1.5,
+        }
+    }
+
+    /// The radius, in px at 1000 px a side, of the neighbourhood whose majority colour each
+    /// contour pixel takes.
+    fn smoothing(self) -> f64 {
+        match self {
+            Detail::Low => 2.0,
+            Detail::Medium => 1.5,
+            Detail::High => 1.0,
         }
     }
 
@@ -254,6 +278,15 @@ pub fn quantize(w: usize, h: usize, px: &[[f32; 4]], s: &Settings) -> Result<Qua
         snap_contours(w, h, &px, &flat, &centers, &mut index);
     }
     let scale = (w.max(h) as f64 / 1000.0).max(1.0);
+    // Strips too thin between two colours, then uneven contours.
+    let rho = ((s.detail.thin_strip() * scale / 2.0).round() as usize).max(1);
+    remove_thin_strips(w, h, &px, &centers, &mut index, rho);
+    let radius = ((s.detail.smoothing() * scale).round() as usize).max(1);
+    for _ in 0..2 {
+        if !smooth_contours(w, h, &mut index, radius) {
+            break;
+        }
+    }
     let min_area = (s.detail.min_area() * scale * scale).round().max(1.0) as usize;
     for _ in 0..2 {
         if !absorb_small_areas(w, h, &mut index, min_area) {
@@ -340,6 +373,215 @@ fn snap_contours(w: usize, h: usize, px: &[[f32; 4]], flat: &[bool], centers: &[
         }
     }
     index.copy_from_slice(&out);
+}
+
+/// The 8 neighbours of (x, y) inside the image.
+fn neighbours8(x: usize, y: usize, w: usize, h: usize) -> impl Iterator<Item = usize> {
+    let (x, y) = (x as isize, y as isize);
+    [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)].into_iter().filter_map(move |(dx, dy)| {
+        let (nx, ny) = (x + dx, y + dy);
+        (nx >= 0 && ny >= 0 && (nx as usize) < w && (ny as usize) < h).then(|| ny as usize * w + nx as usize)
+    })
+}
+
+/// Each pixel's distance (chessboard, in px) to the edge of its area of one colour: 1 for a pixel
+/// with a neighbour (8 around) of another colour or transparent, 2 for the next ones… The image's
+/// border is not an edge. With `same_only`, the distance runs from the pixels where `seed` is
+/// true instead, inside the areas only (it never crosses into another colour).
+fn distances(w: usize, h: usize, index: &[u8], seed: &dyn Fn(usize) -> bool, same_only: bool) -> Vec<u32> {
+    const FAR: u32 = u32::MAX / 2;
+    let mut d: Vec<u32> = (0..w * h).map(|i| if seed(i) { u32::from(!same_only) } else { FAR }).collect();
+    let relax = |d: &mut Vec<u32>, i: usize, j: usize| {
+        if (!same_only || index[i] == index[j]) && d[j] + 1 < d[i] {
+            d[i] = d[j] + 1;
+        }
+    };
+    for y in 0..h {
+        for x in 0..w {
+            let i = y * w + x;
+            if x > 0 {
+                relax(&mut d, i, i - 1);
+            }
+            if y > 0 {
+                relax(&mut d, i, i - w);
+                if x > 0 {
+                    relax(&mut d, i, i - w - 1);
+                }
+                if x + 1 < w {
+                    relax(&mut d, i, i - w + 1);
+                }
+            }
+        }
+    }
+    for y in (0..h).rev() {
+        for x in (0..w).rev() {
+            let i = y * w + x;
+            if x + 1 < w {
+                relax(&mut d, i, i + 1);
+            }
+            if y + 1 < h {
+                relax(&mut d, i, i + w);
+                if x + 1 < w {
+                    relax(&mut d, i, i + w + 1);
+                }
+                if x > 0 {
+                    relax(&mut d, i, i + w - 1);
+                }
+            }
+        }
+    }
+    d
+}
+
+/// The distance of each pixel to the edge of its colour's area (see [`distances`]).
+fn edge_distances(w: usize, h: usize, index: &[u8]) -> Vec<u32> {
+    let edge = |i: usize| neighbours8(i % w, i / w, w, h).any(|j| index[j] != index[i]);
+    distances(w, h, index, &edge, false)
+}
+
+/// Strips of one colour narrower than `2 × rho` px that run between two other colours, their colour
+/// between those two (a blurred or antialiased edge between black and white read as beige, say),
+/// are given, pixel by pixel, to the nearer of the two, so the edge falls where it is in the
+/// visual. Any other thin part stays: the tapered end of a stroke, a fine line of its own colour. True when anything
+/// changed.
+fn remove_thin_strips(w: usize, h: usize, px: &[[f32; 4]], centers: &[[f32; 3]], index: &mut [u8], rho: usize) -> bool {
+    let n = w * h;
+    let rho32 = rho as u32;
+    // What an opening keeps: the cores (deeper than rho in their area) widened back by rho.
+    let depth = edge_distances(w, h, index);
+    let core = |i: usize| index[i] != TRANSPARENT && depth[i] > rho32;
+    let reach = distances(w, h, index, &core, true);
+    let thin: Vec<bool> = (0..n).map(|i| index[i] != TRANSPARENT && reach[i] > rho32).collect();
+    let mut out = index.to_vec();
+    let mut seen = vec![false; n];
+    let mut part: Vec<usize> = Vec::new();
+    let mut stack: Vec<usize> = Vec::new();
+    let mut changed = false;
+    for start in 0..n {
+        if !thin[start] || seen[start] {
+            continue;
+        }
+        // The thin part of one colour, and the colours around it.
+        let own = index[start];
+        part.clear();
+        seen[start] = true;
+        stack.push(start);
+        let mut around: Vec<u8> = Vec::new();
+        while let Some(i) = stack.pop() {
+            part.push(i);
+            for j in neighbours8(i % w, i / w, w, h) {
+                let c = index[j];
+                if c == own {
+                    if thin[j] && !seen[j] {
+                        seen[j] = true;
+                        stack.push(j);
+                    }
+                } else if c != TRANSPARENT && !around.contains(&c) {
+                    around.push(c);
+                }
+            }
+        }
+        // Only a blend: its colour lies between two of the colours around it.
+        let own_lab = match centers.get(usize::from(own)) {
+            Some(c) => *c,
+            None => continue,
+        };
+        let mut allowed: Vec<u8> = Vec::new();
+        for (k, &a) in around.iter().enumerate() {
+            for &b in &around[k + 1..] {
+                let (Some(ca), Some(cb)) = (centers.get(usize::from(a)), centers.get(usize::from(b))) else { continue };
+                if between(own_lab, *ca, *cb) {
+                    for c in [a, b] {
+                        if !allowed.contains(&c) {
+                            allowed.push(c);
+                        }
+                    }
+                }
+            }
+        }
+        if allowed.is_empty() {
+            continue;
+        }
+        // Each pixel: the nearest colour among those around it.
+        let r = rho as isize + 1;
+        for &i in &part {
+            let (x, y) = ((i % w) as isize, (i / w) as isize);
+            let mut near: Vec<u8> = Vec::new();
+            for ny in (y - r).max(0)..(y + r + 1).min(h as isize) {
+                for nx in (x - r).max(0)..(x + r + 1).min(w as isize) {
+                    let c = index[ny as usize * w + nx as usize];
+                    if allowed.contains(&c) && !near.contains(&c) {
+                        near.push(c);
+                    }
+                }
+            }
+            let q = px[i];
+            let lab = srgb_to_lab([to8(q[0]), to8(q[1]), to8(q[2])].map(|v| f32::from(v) / 255.0));
+            if let Some(best) = near.into_iter().filter(|c| usize::from(*c) < centers.len()).min_by(|a, b| {
+                dist2(lab, centers[usize::from(*a)]).total_cmp(&dist2(lab, centers[usize::from(*b)]))
+            }) {
+                out[i] = best;
+                changed = true;
+            }
+        }
+    }
+    index.copy_from_slice(&out);
+    changed
+}
+
+/// Whether the colour `c` lies between `a` and `b` (L*a*b*), as a blend of the two does: its
+/// projection on the segment falls inside it, not too far from it.
+fn between(c: [f32; 3], a: [f32; 3], b: [f32; 3]) -> bool {
+    let ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+    let len2 = ab[0] * ab[0] + ab[1] * ab[1] + ab[2] * ab[2];
+    if len2 <= f32::EPSILON {
+        return false;
+    }
+    let t = ((c[0] - a[0]) * ab[0] + (c[1] - a[1]) * ab[1] + (c[2] - a[2]) * ab[2]) / len2;
+    let p = [a[0] + ab[0] * t, a[1] + ab[1] * t, a[2] + ab[2] * t];
+    (0.1..=0.9).contains(&t) && dist2(c, p) <= 0.35f32.powi(2) * len2
+}
+
+/// Each visible pixel near a contour takes the colour more than half of its neighbourhood
+/// (`radius` px around) has, when that is another colour: the contours lose their teeth and
+/// steps. Transparency never changes. True when anything changed.
+fn smooth_contours(w: usize, h: usize, index: &mut [u8], radius: usize) -> bool {
+    let depth = edge_distances(w, h, index);
+    let mut out = index.to_vec();
+    let r = radius as isize;
+    let mut votes: Vec<(u8, usize)> = Vec::new();
+    let mut changed = false;
+    for y in 0..h {
+        for x in 0..w {
+            let i = y * w + x;
+            let own = index[i];
+            if own == TRANSPARENT || depth[i] > radius as u32 {
+                continue;
+            }
+            votes.clear();
+            let mut total = 0;
+            let (xi, yi) = (x as isize, y as isize);
+            for ny in (yi - r).max(0)..(yi + r + 1).min(h as isize) {
+                for nx in (xi - r).max(0)..(xi + r + 1).min(w as isize) {
+                    let c = index[ny as usize * w + nx as usize];
+                    total += 1;
+                    match votes.iter_mut().find(|v| v.0 == c) {
+                        Some(v) => v.1 += 1,
+                        None => votes.push((c, 1)),
+                    }
+                }
+            }
+            if let Some((c, k)) = votes.iter().copied().filter(|v| v.0 != TRANSPARENT).max_by_key(|v| v.1)
+                && c != own
+                && k * 2 > total
+            {
+                out[i] = c;
+                changed = true;
+            }
+        }
+    }
+    index.copy_from_slice(&out);
+    changed
 }
 
 /// Gives each 4-connected area of one colour smaller than `min_area` px to the colour most
@@ -826,8 +1068,80 @@ mod tests {
         }
         let logo = quantize(60, 40, &px, &Settings { colors: 8, ..Settings::default() }).unwrap();
         assert_eq!(logo.palette.len(), 2);
+        // An illustration keeps a band of a third colour, but not a blended column one pixel wide:
+        // too thin to print, it goes to the two colours on either side.
         let illus = quantize(60, 40, &px, &Settings { colors: 8, kind: Kind::Illustration, detail: Detail::High }).unwrap();
+        assert_eq!(illus.palette.len(), 2);
+        let band: Vec<[f32; 4]> = px.iter().enumerate().map(|(i, q)| if (28..34).contains(&(i % 60)) { [0.5, 0.33, 0.45, 1.0] } else { *q }).collect();
+        let illus = quantize(60, 40, &band, &Settings { colors: 8, kind: Kind::Illustration, detail: Detail::High }).unwrap();
         assert_eq!(illus.palette.len(), 3);
+    }
+
+    /// A black and a white area with a blurred edge read as a third colour (beige, in a strip
+    /// two pixels wide): the strip goes to black and white, the edge stays where the blur's middle
+    /// is. A beige area wide enough stays, and so does the tapered end of a black stroke.
+    #[test]
+    fn thin_strips_between_two_colours_go_to_them() {
+        const BLACK: [f32; 4] = [0.18, 0.18, 0.18, 1.0];
+        const BEIGE: [f32; 4] = [0.9, 0.82, 0.75, 1.0];
+        let (w, h) = (90usize, 60usize);
+        let mut px = Vec::with_capacity(w * h);
+        for y in 0..h {
+            for x in 0..w {
+                px.push(match x {
+                    0..=29 => BLACK,
+                    30 | 31 => [0.86, 0.79, 0.72, 1.0],
+                    32..=59 => WHITE,
+                    _ if y < 30 => BEIGE,
+                    _ => WHITE,
+                });
+            }
+        }
+        // A black stroke tapering to a point in the white, from 6 px wide to 1.
+        for y in 40..56 {
+            let half = (56 - y) as f32 / 5.0;
+            for x in 70..90 {
+                if (x as f32 - 80.0).abs() < half {
+                    px[y * w + x] = BLACK;
+                }
+            }
+        }
+        // A beige touch beside the tip: black is not a blend of white and beige, the tip stays.
+        for y in 52..56 {
+            for x in 82..88 {
+                px[y * w + x] = BEIGE;
+            }
+        }
+        let q = quantize(w, h, &px, &Settings { colors: 3, kind: Kind::Illustration, detail: Detail::High }).unwrap();
+        let names = colours(&q);
+        let at = |x: usize, y: usize| names[usize::from(q.index[y * w + x])].clone();
+        for y in 0..h {
+            assert_ne!(at(30, y), at(80, 10), "row {y}: the blurred edge is not beige");
+            assert_ne!(at(31, y), at(80, 10), "row {y}: the blurred edge is not beige");
+        }
+        assert_eq!((at(29, 20), at(32, 20)), (at(0, 0), at(40, 0)), "black and white either side");
+        assert!(at(75, 10) != at(0, 0) && at(75, 10) != at(40, 0) && at(75, 10) != at(75, 50), "the beige area stays: {names:?}");
+        let stroke = (40..56).flat_map(|y| (70..90).map(move |x| (x, y))).filter(|(x, y)| at(*x, *y) == at(0, 0)).count();
+        assert!(stroke >= 30, "the stroke's tip stays: {stroke} px");
+    }
+
+    /// A contour with teeth one or two pixels deep comes out even.
+    #[test]
+    fn uneven_contours_are_evened_out() {
+        let (w, h) = (60usize, 60usize);
+        let mut px = Vec::with_capacity(w * h);
+        for y in 0..h {
+            for x in 0..w {
+                // A vertical edge at x = 30, its pixels alternately one step in or out.
+                let edge = 30 + [0, 1, -1, 2, 0, -2, 1][y % 7];
+                px.push(if (x as i32) < edge { BLUE } else { ORANGE });
+            }
+        }
+        let q = quantize(w, h, &px, &Settings { colors: 2, kind: Kind::Illustration, detail: Detail::Medium }).unwrap();
+        let blue = q.index[0];
+        let edges: Vec<usize> = (5..55).map(|y| (0..w).take_while(|x| q.index[y * w + x] == blue).count()).collect();
+        let (lo, hi) = (edges.iter().min().unwrap(), edges.iter().max().unwrap());
+        assert!(hi - lo <= 1, "edge between x = {lo} and {hi}: {edges:?}");
     }
 
     /// An orange band over blue, a navy ring around: the antialiased edge between orange and
