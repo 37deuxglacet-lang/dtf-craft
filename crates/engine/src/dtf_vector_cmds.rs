@@ -5,11 +5,14 @@
 //!
 //! * `dtf.vectorize`: the SVG (written to `path`, or returned), and optionally opened in a new
 //!   tab as shape layers, at the document's size and resolution. The app opens the full-screen
-//!   Vectorization module instead when run without parameters.
+//!   Vectorization module instead when run without parameters. Two engines: DTF Craft's own
+//!   (`engine: "dtfcraft"`, the default) and VectorCraft's Image Trace (`engine: "vectorcraft"`,
+//!   [`photocraft_algo::vectorize_vc`]) with its presets and all its settings.
 //!
 //! RGB values are read as sRGB; other colour modes are converted to RGB first.
 
-use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Settings, Smoothing, Style, SvgSize, TraceOptions, Traced};
+use photocraft_algo::vectorize::{self, Detail, Kind, PaletteColor, Quantized, Settings, Smoothing, Style, SvgSize, TraceOptions, Traced};
+use photocraft_algo::vectorize_vc;
 use photocraft_doc::Document;
 use serde_json::{Value, json};
 
@@ -82,6 +85,13 @@ pub fn trace_param(p: &Value, q: &Quantized) -> Result<TraceOptions> {
         None => true,
         Some(v) => v.as_bool().ok_or_else(|| bad("`removeBackground` must be true or false"))?,
     };
+    let excluded = exclude_param(p, &q.palette)?;
+    Ok(TraceOptions { detail: detail_param(p)?, smoothing, remove_background, excluded })
+}
+
+/// `exclude`: the palette colours (#rrggbb) left out of the SVG, as one flag per colour of
+/// `palette`.
+fn exclude_param(p: &Value, palette: &[PaletteColor]) -> Result<Vec<bool>> {
     let excluded: Vec<String> = match p.get("exclude").filter(|v| !v.is_null()) {
         None => Vec::new(),
         Some(v) => v
@@ -91,8 +101,28 @@ pub fn trace_param(p: &Value, q: &Quantized) -> Result<TraceOptions> {
             .map(|h| h.as_str().map(str::to_ascii_uppercase).ok_or_else(|| bad(format!("`exclude`: bad colour {h}"))))
             .collect::<Result<_>>()?,
     };
-    let excluded = q.palette.iter().map(|c| excluded.contains(&vectorize::hex(c.rgb))).collect();
-    Ok(TraceOptions { detail: detail_param(p)?, smoothing, remove_background, excluded })
+    Ok(palette.iter().map(|c| excluded.contains(&vectorize::hex(c.rgb))).collect())
+}
+
+/// A `#rrggbb` colour.
+fn parse_hex(h: &str) -> Option<[u8; 3]> {
+    let x = h.trim().strip_prefix('#').filter(|x| x.len() == 6 && x.is_ascii())?;
+    let b = |i: usize| u8::from_str_radix(&x[i..i + 2], 16).ok();
+    Some([b(0)?, b(2)?, b(4)?])
+}
+
+/// The VectorCraft engine's settings: `preset` (one of VectorCraft's), then the fields of
+/// `vectorcraft` over it; `swatches` (#rrggbb) for the Swatch Book palette.
+pub fn vc_param(p: &Value) -> Result<vectorize_vc::TraceParams> {
+    let mut params = vectorize_vc::params_from(text(p, "preset")?, p.get("vectorcraft")).map_err(bad)?;
+    if let Some(list) = p.get("swatches").filter(|v| !v.is_null()) {
+        let list = list.as_array().ok_or_else(|| bad("`swatches` must be a list of #rrggbb colours"))?;
+        params.swatches = list.iter().map(|h| h.as_str().and_then(parse_hex).ok_or_else(|| bad(format!("`swatches`: bad colour {h}")))).collect::<Result<_>>()?;
+    }
+    if params.palette == vectorize_vc::Palette::DocumentLibrary && params.swatches.is_empty() {
+        return Err(bad("the swatch-book palette needs `swatches`: [#rrggbb…]"));
+    }
+    Ok(params)
 }
 
 /// The visible image as straight RGBA: width, height, pixels.
@@ -102,7 +132,11 @@ pub fn visual_pixels(doc: &Document) -> Result<(u32, u32, Vec<[f32; 4]>)> {
 
 /// The palette as JSON: hex, RGB, share (%), background, in the SVG.
 pub fn palette_json(q: &Quantized, o: &TraceOptions, t: &Traced) -> Vec<Value> {
-    q.palette
+    colours_json(&q.palette, q.background, &o.excluded, t)
+}
+
+fn colours_json(palette: &[PaletteColor], background: Option<usize>, excluded: &[bool], t: &Traced) -> Vec<Value> {
+    palette
         .iter()
         .enumerate()
         .map(|(i, c)| {
@@ -110,8 +144,8 @@ pub fn palette_json(q: &Quantized, o: &TraceOptions, t: &Traced) -> Vec<Value> {
                 "hex": vectorize::hex(c.rgb),
                 "rgb": c.rgb,
                 "share": (c.share * 1000.0).round() / 10.0,
-                "background": q.background == Some(i),
-                "excluded": o.excluded.get(i).copied().unwrap_or(false),
+                "background": background == Some(i),
+                "excluded": excluded.get(i).copied().unwrap_or(false),
                 "inSvg": t.paths.iter().any(|p| p.color == i),
             })
         })
@@ -146,8 +180,8 @@ pub fn seal_param(p: &Value) -> Result<bool> {
 
 /// The palette with the swatch colours that replace some of its colours, and their references:
 /// `"replace": [{"from": "#rrggbb", "to": "#rrggbb", "name": "EX-201 Bleu roi"}]`.
-pub fn replace_param(p: &Value, q: &Quantized) -> Result<(Vec<vectorize::PaletteColor>, Vec<Option<String>>)> {
-    let mut palette = q.palette.clone();
+pub fn replace_param(p: &Value, palette: &[PaletteColor]) -> Result<(Vec<PaletteColor>, Vec<Option<String>>)> {
+    let mut palette = palette.to_vec();
     let mut names = vec![None; palette.len()];
     let Some(list) = p.get("replace").filter(|v| !v.is_null()) else { return Ok((palette, names)) };
     let list = list.as_array().ok_or_else(|| bad("`replace` must be a list of {from, to, name}"))?;
@@ -186,7 +220,11 @@ pub fn open_traced_as(s: &mut Session, t: &Traced, palette: &[vectorize::Palette
 }
 
 fn run(s: &mut Session, p: &Value) -> Result<Value> {
-    let settings = settings_param(p)?;
+    let vectorcraft = match text(p, "engine")? {
+        None | Some("dtfcraft") => false,
+        Some("vectorcraft") => true,
+        Some(e) => return Err(bad(format!("`engine` must be dtfcraft or vectorcraft (got {e})"))),
+    };
     let path = text(p, "path")?.filter(|v| !v.trim().is_empty()).map(str::to_string);
     let open = match p.get("open").filter(|v| !v.is_null()) {
         None => false,
@@ -196,19 +234,34 @@ fn run(s: &mut Session, p: &Value) -> Result<Value> {
     let (name, _) = result_name(&st.doc.name, st.path.as_deref());
     let (mm, dpi, size) = (size_mm(&st.doc), dpi(&st.doc), (st.doc.size.width, st.doc.size.height));
     let (w, h, px) = visual_pixels(&st.doc)?;
-    let q = vectorize::quantize(w as usize, h as usize, &px, &settings).map_err(bad)?;
-    let o = trace_param(p, &q)?;
     let seal = seal_param(p)?;
-    let t = q.trace(&o).map_err(EngineError::Other)?;
-    let (palette, names) = replace_param(p, &q)?;
+    let (t, colours, palette, names) = if vectorcraft {
+        // On the same copy as DTF Craft's engine: at most MAX_SIDE px a side.
+        let params = vc_param(p)?;
+        let (w, h, px) = vectorize::reduce(w as usize, h as usize, &px, vectorize::MAX_SIDE);
+        let r = vectorize_vc::trace(w, h, &px, &params).map_err(|e| EngineError::Other(e.to_string()))?;
+        let excluded = exclude_param(p, &r.palette)?;
+        let t = vectorize_vc::without(&r.traced, &excluded);
+        let colours = colours_json(&r.palette, None, &excluded, &t);
+        let (palette, names) = replace_param(p, &r.palette)?;
+        (t, colours, palette, names)
+    } else {
+        let settings = settings_param(p)?;
+        let q = vectorize::quantize(w as usize, h as usize, &px, &settings).map_err(bad)?;
+        let o = trace_param(p, &q)?;
+        let t = q.trace(&o).map_err(EngineError::Other)?;
+        let colours = palette_json(&q, &o, &t);
+        let (palette, names) = replace_param(p, &q.palette)?;
+        (t, colours, palette, names)
+    };
     let svg = vectorize::svg_named(&t, &palette, &names, SvgSize::Mm(mm.0, mm.1), Style::Fill { seal });
     let mut out = json!({
         "width": t.width,
         "height": t.height,
         "widthMm": (mm.0 * 100.0).round() / 100.0,
         "heightMm": (mm.1 * 100.0).round() / 100.0,
-        "palette": palette_json(&q, &o, &t),
-        "colors": t.paths.len(),
+        "palette": colours,
+        "colors": t.paths.iter().map(|p| p.color).collect::<std::collections::HashSet<_>>().len(),
         "shapes": t.shapes(),
         "points": t.points(),
     });
@@ -233,7 +286,7 @@ pub fn specs() -> Vec<CommandSpec> {
         label: "Vectorization…",
         menu: &["DTF"],
         shortcut: None,
-        params: r##"{"colors":2..32=8,"kind":logo|illustration=logo (logo: colours read in the flat areas, close ones grouped),"detail":low|medium|high=medium (smallest area kept, closeness of the curves),"smoothing":curves|corners=curves,"removeBackground":bool=true (the colour on the visual's edge, where it touches the edge; the same colour inside stays),"exclude":json (optional #rrggbb palette colours left out of the SVG),"replace":json (optional palette colours given a swatch colour: [{from: #rrggbb, to: #rrggbb, name: reference}]; their shapes take that colour and are named after the reference),"sealSeams":bool=true (each shape overlaps its neighbours by half a pixel, so no transparent hairline shows between two colours; false: strictly cut out),"path":str (optional; the SVG is written there, else returned as "svg"),"open":bool=false (open the result in a new tab, as shape layers at the document's size and resolution)} → {width,height (px traced),widthMm,heightMm,palette:[{hex,rgb,share (%),background,excluded,inSvg}],colors,shapes,points,svg|path,document?,name?}. Cut-out shapes, one flat colour each, no shape over another; the SVG has the document's print size. The document is not changed. The app opens the full-screen Vectorization module"##,
+        params: r##"{"engine":dtfcraft|vectorcraft=dtfcraft (vectorcraft: VectorCraft's Image Trace, with its settings below; the settings of the DTF Craft engine are ignored),"preset":str (VectorCraft: one of Default, Auto Color, High Fidelity Photo, Low Fidelity Photo, 3 Colors, 6 Colors, 16 Colors, Shades of Gray, Black and White Logo, Sketched Art, Silhouettes, Line Art, Technical Drawing, Outline, Flat Logo),"vectorcraft":json (VectorCraft: settings over the preset, camelCase: mode bw|grayscale|color|logo, threshold 0..255, palette limited|fullTone|automatic|documentLibrary, colors, colorDetail 0..100, paths 0..100, corners 0..100, noise px, method abutting|overlapping, ignoreWhite, ignoreColor #rrggbb, snapCurvesToLines, shapes, gradients, fills, strokes, strokeWidth px, logoColors [#rrggbb]),"swatches":json (VectorCraft documentLibrary palette: the swatch-book colours [#rrggbb…]),"colors":2..32=8,"kind":logo|illustration=logo (logo: colours read in the flat areas, close ones grouped),"detail":low|medium|high=medium (smallest area kept, closeness of the curves),"smoothing":curves|corners=curves,"removeBackground":bool=true (the colour on the visual's edge, where it touches the edge; the same colour inside stays),"exclude":json (optional #rrggbb palette colours left out of the SVG),"replace":json (optional palette colours given a swatch colour: [{from: #rrggbb, to: #rrggbb, name: reference}]; their shapes take that colour and are named after the reference),"sealSeams":bool=true (each shape overlaps its neighbours by half a pixel, so no transparent hairline shows between two colours; false: strictly cut out),"path":str (optional; the SVG is written there, else returned as "svg"),"open":bool=false (open the result in a new tab, as shape layers at the document's size and resolution)} → {width,height (px traced),widthMm,heightMm,palette:[{hex,rgb,share (%),background,excluded,inSvg}],colors,shapes,points,svg|path,document?,name?}. Cut-out shapes, one flat colour each, no shape over another; the SVG has the document's print size. The document is not changed. The app opens the full-screen Vectorization module"##,
         enabled: has_doc,
         run,
         journal: true,
@@ -327,6 +380,46 @@ mod tests {
         assert!(r["document"].is_u64());
         assert!(s.active().unwrap().doc.layers.iter().any(|l| l.name == "PANTONE_286_C"));
         for p in [json!({"replace": "#000000"}), json!({"replace": [{"from": "#1F4FB5"}]}), json!({"replace": [{"from": "blue", "to": "#000000"}]})] {
+            assert!(s.execute(VECTORIZE, p.clone()).is_err(), "{p}");
+        }
+    }
+
+    #[test]
+    fn the_vectorcraft_engine_traces_with_a_preset_and_its_settings() {
+        let mut s = session();
+        let revision = s.active().unwrap().revision;
+        let r = s.execute(VECTORIZE, json!({"engine": "vectorcraft", "preset": "6 Colors", "vectorcraft": {"ignoreWhite": true}})).unwrap();
+        let hexes: Vec<&str> = r["palette"].as_array().unwrap().iter().map(|c| c["hex"].as_str().unwrap()).collect();
+        assert!(!hexes.contains(&"#FFFFFF") && hexes.len() >= 2, "white ignored: {hexes:?}");
+        let svg = r["svg"].as_str().unwrap();
+        assert!(svg.contains("width=\"10mm\" height=\"6mm\""), "{svg}");
+        // A colour left out, another given a swatch colour and its name.
+        let blue = hexes.iter().find(|h| h.starts_with("#1") || h.starts_with("#2")).unwrap().to_string();
+        let orange = hexes.iter().find(|h| h.starts_with("#E")).unwrap().to_string();
+        let r = s
+            .execute(
+                VECTORIZE,
+                json!({"engine": "vectorcraft", "preset": "6 Colors", "vectorcraft": {"ignoreWhite": true}, "exclude": [orange], "replace": [{"from": blue, "to": "#0033A0", "name": "PANTONE 286 C"}], "open": true}),
+            )
+            .unwrap();
+        let svg = r["svg"].as_str().unwrap();
+        assert!(svg.contains("id=\"PANTONE_286_C\"") && !svg.contains(&orange), "{svg}");
+        assert_eq!(r["colors"].as_u64(), Some(r["palette"].as_array().unwrap().iter().filter(|c| c["inSvg"] == true).count() as u64));
+        assert_eq!(s.documents()[0].revision, revision, "the document is left alone");
+        assert!(s.active().unwrap().doc.layers.iter().any(|l| l.name == "PANTONE_286_C"));
+        // Black and white with a threshold; the swatch-book palette takes its colours.
+        let r = s.execute(VECTORIZE, json!({"engine": "vectorcraft", "vectorcraft": {"mode": "bw", "threshold": 200, "ignoreWhite": true}})).unwrap();
+        assert_eq!(r["palette"][0]["hex"], "#000000");
+        let r = s.execute(VECTORIZE, json!({"engine": "vectorcraft", "vectorcraft": {"mode": "color", "palette": "documentLibrary", "colors": 2}, "swatches": ["#0000FF", "#FF8000", "#FFFFFF"]})).unwrap();
+        let hexes: Vec<&str> = r["palette"].as_array().unwrap().iter().map(|c| c["hex"].as_str().unwrap()).collect();
+        assert!(hexes.iter().all(|h| ["#0000FF", "#FF8000", "#FFFFFF"].contains(h)), "{hexes:?}");
+        for p in [
+            json!({"engine": "potrace"}),
+            json!({"engine": "vectorcraft", "preset": "Nope"}),
+            json!({"engine": "vectorcraft", "vectorcraft": {"mode": "rainbow"}}),
+            json!({"engine": "vectorcraft", "vectorcraft": {"palette": "documentLibrary", "mode": "color"}}),
+            json!({"engine": "vectorcraft", "swatches": ["bleu"]}),
+        ] {
             assert!(s.execute(VECTORIZE, p.clone()).is_err(), "{p}");
         }
     }

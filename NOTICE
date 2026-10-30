@@ -14,6 +14,11 @@ DTF Craft bundles the weights of Real-ESRGAN's realesr-general-x4v3 model
 (crates/algo/models/realesr-general-x4v3.dtfsr), (c) 2021 Xintao Wang, BSD 3-Clause License.
 See crates/algo/models/LICENSE (shipped as LICENSE-Real-ESRGAN.txt).
 
+DTF Craft includes VectorCraft's Image Trace (crates/vectorcraft-trace, crates/vectorcraft-geom),
+copied unchanged from VectorCraft (https://github.com/storytold/vectorcraft), commit a8ec515:
+Copyright (c) 2026 ArtCraft Team and the VectorCraft contributors. Licensed under the MIT License
+or the Apache License, Version 2.0, at your option (LICENSE-MIT, LICENSE-APACHE).
+
 --------------------------------------------------------------------------------------------------
 
 PhotoCraft

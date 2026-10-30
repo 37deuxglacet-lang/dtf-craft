@@ -4138,3 +4138,50 @@ curves	Smooth	Εξομάλυνση
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Κοινό με τον Αναλυτή χρωμάτων. Μορφές: .ase, .aco, .csv· διαφορά σε ΔE 2000.
 	{name} vectorized color sheet	{name} φύλλο χρωμάτων διανυσματοποίησης
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ επιλεγμένο: τα σχήματα παίρνουν το χρώμα της αναφοράς και φέρουν το όνομά της στο SVG. ΔE: έως 2 = ανεπαίσθητη · 2 έως 5 = ορατή από κοντά · πάνω = άλλη απόχρωση
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	Το «{color}» δεν είναι χρώμα: γράψτε το ως #rrggbb.
+	16 Colors	16 χρώματα
+	3 Colors	3 χρώματα
+	6 Colors	6 χρώματα
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Ένας κύκλος, μια έλλειψη, ένα ορθογώνιο ή ένα κανονικό πολύγωνο βγαίνει ακριβώς ως αυτό το σχήμα.
+	Abutting	Γειτονικά
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Γειτονικά: κάθε χρώμα έχει τη δική του περιοχή, τα σχήματα μοιράζονται τα άκρα τους. Επικαλυπτόμενα: κάθε επίπεδο εκτείνεται κάτω από τα επάνω, χωρίς κενό ανάμεσα στα χρώματα.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Μια περιοχή της οποίας το χρώμα αλλάζει ομαλά προς μία κατεύθυνση γίνεται ένα σχήμα με γραμμική διαβάθμιση.
+	Areas smaller than this many pixels are ignored.	Οι περιοχές μικρότερες από αυτόν τον αριθμό pixel αγνοούνται.
+	Black and White	Ασπρόμαυρο
+	Black and White Logo	Ασπρόμαυρο λογότυπο
+	Cut-out shapes, contours cleaned for DTF printing.	Κομμένα σχήματα, περιγράμματα καθαρισμένα για εκτύπωση DTF.
+	Engine	Μηχανή
+	Exact Shapes	Ακριβή σχήματα
+	Fills	Γεμίσματα
+	Flat Logo	Επίπεδο λογότυπο
+	Full Tone	Συνεχής τόνος
+	Grays	Γκρι
+	High Fidelity Photo	Φωτογραφία υψηλής πιστότητας
+	Higher keeps more sharp corners.	Υψηλότερη τιμή κρατά περισσότερες αιχμηρές γωνίες.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Πόσο πιστά ακολουθούν οι καμπύλες τα pixel: υψηλότερη τιμή είναι πιο πιστή, με περισσότερα σημεία.
+	Ignore Color	Παράβλεψη χρώματος
+	Limited	Περιορισμένη
+	Line Art	Γραμμικό σχέδιο
+	Lines as Strokes	Γραμμές ως πινελιές
+	Lines no wider than the stroke width are traced as stroked center lines.	Οι γραμμές που δεν είναι φαρδύτερες από το πάχος πινελιάς σχεδιάζονται ως κεντρικές γραμμές με πινελιά.
+	Load a swatch book to use it as the palette.	Φορτώστε ένα βιβλίο δειγμάτων για να το χρησιμοποιήσετε ως παλέτα.
+	Logo Colors	Χρώματα λογοτύπου
+	Low Fidelity Photo	Φωτογραφία χαμηλής πιστότητας
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Οι σχεδόν ευθείες καμπύλες γίνονται ευθείες γραμμές· στο Επίπεδο λογότυπο, τα τμήματα κύκλου γίνονται πραγματικά τόξα.
+	Nothing to trace: everything is ignored or transparent.	Τίποτα για ανίχνευση: όλα αγνοούνται ή είναι διαφανή.
+	Outline	Περίγραμμα
+	Overlapping	Επικαλυπτόμενα
+	Pixels darker than this are black.	Τα pixel πιο σκούρα από αυτή την τιμή γίνονται μαύρα.
+	Shades of Gray	Αποχρώσεις του γκρι
+	Silhouettes	Σιλουέτες
+	Sketched Art	Σκίτσο
+	Snap Curves to Lines	Προσκόλληση καμπυλών σε γραμμές
+	Technical Drawing	Τεχνικό σχέδιο
+	The areas of this color are left out (white when the field is empty).	Οι περιοχές αυτού του χρώματος παραλείπονται (λευκό αν το πεδίο είναι κενό).
+	The colors of the reference swatch book below, at most this many.	Τα χρώματα του βιβλίου δειγμάτων αναφοράς παρακάτω, το πολύ τόσα.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Αυτό το γραφικό δεν είναι λογότυπο με επίπεδα χρώματα ({p} % των συμπαγών περιοχών είναι μονόχρωμες): επιλέξτε τη λειτουργία Χρώμα.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Πάρα πολλά σημεία: αυξήστε τον Θόρυβο ή μειώστε τις Διαδρομές ή τα Χρώματα.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Ανίχνευση εικόνας του VectorCraft: οι προρυθμίσεις του και όλες οι ρυθμίσεις του, για DTF και άλλες τεχνικές.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Διανυσματοποίηση: Ανίχνευση εικόνας του VectorCraft (ArtCraft Team και οι συνεισφέροντες του VectorCraft, MIT OR Apache-2.0) και visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	αυτόματα, ή #rrggbb #rrggbb…

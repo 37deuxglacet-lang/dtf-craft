@@ -3065,3 +3065,52 @@ curves	Smooth	平滑
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	与颜色分析器共用。格式：.ase、.aco、.csv；差异以 ΔE 2000 计。
 	{name} vectorized color sheet	{name} 矢量化色卡
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 勾选：形状采用参考色，并在 SVG 中以其命名。ΔE：2 以内 = 难以察觉 · 2 到 5 = 近看可见 · 以上 = 另一色相
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	“{color}”不是颜色：请写成 #rrggbb。
+	16 Colors	16 色
+	3 Colors	3 色
+	6 Colors	6 色
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	圆、椭圆、矩形或正多边形会准确输出为该形状。
+	Abutting	邻接
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	邻接：每种颜色有自己的区域，形状共享边缘。叠加：每个图层延伸到上方图层之下，颜色之间没有缝隙。
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	颜色沿一个方向均匀变化的区域成为一个以线性渐变填充的形状。
+	Areas smaller than this many pixels are ignored.	小于此像素数的区域将被忽略。
+	Black and White	黑白
+	Black and White Logo	黑白徽标
+	Cut-out shapes, contours cleaned for DTF printing.	剪切形状，轮廓已为 DTF 打印清理。
+	Engine	引擎
+	Exact Shapes	精确形状
+	Fills	填充
+	Flat Logo	平面徽标
+	Full Tone	连续色调
+	Grays	灰度级
+	High Fidelity Photo	高保真照片
+	Higher keeps more sharp corners.	越高保留的尖角越多。
+	How closely the curves follow the pixels: higher is more faithful, with more points.	曲线贴合像素的程度：越高越忠实，点也越多。
+	Ignore Color	忽略颜色
+	Limited	有限
+	Line Art	线稿
+	Lines as Strokes	线条作为描边
+	Lines no wider than the stroke width are traced as stroked center lines.	不宽于描边宽度的线条将描摹为带描边的中心线。
+	Load a swatch book to use it as the palette.	请载入色板库以将其用作调色板。
+	Logo Colors	徽标颜色
+	Low Fidelity Photo	低保真照片
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	近乎笔直的曲线变为直线；在平面徽标中，圆的部分变为真正的圆弧。
+	Nothing to trace: everything is ignored or transparent.	没有可描摹的内容：全部被忽略或透明。
+	Outline	轮廓
+	Overlapping	叠加
+	Pixels darker than this are black.	比此值更暗的像素变为黑色。
+	Shades of Gray	灰色阴影
+	Silhouettes	剪影
+	Sketched Art	素描图稿
+	Snap Curves to Lines	将曲线贴齐到线条
+	Technical Drawing	技术图纸
+	The areas of this color are left out (white when the field is empty).	移除此颜色的区域（字段为空时为白色）。
+	The colors of the reference swatch book below, at most this many.	下方参考色板库的颜色，最多此数量。
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	此图像不是平面色徽标（{p} % 的实色区域为纯色）：请选择颜色模式。
+	Too many points to trace: raise Noise, or lower Paths or Colors.	点数过多：请提高杂色，或降低路径或颜色。
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft 的图像描摹：其预设和全部设置，适用于 DTF 和其他工艺。
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	矢量化：VectorCraft 的图像描摹（ArtCraft Team 与 VectorCraft 贡献者，MIT OR Apache-2.0）和 visioncortex（MIT OR Apache-2.0）。
+	automatic, or #rrggbb #rrggbb…	自动，或 #rrggbb #rrggbb…
+	Method	方法
+	Stroke Width	描边宽度

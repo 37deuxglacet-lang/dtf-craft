@@ -4116,3 +4116,50 @@ curves	Smooth	スムーズ
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	カラー分析と共有。形式：.ase、.aco、.csv。差は ΔE 2000。
 	{name} vectorized color sheet	{name} ベクトル化カラーシート
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ チェック：形状は参照色になり、SVG ではその名前が付きます。ΔE：2 以下 = 知覚できない · 2〜5 = 近くで見える · それ以上 = 別の色相
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	「{color}」は色ではありません。#rrggbb の形式で書いてください。
+	16 Colors	16色
+	3 Colors	3色
+	6 Colors	6色
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	円・楕円・長方形・正多角形は、そのままの図形として出力されます。
+	Abutting	隣接
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	隣接：各色が自分の領域を持ち、図形は境界を共有します。重ね合わせ：各レイヤーが上のレイヤーの下まで広がり、色の間に隙間ができません。
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	一方向に均一に色が変わる領域は、線形グラデーションで塗られた1つの図形になります。
+	Areas smaller than this many pixels are ignored.	このピクセル数より小さい領域は無視されます。
+	Black and White	白黒
+	Black and White Logo	白黒ロゴ
+	Cut-out shapes, contours cleaned for DTF printing.	切り抜き図形、DTF 印刷向けに整えた輪郭。
+	Engine	エンジン
+	Exact Shapes	正確な図形
+	Fills	塗り
+	Flat Logo	フラットロゴ
+	Full Tone	連続階調
+	Grays	グレー
+	High Fidelity Photo	高精度写真
+	Higher keeps more sharp corners.	高いほど鋭い角を多く残します。
+	How closely the curves follow the pixels: higher is more faithful, with more points.	曲線がピクセルにどれだけ沿うか：高いほど忠実で、ポイントが増えます。
+	Ignore Color	カラーを無視
+	Limited	制限
+	Line Art	ラインアート
+	Lines as Strokes	線を線として
+	Lines no wider than the stroke width are traced as stroked center lines.	線幅以下の線は、線付きの中心線としてトレースされます。
+	Load a swatch book to use it as the palette.	スウォッチブックを読み込んでパレットとして使用してください。
+	Logo Colors	ロゴの色
+	Low Fidelity Photo	低精度写真
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	ほぼ直線の曲線は直線になり、フラットロゴでは円の一部が正確な円弧になります。
+	Nothing to trace: everything is ignored or transparent.	トレースするものがありません：すべて無視されたか透明です。
+	Outline	アウトライン
+	Overlapping	重ね合わせ
+	Pixels darker than this are black.	この値より暗いピクセルは黒になります。
+	Shades of Gray	グレースケールの濃淡
+	Silhouettes	シルエット
+	Sketched Art	スケッチアート
+	Snap Curves to Lines	曲線を線に合わせる
+	Technical Drawing	テクニカルドローイング
+	The areas of this color are left out (white when the field is empty).	この色の領域は除外されます（空欄なら白）。
+	The colors of the reference swatch book below, at most this many.	下の参照スウォッチブックの色、最大でこの数。
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	このビジュアルはフラットカラーのロゴではありません（ベタ領域の {p} % が単色）：カラーモードを選んでください。
+	Too many points to trace: raise Noise, or lower Paths or Colors.	ポイントが多すぎます：ノイズを上げるか、パスまたはカラーを下げてください。
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft の画像トレース：プリセットとすべての設定、DTF やほかの技法に。
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	ベクトル化：VectorCraft の画像トレース（ArtCraft Team と VectorCraft の貢献者、MIT OR Apache-2.0）と visioncortex（MIT OR Apache-2.0）。
+	automatic, or #rrggbb #rrggbb…	自動、または #rrggbb #rrggbb…

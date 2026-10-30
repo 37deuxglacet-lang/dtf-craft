@@ -4227,3 +4227,50 @@ layerLabel	No Color	Sem cor
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Compartilhado com o Analisador de cores. Formatos: .ase, .aco, .csv; diferença em ΔE 2000.
 	{name} vectorized color sheet	{name} ficha de cores vetorizada
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ marcado: as formas assumem a cor da referência e levam seu nome no SVG. ΔE: até 2 = imperceptível · de 2 a 5 = visível de perto · acima = outro tom
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}" não é uma cor: escreva como #rrggbb.
+	16 Colors	16 cores
+	3 Colors	3 cores
+	6 Colors	6 cores
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Um círculo, uma elipse, um retângulo ou um polígono regular sai exatamente com essa forma.
+	Abutting	Adjacentes
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Adjacentes: cada cor tem sua própria área, as formas compartilham suas bordas. Sobrepostas: cada camada se estende sob as de cima, sem fresta entre as cores.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Uma área cuja cor muda de forma regular em uma direção vira uma só forma preenchida com um degradê linear.
+	Areas smaller than this many pixels are ignored.	Áreas com menos pixels que este valor são ignoradas.
+	Black and White	Preto e branco
+	Black and White Logo	Logotipo preto e branco
+	Cut-out shapes, contours cleaned for DTF printing.	Formas recortadas, contornos limpos para a impressão DTF.
+	Engine	Motor
+	Exact Shapes	Formas exatas
+	Fills	Preenchimentos
+	Flat Logo	Logotipo chapado
+	Full Tone	Tom contínuo
+	Grays	Cinzas
+	High Fidelity Photo	Foto de alta fidelidade
+	Higher keeps more sharp corners.	Mais alto mantém mais cantos vivos.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Fidelidade das curvas aos pixels: mais alto é mais fiel, com mais pontos.
+	Ignore Color	Ignorar cor
+	Limited	Limitada
+	Line Art	Desenho a traço
+	Lines as Strokes	Linhas como traçados
+	Lines no wider than the stroke width are traced as stroked center lines.	Linhas não mais largas que a espessura do traçado são decalcadas como linhas centrais com traçado.
+	Load a swatch book to use it as the palette.	Carregue um catálogo de amostras para usá-lo como paleta.
+	Logo Colors	Cores do logotipo
+	Low Fidelity Photo	Foto de baixa fidelidade
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Curvas quase retas viram linhas retas; em Logotipo chapado, partes de círculo viram arcos verdadeiros.
+	Nothing to trace: everything is ignored or transparent.	Nada a decalcar: tudo está ignorado ou transparente.
+	Outline	Contorno
+	Overlapping	Sobrepostas
+	Pixels darker than this are black.	Pixels mais escuros que este valor ficam pretos.
+	Shades of Gray	Tons de cinza
+	Silhouettes	Silhuetas
+	Sketched Art	Esboço
+	Snap Curves to Lines	Ajustar curvas a linhas
+	Technical Drawing	Desenho técnico
+	The areas of this color are left out (white when the field is empty).	As áreas desta cor são retiradas (branco se o campo estiver vazio).
+	The colors of the reference swatch book below, at most this many.	As cores do catálogo de referência abaixo, no máximo este número.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Este visual não é um logotipo de cores chapadas ({p} % das áreas sólidas são lisas): escolha o modo Cor.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Pontos demais: aumente Ruído, ou diminua Traçados ou Cores.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Rastreamento de imagem do VectorCraft: suas predefinições e todos os seus ajustes, para DTF e outras técnicas.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vetorização: Rastreamento de imagem do VectorCraft (ArtCraft Team e os colaboradores do VectorCraft, MIT OR Apache-2.0) e visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automático, ou #rrggbb #rrggbb…

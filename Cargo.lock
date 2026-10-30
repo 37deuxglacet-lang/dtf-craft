@@ -3420,6 +3420,7 @@ dependencies = [
  "arrayvec",
  "euclid",
  "polycool",
+ "serde",
  "smallvec",
 ]
 
@@ -4696,6 +4697,7 @@ dependencies = [
 name = "photocraft-algo"
 version = "0.8.2"
 dependencies = [
+ "kurbo 0.13.1",
  "photocraft-color",
  "photocraft-geom",
  "photocraft-raster",
@@ -4703,6 +4705,8 @@ dependencies = [
  "rustfft",
  "serde",
  "serde_json",
+ "vectorcraft-geom",
+ "vectorcraft-trace",
  "visioncortex",
 ]
 
@@ -7529,6 +7533,28 @@ dependencies = [
  "aligned-vec",
  "num-traits",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "vectorcraft-geom"
+version = "0.1.0"
+dependencies = [
+ "kurbo 0.13.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "vectorcraft-trace"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "kurbo 0.13.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "vectorcraft-geom",
 ]
 
 [[package]]

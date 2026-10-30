@@ -4040,3 +4040,50 @@ curves	Smooth	Wygładź
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Wspólny z Analizatorem kolorów. Formaty: .ase, .aco, .csv; różnica w ΔE 2000.
 	{name} vectorized color sheet	{name} karta kolorów po wektoryzacji
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ zaznaczone: kształty przyjmują kolor odniesienia i noszą jego nazwę w SVG. ΔE: do 2 = niezauważalna · od 2 do 5 = widoczna z bliska · powyżej = inny odcień
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}” to nie kolor: zapisz go jako #rrggbb.
+	16 Colors	16 kolorów
+	3 Colors	3 kolory
+	6 Colors	6 kolorów
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Okrąg, elipsa, prostokąt lub wielokąt foremny wychodzi dokładnie jako ten kształt.
+	Abutting	Przylegające
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Przylegające: każdy kolor ma własny obszar, kształty dzielą krawędzie. Nakładające się: każda warstwa sięga pod warstwy wyżej, bez szczelin między kolorami.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Obszar, którego kolor zmienia się równomiernie w jednym kierunku, staje się jednym kształtem z gradientem liniowym.
+	Areas smaller than this many pixels are ignored.	Obszary mniejsze niż ta liczba pikseli są pomijane.
+	Black and White	Czarno-biały
+	Black and White Logo	Logo czarno-białe
+	Cut-out shapes, contours cleaned for DTF printing.	Wycięte kształty, kontury oczyszczone do druku DTF.
+	Engine	Silnik
+	Exact Shapes	Dokładne kształty
+	Fills	Wypełnienia
+	Flat Logo	Logo płaskie
+	Full Tone	Ton ciągły
+	Grays	Szarości
+	High Fidelity Photo	Zdjęcie wysokiej wierności
+	Higher keeps more sharp corners.	Wyżej zachowuje więcej ostrych narożników.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Jak dokładnie krzywe śledzą piksele: wyżej jest wierniej, z większą liczbą punktów.
+	Ignore Color	Pomiń kolor
+	Limited	Ograniczona
+	Line Art	Rysunek kreskowy
+	Lines as Strokes	Linie jako obrysy
+	Lines no wider than the stroke width are traced as stroked center lines.	Linie nie szersze niż grubość obrysu są obrysowywane jako linie środkowe z obrysem.
+	Load a swatch book to use it as the palette.	Wczytaj wzornik, aby użyć go jako palety.
+	Logo Colors	Kolory logo
+	Low Fidelity Photo	Zdjęcie niskiej wierności
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Prawie proste krzywe stają się liniami prostymi; w Logo płaskim części okręgów stają się prawdziwymi łukami.
+	Nothing to trace: everything is ignored or transparent.	Nic do obrysowania: wszystko jest pominięte lub przezroczyste.
+	Outline	Kontur
+	Overlapping	Nakładające się
+	Pixels darker than this are black.	Piksele ciemniejsze od tej wartości są czarne.
+	Shades of Gray	Odcienie szarości
+	Silhouettes	Sylwetki
+	Sketched Art	Szkic
+	Snap Curves to Lines	Przyciągaj krzywe do linii
+	Technical Drawing	Rysunek techniczny
+	The areas of this color are left out (white when the field is empty).	Obszary tego koloru są pomijane (biały, gdy pole jest puste).
+	The colors of the reference swatch book below, at most this many.	Kolory wzornika referencyjnego poniżej, najwyżej tyle.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Ten projekt nie jest logo w płaskich kolorach ({p} % pełnych obszarów jest jednolitych): wybierz tryb Kolor.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Za dużo punktów: zwiększ Szum lub zmniejsz Ścieżki albo Kolory.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Obrysowanie obrazu z VectorCraft: jego ustawienia wstępne i wszystkie ustawienia, do DTF i innych technik.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Wektoryzacja: Obrysowanie obrazu z VectorCraft (ArtCraft Team i współtwórcy VectorCraft, MIT OR Apache-2.0) oraz visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automatycznie lub #rrggbb #rrggbb…

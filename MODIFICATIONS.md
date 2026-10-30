@@ -95,7 +95,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `apps/photocraft-cli/tests/cli.rs`
 - `crates/engine/src/build_info.rs`
 
-## Added (31)
+## Added (34)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -128,6 +128,9 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/color_sheet.rs`
 - `crates/ui-egui/src/home_image.rs`
 - `crates/ui-egui/src/promo.rs`
+- `crates/algo/src/vectorize_vc.rs`
+- `crates/vectorcraft-geom/` (copied unchanged from VectorCraft, see below)
+- `crates/vectorcraft-trace/` (copied unchanged from VectorCraft, see below)
 
 ## Removed (7)
 
@@ -138,6 +141,11 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `.github/workflows/perf-nightly.yml`
 - `.github/workflows/release.yml`
 - `.github/workflows/windows-arm64.yml`
+
+`crates/vectorcraft-geom/src` and `crates/vectorcraft-trace/src` are VectorCraft's `crates/geom/src` and
+`crates/trace/src` (https://github.com/storytold/vectorcraft, commit `a8ec515`), Copyright (c) 2026
+ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0, unchanged; only their
+`Cargo.toml` and `README.md` are DTF Craft's.
 
 Notes: `LICENSE-MIT` and `NOTICE` carry the DTF Craft copyright lines; `README.md` is the DTF Craft
 README (the original is kept as `README-PhotoCraft.md`); the Windows workflow publishes no binary in

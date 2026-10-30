@@ -4140,3 +4140,50 @@ curves	Smooth	Згладити
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Спільний з Аналізатором кольору. Формати: .ase, .aco, .csv; різниця в ΔE 2000.
 	{name} vectorized color sheet	{name} кольоровий аркуш векторизації
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ позначено: фігури набувають кольору еталона й у SVG мають його назву. ΔE: до 2 = непомітно · від 2 до 5 = помітно зблизька · більше = інший відтінок
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	«{color}» — не колір: запишіть його як #rrggbb.
+	16 Colors	16 кольорів
+	3 Colors	3 кольори
+	6 Colors	6 кольорів
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Коло, еліпс, прямокутник або правильний многокутник виходить саме такою фігурою.
+	Abutting	Суміжні
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Суміжні: кожен колір має власну область, фігури мають спільні краї. Накладені: кожен шар заходить під шари вище, без проміжків між кольорами.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Область, колір якої рівномірно змінюється в одному напрямку, стає однією фігурою з лінійним градієнтом.
+	Areas smaller than this many pixels are ignored.	Області, менші за цю кількість пікселів, ігноруються.
+	Black and White	Чорно-білий
+	Black and White Logo	Чорно-білий логотип
+	Cut-out shapes, contours cleaned for DTF printing.	Вирізані фігури, контури очищено для друку DTF.
+	Engine	Рушій
+	Exact Shapes	Точні фігури
+	Fills	Заливки
+	Flat Logo	Плаский логотип
+	Full Tone	Безперервний тон
+	Grays	Відтінки
+	High Fidelity Photo	Фото високої точності
+	Higher keeps more sharp corners.	Що вище, то більше гострих кутів зберігається.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Наскільки точно криві йдуть за пікселями: вище — точніше, з більшою кількістю точок.
+	Ignore Color	Ігнорувати колір
+	Limited	Обмежена
+	Line Art	Штриховий малюнок
+	Lines as Strokes	Лінії як обведення
+	Lines no wider than the stroke width are traced as stroked center lines.	Лінії, не ширші за товщину обведення, трасуються як осьові лінії з обведенням.
+	Load a swatch book to use it as the palette.	Завантажте каталог зразків, щоб використати його як палітру.
+	Logo Colors	Кольори логотипа
+	Low Fidelity Photo	Фото низької точності
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Майже прямі криві стають прямими лініями; у Пласкому логотипі частини кіл стають справжніми дугами.
+	Nothing to trace: everything is ignored or transparent.	Нічого трасувати: усе ігнорується або прозоре.
+	Outline	Контур
+	Overlapping	Накладені
+	Pixels darker than this are black.	Пікселі, темніші за це значення, стають чорними.
+	Shades of Gray	Відтінки сірого
+	Silhouettes	Силуети
+	Sketched Art	Ескіз
+	Snap Curves to Lines	Прив'язати криві до ліній
+	Technical Drawing	Технічне креслення
+	The areas of this color are left out (white when the field is empty).	Області цього кольору виключаються (білий, якщо поле порожнє).
+	The colors of the reference swatch book below, at most this many.	Кольори еталонного каталогу зразків нижче, не більше цієї кількості.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Це зображення не пласкокольоровий логотип ({p} % суцільних областей однотонні): виберіть режим «Колір».
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Забагато точок: збільште Шум або зменште Контури чи Кольори.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Трасування зображення VectorCraft: його стилі та всі його налаштування, для DTF та інших технологій.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизація: трасування зображення VectorCraft (ArtCraft Team і учасники VectorCraft, MIT OR Apache-2.0) та visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	автоматично або #rrggbb #rrggbb…

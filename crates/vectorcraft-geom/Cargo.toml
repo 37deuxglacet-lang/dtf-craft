@@ -1,0 +1,19 @@
+# Copied unchanged from VectorCraft (crates/geom, commit a8ec515), see README.md.
+[package]
+name = "vectorcraft-geom"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "VectorCraft geometry (copied from VectorCraft for DTF Craft's Vectorization)"
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+kurbo = { version = "0.13", features = ["serde"] }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

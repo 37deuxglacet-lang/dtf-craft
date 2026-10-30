@@ -1,0 +1,21 @@
+# Copied unchanged from VectorCraft (crates/trace, commit a8ec515), see README.md.
+[package]
+name = "vectorcraft-trace"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "VectorCraft Image Trace: raster to vector tracing (copied from VectorCraft for DTF Craft's Vectorization)"
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+vectorcraft-geom = { path = "../vectorcraft-geom" }
+kurbo = { version = "0.13", features = ["serde"] }
+image = { workspace = true, features = ["png"] }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

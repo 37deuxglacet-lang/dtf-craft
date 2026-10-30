@@ -4358,3 +4358,50 @@ cameraRaw	Yellow	Sárga
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Közös a Színelemzővel. Formátumok: .ase, .aco, .csv; eltérés ΔE 2000-ben.
 	{name} vectorized color sheet	{name} vektorizált színlap
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ bejelölve: az alakzatok a referencia színét veszik fel, és az SVG-ben annak nevét viselik. ΔE: 2-ig = észrevehetetlen · 2–5 = közelről látható · felette = más árnyalat
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}” nem szín: #rrggbb formában írja.
+	16 Colors	16 szín
+	3 Colors	3 szín
+	6 Colors	6 szín
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	A kör, ellipszis, téglalap vagy szabályos sokszög pontosan ilyen alakzatként jön ki.
+	Abutting	Szomszédos
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Szomszédos: minden színnek saját területe van, az alakzatok közös élen találkoznak. Átfedő: minden réteg a fölötte lévők alá is kiterjed, így nincs rés a színek között.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Az a terület, amelynek színe egy irányban egyenletesen változik, egyetlen lineáris színátmenettel kitöltött alakzat lesz.
+	Areas smaller than this many pixels are ignored.	Az ennél kevesebb képpontú területeket figyelmen kívül hagyja.
+	Black and White	Fekete-fehér
+	Black and White Logo	Fekete-fehér logó
+	Cut-out shapes, contours cleaned for DTF printing.	Kivágott alakzatok, DTF-nyomtatáshoz tisztított kontúrok.
+	Engine	Motor
+	Exact Shapes	Pontos alakzatok
+	Fills	Kitöltések
+	Flat Logo	Sík logó
+	Full Tone	Folyamatos tónus
+	Grays	Szürkék
+	High Fidelity Photo	Nagy hűségű fotó
+	Higher keeps more sharp corners.	A magasabb érték több éles sarkot tart meg.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Mennyire követik a görbék a képpontokat: a magasabb hűbb, több ponttal.
+	Ignore Color	Szín figyelmen kívül hagyása
+	Limited	Korlátozott
+	Line Art	Vonalrajz
+	Lines as Strokes	Vonalak körvonalként
+	Lines no wider than the stroke width are traced as stroked center lines.	A körvonal-vastagságnál nem szélesebb vonalak középvonalként, körvonallal lesznek átrajzolva.
+	Load a swatch book to use it as the palette.	Töltsön be egy színmintakönyvet, hogy palettaként használja.
+	Logo Colors	Logó színei
+	Low Fidelity Photo	Kis hűségű fotó
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	A majdnem egyenes görbék egyenesek lesznek; a Sík logóban a körrészek valódi ívek lesznek.
+	Nothing to trace: everything is ignored or transparent.	Nincs mit átrajzolni: minden figyelmen kívül hagyva vagy átlátszó.
+	Outline	Körvonal
+	Overlapping	Átfedő
+	Pixels darker than this are black.	Az ennél sötétebb képpontok feketék.
+	Shades of Gray	Szürkeárnyalatok
+	Silhouettes	Sziluettek
+	Sketched Art	Vázlat
+	Snap Curves to Lines	Görbék illesztése vonalakhoz
+	Technical Drawing	Műszaki rajz
+	The areas of this color are left out (white when the field is empty).	Ennek a színnek a területei kimaradnak (fehér, ha a mező üres).
+	The colors of the reference swatch book below, at most this many.	Az alábbi referencia-színmintakönyv színei, legfeljebb ennyi.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Ez a grafika nem sík színű logó (tömör területeinek {p} %-a egyszínű): válassza a Szín módot.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Túl sok pont: növelje a Zajt, vagy csökkentse az Útvonalakat vagy a Színeket.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	A VectorCraft Képátrajzolója: előbeállításai és minden beállítása, DTF-hez és más technikákhoz.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorizálás: a VectorCraft Képátrajzolója (ArtCraft Team és a VectorCraft közreműködői, MIT OR Apache-2.0) és a visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automatikus, vagy #rrggbb #rrggbb…

@@ -6,6 +6,11 @@
 //! at the document's print size (`dtf.vectorize`), optionally opened in a new tab as shape layers.
 //! The document is never changed.
 //!
+//! Two engines: DTF Craft's own, and VectorCraft's Image Trace ([`photocraft_algo::vectorize_vc`])
+//! with its presets and all its settings (mode, palette, paths, corners, noise, method, ignore
+//! colour, shapes, gradients, strokes). The palette table, the swatch book, the PDF sheet and the
+//! export are the same with either.
+//!
 //! The module works on the same copy the command traces (at most [`vectorize::MAX_SIDE`] px a
 //! side), so the exported SVG is the one previewed.
 //!
@@ -17,7 +22,8 @@
 use std::collections::{HashMap, HashSet};
 
 use egui::{Align2, Color32, FontId, Rect, RichText, Sense, Stroke, pos2, vec2};
-use photocraft_algo::vectorize::{self, Detail, Kind, Quantized, Smoothing, Style, SvgSize, TraceOptions, Traced};
+use photocraft_algo::vectorize::{self, Detail, Kind, PaletteColor, Quantized, Smoothing, Style, SvgSize, TraceOptions, Traced};
+use photocraft_algo::vectorize_vc::{self as vc, Method, Mode, Palette, TraceParams, VcError, VcTraced};
 use photocraft_engine::dtf_vector_cmds as cmds;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -49,10 +55,28 @@ pub enum View {
     SideBySide,
 }
 
+/// Which tracer draws the shapes.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Engine {
+    /// DTF Craft's own: cut-out shapes, contours cleaned for DTF.
+    #[default]
+    DtfCraft,
+    /// VectorCraft's Image Trace, with all its settings.
+    VectorCraft,
+}
+
+/// VectorCraft's preset a new module starts with.
+const VC_PRESET: &str = "6 Colors";
+
 /// The module's settings, remembered with the preferences.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
+    pub engine: Engine,
+    /// VectorCraft: the preset the settings come from (`None`: changed since).
+    pub vc_preset: Option<String>,
+    pub vc: TraceParams,
     /// At most this many colours (2–16 here; the command takes up to 32).
     pub colors: u32,
     pub kind: Kind,
@@ -70,6 +94,9 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            engine: Engine::DtfCraft,
+            vc_preset: Some(VC_PRESET.into()),
+            vc: vc::preset(VC_PRESET).unwrap_or_default(),
             colors: 8,
             kind: Kind::Logo,
             detail: Detail::Medium,
@@ -116,6 +143,9 @@ pub struct Vectorizer {
     /// Palette colours left out of the SVG, by hex.
     pub excluded: HashSet<String>,
     pub quantized: Option<Quantized>,
+    /// The VectorCraft engine's trace, every colour.
+    pub vc: Option<VcTraced>,
+    /// The shapes the SVG has (the colours left out removed).
     pub traced: Option<Traced>,
     /// Why the last analysis or tracing failed.
     pub error: Option<String>,
@@ -126,6 +156,9 @@ pub struct Vectorizer {
     /// The palette colour whose reference is being changed, and the picker's search.
     changing: Option<usize>,
     search: String,
+    /// VectorCraft's colour fields being typed: Logo Colors, Ignore Color.
+    logo_text: String,
+    ignore_text: String,
     revision: u64,
     original: Option<egui::TextureHandle>,
     vectorized: Option<Tex>,
@@ -175,6 +208,25 @@ fn decimal(v: f64) -> String {
     }
 }
 
+/// The colours a trace has shapes of.
+fn colours_in(t: &Traced) -> usize {
+    t.paths.iter().map(|p| p.color).collect::<HashSet<_>>().len()
+}
+
+/// Why VectorCraft traced nothing, in the user's language.
+fn vc_error(e: &VcError) -> String {
+    match e {
+        VcError::NotFlat(k) => crate::i18n::fmt(
+            tl!("This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode."),
+            &[("p", &format!("{:.0}", k * 100.0))],
+        ),
+        VcError::TooComplex => tl!("Too many points to trace: raise Noise, or lower Paths or Colors.").to_string(),
+        VcError::BadColor(c) => crate::i18n::fmt(tl!("\"{color}\" is not a color: write it as #rrggbb."), &[("color", c)]),
+        VcError::Empty => tl!("Nothing to trace: everything is ignored or transparent.").to_string(),
+        VcError::Other(e) => e.clone(),
+    }
+}
+
 impl Vectorizer {
     /// The module for the visual `px` (`size`, straight RGBA) of document `doc`.
     #[allow(clippy::too_many_arguments)]
@@ -206,12 +258,15 @@ impl Vectorizer {
             settings,
             excluded: HashSet::new(),
             quantized: None,
+            vc: None,
             traced: None,
             error: None,
             book,
             choices: HashMap::new(),
             changing: None,
             search: String::new(),
+            logo_text: String::new(),
+            ignore_text: String::new(),
             revision: 0,
             original: None,
             vectorized: None,
@@ -226,8 +281,71 @@ impl Vectorizer {
             retrace: false,
             help: false,
         };
+        v.logo_text = v.settings.vc.logo_colors.join(" ");
+        v.ignore_text = v.settings.vc.ignore_color.clone().unwrap_or_default();
         v.quantize();
         v
+    }
+
+    /// VectorCraft's preset `name` (one of [`vc::PRESET_NAMES`]): its settings replace the current
+    /// ones (traced again once the module updates).
+    pub fn apply_preset(&mut self, name: &str) {
+        let Some(p) = vc::preset(name) else { return };
+        self.settings.vc = p;
+        self.settings.vc_preset = Some(name.to_string());
+        self.logo_text = self.settings.vc.logo_colors.join(" ");
+        self.ignore_text = self.settings.vc.ignore_color.clone().unwrap_or_default();
+        if self.settings.engine == Engine::VectorCraft {
+            self.requantize = true;
+        }
+    }
+
+    /// The palette of the engine in use: the colours traced, largest share first.
+    pub fn palette(&self) -> &[PaletteColor] {
+        match self.settings.engine {
+            Engine::DtfCraft => self.quantized.as_ref().map_or(&[], |q| q.palette.as_slice()),
+            Engine::VectorCraft => self.vc.as_ref().map_or(&[], |r| r.palette.as_slice()),
+        }
+    }
+
+    /// The background colour's index in the palette (DTF Craft's engine only).
+    fn background_index(&self) -> Option<usize> {
+        match self.settings.engine {
+            Engine::DtfCraft => self.quantized.as_ref().and_then(|q| q.background),
+            Engine::VectorCraft => None,
+        }
+    }
+
+    /// The colours left out, one flag per palette colour.
+    fn excluded_flags(&self) -> Vec<bool> {
+        self.palette().iter().map(|c| self.excluded.contains(&vectorize::hex(c.rgb))).collect()
+    }
+
+    /// VectorCraft's settings as traced: the swatch book's colours for its Swatch Book palette.
+    fn vc_params(&self) -> Result<TraceParams, String> {
+        let mut p = self.settings.vc.clone();
+        if p.mode == Mode::Color && p.palette == Palette::DocumentLibrary {
+            let book = self.book.as_ref().ok_or_else(|| tl!("Load a swatch book to use it as the palette.").to_string())?;
+            p.swatches = book.swatches.iter().map(analyzer::swatch8).collect();
+        }
+        Ok(p)
+    }
+
+    /// Traces with VectorCraft, then leaves out the colours unchecked.
+    fn trace_vc(&mut self) {
+        let result = self.vc_params().and_then(|p| vc::trace(self.w, self.h, &self.px, &p).map_err(|e| vc_error(&e)));
+        match result {
+            Ok(r) => {
+                self.vc = Some(r);
+                self.trace();
+            }
+            Err(e) => {
+                self.vc = None;
+                self.traced = None;
+                self.error = Some(e);
+                self.revision += 1;
+            }
+        }
     }
 
     fn palette_settings(&self) -> vectorize::Settings {
@@ -237,6 +355,10 @@ impl Vectorizer {
     /// Reduces the colours again, then traces.
     pub fn quantize(&mut self) {
         self.requantize = false;
+        if self.settings.engine == Engine::VectorCraft {
+            self.trace_vc();
+            return;
+        }
         match vectorize::quantize(self.w, self.h, &self.px, &self.palette_settings()) {
             Ok(q) => {
                 self.quantized = Some(q);
@@ -260,6 +382,18 @@ impl Vectorizer {
     /// Traces the shapes again (smoothing, background or colours left out changed).
     pub fn trace(&mut self) {
         self.retrace = false;
+        if self.settings.engine == Engine::VectorCraft {
+            // Only the colours left out change: VectorCraft's trace stays.
+            match self.vc.as_ref() {
+                Some(r) => {
+                    self.traced = Some(vc::without(&r.traced, &self.excluded_flags()));
+                    self.error = None;
+                }
+                None => self.traced = None,
+            }
+            self.revision += 1;
+            return;
+        }
         let o = self.trace_options();
         let result = match self.quantized.as_ref() {
             Some(q) => q.trace(&o),
@@ -307,15 +441,13 @@ impl Vectorizer {
 
     /// The background colour found on the visual's edge, when there is one.
     pub fn background(&self) -> Option<[u8; 3]> {
-        let q = self.quantized.as_ref()?;
-        q.background.and_then(|i| q.palette.get(i)).map(|c| c.rgb)
+        self.background_index().and_then(|i| self.palette().get(i)).map(|c| c.rgb)
     }
 
     /// Each palette colour's reference: the swatch (picked, or the nearest), its ΔE 2000 and
     /// whether the colour takes it in the SVG.
     pub fn matches(&self) -> Vec<Option<(usize, f32, bool)>> {
-        let Some(q) = self.quantized.as_ref() else { return Vec::new() };
-        q.palette
+        self.palette()
             .iter()
             .map(|c| {
                 let choice = self.choices.get(&vectorize::hex(c.rgb)).copied().unwrap_or_default();
@@ -332,8 +464,7 @@ impl Vectorizer {
     /// The palette as the SVG draws it (the swatch colours replacing the colours checked) and each
     /// colour's name (its swatch reference when replaced).
     pub fn svg_palette(&self) -> (Vec<vectorize::PaletteColor>, Vec<Option<String>>) {
-        let Some(q) = self.quantized.as_ref() else { return (Vec::new(), Vec::new()) };
-        let mut palette = q.palette.clone();
+        let mut palette = self.palette().to_vec();
         let mut names = vec![None; palette.len()];
         for (i, m) in self.matches().into_iter().enumerate() {
             if let Some((k, _, true)) = m
@@ -364,6 +495,10 @@ impl Vectorizer {
         }
         self.changing = None;
         self.revision += 1;
+        // The book is VectorCraft's palette: trace again.
+        if self.settings.engine == Engine::VectorCraft && self.settings.vc.mode == Mode::Color && self.settings.vc.palette == Palette::DocumentLibrary {
+            self.requantize = true;
+        }
     }
 
     /// The parameters `dtf.vectorize` takes to trace what the module shows.
@@ -383,25 +518,25 @@ impl Vectorizer {
             Smoothing::Corners => "corners",
         };
         // Only the palette's colours: a colour left out of an earlier palette means nothing now.
-        let mut exclude: Vec<String> = self
-            .quantized
-            .as_ref()
-            .map(|q| q.palette.iter().map(|c| vectorize::hex(c.rgb)).filter(|h| self.excluded.contains(h)).collect())
-            .unwrap_or_default();
+        let mut exclude: Vec<String> = self.palette().iter().map(|c| vectorize::hex(c.rgb)).filter(|h| self.excluded.contains(h)).collect();
         exclude.sort();
         // The colours that take their swatch, and its reference.
         let (palette, names) = self.svg_palette();
         let replace: Vec<Value> = self
-            .quantized
-            .as_ref()
-            .map(|q| {
-                q.palette
-                    .iter()
-                    .zip(palette.iter().zip(&names))
-                    .filter_map(|(c, (to, name))| name.as_ref().map(|n| json!({"from": vectorize::hex(c.rgb), "to": vectorize::hex(to.rgb), "name": n})))
-                    .collect()
-            })
-            .unwrap_or_default();
+            .palette()
+            .iter()
+            .zip(palette.iter().zip(&names))
+            .filter_map(|(c, (to, name))| name.as_ref().map(|n| json!({"from": vectorize::hex(c.rgb), "to": vectorize::hex(to.rgb), "name": n})))
+            .collect();
+        if s.engine == Engine::VectorCraft {
+            let mut p = json!({"engine": "vectorcraft", "vectorcraft": serde_json::to_value(&s.vc).unwrap_or(Value::Null), "sealSeams": s.seal, "exclude": exclude, "replace": replace});
+            if let Ok(params) = self.vc_params()
+                && !params.swatches.is_empty()
+            {
+                p["swatches"] = json!(params.swatches.iter().map(|c| vectorize::hex(*c)).collect::<Vec<_>>());
+            }
+            return p;
+        }
         json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "sealSeams": s.seal, "exclude": exclude, "replace": replace})
     }
 
@@ -499,7 +634,7 @@ impl Vectorizer {
     /// The colour sheet of the vectorized visual: the original and the vectorized result side by
     /// side, the SVG's colours with their references.
     pub fn sheet(&self) -> Option<ColorSheet> {
-        let (q, t) = (self.quantized.as_ref()?, self.traced.as_ref()?);
+        let t = self.traced.as_ref()?;
         let (w, h, px) = analyzer::downsample(self.w, self.h, &self.px, SHEET_IMAGE_MAX);
         let image = (w, h, rgba8(&px));
         let k = w as f32 / self.w.max(1) as f32;
@@ -509,8 +644,8 @@ impl Vectorizer {
         // The colours in the SVG, in the palette's order.
         let used: HashSet<usize> = t.paths.iter().map(|p| p.color).collect();
         let matches = self.matches();
-        let rows = q
-            .palette
+        let rows = self
+            .palette()
             .iter()
             .enumerate()
             .filter(|(i, _)| used.contains(i))
@@ -601,7 +736,7 @@ pub fn open(app: &mut PhotocraftApp) -> Result<Value, String> {
     let (doc, name, path) = (st.doc.id, st.doc.name.clone(), st.path.clone());
     let (dpi, mm) = (cmds::dpi(&st.doc), cmds::size_mm(&st.doc));
     let v = Vectorizer::new(doc, &name, path, (w, h), dpi, mm, mode, &px, load_settings(app), analyzer::load_book(app));
-    let colors = v.quantized.as_ref().map_or(0, |q| q.palette.len());
+    let colors = v.palette().len();
     app.vectorizer = Some(v);
     Ok(json!({"colors": colors}))
 }
@@ -808,7 +943,7 @@ fn preview(ui: &mut egui::Ui, v: &mut Vectorizer, area: Rect) {
         (Some(tr), _) => {
             let figures = crate::i18n::fmt(
                 tl!("{colors} colors · {shapes} shapes · {points} points"),
-                &[("colors", &tr.paths.len().to_string()), ("shapes", &tr.shapes().to_string()), ("points", &tr.points().to_string())],
+                &[("colors", &colours_in(tr).to_string()), ("shapes", &tr.shapes().to_string()), ("points", &tr.points().to_string())],
             );
             // Sealed seams overlap by half a pixel: "no overlap" only when they are not.
             if v.settings.seal { figures } else { format!("{figures}   ·   {}", tl!("Cut-out shapes, no overlap")) }
@@ -990,6 +1125,173 @@ fn choice<T: Copy + PartialEq>(ui: &mut egui::Ui, value: &mut T, options: &[(T, 
     changed
 }
 
+/// A drop-down list of `options`; true when the value changed.
+fn combo<T: Copy + PartialEq>(ui: &mut egui::Ui, id: &str, value: &mut T, options: &[(T, &str)]) -> bool {
+    let mut changed = false;
+    let current = options.iter().find(|o| o.0 == *value).map_or("", |o| o.1);
+    egui::ComboBox::from_id_salt(id).selected_text(current).width(210.0).show_ui(ui, |ui| {
+        for (o, label) in options {
+            if ui.selectable_label(*value == *o, *label).clicked() && *value != *o {
+                *value = *o;
+                changed = true;
+            }
+        }
+    });
+    changed
+}
+
+/// A VectorCraft preset's name in the user's language.
+fn preset_label(name: &str) -> &str {
+    match name {
+        "Default" => tl!("Default"),
+        "Auto Color" => tl!("Auto Color"),
+        "High Fidelity Photo" => tl!("High Fidelity Photo"),
+        "Low Fidelity Photo" => tl!("Low Fidelity Photo"),
+        "3 Colors" => tl!("3 Colors"),
+        "6 Colors" => tl!("6 Colors"),
+        "16 Colors" => tl!("16 Colors"),
+        "Shades of Gray" => tl!("Shades of Gray"),
+        "Black and White Logo" => tl!("Black and White Logo"),
+        "Sketched Art" => tl!("Sketched Art"),
+        "Silhouettes" => tl!("Silhouettes"),
+        "Line Art" => tl!("Line Art"),
+        "Technical Drawing" => tl!("Technical Drawing"),
+        "Outline" => tl!("Outline"),
+        "Flat Logo" => tl!("Flat Logo"),
+        other => other,
+    }
+}
+
+/// `#rrggbb` colours typed one after another (spaces or commas between), upper case.
+fn hex_list(text: &str) -> Vec<String> {
+    text.split(|c: char| c.is_whitespace() || c == ',' || c == ';')
+        .filter(|w| !w.is_empty())
+        .map(|w| if w.starts_with('#') { w.to_ascii_uppercase() } else { format!("#{}", w.to_ascii_uppercase()) })
+        .collect()
+}
+
+/// VectorCraft's settings: its preset, then every setting it has. True when they changed.
+fn vc_settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
+    let t = Tokens::get(ui.ctx());
+    let before = v.settings.vc.clone();
+    egui::Grid::new("dtf-vectorizer-vc").num_columns(2).spacing(vec2(12.0, 8.0)).show(ui, |ui| {
+        ui.label(tl!("Preset"));
+        let current = v.settings.vc_preset.as_deref().map_or(tl!("Custom"), preset_label).to_string();
+        let mut picked = None;
+        egui::ComboBox::from_id_salt("dtf-vectorizer-vc-preset").selected_text(current).width(210.0).show_ui(ui, |ui| {
+            for name in vc::PRESET_NAMES {
+                if ui.selectable_label(v.settings.vc_preset.as_deref() == Some(*name), preset_label(name)).clicked() {
+                    picked = Some(*name);
+                }
+            }
+        });
+        if let Some(name) = picked {
+            v.apply_preset(name);
+        }
+        ui.end_row();
+        ui.label(tl!("Mode"));
+        combo(
+            ui,
+            "dtf-vectorizer-vc-mode",
+            &mut v.settings.vc.mode,
+            &[(Mode::BlackAndWhite, tl!("Black and White")), (Mode::Grayscale, tl!("Grayscale")), (Mode::Color, tl!("Color")), (Mode::Logo, tl!("Flat Logo"))],
+        );
+        ui.end_row();
+        let s = &mut v.settings.vc;
+        match s.mode {
+            Mode::BlackAndWhite => {
+                ui.label(tl!("Threshold")).on_hover_text(tl!("Pixels darker than this are black."));
+                ui.add(egui::Slider::new(&mut s.threshold, 0..=255));
+                ui.end_row();
+            }
+            Mode::Grayscale => {
+                ui.label(tl!("Grays"));
+                ui.add(egui::Slider::new(&mut s.colors, 2..=256).logarithmic(true));
+                ui.end_row();
+            }
+            Mode::Color => {
+                ui.label(tl!("Palette"));
+                combo(
+                    ui,
+                    "dtf-vectorizer-vc-palette",
+                    &mut s.palette,
+                    &[(Palette::Limited, tl!("Limited")), (Palette::FullTone, tl!("Full Tone")), (Palette::Automatic, tl!("Automatic")), (Palette::DocumentLibrary, tl!("Swatch Book"))],
+                );
+                ui.end_row();
+                match s.palette {
+                    Palette::Limited | Palette::DocumentLibrary => {
+                        ui.label(tl!("Colors"));
+                        ui.add(egui::Slider::new(&mut s.colors, 2..=256).logarithmic(true));
+                        ui.end_row();
+                    }
+                    Palette::FullTone | Palette::Automatic => {
+                        ui.label(tl!("Color Detail"));
+                        ui.add(egui::Slider::new(&mut s.color_detail, 0.0..=100.0).fixed_decimals(0));
+                        ui.end_row();
+                    }
+                }
+            }
+            Mode::Logo => {
+                ui.label(tl!("Logo Colors"));
+                let edit = ui.add(egui::TextEdit::singleline(&mut v.logo_text).hint_text(tl!("automatic, or #rrggbb #rrggbb…")).desired_width(210.0));
+                if edit.lost_focus() {
+                    v.settings.vc.logo_colors = hex_list(&v.logo_text);
+                }
+                ui.end_row();
+            }
+        }
+        let s = &mut v.settings.vc;
+        ui.label(tl!("Paths")).on_hover_text(tl!("How closely the curves follow the pixels: higher is more faithful, with more points."));
+        ui.add(egui::Slider::new(&mut s.paths, 0.0..=100.0).fixed_decimals(0));
+        ui.end_row();
+        ui.label(tl!("Corners")).on_hover_text(tl!("Higher keeps more sharp corners."));
+        ui.add(egui::Slider::new(&mut s.corners, 0.0..=100.0).fixed_decimals(0));
+        ui.end_row();
+        ui.label(tl!("Noise")).on_hover_text(tl!("Areas smaller than this many pixels are ignored."));
+        ui.add(egui::Slider::new(&mut s.noise, 1..=1000).logarithmic(true).suffix(" px"));
+        ui.end_row();
+        ui.label(tl!("Method")).on_hover_text(tl!("Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors."));
+        combo(ui, "dtf-vectorizer-vc-method", &mut s.method, &[(Method::Abutting, tl!("Abutting")), (Method::Overlapping, tl!("Overlapping"))]);
+        ui.end_row();
+        ui.label(tl!("Create"));
+        ui.horizontal(|ui| {
+            ui.checkbox(&mut s.fills, tl!("Fills"));
+            ui.checkbox(&mut s.strokes, tl!("Lines as Strokes")).on_hover_text(tl!("Lines no wider than the stroke width are traced as stroked center lines."));
+        });
+        ui.end_row();
+        if s.strokes {
+            ui.label(tl!("Stroke Width"));
+            ui.add(egui::Slider::new(&mut s.stroke_width, 1.0..=100.0).logarithmic(true).fixed_decimals(1).suffix(" px"));
+            ui.end_row();
+        }
+    });
+    ui.add_space(4.0);
+    ui.horizontal(|ui| {
+        ui.checkbox(&mut v.settings.vc.ignore_white, tl!("Ignore Color")).on_hover_text(tl!("The areas of this color are left out (white when the field is empty)."));
+        let edit = ui.add_enabled(v.settings.vc.ignore_white, egui::TextEdit::singleline(&mut v.ignore_text).hint_text("#FFFFFF").desired_width(90.0));
+        if edit.lost_focus() {
+            let text = v.ignore_text.trim();
+            v.settings.vc.ignore_color = (!text.is_empty()).then(|| hex_list(text).into_iter().next().unwrap_or_default());
+        }
+    });
+    let s = &mut v.settings.vc;
+    ui.checkbox(&mut s.snap_curves_to_lines, tl!("Snap Curves to Lines")).on_hover_text(tl!("Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs."));
+    ui.checkbox(&mut s.shapes, tl!("Exact Shapes")).on_hover_text(tl!("A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape."));
+    let gradients = matches!(s.mode, Mode::Grayscale | Mode::Color);
+    ui.add_enabled(gradients, egui::Checkbox::new(&mut s.gradients, tl!("Gradients")))
+        .on_hover_text(tl!("An area whose color changes evenly in one direction is one shape filled with a linear gradient."));
+    if s.mode == Mode::Color && s.palette == Palette::DocumentLibrary {
+        let note = if v.book.is_some() { tl!("The colors of the reference swatch book below, at most this many.") } else { tl!("Load a swatch book to use it as the palette.") };
+        ui.label(RichText::new(note).small().color(if v.book.is_some() { t.text_faint } else { t.warning }));
+    }
+    let changed = v.settings.vc != before;
+    // Changed by hand: no longer the preset.
+    if changed && v.settings.vc_preset.as_deref().and_then(vc::preset).is_some_and(|p| p != v.settings.vc) {
+        v.settings.vc_preset = None;
+    }
+    changed
+}
+
 fn patch(ui: &mut egui::Ui, rgb: [u8; 3], size: f32) -> egui::Response {
     let (r, resp) = ui.allocate_exact_size(vec2(size, size), Sense::hover());
     ui.painter().rect_filled(r, 2.0, c32(rgb));
@@ -1020,44 +1322,63 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
     });
     section(ui, tl!("Settings"));
     let mut redo = Redo::Nothing;
-    egui::Grid::new("dtf-vectorizer-settings").num_columns(2).spacing(vec2(12.0, 8.0)).show(ui, |ui| {
-        ui.label(tl!("Type of Visual"));
-        if choice(ui, &mut v.settings.kind, &[(Kind::Logo, tl!("Logo · flat colors")), (Kind::Illustration, tl!("Illustration · shades"))]) {
-            redo = Redo::Quantize;
-        }
-        ui.end_row();
-        ui.label(tl!("Number of Colors"));
-        if ui.add(egui::Slider::new(&mut v.settings.colors, 2..=16)).changed() {
-            redo = Redo::Quantize;
-        }
-        ui.end_row();
-        ui.label(tl!("Detail Level"));
-        if choice(ui, &mut v.settings.detail, &[(Detail::Low, tl!("Low Detail")), (Detail::Medium, tl!("Medium Detail")), (Detail::High, tl!("High Detail"))]) {
-            redo = Redo::Quantize;
-        }
-        ui.end_row();
-        ui.label(tl!("Smoothing"));
-        if choice(ui, &mut v.settings.smoothing, &[(Smoothing::Curves, tl!("Curves")), (Smoothing::Corners, tl!("Sharp Corners"))]) && redo == Redo::Nothing {
-            redo = Redo::Trace;
-        }
-        ui.end_row();
-    });
-    ui.add_space(4.0);
-    let background = v.background();
     ui.horizontal(|ui| {
-        let check = ui.add_enabled(background.is_some(), egui::Checkbox::new(&mut v.settings.remove_background, tl!("Remove the Background")));
-        if check.changed() && redo == Redo::Nothing {
-            redo = Redo::Trace;
-        }
-        if let Some(rgb) = background {
-            ui.add_space(6.0);
-            patch(ui, rgb, 16.0);
-            ui.label(RichText::new(vectorize::hex(rgb)).font(crate::theme::mono(11.5)));
-            ui.label(RichText::new(tl!("read on the visual's edge")).small().color(t.text_faint));
+        ui.label(tl!("Engine"));
+        ui.add_space(8.0);
+        if choice(ui, &mut v.settings.engine, &[(Engine::DtfCraft, "DTF Craft"), (Engine::VectorCraft, "VectorCraft")]) {
+            redo = Redo::Quantize;
         }
     });
-    if background.is_none() {
-        ui.label(RichText::new(tl!("No background found: the visual is already cut out.")).small().color(t.text_faint));
+    let about = match v.settings.engine {
+        Engine::DtfCraft => tl!("Cut-out shapes, contours cleaned for DTF printing."),
+        Engine::VectorCraft => tl!("VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques."),
+    };
+    ui.label(RichText::new(about).small().color(t.text_faint));
+    ui.add_space(6.0);
+    if v.settings.engine == Engine::VectorCraft {
+        if vc_settings_ui(ui, v) {
+            redo = Redo::Quantize;
+        }
+    } else {
+        egui::Grid::new("dtf-vectorizer-settings").num_columns(2).spacing(vec2(12.0, 8.0)).show(ui, |ui| {
+            ui.label(tl!("Type of Visual"));
+            if choice(ui, &mut v.settings.kind, &[(Kind::Logo, tl!("Logo · flat colors")), (Kind::Illustration, tl!("Illustration · shades"))]) {
+                redo = Redo::Quantize;
+            }
+            ui.end_row();
+            ui.label(tl!("Number of Colors"));
+            if ui.add(egui::Slider::new(&mut v.settings.colors, 2..=16)).changed() {
+                redo = Redo::Quantize;
+            }
+            ui.end_row();
+            ui.label(tl!("Detail Level"));
+            if choice(ui, &mut v.settings.detail, &[(Detail::Low, tl!("Low Detail")), (Detail::Medium, tl!("Medium Detail")), (Detail::High, tl!("High Detail"))]) {
+                redo = Redo::Quantize;
+            }
+            ui.end_row();
+            ui.label(tl!("Smoothing"));
+            if choice(ui, &mut v.settings.smoothing, &[(Smoothing::Curves, tl!("Curves")), (Smoothing::Corners, tl!("Sharp Corners"))]) && redo == Redo::Nothing {
+                redo = Redo::Trace;
+            }
+            ui.end_row();
+        });
+        ui.add_space(4.0);
+        let background = v.background();
+        ui.horizontal(|ui| {
+            let check = ui.add_enabled(background.is_some(), egui::Checkbox::new(&mut v.settings.remove_background, tl!("Remove the Background")));
+            if check.changed() && redo == Redo::Nothing {
+                redo = Redo::Trace;
+            }
+            if let Some(rgb) = background {
+                ui.add_space(6.0);
+                patch(ui, rgb, 16.0);
+                ui.label(RichText::new(vectorize::hex(rgb)).font(crate::theme::mono(11.5)));
+                ui.label(RichText::new(tl!("read on the visual's edge")).small().color(t.text_faint));
+            }
+        });
+        if background.is_none() {
+            ui.label(RichText::new(tl!("No background found: the visual is already cut out.")).small().color(t.text_faint));
+        }
     }
     let seal = ui
         .checkbox(&mut v.settings.seal, tl!("Close the Seams between Colors"))
@@ -1101,14 +1422,18 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
 /// and name in the SVG.
 fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui::Ui, &str)) {
     let t = Tokens::get(ui.ctx());
-    let Some(q) = v.quantized.as_ref() else { return };
-    let in_svg = v.traced.as_ref().map_or(0, |tr| tr.paths.len());
+    if v.palette().is_empty() {
+        return;
+    }
+    let palette = v.palette().to_vec();
+    let background = v.background_index();
+    let in_svg = v.traced.as_ref().map_or(0, colours_in);
     section(
         ui,
         &format!(
             "{} · {}",
             tl!("Detected Colors"),
-            crate::i18n::fmt(tl!("{n} colors · {k} in the SVG"), &[("n", &q.palette.len().to_string()), ("k", &in_svg.to_string())])
+            crate::i18n::fmt(tl!("{n} colors · {k} in the SVG"), &[("n", &palette.len().to_string()), ("k", &in_svg.to_string())])
         ),
     );
     let matches = v.matches();
@@ -1124,7 +1449,7 @@ fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui:
         ui.label(RichText::new(tl!("Match")).small().color(t.text_dim));
         ui.label(RichText::new("ΔE").small().color(t.text_dim));
         ui.end_row();
-        for (i, c) in q.palette.iter().enumerate() {
+        for (i, c) in palette.iter().enumerate() {
             let hex = vectorize::hex(c.rgb);
             let mut keep = !v.excluded.contains(&hex);
             let check = ui.add(egui::Checkbox::without_text(&mut keep)).on_hover_text(crate::i18n::fmt(tl!("Keep {hex} in the SVG"), &[("hex", &hex)]));
@@ -1141,7 +1466,7 @@ fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui:
                 patch(ui, c.rgb, 22.0).on_hover_text(format!("RGB {} · {} · {}", c.rgb[0], c.rgb[1], c.rgb[2]));
                 ui.vertical(|ui| {
                     ui.label(RichText::new(&hex).font(crate::theme::mono(11.5)));
-                    if q.background == Some(i) {
+                    if background == Some(i) {
                         ui.label(RichText::new(tl!("Edge Background")).small().color(t.warning));
                     }
                 });
@@ -1198,7 +1523,7 @@ fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui:
 
 /// "Change…": the reference of a palette colour.
 fn change_reference(ctx: &egui::Context, v: &mut Vectorizer) {
-    let target = v.changing.and_then(|i| v.quantized.as_ref()?.palette.get(i).map(|c| (i, c.rgb)));
+    let target = v.changing.and_then(|i| v.palette().get(i).map(|c| (i, c.rgb)));
     let (Some((i, rgb)), Some(book)) = (target, v.book.as_ref()) else {
         v.changing = None;
         return;
@@ -1461,6 +1786,20 @@ mod tests {
         h.render().unwrap().save(dir.join("vectorisation_nuancier.png")).unwrap();
         let sheet = h.state().vectorizer.as_ref().unwrap().sheet().unwrap();
         std::fs::write(dir.join("vectorisation_fiche.pdf"), crate::color_sheet::pdf(&sheet)).unwrap();
+        // The VectorCraft engine, Flat Logo preset.
+        let v = h.state_mut().vectorizer.as_mut().unwrap();
+        v.settings.engine = Engine::VectorCraft;
+        v.apply_preset("Flat Logo");
+        v.quantize();
+        h.run_steps(6);
+        h.render().unwrap().save(dir.join("vectorisation_vectorcraft.png")).unwrap();
+        let v = h.state_mut().vectorizer.as_mut().unwrap();
+        v.apply_preset("6 Colors");
+        v.settings.vc.method = Method::Overlapping;
+        v.settings.vc.strokes = true;
+        v.quantize();
+        h.run_steps(6);
+        h.render().unwrap().save(dir.join("vectorisation_vectorcraft_reglages.png")).unwrap();
     }
 
     /// Zoomed in, the visible part of the result is drawn again at the screen's resolution;
@@ -1647,5 +1986,98 @@ mod tests {
         h.key_press(egui::Key::Escape);
         h.run_steps(2);
         assert!(h.state().vectorizer.is_none());
+    }
+
+    /// The VectorCraft engine: its preset traces the visual, the palette table, the colours left
+    /// out, the swatch book and the export work as with DTF Craft's engine.
+    #[test]
+    fn the_vectorcraft_engine_traces_and_exports_the_same_way() {
+        let (mut app, written) = app();
+        crate::color_analyzer_ui::save_book(&mut app, &book());
+        open(&mut app).unwrap();
+        let v = app.vectorizer.as_mut().unwrap();
+        v.settings.engine = Engine::VectorCraft;
+        v.settings.vc = vc::preset("3 Colors").unwrap();
+        v.settings.vc.ignore_white = true;
+        v.quantize();
+        assert!(v.error.is_none(), "{:?}", v.error);
+        let hexes: Vec<String> = v.palette().iter().map(|c| vectorize::hex(c.rgb)).collect();
+        assert!(hexes.len() >= 2 && !hexes.contains(&"#FFFFFF".to_string()), "{hexes:?}");
+        assert!(v.svg().unwrap().contains("EX-201_Bleu_roi"), "the blue takes its swatch");
+        // Left out: its shapes go, VectorCraft does not trace again.
+        let orange = hexes.iter().find(|h| h.starts_with("#E")).unwrap().clone();
+        v.set_excluded(&orange, true);
+        v.update();
+        assert!(!v.svg().unwrap().contains("EX-114"), "the orange is left out");
+        assert_eq!(v.params()["engine"], "vectorcraft");
+        let preview = v.svg().unwrap();
+        let (dialog, _) = crate::file_dialog::fake(vec![Some(crate::file_dialog::FileDialogAnswer::SaveTo("out/logo vectorisé.svg".into()))]);
+        app.services.file_dialog = Some(dialog);
+        export_svg(&mut app).unwrap();
+        app.poll_file_dialog(&egui::Context::default(), None);
+        let svg = String::from_utf8(written.borrow()[0].1.clone()).unwrap();
+        assert_eq!(svg, preview, "the export is what the module shows");
+        // The settings are remembered with the engine.
+        let s: Settings = serde_json::from_value(app.session.prefs().dialogs[SETTINGS_PREF].clone()).unwrap();
+        assert_eq!((s.engine, s.vc.ignore_white), (Engine::VectorCraft, true));
+    }
+
+    /// VectorCraft's Swatch Book palette takes the reference swatch book's colours; its errors
+    /// read in the user's language.
+    #[test]
+    fn the_swatch_book_is_vectorcrafts_palette_and_errors_are_explained() {
+        let (mut app, _) = app();
+        open(&mut app).unwrap();
+        let v = app.vectorizer.as_mut().unwrap();
+        v.settings.engine = Engine::VectorCraft;
+        v.settings.vc = TraceParams { mode: Mode::Color, palette: Palette::DocumentLibrary, colors: 3, ..vc::preset("6 Colors").unwrap() };
+        v.quantize();
+        assert_eq!(v.error.as_deref(), Some("Load a swatch book to use it as the palette."));
+        v.set_book(Some(book()));
+        v.update();
+        let swatches: Vec<[u8; 3]> = book().swatches.iter().map(analyzer::swatch8).collect();
+        assert!(v.palette().iter().all(|c| swatches.contains(&c.rgb) || c.rgb == [255, 255, 255]), "{:?}", v.palette());
+        v.settings.vc = TraceParams { ignore_white: true, ignore_color: Some("bleu".into()), ..vc::preset("6 Colors").unwrap() };
+        v.quantize();
+        assert_eq!(v.error.as_deref(), Some("\"bleu\" is not a color: write it as #rrggbb."));
+        assert_eq!(hex_list("1f4fb5, #e4572e  000000"), vec!["#1F4FB5", "#E4572E", "#000000"]);
+    }
+
+    #[test]
+    fn the_vectorcraft_panel_switches_presets_and_marks_changes() {
+        let (mut app, _) = app();
+        open(&mut app).unwrap();
+        app.vectorizer.as_mut().unwrap().settings.engine = Engine::VectorCraft;
+        app.vectorizer.as_mut().unwrap().quantize();
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 900.0)).build_ui_state(
+            |ui, app: &mut PhotocraftApp| {
+                let ready = egui::Id::new("vectorizer-test-fonts");
+                if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
+                    PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
+                    ui.ctx().data_mut(|d| d.insert_temp(ready, true));
+                    return;
+                }
+                show(app, ui.ctx());
+            },
+            app,
+        );
+        h.run_steps(3);
+        assert!(h.query_by_label("Paths").is_some() && h.query_by_label("Corners").is_some() && h.query_by_label("Threshold").is_none());
+        h.state_mut().vectorizer.as_mut().unwrap().apply_preset("Black and White Logo");
+        h.run_steps(4);
+        let v = h.state().vectorizer.as_ref().unwrap();
+        assert_eq!((v.settings.vc.mode, v.settings.vc_preset.as_deref()), (Mode::BlackAndWhite, Some("Black and White Logo")));
+        assert!(h.query_by_label("Threshold").is_some());
+        h.state_mut().vectorizer.as_mut().unwrap().settings.vc.noise = 50;
+        h.run_steps(1);
+        h.get_by_label("Exact Shapes").click();
+        h.run_steps(3);
+        let v = h.state().vectorizer.as_ref().unwrap();
+        assert_eq!(v.settings.vc_preset, None, "changed by hand: Custom");
+        // Back to DTF Craft's engine: its own settings.
+        h.get_by_label("DTF Craft").click();
+        h.run_steps(4);
+        assert!(h.query_by_label("Type of Visual").is_some());
+        assert!(h.state().vectorizer.as_ref().unwrap().quantized.is_some());
     }
 }

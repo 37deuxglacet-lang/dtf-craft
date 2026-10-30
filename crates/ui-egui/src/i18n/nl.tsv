@@ -4197,3 +4197,50 @@ curves	Smooth	Vloeiend maken
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Gedeeld met de Kleuranalyse. Formaten: .ase, .aco, .csv; verschil in ΔE 2000.
 	{name} vectorized color sheet	{name} kleurenblad gevectoriseerd
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ aangevinkt: de vormen krijgen de kleur van de referentie en dragen de naam ervan in de SVG. ΔE: tot 2 = onwaarneembaar · 2 tot 5 = zichtbaar van dichtbij · daarboven = andere tint
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	'{color}' is geen kleur: schrijf het als #rrggbb.
+	16 Colors	16 kleuren
+	3 Colors	3 kleuren
+	6 Colors	6 kleuren
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Een cirkel, ellips, rechthoek of regelmatige veelhoek komt er precies als die vorm uit.
+	Abutting	Aangrenzend
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Aangrenzend: elke kleur heeft een eigen gebied, de vormen delen hun randen. Overlappend: elke laag loopt door onder de lagen erboven, zodat er geen kier tussen kleuren is.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Een gebied waarvan de kleur gelijkmatig in één richting verloopt, wordt één vorm met een lineair verloop.
+	Areas smaller than this many pixels are ignored.	Gebieden kleiner dan dit aantal pixels worden genegeerd.
+	Black and White	Zwart-wit
+	Black and White Logo	Zwart-witlogo
+	Cut-out shapes, contours cleaned for DTF printing.	Uitgesneden vormen, contouren opgeschoond voor DTF-druk.
+	Engine	Engine
+	Exact Shapes	Exacte vormen
+	Fills	Vullingen
+	Flat Logo	Vlak logo
+	Full Tone	Doorlopende tonen
+	Grays	Grijswaarden
+	High Fidelity Photo	Foto hoge getrouwheid
+	Higher keeps more sharp corners.	Hoger behoudt meer scherpe hoeken.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Hoe nauw de curven de pixels volgen: hoger is getrouwer, met meer punten.
+	Ignore Color	Kleur negeren
+	Limited	Beperkt
+	Line Art	Lijntekening
+	Lines as Strokes	Lijnen als lijnen
+	Lines no wider than the stroke width are traced as stroked center lines.	Lijnen die niet breder zijn dan de lijndikte worden overgetrokken als middenlijnen met een lijn.
+	Load a swatch book to use it as the palette.	Laad een stalenboek om het als palet te gebruiken.
+	Logo Colors	Logokleuren
+	Low Fidelity Photo	Foto lage getrouwheid
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Bijna rechte curven worden rechte lijnen; in Vlak logo worden cirkeldelen echte bogen.
+	Nothing to trace: everything is ignored or transparent.	Niets over te trekken: alles is genegeerd of transparant.
+	Outline	Omtrek
+	Overlapping	Overlappend
+	Pixels darker than this are black.	Pixels donkerder dan deze waarde worden zwart.
+	Shades of Gray	Grijstinten
+	Silhouettes	Silhouetten
+	Sketched Art	Schets
+	Snap Curves to Lines	Curven aan lijnen uitlijnen
+	Technical Drawing	Technische tekening
+	The areas of this color are left out (white when the field is empty).	De gebieden van deze kleur worden weggelaten (wit als het veld leeg is).
+	The colors of the reference swatch book below, at most this many.	De kleuren van het referentiestalenboek hieronder, hooguit zoveel.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Dit ontwerp is geen logo met vlakke kleuren ({p} % van de volle vlakken is effen): kies de modus Kleur.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Te veel punten: verhoog Ruis, of verlaag Paden of Kleuren.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Afbeelding overtrekken van VectorCraft: de voorinstellingen en alle instellingen, voor DTF en andere technieken.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vectorisatie: Afbeelding overtrekken van VectorCraft (ArtCraft Team en de VectorCraft-bijdragers, MIT OR Apache-2.0) en visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automatisch, of #rrggbb #rrggbb…

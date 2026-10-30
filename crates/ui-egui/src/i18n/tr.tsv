@@ -4169,3 +4169,50 @@ cameraData	Lens	Lens
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Renk Analizcisi ile ortak. Biçimler: .ase, .aco, .csv; fark ΔE 2000 ile.
 	{name} vectorized color sheet	{name} vektörleştirilmiş renk sayfası
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ işaretli: şekiller referansın rengini alır ve SVG'de onun adını taşır. ΔE: 2'ye kadar = fark edilmez · 2 ile 5 arası = yakından görülür · üstü = başka ton
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}" bir renk değil: #rrggbb olarak yazın.
+	16 Colors	16 renk
+	3 Colors	3 renk
+	6 Colors	6 renk
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Bir daire, elips, dikdörtgen veya düzgün çokgen tam olarak o şekil olarak çıkar.
+	Abutting	Bitişik
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Bitişik: her rengin kendi alanı vardır, şekiller kenarlarını paylaşır. Üst üste: her katman üstündekilerin altına uzanır, renkler arasında boşluk kalmaz.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Rengi tek yönde düzenli değişen bir alan, doğrusal degradeyle doldurulmuş tek bir şekil olur.
+	Areas smaller than this many pixels are ignored.	Bu kadar pikselden küçük alanlar yok sayılır.
+	Black and White	Siyah beyaz
+	Black and White Logo	Siyah beyaz logo
+	Cut-out shapes, contours cleaned for DTF printing.	Kesilmiş şekiller, DTF baskı için temizlenmiş konturlar.
+	Engine	Motor
+	Exact Shapes	Tam şekiller
+	Fills	Dolgular
+	Flat Logo	Düz logo
+	Full Tone	Sürekli ton
+	Grays	Griler
+	High Fidelity Photo	Yüksek doğruluklu fotoğraf
+	Higher keeps more sharp corners.	Yüksek değer daha çok keskin köşe korur.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Eğrilerin piksellere ne kadar yakın gittiği: yüksek daha sadık, daha çok nokta.
+	Ignore Color	Rengi yok say
+	Limited	Sınırlı
+	Line Art	Çizgi çizim
+	Lines as Strokes	Çizgiler kontur olarak
+	Lines no wider than the stroke width are traced as stroked center lines.	Kontur kalınlığından geniş olmayan çizgiler konturlu orta çizgiler olarak izlenir.
+	Load a swatch book to use it as the palette.	Palet olarak kullanmak için bir renk örneği kitabı yükleyin.
+	Logo Colors	Logo renkleri
+	Low Fidelity Photo	Düşük doğruluklu fotoğraf
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Neredeyse düz eğriler düz çizgi olur; Düz logoda daire parçaları gerçek yaylar olur.
+	Nothing to trace: everything is ignored or transparent.	İzlenecek bir şey yok: her şey yok sayıldı veya saydam.
+	Outline	Anahat
+	Overlapping	Üst üste
+	Pixels darker than this are black.	Bu değerden koyu pikseller siyah olur.
+	Shades of Gray	Gri tonları
+	Silhouettes	Siluetler
+	Sketched Art	Eskiz
+	Snap Curves to Lines	Eğrileri çizgilere yasla
+	Technical Drawing	Teknik çizim
+	The areas of this color are left out (white when the field is empty).	Bu rengin alanları çıkarılır (alan boşsa beyaz).
+	The colors of the reference swatch book below, at most this many.	Aşağıdaki referans renk örneği kitabının renkleri, en fazla bu kadar.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Bu görsel düz renkli bir logo değil (dolu alanlarının %{p} kadarı düz): Renk modunu seçin.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Çok fazla nokta: Gürültüyü artırın veya Yolları ya da Renkleri azaltın.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft Görüntü İzleme: ön ayarları ve tüm ayarları, DTF ve diğer teknikler için.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektörleştirme: VectorCraft Görüntü İzleme (ArtCraft Team ve VectorCraft katkıcıları, MIT OR Apache-2.0) ve visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	otomatik veya #rrggbb #rrggbb…

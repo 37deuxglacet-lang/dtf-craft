@@ -161,6 +161,29 @@ pub struct ColorPath {
     pub shapes: usize,
     /// Anchor points (segment ends) of the path.
     pub points: usize,
+    /// How the path is painted (filled, unless the VectorCraft engine traced a line or a gradient).
+    pub paint: Paint,
+}
+
+/// How a path is painted.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub enum Paint {
+    /// Filled with its colour.
+    #[default]
+    Fill,
+    /// A centre line stroked this wide (px), its ends square or round.
+    Stroke { width: f64, square_caps: bool },
+    /// Filled with a linear gradient (its colour is the gradient's middle one).
+    Gradient(LinearGradient),
+}
+
+/// A linear gradient, in the traced pixels' units.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LinearGradient {
+    pub start: [f64; 2],
+    pub end: [f64; 2],
+    /// Offset (0–1, ascending) and colour.
+    pub stops: Vec<(f64, [u8; 3])>,
 }
 
 /// How the shapes are traced.
@@ -779,7 +802,7 @@ impl Quantized {
             let traced = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| trace_colour(&image, mode, o.detail)))
                 .map_err(|_| format!("the tracer failed on colour {}", hex(self.palette[color].rgb)))?;
             if let Some((d, shapes, points)) = traced {
-                paths.push(ColorPath { color, d, shapes, points });
+                paths.push(ColorPath { color, d, shapes, points, paint: Paint::Fill });
             }
         }
         Ok(Traced { width: w, height: h, paths })
@@ -805,7 +828,7 @@ fn trace_colour(image: &BinaryImage, mode: PathSimplifyMode, detail: Detail) -> 
     (shapes > 0).then_some((d, shapes, points))
 }
 
-fn num(v: f64) -> String {
+pub(crate) fn num(v: f64) -> String {
     let r = (v * 100.0).round() / 100.0;
     let s = format!("{r:.2}");
     let s = s.trim_end_matches('0').trim_end_matches('.');
@@ -908,6 +931,7 @@ pub fn svg_named(t: &Traced, palette: &[PaletteColor], names: &[Option<String>],
         t.width, t.height
     ));
     let mut used: Vec<String> = Vec::new();
+    let mut gradients = 0;
     for p in &t.paths {
         let Some(c) = palette.get(p.color) else { continue };
         let colour = hex(c.rgb);
@@ -922,18 +946,49 @@ pub fn svg_named(t: &Traced, palette: &[PaletteColor], names: &[Option<String>],
             k += 1;
         }
         used.push(id.clone());
-        match style {
-            Style::Contours(width) => out.push_str(&format!(
+        match (style, &p.paint) {
+            (Style::Contours(width), _) => out.push_str(&format!(
                 "<path id=\"{id}\" d=\"{}\" fill=\"none\" stroke=\"#FF2FA0\" stroke-width=\"{}\" stroke-linejoin=\"round\"/>\n",
                 p.d,
                 num(width)
             )),
-            Style::Fill { seal: true } => out.push_str(&format!(
+            // A centre line: its stroke is the shape.
+            (Style::Fill { .. }, Paint::Stroke { width, square_caps }) => out.push_str(&format!(
+                "<path id=\"{id}\" d=\"{}\" fill=\"none\" stroke=\"{colour}\" stroke-width=\"{}\" stroke-linecap=\"{}\" stroke-linejoin=\"round\"/>\n",
+                p.d,
+                num(*width),
+                if *square_caps { "square" } else { "round" }
+            )),
+            (Style::Fill { seal }, Paint::Gradient(g)) => {
+                gradients += 1;
+                let gid = format!("degrade-{gradients}");
+                out.push_str(&format!(
+                    "<defs><linearGradient id=\"{gid}\" gradientUnits=\"userSpaceOnUse\" x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\">",
+                    num(g.start[0]),
+                    num(g.start[1]),
+                    num(g.end[0]),
+                    num(g.end[1])
+                ));
+                for (offset, rgb) in &g.stops {
+                    out.push_str(&format!("<stop offset=\"{}\" stop-color=\"{}\"/>", num(offset.clamp(0.0, 1.0)), hex(*rgb)));
+                }
+                out.push_str("</linearGradient></defs>\n");
+                if seal {
+                    out.push_str(&format!(
+                        "<path id=\"{id}\" d=\"{}\" fill=\"url(#{gid})\" stroke=\"url(#{gid})\" stroke-width=\"{}\" stroke-linejoin=\"round\"/>\n",
+                        p.d,
+                        num(SEAM)
+                    ));
+                } else {
+                    out.push_str(&format!("<path id=\"{id}\" d=\"{}\" fill=\"url(#{gid})\"/>\n", p.d));
+                }
+            }
+            (Style::Fill { seal: true }, Paint::Fill) => out.push_str(&format!(
                 "<path id=\"{id}\" d=\"{}\" fill=\"{colour}\" stroke=\"{colour}\" stroke-width=\"{}\" stroke-linejoin=\"round\"/>\n",
                 p.d,
                 num(SEAM)
             )),
-            Style::Fill { seal: false } => out.push_str(&format!("<path id=\"{id}\" d=\"{}\" fill=\"{colour}\"/>\n", p.d)),
+            (Style::Fill { seal: false }, Paint::Fill) => out.push_str(&format!("<path id=\"{id}\" d=\"{}\" fill=\"{colour}\"/>\n", p.d)),
         }
     }
     out.push_str("</svg>\n");

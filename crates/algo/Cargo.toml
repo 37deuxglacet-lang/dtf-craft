@@ -17,6 +17,11 @@ serde = { workspace = true }
 rustfft = "6.4.1"
 # DTF Craft: the Vectorisation module's tracer (MIT OR Apache-2.0).
 visioncortex = "0.9.3"
+# DTF Craft: the VectorCraft engine of the Vectorisation module (copied from VectorCraft, MIT OR Apache-2.0).
+vectorcraft-trace = { path = "../vectorcraft-trace" }
+vectorcraft-geom = { path = "../vectorcraft-geom" }
+kurbo = "0.13"
+serde_json = { workspace = true }
 
 # Parallel tiles on native; wasm builds stay single-threaded.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

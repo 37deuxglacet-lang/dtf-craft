@@ -4046,3 +4046,50 @@ navigator	Zoom	Zvětšení
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Sdíleno s Analyzátorem barev. Formáty: .ase, .aco, .csv; rozdíl v ΔE 2000.
 	{name} vectorized color sheet	{name} barevný list vektorizace
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ zaškrtnuto: tvary převezmou barvu reference a v SVG nesou její název. ΔE: do 2 = nepostřehnutelné · 2 až 5 = viditelné zblízka · víc = jiný odstín
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}“ není barva: zapište ji jako #rrggbb.
+	16 Colors	16 barev
+	3 Colors	3 barvy
+	6 Colors	6 barev
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Kruh, elipsa, obdélník nebo pravidelný mnohoúhelník vyjde přesně jako tento tvar.
+	Abutting	Sousedící
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Sousedící: každá barva má vlastní plochu, tvary sdílejí okraje. Překrývající: každá vrstva sahá pod vrstvy nad ní, mezi barvami není mezera.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Plocha, jejíž barva se plynule mění jedním směrem, je jeden tvar vyplněný lineárním přechodem.
+	Areas smaller than this many pixels are ignored.	Plochy menší než tento počet pixelů se ignorují.
+	Black and White	Černobílý
+	Black and White Logo	Černobílé logo
+	Cut-out shapes, contours cleaned for DTF printing.	Vyříznuté tvary, obrysy vyčištěné pro tisk DTF.
+	Engine	Modul
+	Exact Shapes	Přesné tvary
+	Fills	Výplně
+	Flat Logo	Plošné logo
+	Full Tone	Spojitý tón
+	Grays	Šedé
+	High Fidelity Photo	Fotografie vysoké věrnosti
+	Higher keeps more sharp corners.	Vyšší zachová více ostrých rohů.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Jak přesně křivky sledují pixely: vyšší je věrnější, s více body.
+	Ignore Color	Ignorovat barvu
+	Limited	Omezená
+	Line Art	Kresba
+	Lines as Strokes	Čáry jako tahy
+	Lines no wider than the stroke width are traced as stroked center lines.	Čáry ne širší než tloušťka tahu se obkreslí jako středové čáry s tahem.
+	Load a swatch book to use it as the palette.	Načtěte vzorník, abyste ho použili jako paletu.
+	Logo Colors	Barvy loga
+	Low Fidelity Photo	Fotografie nízké věrnosti
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Téměř rovné křivky se stanou úsečkami; v Plošném logu se části kruhů stanou skutečnými oblouky.
+	Nothing to trace: everything is ignored or transparent.	Nic k obkreslení: vše je ignorováno nebo průhledné.
+	Outline	Obrys
+	Overlapping	Překrývající
+	Pixels darker than this are black.	Pixely tmavší než tato hodnota jsou černé.
+	Shades of Gray	Odstíny šedé
+	Silhouettes	Siluety
+	Sketched Art	Skica
+	Snap Curves to Lines	Přichytit křivky k čarám
+	Technical Drawing	Technický výkres
+	The areas of this color are left out (white when the field is empty).	Plochy této barvy se vynechají (bílá, když je pole prázdné).
+	The colors of the reference swatch book below, at most this many.	Barvy referenčního vzorníku níže, nejvýše tolik.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Tento motiv není logo v plných barvách ({p} % plných ploch je jednolitých): zvolte režim Barva.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Příliš mnoho bodů: zvyšte Šum, nebo snižte Cesty či Barvy.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Obkreslení obrazu z VectorCraft: jeho předvolby a všechna nastavení, pro DTF i jiné techniky.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorizace: Obkreslení obrazu z VectorCraft (ArtCraft Team a přispěvatelé VectorCraft, MIT OR Apache-2.0) a visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automaticky, nebo #rrggbb #rrggbb…

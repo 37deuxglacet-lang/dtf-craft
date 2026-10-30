@@ -3618,3 +3618,50 @@ curves	Smooth	매끄럽게
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	색상 분석기와 공유. 형식: .ase, .aco, .csv; 차이는 ΔE 2000.
 	{name} vectorized color sheet	{name} 벡터화 색상 시트
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 선택: 도형이 기준 색상을 가지며 SVG에서 그 이름이 붙습니다. ΔE: 2 이하 = 인지 불가 · 2~5 = 가까이서 보임 · 그 이상 = 다른 색조
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}"은(는) 색이 아닙니다: #rrggbb 형식으로 쓰세요.
+	16 Colors	16색
+	3 Colors	3색
+	6 Colors	6색
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	원, 타원, 사각형, 정다각형은 정확히 그 모양으로 나옵니다.
+	Abutting	인접
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	인접: 각 색이 자기 영역을 가지며 모양이 경계를 공유합니다. 겹침: 각 레이어가 위 레이어 아래까지 이어져 색 사이에 틈이 없습니다.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	한 방향으로 고르게 색이 변하는 영역은 선형 그레이디언트로 채운 하나의 모양이 됩니다.
+	Areas smaller than this many pixels are ignored.	이 픽셀 수보다 작은 영역은 무시됩니다.
+	Black and White	흑백
+	Black and White Logo	흑백 로고
+	Cut-out shapes, contours cleaned for DTF printing.	잘라낸 모양, DTF 인쇄용으로 정리한 윤곽.
+	Engine	엔진
+	Exact Shapes	정확한 모양
+	Fills	칠
+	Flat Logo	단색 로고
+	Full Tone	연속 톤
+	Grays	회색
+	High Fidelity Photo	고품질 사진
+	Higher keeps more sharp corners.	높을수록 날카로운 모서리를 더 유지합니다.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	곡선이 픽셀을 따르는 정도: 높을수록 충실하며 점이 많아집니다.
+	Ignore Color	색상 무시
+	Limited	제한
+	Line Art	선화
+	Lines as Strokes	선을 획으로
+	Lines no wider than the stroke width are traced as stroked center lines.	획 두께보다 넓지 않은 선은 획이 있는 중심선으로 추적됩니다.
+	Load a swatch book to use it as the palette.	팔레트로 쓰려면 견본 책을 불러오세요.
+	Logo Colors	로고 색
+	Low Fidelity Photo	저품질 사진
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	거의 곧은 곡선은 직선이 되고, 단색 로고에서는 원의 일부가 실제 호가 됩니다.
+	Nothing to trace: everything is ignored or transparent.	추적할 것이 없습니다: 모두 무시되었거나 투명합니다.
+	Outline	윤곽선
+	Overlapping	겹침
+	Pixels darker than this are black.	이 값보다 어두운 픽셀은 검정이 됩니다.
+	Shades of Gray	회색 음영
+	Silhouettes	실루엣
+	Sketched Art	스케치
+	Snap Curves to Lines	곡선을 선에 맞추기
+	Technical Drawing	기술 도면
+	The areas of this color are left out (white when the field is empty).	이 색의 영역은 제외됩니다(칸이 비어 있으면 흰색).
+	The colors of the reference swatch book below, at most this many.	아래 기준 견본 책의 색, 최대 이 개수.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	이 이미지는 단색 로고가 아닙니다(단색 영역 {p} %): 색상 모드를 선택하세요.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	점이 너무 많습니다: 노이즈를 높이거나 패스 또는 색상을 낮추세요.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft의 이미지 추적: 사전 설정과 모든 설정, DTF와 다른 기법용.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	벡터화: VectorCraft의 이미지 추적(ArtCraft Team 및 VectorCraft 기여자, MIT OR Apache-2.0)과 visioncortex(MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	자동, 또는 #rrggbb #rrggbb…

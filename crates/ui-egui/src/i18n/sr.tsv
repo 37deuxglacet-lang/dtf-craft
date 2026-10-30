@@ -4511,3 +4511,50 @@ shape	Appearance	Izgled
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Заједничко са Анализатором боја. Формати: .ase, .aco, .csv; разлика у ΔE 2000.
 	{name} vectorized color sheet	{name} лист боја векторизације
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ означено: облици добијају боју референце и у SVG-у носе њено име. ΔE: до 2 = неприметно · од 2 до 5 = видљиво изблиза · више = друга нијанса
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}” није боја: напишите је као #rrggbb.
+	16 Colors	16 боја
+	3 Colors	3 боје
+	6 Colors	6 боја
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Круг, елипса, правоугаоник или правилан многоугао излази тачно као тај облик.
+	Abutting	Суседни
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Суседни: свака боја има своју област, облици деле ивице. Преклопљени: сваки слој се протеже испод слојева изнад, без размака између боја.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Област чија се боја равномерно мења у једном правцу постаје један облик испуњен линеарним прелазом.
+	Areas smaller than this many pixels are ignored.	Области мање од овог броја пиксела се занемарују.
+	Black and White	Црно-бело
+	Black and White Logo	Црно-бели лого
+	Cut-out shapes, contours cleaned for DTF printing.	Исечени облици, контуре очишћене за DTF штампу.
+	Engine	Мотор
+	Exact Shapes	Тачни облици
+	Fills	Испуне
+	Flat Logo	Равни лого
+	Full Tone	Непрекидни тон
+	Grays	Сиве
+	High Fidelity Photo	Фотографија високе верности
+	Higher keeps more sharp corners.	Веће задржава више оштрих углова.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Колико тачно криве прате пикселе: веће је верније, са више тачака.
+	Ignore Color	Занемари боју
+	Limited	Ограничена
+	Line Art	Цртеж линијама
+	Lines as Strokes	Линије као потези
+	Lines no wider than the stroke width are traced as stroked center lines.	Линије не шире од дебљине потеза прецртавају се као средишње линије са потезом.
+	Load a swatch book to use it as the palette.	Учитајте књигу узорака да бисте је користили као палету.
+	Logo Colors	Боје логоа
+	Low Fidelity Photo	Фотографија ниске верности
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Скоро праве криве постају праве линије; у Равном логоу делови круга постају прави лукови.
+	Nothing to trace: everything is ignored or transparent.	Нема шта да се прецрта: све је занемарено или провидно.
+	Outline	Обрис
+	Overlapping	Преклопљени
+	Pixels darker than this are black.	Пиксели тамнији од ове вредности постају црни.
+	Shades of Gray	Нијансе сиве
+	Silhouettes	Силуете
+	Sketched Art	Скица
+	Snap Curves to Lines	Привуци криве на линије
+	Technical Drawing	Технички цртеж
+	The areas of this color are left out (white when the field is empty).	Области ове боје се изостављају (бела ако је поље празно).
+	The colors of the reference swatch book below, at most this many.	Боје референтне књиге узорака испод, највише толико.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Овај мотив није лого у равним бојама ({p} % пуних површина је једнобојно): изаберите режим Боја.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Превише тачака: повећајте Шум или смањите Путање или Боје.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Прецртавање слике из VectorCraft-а: његова подешавања и сва његова подешавања, за DTF и друге технике.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизација: Прецртавање слике из VectorCraft-а (ArtCraft Team и сарадници VectorCraft-а, MIT OR Apache-2.0) и visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	аутоматски, или #rrggbb #rrggbb…

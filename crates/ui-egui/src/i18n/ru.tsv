@@ -3412,3 +3412,51 @@ curves	Smooth	Сгладить
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Общий с Анализатором цвета. Форматы: .ase, .aco, .csv; разница в ΔE 2000.
 	{name} vectorized color sheet	{name} цветовой лист векторизации
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ отмечено: фигуры принимают цвет эталона и в SVG носят его имя. ΔE: до 2 = незаметно · от 2 до 5 = заметно вблизи · выше = другой оттенок
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	«{color}» — не цвет: запишите его как #rrggbb.
+	16 Colors	16 цветов
+	3 Colors	3 цвета
+	6 Colors	6 цветов
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Круг, эллипс, прямоугольник или правильный многоугольник выходит точно такой фигурой.
+	Abutting	Смежные
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Смежные: у каждого цвета своя область, фигуры делят общие края. Перекрывающиеся: каждый слой заходит под слои выше, без зазоров между цветами.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Область, цвет которой равномерно меняется в одном направлении, становится одной фигурой с линейным градиентом.
+	Areas smaller than this many pixels are ignored.	Области меньше этого числа пикселей игнорируются.
+	Black and White	Чёрно-белый
+	Black and White Logo	Чёрно-белый логотип
+	Cut-out shapes, contours cleaned for DTF printing.	Вырезанные фигуры, контуры очищены для печати DTF.
+	Engine	Движок
+	Exact Shapes	Точные фигуры
+	Fills	Заливки
+	Flat Logo	Плоский логотип
+	Full Tone	Непрерывный тон
+	Grays	Оттенки
+	High Fidelity Photo	Фото высокой точности
+	Higher keeps more sharp corners.	Чем выше, тем больше острых углов сохраняется.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Насколько точно кривые следуют пикселям: выше — точнее, с большим числом точек.
+	Ignore Color	Игнорировать цвет
+	Limited	Ограниченная
+	Line Art	Штриховой рисунок
+	Lines as Strokes	Линии как обводки
+	Lines no wider than the stroke width are traced as stroked center lines.	Линии не шире толщины обводки трассируются как осевые линии с обводкой.
+	Load a swatch book to use it as the palette.	Загрузите каталог образцов, чтобы использовать его как палитру.
+	Logo Colors	Цвета логотипа
+	Low Fidelity Photo	Фото низкой точности
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Почти прямые кривые становятся прямыми линиями; в Плоском логотипе части окружностей становятся настоящими дугами.
+	Nothing to trace: everything is ignored or transparent.	Нечего трассировать: всё игнорируется или прозрачно.
+	Outline	Контур
+	Overlapping	Перекрывающиеся
+	Pixels darker than this are black.	Пиксели темнее этого значения становятся чёрными.
+	Shades of Gray	Оттенки серого
+	Silhouettes	Силуэты
+	Sketched Art	Эскиз
+	Snap Curves to Lines	Привязать кривые к линиям
+	Technical Drawing	Технический чертёж
+	The areas of this color are left out (white when the field is empty).	Области этого цвета исключаются (белый, если поле пустое).
+	The colors of the reference swatch book below, at most this many.	Цвета эталонного каталога образцов ниже, не больше этого числа.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Это изображение не плоский цветной логотип ({p} % сплошных областей однотонны): выберите режим «Цвет».
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Слишком много точек: увеличьте Шум или уменьшите Контуры или Цвета.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Трассировка изображения VectorCraft: её стили и все её настройки, для DTF и других технологий.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизация: трассировка изображения VectorCraft (ArtCraft Team и участники VectorCraft, MIT OR Apache-2.0) и visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	автоматически или #rrggbb #rrggbb…
+	Stroke Width	Толщина обводки

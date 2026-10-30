@@ -3436,3 +3436,51 @@ curves	Smooth	Haluskan
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dipakai bersama Penganalisis Warna. Format: .ase, .aco, .csv; selisih dalam ΔE 2000.
 	{name} vectorized color sheet	{name} lembar warna vektorisasi
 	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ dicentang: bentuk mengambil warna referensi dan diberi namanya di SVG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}" bukan warna: tulis sebagai #rrggbb.
+	16 Colors	16 warna
+	3 Colors	3 warna
+	6 Colors	6 warna
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Lingkaran, elips, persegi panjang, atau poligon beraturan keluar persis sebagai bentuk itu.
+	Abutting	Bersebelahan
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Bersebelahan: tiap warna punya area sendiri, bentuk berbagi tepi. Bertumpuk: tiap lapisan memanjang di bawah lapisan di atasnya, tanpa celah antarwarna.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Area yang warnanya berubah merata ke satu arah menjadi satu bentuk berisi gradien linear.
+	Areas smaller than this many pixels are ignored.	Area yang lebih kecil dari jumlah piksel ini diabaikan.
+	Black and White	Hitam putih
+	Black and White Logo	Logo hitam putih
+	Cut-out shapes, contours cleaned for DTF printing.	Bentuk terpotong, kontur dibersihkan untuk cetak DTF.
+	Engine	Mesin
+	Exact Shapes	Bentuk tepat
+	Fills	Isian
+	Flat Logo	Logo warna datar
+	Full Tone	Nada kontinu
+	Grays	Abu-abu
+	High Fidelity Photo	Foto fidelitas tinggi
+	Higher keeps more sharp corners.	Lebih tinggi mempertahankan lebih banyak sudut tajam.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Seberapa dekat kurva mengikuti piksel: lebih tinggi lebih setia, dengan lebih banyak titik.
+	Ignore Color	Abaikan warna
+	Limited	Terbatas
+	Line Art	Gambar garis
+	Lines as Strokes	Garis sebagai goresan
+	Lines no wider than the stroke width are traced as stroked center lines.	Garis yang tidak lebih lebar dari tebal goresan dijiplak sebagai garis tengah dengan goresan.
+	Load a swatch book to use it as the palette.	Muat buku swatch untuk memakainya sebagai palet.
+	Logo Colors	Warna logo
+	Low Fidelity Photo	Foto fidelitas rendah
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Kurva yang hampir lurus menjadi garis lurus; pada Logo warna datar, bagian lingkaran menjadi busur sejati.
+	Nothing to trace: everything is ignored or transparent.	Tidak ada yang dijiplak: semuanya diabaikan atau transparan.
+	Outline	Garis luar
+	Overlapping	Bertumpuk
+	Pixels darker than this are black.	Piksel yang lebih gelap dari nilai ini menjadi hitam.
+	Shades of Gray	Gradasi abu-abu
+	Silhouettes	Siluet
+	Sketched Art	Sketsa
+	Snap Curves to Lines	Tempelkan kurva ke garis
+	Technical Drawing	Gambar teknik
+	The areas of this color are left out (white when the field is empty).	Area warna ini dihilangkan (putih jika kolom kosong).
+	The colors of the reference swatch book below, at most this many.	Warna buku swatch acuan di bawah, paling banyak sejumlah ini.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Visual ini bukan logo warna datar ({p} % area padatnya rata): pilih mode Warna.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Terlalu banyak titik: naikkan Derau, atau turunkan Jalur atau Warna.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Jiplak Gambar VectorCraft: preset dan semua pengaturannya, untuk DTF dan teknik lain.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorisasi: Jiplak Gambar VectorCraft (ArtCraft Team dan kontributor VectorCraft, MIT OR Apache-2.0) dan visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	otomatis, atau #rrggbb #rrggbb…
+	Stroke Width	Tebal goresan
