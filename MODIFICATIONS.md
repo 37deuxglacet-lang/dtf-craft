@@ -95,7 +95,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `apps/photocraft-cli/tests/cli.rs`
 - `crates/engine/src/build_info.rs`
 
-## Added (34)
+## Added (35)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -129,6 +129,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/home_image.rs`
 - `crates/ui-egui/src/promo.rs`
 - `crates/algo/src/vectorize_vc.rs`
+- `crates/ui-egui/src/offers.rs`
 - `crates/vectorcraft-geom/` (copied unchanged from VectorCraft, see below)
 - `crates/vectorcraft-trace/` (copied unchanged from VectorCraft, see below)
 

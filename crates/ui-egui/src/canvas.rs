@@ -2659,9 +2659,17 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     let promo = (area.height() >= card_h + crate::promo::HEIGHT + 80.0 && promo_w >= crate::promo::min_width())
         .then(|| Rect::from_center_size(egui::pos2(area.center().x, area.bottom() - 28.0 - crate::promo::HEIGHT / 2.0), egui::vec2(promo_w, crate::promo::HEIGHT)));
     let above = promo.map_or(area, |p| Rect::from_min_max(area.min, egui::pos2(area.right(), p.top() - 12.0)));
-    let card = Rect::from_center_size(above.center(), egui::vec2(460.0, card_h));
+    // DTF Craft: with the offers' box (in French, room permitting), the card and the box are
+    // centred together.
+    let offers_w = if crate::offers::shown() { crate::offers::HOME_WIDTH + 40.0 } else { 0.0 };
+    let shift = if offers_w > 0.0 && above.width() >= 460.0 + offers_w + 48.0 { offers_w / 2.0 } else { 0.0 };
+    let card = Rect::from_center_size(egui::pos2(above.center().x - shift, above.center().y), egui::vec2(460.0, card_h));
     if let Some(p) = promo {
         crate::promo::strip(app, ui, p);
+    }
+    // DTF Craft: the training and quote offers beside the card, when there is room (in French).
+    if let Some(r) = crate::offers::home_rect(above, card, crate::offers::HOME_HEIGHT) {
+        crate::offers::home(app, ui, r);
     }
     let new_label = crate::shortcuts::command_label(app, "New document…", "file.new");
     let open_label = crate::shortcuts::command_label(app, "Open…", "file.open");

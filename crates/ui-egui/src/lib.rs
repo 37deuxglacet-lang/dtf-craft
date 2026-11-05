@@ -126,6 +126,7 @@ pub mod links;
 pub mod gang_sheet_ui;
 /// DTF Craft: the start screen's strip of Stéphane Glacet's sites.
 pub mod promo;
+pub mod offers;
 /// DTF Craft: the start screen's background illustration, from Pixabay.
 pub mod home_image;
 pub mod liquify_ui;
@@ -1920,6 +1921,8 @@ impl eframe::App for PhotocraftApp {
         camera_raw_ui::show(self, &ctx);
         color_analyzer_ui::show(self, &ctx);
         vectorizer_ui::show(self, &ctx);
+        // DTF Craft: a training or quote request asked for from a help sheet.
+        offers::poll(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         gang_sheet_ui::show(self, &ctx);
         canvas::extra_windows(self, &ctx);

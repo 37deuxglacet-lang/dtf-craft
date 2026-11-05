@@ -151,6 +151,8 @@ pub fn sheet_toggle(ui: &mut egui::Ui, open: &mut bool, command: &str) {
             ui.label(RichText::new(text).color(t.text_dim));
             ui.add_space(4.0);
         }
+        // DTF Craft: training on this tool, or a change to it (in French).
+        crate::offers::help_links(ui, command);
     });
     ui.add_space(4.0);
 }

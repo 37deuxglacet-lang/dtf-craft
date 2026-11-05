@@ -179,6 +179,10 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     if id == "ui.symmetryTransform" {
         return crate::symmetry_ui::begin(app).map(|_| Value::Null);
     }
+    // DTF Craft: the training and quote requests (DTF and Help menus).
+    if let Some(r) = crate::offers::menu(app, ctx, id) {
+        return r;
+    }
     if let Some(r) = crate::tool_reset::invoke(app, id, &params) {
         return r;
     }
@@ -1112,6 +1116,8 @@ pub fn menu_items(app: &PhotocraftApp) -> Vec<MenuItem> {
             MenuItem { id: "---".into(), label: "---".into(), path: vec!["Help".into()], shortcut: None, enabled: false, checked: None, color: None },
         );
     }
+    // DTF Craft: the training and quote requests, in French (DTF and Help menus).
+    crate::offers::insert_menu_items(&mut items);
     // Window: the open documents in tab order, after a separator, the active one checked.
     if let Some(last) = items.iter().rposition(|i| i.path.first().map(String::as_str) == Some("Window")) {
         let window = || vec!["Window".to_string()];
