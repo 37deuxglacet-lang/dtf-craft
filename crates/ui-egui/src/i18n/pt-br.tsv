@@ -4274,3 +4274,32 @@ layerLabel	No Color	Sem cor
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Rastreamento de imagem do VectorCraft: suas predefinições e todos os seus ajustes, para DTF e outras técnicas.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vetorização: Rastreamento de imagem do VectorCraft (ArtCraft Team e os colaboradores do VectorCraft, MIT OR Apache-2.0) e visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automático, ou #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Células de {size} × {size} cm · {rows} linhas
+	Cells touch: no spacing between images.	Células encostadas: sem espaçamento entre as imagens.
+	No Cells	Sem células
+	Organize Automatically on Import	Organizar automaticamente ao importar
+	Printed width: {width} cm	Largura de impressão: {width} cm
+	Reserve up to {max} cm · not exported	Reserva até {max} cm · não exportada
+	Snap to the Cells	Encaixar nas células
+	Split the Width into Cells	Dividir a largura em células
+	{width} × {length} cm (max {max})	{width} × {length} cm (máx. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Sem tamanho no arquivo: {width} cm propostos.
+	Place	Posicionar
+	SVG Print Size	Tamanho de impressão do SVG
+	Size given in the file.	Tamanho indicado no arquivo.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Formatos aceitos: PNG (recortado aos pixels visíveis) e SVG (renderizado no tamanho de impressão)
+	Width in cells:	Largura em células:
+	SVG files still waiting: {n}	Arquivos SVG ainda aguardando: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	IA ×{scale}: {from} → {to} px
+	Background {color} made transparent	Fundo {color} tornado transparente
+	Copy for Vectorization	Cópia para vetorização
+	Fringes removed, 2 px margin	Franjas removidas, margem de 2 px
+	JPEG: light median against the artefacts	JPEG: mediana leve contra os artefatos
+	Optimize for Vectorization	Otimizar para vetorização
+	RGB 8 bits, sRGB	RGB 8 bits, sRGB
+	Reduced: {from} → {to} px	Reduzido: {from} → {to} px
+	Size kept: {size} px	Tamanho mantido: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Cores demais ({n}): uma foto ou um degradê não se presta bem à vetorização.

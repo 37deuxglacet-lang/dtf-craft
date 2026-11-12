@@ -4558,3 +4558,32 @@ shape	Appearance	Izgled
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Прецртавање слике из VectorCraft-а: његова подешавања и сва његова подешавања, за DTF и друге технике.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизација: Прецртавање слике из VectorCraft-а (ArtCraft Team и сарадници VectorCraft-а, MIT OR Apache-2.0) и visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	аутоматски, или #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Ćelije {size} × {size} cm · redova: {rows}
+	Cells touch: no spacing between images.	Ćelije se dodiruju: bez razmaka između slika.
+	No Cells	Bez ćelija
+	Organize Automatically on Import	Automatski rasporedi pri uvozu
+	Printed width: {width} cm	Širina štampe: {width} cm
+	Reserve up to {max} cm · not exported	Rezerva do {max} cm · ne izvozi se
+	Snap to the Cells	Prianjanje uz ćelije
+	Split the Width into Cells	Podeli širinu na ćelije
+	{width} × {length} cm (max {max})	{width} × {length} cm (maks. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Datoteka nema veličinu: predloženo {width} cm.
+	Place	Postavi
+	SVG Print Size	Veličina štampe SVG-a
+	Size given in the file.	Veličina navedena u datoteci.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Podržani formati: PNG (isečen na vidljive piksele) i SVG (iscrtan u veličini štampe)
+	Width in cells:	Širina u ćelijama:
+	SVG files still waiting: {n}	Još SVG datoteka na čekanju: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Pozadina {color} postala providna
+	Copy for Vectorization	Kopija za vektorizaciju
+	Fringes removed, 2 px margin	Rubovi uklonjeni, margina 2 px
+	JPEG: light median against the artefacts	JPEG: blagi medijan protiv artefakata
+	Optimize for Vectorization	Optimizuj za vektorizaciju
+	RGB 8 bits, sRGB	RGB 8 bita, sRGB
+	Reduced: {from} → {to} px	Smanjeno: {from} → {to} px
+	Size kept: {size} px	Veličina zadržana: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Previše boja ({n}): fotografija ili prelaz se loše vektorizuju.

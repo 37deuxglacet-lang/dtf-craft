@@ -4187,3 +4187,33 @@ curves	Smooth	Згладити
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Трасування зображення VectorCraft: його стилі та всі його налаштування, для DTF та інших технологій.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизація: трасування зображення VectorCraft (ArtCraft Team і учасники VectorCraft, MIT OR Apache-2.0) та visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	автоматично або #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Комірки {size} × {size} см · рядів: {rows}
+	Cells touch: no spacing between images.	Комірки прилягають: без інтервалу між зображеннями.
+	No Cells	Без комірок
+	Organize Automatically on Import	Автоматично розкладати під час імпорту
+	Printed width: {width} cm	Ширина друку: {width} см
+	Reserve up to {max} cm · not exported	Резерв до {max} см · не експортується
+	Snap to the Cells	Прив'язка до комірок
+	Split the Width into Cells	Розділити ширину на комірки
+	{width} × {length} cm (max {max})	{width} × {length} см (макс. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	У файлі немає розміру: запропоновано {width} см.
+	Place	Розмістити
+	SVG Print Size	Розмір друку SVG
+	Size given in the file.	Розмір із файлу.
+	Skip	Пропустити
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Підтримувані формати: PNG (обрізається за видимими пікселями) і SVG (відтворюється в розмірі друку)
+	Width in cells:	Ширина в комірках:
+	SVG files still waiting: {n}	Ще файлів SVG у черзі: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	ШІ ×{scale}: {from} → {to} px
+	Background {color} made transparent	Тло {color} зроблено прозорим
+	Copy for Vectorization	Копія для векторизації
+	Fringes removed, 2 px margin	Ореоли видалено, поле 2 px
+	JPEG: light median against the artefacts	JPEG: легка медіана проти артефактів
+	Optimize for Vectorization	Оптимізувати для векторизації
+	RGB 8 bits, sRGB	RGB 8 біт, sRGB
+	Reduced: {from} → {to} px	Зменшено: {from} → {to} px
+	Size kept: {size} px	Розмір збережено: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Забагато кольорів ({n}): фото чи градієнт погано підходять для векторизації.

@@ -3665,3 +3665,33 @@ curves	Smooth	매끄럽게
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft의 이미지 추적: 사전 설정과 모든 설정, DTF와 다른 기법용.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	벡터화: VectorCraft의 이미지 추적(ArtCraft Team 및 VectorCraft 기여자, MIT OR Apache-2.0)과 visioncortex(MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	자동, 또는 #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm 셀 · {rows}행
+	Cells touch: no spacing between images.	셀이 맞닿음: 이미지 사이 간격 없음.
+	No Cells	셀 없음
+	Organize Automatically on Import	가져올 때 자동 정렬
+	Printed width: {width} cm	인쇄 폭: {width} cm
+	Reserve up to {max} cm · not exported	{max} cm까지 여유 공간 · 내보내지 않음
+	Snap to the Cells	셀에 맞춤
+	Split the Width into Cells	폭을 셀로 나누기
+	{width} × {length} cm (max {max})	{width} × {length} cm (최대 {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	파일에 크기가 없습니다: {width} cm를 제안합니다.
+	Place	배치
+	SVG Print Size	SVG 인쇄 크기
+	Size given in the file.	파일에 지정된 크기입니다.
+	Skip	건너뛰기
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	지원 형식: PNG(보이는 픽셀로 자름) 및 SVG(인쇄 크기로 렌더링)
+	Width in cells:	셀 단위 폭:
+	SVG files still waiting: {n}	대기 중인 SVG 파일: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	배경 {color}을(를) 투명하게 함
+	Copy for Vectorization	벡터화용 사본
+	Fringes removed, 2 px margin	프린지 제거, 여백 2 px
+	JPEG: light median against the artefacts	JPEG: 아티팩트 제거용 약한 중간값
+	Optimize for Vectorization	벡터화에 맞게 최적화
+	RGB 8 bits, sRGB	RGB 8비트, sRGB
+	Reduced: {from} → {to} px	축소: {from} → {to} px
+	Size kept: {size} px	크기 유지: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	색이 너무 많습니다({n}): 사진이나 그라디언트는 벡터화에 적합하지 않습니다.

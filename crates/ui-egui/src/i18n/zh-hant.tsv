@@ -3099,3 +3099,33 @@ curves	Smooth	平滑
 	automatic, or #rrggbb #rrggbb…	自動，或 #rrggbb #rrggbb…
 	Method	方法
 	Stroke Width	筆畫寬度
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm 格 · {rows} 列
+	Cells touch: no spacing between images.	格子相接：圖片之間無間距。
+	No Cells	不分格
+	Organize Automatically on Import	匯入時自動排列
+	Printed width: {width} cm	列印寬度：{width} cm
+	Reserve up to {max} cm · not exported	預留至 {max} cm · 不匯出
+	Snap to the Cells	吸附至格子
+	Split the Width into Cells	將寬度分成格子
+	{width} × {length} cm (max {max})	{width} × {length} cm（最大 {max}）
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	檔案中沒有尺寸：建議 {width} cm。
+	Place	放置
+	SVG Print Size	SVG 列印尺寸
+	Size given in the file.	檔案中提供的尺寸。
+	Skip	略過
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	支援的格式：PNG（裁切至可見像素）與 SVG（依列印尺寸算繪）
+	Width in cells:	以格計的寬度：
+	SVG files still waiting: {n}	仍在等待的 SVG 檔案：{n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}：{from} → {to} px
+	Background {color} made transparent	背景 {color} 已設為透明
+	Copy for Vectorization	用於向量化的副本
+	Fringes removed, 2 px margin	已去除毛邊，邊距 2 px
+	JPEG: light median against the artefacts	JPEG：輕度中值濾鏡去除雜訊
+	Optimize for Vectorization	為向量化最佳化
+	RGB 8 bits, sRGB	RGB 8 位元，sRGB
+	Reduced: {from} → {to} px	縮小：{from} → {to} px
+	Size kept: {size} px	保持尺寸：{size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	顏色過多（{n}）：照片或漸層不適合向量化。

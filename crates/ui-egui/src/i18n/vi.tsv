@@ -3973,3 +3973,33 @@ curves	Smooth	Làm mượt
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Đồ hình ảnh của VectorCraft: các thiết lập sẵn và mọi thiết lập, cho DTF và các kỹ thuật khác.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vector hóa: Đồ hình ảnh của VectorCraft (ArtCraft Team và những người đóng góp VectorCraft, MIT OR Apache-2.0) và visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	tự động, hoặc #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Ô {size} × {size} cm · {rows} hàng
+	Cells touch: no spacing between images.	Các ô liền nhau: không có khoảng cách giữa các hình.
+	No Cells	Không chia ô
+	Organize Automatically on Import	Tự động sắp xếp khi nhập
+	Printed width: {width} cm	Chiều rộng in: {width} cm
+	Reserve up to {max} cm · not exported	Phần dự trữ đến {max} cm · không xuất
+	Snap to the Cells	Bám theo ô
+	Split the Width into Cells	Chia chiều rộng thành ô
+	{width} × {length} cm (max {max})	{width} × {length} cm (tối đa {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Tệp không có kích thước: đề xuất {width} cm.
+	Place	Đặt
+	SVG Print Size	Kích thước in SVG
+	Size given in the file.	Kích thước ghi trong tệp.
+	Skip	Bỏ qua
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Định dạng hỗ trợ: PNG (cắt theo điểm ảnh hiển thị) và SVG (vẽ theo kích thước in)
+	Width in cells:	Chiều rộng theo ô:
+	SVG files still waiting: {n}	Tệp SVG còn chờ: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Nền {color} đã thành trong suốt
+	Copy for Vectorization	Bản sao để vector hóa
+	Fringes removed, 2 px margin	Đã xóa viền, lề 2 px
+	JPEG: light median against the artefacts	JPEG: lọc trung vị nhẹ chống nhiễu
+	Optimize for Vectorization	Tối ưu để vector hóa
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Thu nhỏ: {from} → {to} px
+	Size kept: {size} px	Giữ kích thước: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Quá nhiều màu ({n}): ảnh chụp hoặc dải chuyển màu khó vector hóa.

@@ -4087,3 +4087,33 @@ curves	Smooth	Wygładź
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Obrysowanie obrazu z VectorCraft: jego ustawienia wstępne i wszystkie ustawienia, do DTF i innych technik.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Wektoryzacja: Obrysowanie obrazu z VectorCraft (ArtCraft Team i współtwórcy VectorCraft, MIT OR Apache-2.0) oraz visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automatycznie lub #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Komórki {size} × {size} cm · rzędy: {rows}
+	Cells touch: no spacing between images.	Komórki przylegają: bez odstępu między obrazami.
+	No Cells	Bez komórek
+	Organize Automatically on Import	Porządkuj automatycznie przy imporcie
+	Printed width: {width} cm	Szerokość druku: {width} cm
+	Reserve up to {max} cm · not exported	Rezerwa do {max} cm · nie jest eksportowana
+	Snap to the Cells	Przyciągaj do komórek
+	Split the Width into Cells	Podziel szerokość na komórki
+	{width} × {length} cm (max {max})	{width} × {length} cm (maks. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Brak rozmiaru w pliku: proponowane {width} cm.
+	Place	Umieść
+	SVG Print Size	Rozmiar wydruku SVG
+	Size given in the file.	Rozmiar podany w pliku.
+	Skip	Pomiń
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Obsługiwane formaty: PNG (przycięty do widocznych pikseli) i SVG (renderowany w rozmiarze wydruku)
+	Width in cells:	Szerokość w komórkach:
+	SVG files still waiting: {n}	Oczekujące pliki SVG: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Tło {color} przezroczyste
+	Copy for Vectorization	Kopia do wektoryzacji
+	Fringes removed, 2 px margin	Obwódki usunięte, margines 2 px
+	JPEG: light median against the artefacts	JPEG: lekka mediana przeciw artefaktom
+	Optimize for Vectorization	Optymalizuj do wektoryzacji
+	RGB 8 bits, sRGB	RGB 8 bitów, sRGB
+	Reduced: {from} → {to} px	Zmniejszono: {from} → {to} px
+	Size kept: {size} px	Rozmiar bez zmian: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Za dużo kolorów ({n}): zdjęcie lub gradient słabo nadaje się do wektoryzacji.

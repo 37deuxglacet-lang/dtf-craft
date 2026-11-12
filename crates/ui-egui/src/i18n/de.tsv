@@ -3495,3 +3495,33 @@ curves	Smooth	Glätten
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorisierung: Bildnachzeichner von VectorCraft (ArtCraft Team und die VectorCraft-Mitwirkenden, MIT OR Apache-2.0) und visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automatisch, oder #rrggbb #rrggbb…
 	Stroke Width	Konturstärke
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Zellen von {size} × {size} cm · {rows} Reihen
+	Cells touch: no spacing between images.	Zellen grenzen aneinander: kein Abstand zwischen Bildern.
+	No Cells	Keine Zellen
+	Organize Automatically on Import	Beim Import automatisch anordnen
+	Printed width: {width} cm	Druckbreite: {width} cm
+	Reserve up to {max} cm · not exported	Reserve bis {max} cm · nicht exportiert
+	Snap to the Cells	An Zellen ausrichten
+	Split the Width into Cells	Breite in Zellen unterteilen
+	{width} × {length} cm (max {max})	{width} × {length} cm (max. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Keine Größe in der Datei: {width} cm vorgeschlagen.
+	Place	Platzieren
+	SVG Print Size	SVG-Druckgröße
+	Size given in the file.	Größe aus der Datei.
+	Skip	Überspringen
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Unterstützte Formate: PNG (auf sichtbare Pixel zugeschnitten) und SVG (in Druckgröße gerendert)
+	Width in cells:	Breite in Zellen:
+	SVG files still waiting: {n}	Noch wartende SVG-Dateien: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	KI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Hintergrund {color} transparent gemacht
+	Copy for Vectorization	Kopie für die Vektorisierung
+	Fringes removed, 2 px margin	Säume entfernt, 2 px Rand
+	JPEG: light median against the artefacts	JPEG: leichter Median gegen Artefakte
+	Optimize for Vectorization	Für die Vektorisierung optimieren
+	RGB 8 bits, sRGB	RGB 8 Bit, sRGB
+	Reduced: {from} → {to} px	Verkleinert: {from} → {to} px
+	Size kept: {size} px	Größe beibehalten: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Zu viele Farben ({n}): Ein Foto oder ein Verlauf eignet sich schlecht zur Vektorisierung.

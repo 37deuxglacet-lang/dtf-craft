@@ -4244,3 +4244,32 @@ curves	Smooth	Vloeiend maken
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Afbeelding overtrekken van VectorCraft: de voorinstellingen en alle instellingen, voor DTF en andere technieken.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vectorisatie: Afbeelding overtrekken van VectorCraft (ArtCraft Team en de VectorCraft-bijdragers, MIT OR Apache-2.0) en visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automatisch, of #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Cellen van {size} × {size} cm · {rows} rijen
+	Cells touch: no spacing between images.	Cellen sluiten aan: geen ruimte tussen afbeeldingen.
+	No Cells	Geen cellen
+	Organize Automatically on Import	Automatisch ordenen bij importeren
+	Printed width: {width} cm	Drukbreedte: {width} cm
+	Reserve up to {max} cm · not exported	Reserve tot {max} cm · niet geëxporteerd
+	Snap to the Cells	Uitlijnen op de cellen
+	Split the Width into Cells	Breedte in cellen verdelen
+	{width} × {length} cm (max {max})	{width} × {length} cm (max. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Geen formaat in het bestand: {width} cm voorgesteld.
+	Place	Plaatsen
+	SVG Print Size	Afdrukformaat van de SVG
+	Size given in the file.	Formaat uit het bestand.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Ondersteunde formaten: PNG (bijgesneden tot zichtbare pixels) en SVG (op afdrukformaat gerenderd)
+	Width in cells:	Breedte in cellen:
+	SVG files still waiting: {n}	SVG-bestanden nog in de wachtrij: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Achtergrond {color} transparant gemaakt
+	Copy for Vectorization	Kopie voor vectorisatie
+	Fringes removed, 2 px margin	Randen verwijderd, marge van 2 px
+	JPEG: light median against the artefacts	JPEG: lichte mediaan tegen artefacten
+	Optimize for Vectorization	Optimaliseren voor vectorisatie
+	RGB 8 bits, sRGB	RGB 8 bits, sRGB
+	Reduced: {from} → {to} px	Verkleind: {from} → {to} px
+	Size kept: {size} px	Formaat behouden: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Te veel kleuren ({n}): een foto of verloop is slecht geschikt voor vectorisatie.

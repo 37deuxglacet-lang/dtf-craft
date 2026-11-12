@@ -4405,3 +4405,32 @@ cameraRaw	Yellow	Sárga
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	A VectorCraft Képátrajzolója: előbeállításai és minden beállítása, DTF-hez és más technikákhoz.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorizálás: a VectorCraft Képátrajzolója (ArtCraft Team és a VectorCraft közreműködői, MIT OR Apache-2.0) és a visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automatikus, vagy #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm-es cellák · {rows} sor
+	Cells touch: no spacing between images.	A cellák érintkeznek: nincs térköz a képek között.
+	No Cells	Nincs cellafelosztás
+	Organize Automatically on Import	Automatikus elrendezés importáláskor
+	Printed width: {width} cm	Nyomtatási szélesség: {width} cm
+	Reserve up to {max} cm · not exported	Tartalék {max} cm-ig · nem kerül exportálásra
+	Snap to the Cells	Igazítás a cellákhoz
+	Split the Width into Cells	A szélesség felosztása cellákra
+	{width} × {length} cm (max {max})	{width} × {length} cm (max. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	A fájl nem ad meg méretet: {width} cm javasolt.
+	Place	Elhelyezés
+	SVG Print Size	Az SVG nyomtatási mérete
+	Size given in the file.	A fájlban megadott méret.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Támogatott formátumok: PNG (a látható képpontokra vágva) és SVG (nyomtatási méretben renderelve)
+	Width in cells:	Szélesség cellákban:
+	SVG files still waiting: {n}	Még várakozó SVG-fájlok: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	MI ×{scale}: {from} → {to} px
+	Background {color} made transparent	A(z) {color} háttér átlátszó lett
+	Copy for Vectorization	Másolat vektorizáláshoz
+	Fringes removed, 2 px margin	Szegélyek eltávolítva, 2 px margó
+	JPEG: light median against the artefacts	JPEG: enyhe medián a műtermékek ellen
+	Optimize for Vectorization	Optimalizálás vektorizáláshoz
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Kicsinyítve: {from} → {to} px
+	Size kept: {size} px	Méret megtartva: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Túl sok szín ({n}): fénykép vagy színátmenet rosszul vektorizálható.

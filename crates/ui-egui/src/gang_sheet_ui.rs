@@ -18,6 +18,18 @@
 //! Visuals keep a margin from the film edges and a spacing between them (each visual may ask for
 //! its own); a visual dropped closer than that to another goes back where it was.
 //!
+//! Cells: the printed width (inside the edge margins) can be split into columns of square cells
+//! (42 cm film, 1 cm edges, 4 columns: 10 × 10 cm cells). Each visual then takes the whole cells
+//! it needs, centred in them, the cells touch (no spacing), an import lays every sheet out again
+//! (a new sheet whenever one is full) and a dragged visual lands in the nearest cells. The film
+//! is drawn as long as its visuals need, the rest up to the longest sheet hatched (not exported).
+//!
+//! SVG files: each dropped or imported drawing first opens a small window asking its print size
+//! (the file's own when it gives one in cm, mm, in, pt or pc, else one 10 cm cell; buttons for
+//! a width in whole cells). It then prints at 300 ppi at whatever size it is given, now or later:
+//! the export draws it from the file at its print size (`svg`: `widthCm`, `heightCm`, `cells` or
+//! `"skip"` answers that window on the control channel).
+//!
 //! Selection: a click picks a visual, Shift+click (or Ctrl+click) adds or removes one, a rectangle
 //! drawn from an empty part of the film picks every visual it touches, Ctrl+A picks them all. The
 //! selection moves, turns (as one block, about its centre), mirrors, centres, pushes, copies,
@@ -31,7 +43,7 @@
 //! egui style in for its own drawing and puts the app's back afterwards.
 //!
 //! Control channel: `ui.menu.invoke {"id":"dtf.gangSheet","params":{"ui":{…}}}` with `addFiles`,
-//! `addDocument`, `set` (film and display settings), `source` (`index`, `widthCm`, `heightCm`,
+//! `addDocument`, `set` (film and display settings; `columns`, `organizeOnImport`, `snapToCells`), `source` (`index`, `widthCm`, `heightCm`,
 //! `lock`, `quantity`, `marginMm`/`null`), `removeSource`, `autoBuild`, `select` (index, list or
 //! `null`), `selectAll`, `group`, `ungroup`, `move` (the selection's box corner), `rotate`
 //! (quarters), `mirror` (`"h"`/`"v"`), `stretch`, `center`, `align`, `duplicate`, `delete`,
@@ -73,7 +85,9 @@ const MAX_LENGTH_CM: f32 = 100.0;
 const MAX_SHEETS: usize = 50;
 const MAX_UNDO: usize = 100;
 /// Film widths offered in the toolbar (cm).
-const FILM_PRESETS: [f32; 5] = [30.0, 40.0, 56.0, 57.0, 60.0];
+const FILM_PRESETS: [f32; 6] = [30.0, 40.0, 42.0, 56.0, 57.0, 60.0];
+/// Column counts offered in the toolbar.
+const COLUMN_PRESETS: [u32; 6] = [2, 3, 4, 5, 6, 8];
 
 // ---------------------------------------------------------------- light look
 
@@ -171,6 +185,8 @@ pub struct Source {
     /// A background left on it (opaque corners), and its share of semi-transparent pixels.
     pub background: bool,
     pub semi: f64,
+    /// An SVG: drawn again at its print size on export, so always at full resolution.
+    pub vector: bool,
     preview: Option<egui::ColorImage>,
     tex: Option<TextureHandle>,
 }
@@ -178,6 +194,9 @@ pub struct Source {
 impl Source {
     /// Its print resolution: the lower of the two axes'.
     pub fn dpi(&self) -> f64 {
+        if self.vector {
+            return cmd::DEFAULT_RESOLUTION;
+        }
         gs::effective_dpi(self.px.0, self.w).min(gs::effective_dpi(self.px.1, self.h))
     }
 
@@ -233,6 +252,13 @@ struct Settings {
     grid: bool,
     backdrop: Backdrop,
     custom: [u8; 3],
+    /// The printed width split into `cells_cols` columns of square cells.
+    cells_on: bool,
+    cells_cols: u32,
+    /// An import lays every sheet out again in the cells.
+    cells_auto: bool,
+    /// A dragged visual lands in the nearest cells.
+    cells_snap: bool,
 }
 
 impl Default for Settings {
@@ -253,6 +279,10 @@ impl Default for Settings {
             grid: false,
             backdrop: Backdrop::Checker,
             custom: [35, 28, 28],
+            cells_on: true,
+            cells_cols: cmd::DEFAULT_COLUMNS,
+            cells_auto: true,
+            cells_snap: true,
         }
     }
 }
@@ -318,8 +348,19 @@ fn units_cm(v: i64) -> f32 {
     (v as f64 / UNITS_PER_CM as f64) as f32
 }
 
+/// An SVG waiting for its print size (one window per file).
+struct PendingSvg {
+    path: String,
+    visual: Visual,
+    w_cm: f32,
+    h_cm: f32,
+    tex: Option<TextureHandle>,
+}
+
 pub struct GangSheetDialog {
     settings: Settings,
+    /// SVG files dropped or imported, first one asked about first.
+    svg_queue: Vec<PendingSvg>,
     pub sources: Vec<Source>,
     pub sheets: Vec<SheetDoc>,
     pub active: usize,
@@ -364,6 +405,7 @@ impl GangSheetDialog {
         let settings = LAST_SETTINGS.lock().ok().and_then(|f| *f).unwrap_or_default();
         GangSheetDialog {
             settings,
+            svg_queue: Vec::new(),
             sources: Vec::new(),
             sheets: vec![SheetDoc::new(1)],
             active: 0,
@@ -392,7 +434,37 @@ impl GangSheetDialog {
     }
 
     fn gap(&self) -> i64 {
-        if self.settings.gap_on { cm_units(self.settings.gap_cm) } else { 0 }
+        if self.settings.gap_on && self.cols() == 0 { cm_units(self.settings.gap_cm) } else { 0 }
+    }
+
+    /// Columns of cells (0: no cells).
+    fn cols(&self) -> u32 {
+        if self.settings.cells_on { self.settings.cells_cols.clamp(1, cmd::MAX_COLUMNS) } else { 0 }
+    }
+
+    /// Whether an import lays the sheets out again in the cells.
+    fn organizes(&self) -> bool {
+        self.cols() > 0 && self.settings.cells_auto
+    }
+
+    /// Places `sizes` around `occupied` on the active sheet's film: in the cells, or packed at the
+    /// widest spacing.
+    fn pack(&self, sizes: &[(i64, i64)], occupied: &[Item], rotate: bool) -> Vec<Option<gs::Spot>> {
+        match self.cols() {
+            0 => self.sheet().with_gap(self.widest_gap()).pack(sizes, occupied, rotate),
+            n => self.sheet().pack_cells(sizes, occupied, rotate, n),
+        }
+    }
+
+    /// The length sheet `k` needs.
+    fn used_on(&self, k: usize) -> i64 {
+        let items: Vec<Item> = self.sheets.get(k).map_or_else(Vec::new, |doc| {
+            doc.placed.iter().map(|p| {
+                let (w, h) = self.size_of(p.source);
+                cmd::footprint(p, w, h)
+            }).collect()
+        });
+        self.sheet().used_length(&items)
     }
 
     pub fn sheet(&self) -> Sheet {
@@ -401,11 +473,17 @@ impl GangSheetDialog {
 
     /// A source's spacing: its own, or the sheet's.
     fn gap_of(&self, source: usize) -> i64 {
+        if self.cols() > 0 {
+            return 0;
+        }
         self.sources.get(source).and_then(|s| s.margin).unwrap_or_else(|| self.gap())
     }
 
     /// The largest spacing any visual asks for (Auto Build packs at it).
     fn widest_gap(&self) -> i64 {
+        if self.cols() > 0 {
+            return 0;
+        }
         self.sources.iter().filter_map(|s| s.margin).fold(self.gap(), i64::max)
     }
 
@@ -513,9 +591,8 @@ impl GangSheetDialog {
         if count == 0 || source >= self.sources.len() {
             return 0;
         }
-        let sheet = self.sheet().with_gap(self.widest_gap());
         let size = self.size_of(source);
-        let spots = sheet.pack(&vec![size; count], &self.items(), self.settings.rotate);
+        let spots = self.pack(&vec![size; count], &self.items(), self.settings.rotate);
         let mut n = 0;
         for sp in spots.into_iter().flatten() {
             let orientation = Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() };
@@ -590,7 +667,6 @@ impl GangSheetDialog {
         for (i, n) in want.iter().enumerate() {
             queue.extend(std::iter::repeat_n(i, *n));
         }
-        let sheet = self.sheet().with_gap(self.widest_gap());
         loop {
             let n = self.sheets.len();
             let mut doc = SheetDoc::new(n + 1);
@@ -599,7 +675,7 @@ impl GangSheetDialog {
                 doc.copies = *copies;
             }
             // Groups first, as they stand, then the single visuals around them.
-            let block_spots = sheet.pack(&blocks.iter().map(|b| (b.w, b.h)).collect::<Vec<_>>(), &[], false);
+            let block_spots = self.pack(&blocks.iter().map(|b| (b.w, b.h)).collect::<Vec<_>>(), &[], false);
             let mut left_blocks = Vec::new();
             let mut occupied = Vec::new();
             for (b, spot) in blocks.iter().zip(block_spots) {
@@ -615,7 +691,7 @@ impl GangSheetDialog {
                 }
             }
             let sizes: Vec<(i64, i64)> = queue.iter().map(|s| self.size_of(*s)).collect();
-            let spots = sheet.pack(&sizes, &occupied, self.settings.rotate);
+            let spots = self.pack(&sizes, &occupied, self.settings.rotate);
             let mut left = Vec::new();
             for (s, spot) in queue.iter().zip(spots) {
                 match spot {
@@ -681,11 +757,23 @@ impl GangSheetDialog {
             _ => {}
         }
         self.clamp_all();
+        // In the cells, a new size may need other cells: the sheets are laid out again.
+        if self.organizes() {
+            self.relayout();
+        }
     }
 
     pub(crate) fn add_visual(&mut self, origin: Origin, v: &Visual) {
+        self.add_visual_sized(origin, v, None);
+    }
+
+    /// Adds a visual printed `width` units wide (its own size when `None`), kept on the film.
+    fn add_visual_sized(&mut self, origin: Origin, v: &Visual, width: Option<i64>) {
         self.checkpoint(None);
-        let width = v.natural_width(&self.sheet());
+        let width = match width {
+            Some(w) => self.fit_width(w, v.width, v.height),
+            None => v.natural_width(&self.sheet()),
+        };
         let (w, h) = gs::size_for_width(v.width, v.height, width);
         self.sources.push(Source {
             origin,
@@ -698,15 +786,56 @@ impl GangSheetDialog {
             quantity: 1,
             background: v.background,
             semi: v.semi_transparent,
+            vector: v.vector.is_some(),
             preview: Some(preview_image(v)),
             tex: None,
         });
         let s = self.sources.len() - 1;
+        if self.organizes() {
+            self.relayout();
+            return;
+        }
         if self.add_copies(s, 1) == 0 {
             self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
         } else {
             self.selected = vec![self.placed().len() - 1];
         }
+    }
+
+    /// `w` (units) no wider than the film nor, for a `pw × ph` px visual, longer than the sheet.
+    fn fit_width(&self, w: i64, pw: u32, ph: u32) -> i64 {
+        let (iw, il) = self.sheet().inner();
+        let ratio = f64::from(ph.max(1)) / f64::from(pw.max(1));
+        let longest = (il.max(1) as f64 / ratio).floor() as i64;
+        w.min(iw.max(1)).min(longest.max(1)).max(1)
+    }
+
+    /// Asks for an SVG's print size before it goes on the sheet: the file's own, else one cell
+    /// (10 cm without cells).
+    fn queue_svg(&mut self, path: String, v: Visual) {
+        let physical = v.vector.as_ref().is_some_and(|x| x.physical);
+        let cell = self.sheet().cell_size(self.cols());
+        let own = v.natural_width(&self.sheet());
+        let w = self.fit_width(if physical { own } else if cell > 0 { cell } else { own }, v.width, v.height);
+        let (_, h) = gs::size_for_width(v.width, v.height, w);
+        self.svg_queue.push(PendingSvg { path, visual: v, w_cm: units_cm(w), h_cm: units_cm(h), tex: None });
+    }
+
+    /// The first SVG waiting: placed at `width` units wide, or skipped (`None`).
+    fn answer_svg(&mut self, width: Option<i64>) {
+        if self.svg_queue.is_empty() {
+            return;
+        }
+        let p = self.svg_queue.remove(0);
+        if let Some(w) = width {
+            self.add_visual_sized(Origin::File(p.path), &p.visual, Some(w));
+        }
+    }
+
+    /// Every sheet laid out again (Auto Build), what fits nowhere told on the status line.
+    fn relayout(&mut self) {
+        let left = self.auto_build();
+        self.status = if left > 0 { crate::i18n::fmt(tl!("{n} not placed"), &[("n", &left.to_string())]) } else { String::new() };
     }
 
     fn remove_source(&mut self, source: usize) {
@@ -951,7 +1080,7 @@ impl GangSheetDialog {
         let at = |nb: Item| -> Vec<Item> { rel.iter().map(|r| Item { x: nb.x + r.x, y: nb.y + r.y, ..*r }).collect() };
         if self.block_collides(list, &at(nb)) {
             let (others, _) = self.others(list);
-            match sheet.with_gap(self.widest_gap()).pack(&[(bw, bh)], &others, false).first().copied().flatten() {
+            match self.pack(&[(bw, bh)], &others, false).first().copied().flatten() {
                 Some(sp) => nb = Item { x: sp.x, y: sp.y, ..nb },
                 None => return false,
             }
@@ -1156,7 +1285,7 @@ impl GangSheetDialog {
     /// Puts `clip` where there is room on the active sheet (its groups as new groups) and selects
     /// it.
     fn paste(&mut self, clip: &Clip) -> bool {
-        let spot = self.sheet().with_gap(self.widest_gap()).pack(&[(clip.w, clip.h)], &self.items(), false).first().copied().flatten();
+        let spot = self.pack(&[(clip.w, clip.h)], &self.items(), false).first().copied().flatten();
         let Some(sp) = spot else {
             self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", &clip.members.len().to_string())]);
             return false;
@@ -1252,6 +1381,7 @@ impl GangSheetDialog {
         }
         let film_changed = (s.width_cm, s.max_length_cm, s.edge_on, s.edge_cm)
             != (self.settings.width_cm, self.settings.max_length_cm, self.settings.edge_on, self.settings.edge_cm);
+        let cells_changed = (s.cells_on, s.cells_cols, s.cells_auto) != (self.settings.cells_on, self.settings.cells_cols, self.settings.cells_auto);
         self.settings = s;
         if let Ok(mut last) = LAST_SETTINGS.lock() {
             *last = Some(s);
@@ -1267,6 +1397,11 @@ impl GangSheetDialog {
                 }
             }
             self.clamp_all();
+        }
+        // In the cells, a new film or a new split lays the sheets out again.
+        if (film_changed || cells_changed) && self.organizes() && !self.sources.is_empty() {
+            self.checkpoint(None);
+            self.relayout();
         }
     }
 
@@ -1332,19 +1467,25 @@ impl GangSheetDialog {
             "edgeMargin": if s.edge_on { s.edge_cm } else { 0.0 }, "spacing": if s.gap_on { s.gap_cm } else { 0.0 },
             "rotate": s.rotate, "showResolution": s.show_res, "showOverlap": s.show_overlap, "snap": s.snap,
             "warnBackground": s.warn_background, "warnTransparency": s.warn_semi, "grid": s.grid,
+            "columns": self.cols(), "cellCm": units_cm(self.sheet().cell_size(self.cols())), "rows": self.sheet().cell_rows(self.cols()),
+            "organizeOnImport": s.cells_auto, "snapToCells": s.cells_snap,
             "sources": self.sources.iter().enumerate().map(|(i, src)| json!({
                 "name": src.name, "pixels": [src.px.0, src.px.1], "widthCm": units_cm(src.w), "heightCm": units_cm(src.h),
                 "lock": src.lock, "marginMm": src.margin.map(|m| m as f64 / 10.0), "dpi": src.dpi().round(),
                 "level": DpiLevel::of(src.dpi()), "quantity": src.quantity, "onSheet": self.copies_on_sheet(i),
-                "background": src.background, "semiTransparent": src.semi,
+                "background": src.background, "semiTransparent": src.semi, "vector": src.vector,
             })).collect::<Vec<_>>(),
-            "sheets": self.sheets.iter().map(|d| json!({"name": d.name, "images": d.placed.len(), "copies": d.copies})).collect::<Vec<_>>(),
+            "sheets": self.sheets.iter().enumerate().map(|(k, d)| json!({"name": d.name, "images": d.placed.len(), "copies": d.copies, "lengthCm": units_cm(self.used_on(k))})).collect::<Vec<_>>(),
             "active": self.active,
             "placements": self.placed().iter().zip(&conflicts).map(|(p, c)| json!({
                 "source": p.source, "x": units_cm(p.x), "y": units_cm(p.y), "rotation": u32::from(p.orientation.quarter) * 90,
                 "flipH": p.orientation.flip_h, "flipV": p.orientation.flip_v, "conflict": c, "group": p.group,
             })).collect::<Vec<_>>(),
             "selected": self.sel(),
+            "pendingSvg": self.svg_queue.iter().map(|p| json!({
+                "name": p.visual.name, "widthCm": p.w_cm, "heightCm": p.h_cm,
+                "physical": p.visual.vector.as_ref().is_some_and(|x| x.physical),
+            })).collect::<Vec<_>>(),
             "usedLengthCm": units_cm(self.sheet().used_length(&items)),
             "conflicts": conflicts.iter().filter(|c| **c).count(),
             "undo": self.undo.len(), "redo": self.redo.len(),
@@ -1360,12 +1501,13 @@ pub fn open(app: &mut PhotocraftApp) {
     }
 }
 
-/// Adds PNG files from disk; failures go to the status line.
+/// Adds PNG files from disk (SVG files wait for their size); failures go to the status line.
 pub fn add_files(app: &mut PhotocraftApp, paths: &[String]) {
     let Some(d) = app.gang_sheet.as_mut() else { return };
     let mut errors = Vec::new();
     for path in paths {
         match cmd::load_file(path) {
+            Ok(v) if v.vector.is_some() => d.queue_svg(path.clone(), v),
             Ok(v) => d.add_visual(Origin::File(path.clone()), &v),
             Err(e) => errors.push(e.to_string()),
         }
@@ -1394,12 +1536,12 @@ pub fn drop_files(app: &mut PhotocraftApp, files: &[egui::DroppedFileHandle]) {
 
 fn pick_files(app: &mut PhotocraftApp) {
     let initial_dir = crate::file_dialog::last_used_dir(&app.ui.recent_files);
-    let r = app.ask_file(FileDialogRequest::Open { multiple: true, initial_dir, extensions: Some(vec!["png".into()]) }, |app, answer| match answer {
+    let r = app.ask_file(FileDialogRequest::Open { multiple: true, initial_dir, extensions: Some(vec!["png".into(), "svg".into(), "svgz".into()]) }, |app, answer| match answer {
         FileDialogAnswer::Paths(paths) => {
             add_files(app, &paths);
             Ok(Value::Null)
         }
-        _ => Err("PNG files are added from a folder on this computer".to_string()),
+        _ => Err("PNG and SVG files are added from a folder on this computer".to_string()),
     });
     if let Err(e) = r
         && e != crate::file_dialog::CANCELLED
@@ -1527,6 +1669,14 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         s.warn_background = b("warnBackground", s.warn_background);
         s.warn_semi = b("warnTransparency", s.warn_semi);
         s.grid = b("grid", s.grid);
+        if let Some(c) = set.get("columns").and_then(Value::as_f64).filter(|c| c.is_finite()) {
+            s.cells_on = c >= 1.0;
+            if c >= 1.0 {
+                s.cells_cols = (c.round() as u32).min(cmd::MAX_COLUMNS);
+            }
+        }
+        s.cells_auto = b("organizeOnImport", s.cells_auto);
+        s.cells_snap = b("snapToCells", s.cells_snap);
         d.set_settings(s);
     }
     if let Some(s) = ui.get("source") {
@@ -1554,6 +1704,24 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         {
             src.margin = m.as_f64().filter(|v| v.is_finite()).map(|v| (v.clamp(0.0, 100.0) * 10.0).round() as i64);
         }
+    }
+    // The SVG size window: its width or height in cm, a width in whole cells, or skip.
+    if let Some(a) = ui.get("svg") {
+        let first = d.svg_queue.first().map(|p| (p.visual.width, p.visual.height));
+        let (pw, ph) = first.ok_or("no SVG waiting for its size")?;
+        let cell = d.sheet().cell_size(d.cols());
+        let width = if a.as_str() == Some("skip") {
+            None
+        } else if let Some(w) = a.get("widthCm").and_then(cm) {
+            Some(w)
+        } else if let Some(h) = a.get("heightCm").and_then(cm) {
+            Some(gs::size_for_width(ph, pw, h).1)
+        } else if let Some(n) = a.get("cells").and_then(Value::as_u64).filter(|n| *n > 0 && cell > 0) {
+            Some(cell * n as i64)
+        } else {
+            d.svg_queue.first().map(|p| cm_units(p.w_cm))
+        };
+        d.answer_svg(width);
     }
     if let Some(i) = index(ui.get("removeSource")) {
         d.remove_source(i);
@@ -1932,6 +2100,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     light_scope(ctx, || {
         draw(app, ctx, has_doc, &mut act);
         confirm_dialog(app, ctx, &mut act);
+        svg_dialog(app, ctx);
     });
     if act.add_files {
         pick_files(app);
@@ -2002,6 +2171,7 @@ fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut A
     if !ctx.text_edit_focused()
         && let Some(d) = app.gang_sheet.as_mut()
         && !d.confirm_export
+        && d.svg_queue.is_empty()
     {
         keys(d, ctx, act);
     }
@@ -2064,7 +2234,7 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
             if widgets::primary_button(ui, tl!("Import Images"), 150.0).clicked() {
                 act.add_files = true;
             }
-            ui.label(egui::RichText::new(tl!("Supported format: PNG (cropped to its visible pixels)")).color(t.text_faint).size(11.0));
+            ui.label(egui::RichText::new(tl!("Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)")).color(t.text_faint).size(11.0));
             if ui.add_enabled_ui(has_doc, |ui| widgets::secondary_button(ui, tl!("Add Open Document"), 180.0)).inner.clicked() {
                 act.add_document = true;
             }
@@ -2384,14 +2554,40 @@ fn settings_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &T
         if s.edge_on {
             number_row(ui, tl!("Along the edges"), &mut s.edge_cm, 0.0..=10.0, "cm", 2);
         }
-        switch_row(ui, tl!("Image Margin"), &mut s.gap_on);
-        if s.gap_on {
-            number_row(ui, tl!("Between images"), &mut s.gap_cm, 0.0..=10.0, "cm", 2);
+        if s.cells_on {
+            ui.label(egui::RichText::new(tl!("Cells touch: no spacing between images.")).size(11.5).color(t.text_faint));
+        } else {
+            switch_row(ui, tl!("Image Margin"), &mut s.gap_on);
+            if s.gap_on {
+                number_row(ui, tl!("Between images"), &mut s.gap_cm, 0.0..=10.0, "cm", 2);
+            }
         }
         widgets::hairline(ui);
         number_row(ui, tl!("Film Width"), &mut s.width_cm, 10.0..=300.0, "cm", 1);
+        let printed = s.width_cm - if s.edge_on { 2.0 * s.edge_cm } else { 0.0 };
+        ui.label(egui::RichText::new(crate::i18n::fmt(tl!("Printed width: {width} cm"), &[("width", &widgets::fmt_num(f64::from(printed)))])).size(11.5).color(t.text_faint));
         number_row(ui, tl!("Max Length"), &mut s.max_length_cm, 10.0..=MAX_LENGTH_CM, "cm", 1);
         switch_row(ui, tl!("Auto Build May Rotate"), &mut s.rotate);
+        widgets::hairline(ui);
+        switch_row(ui, tl!("Split the Width into Cells"), &mut s.cells_on);
+        if s.cells_on {
+            let mut cols = s.cells_cols as f32;
+            if number_row(ui, tl!("Columns"), &mut cols, 1.0..=cmd::MAX_COLUMNS as f32, "", 0) {
+                s.cells_cols = (cols.round() as u32).clamp(1, cmd::MAX_COLUMNS);
+            }
+            let edge = if s.edge_on { cm_units(s.edge_cm) } else { 0 };
+            let (sheet, n) = (Sheet::new(cm_units(s.width_cm), cm_units(s.max_length_cm), edge, 0), s.cells_cols);
+            ui.label(
+                egui::RichText::new(crate::i18n::fmt(
+                    tl!("Cells of {size} × {size} cm · {rows} rows"),
+                    &[("size", &cm_text(sheet.cell_size(n))), ("rows", &sheet.cell_rows(n).to_string())],
+                ))
+                .size(11.5)
+                .color(t.text_faint),
+            );
+            switch_row(ui, tl!("Organize Automatically on Import"), &mut s.cells_auto);
+            switch_row(ui, tl!("Snap to the Cells"), &mut s.cells_snap);
+        }
     });
     d.set_settings(s);
 }
@@ -2413,6 +2609,27 @@ fn toolbar_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Toke
     if widgets::dropdown(&mut bar, "gang-film", &mut width, &opts, 140.0) {
         s.width_cm = width;
     }
+    bar.add_space(4.0);
+    // Cells: none, or the printed width in so many columns.
+    let mut cols = d.cols();
+    let cell_labels: Vec<(u32, String)> = {
+        let mut v: Vec<u32> = COLUMN_PRESETS.to_vec();
+        if cols > 0 && !v.contains(&cols) {
+            v.push(cols);
+            v.sort_unstable();
+        }
+        let sheet = d.sheet();
+        let mut out = vec![(0, tl!("No Cells").to_string())];
+        out.extend(v.iter().map(|n| (*n, format!("{n} × {} cm", cm_text(sheet.cell_size(*n))))));
+        out
+    };
+    let cell_opts: Vec<(u32, &str)> = cell_labels.iter().map(|(n, l)| (*n, l.as_str())).collect();
+    if widgets::dropdown(&mut bar, "gang-cells", &mut cols, &cell_opts, 110.0) {
+        s.cells_on = cols > 0;
+        if cols > 0 {
+            s.cells_cols = cols;
+        }
+    }
     bar.add_space(8.0);
     widgets::vline(&mut bar, 22.0);
     if tool_button(&mut bar, "undo-2", tl!("Undo (Ctrl+Z)"), !d.undo.is_empty(), 0.0, false).clicked() {
@@ -2427,7 +2644,7 @@ fn toolbar_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Toke
     }
     // A narrow window leaves the spacing to Settings and Auto Build, so every tool keeps its room.
     let narrow = rect.width() < 1160.0;
-    if !narrow {
+    if !narrow && !s.cells_on {
         widgets::vline(&mut bar, 22.0);
         widgets::checkbox(&mut bar, &mut s.gap_on, tl!("Image Margin"));
         bar.add_space(4.0);
@@ -2559,8 +2776,8 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
         widgets::checkbox(ui, &mut s.edge_on, tl!("With the sheet margin"));
         ui.add_enabled_ui(s.edge_on, |ui| widgets::typed_value_field(ui, &mut s.edge_cm, 0.0..=10.0, "cm", 70.0, 2));
         ui.add_space(16.0);
-        widgets::checkbox(ui, &mut s.gap_on, tl!("With the image margin"));
-        ui.add_enabled_ui(s.gap_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 70.0, 2));
+        ui.add_enabled_ui(!s.cells_on, |ui| widgets::checkbox(ui, &mut s.gap_on, tl!("With the image margin")));
+        ui.add_enabled_ui(s.gap_on && !s.cells_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 70.0, 2));
         ui.add_space(16.0);
         widgets::checkbox(ui, &mut s.rotate, tl!("Allow Rotation"));
     });
@@ -2711,7 +2928,6 @@ fn sheets_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tok
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 12.0))));
     panel.spacing_mut().item_spacing.y = 8.0;
     panel.label(egui::RichText::new(format!("({})   {}", d.sheets.len(), tl!("Active Gang Sheets"))).font(crate::theme::semibold(13.0)).color(t.text));
-    let film = format!("{} cm x {} cm", widgets::fmt_num(f64::from(d.settings.width_cm)), widgets::fmt_num(f64::from(d.settings.max_length_cm)));
     let mut pick = None;
     let mut dup = None;
     let mut del = None;
@@ -2721,6 +2937,15 @@ fn sheets_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tok
         for k in 0..d.sheets.len() {
             let active = k == d.active;
             let Some(doc) = d.sheets.get(k).cloned() else { continue };
+            // The sheet's real size: as long as its visuals need.
+            let film = crate::i18n::fmt(
+                tl!("{width} × {length} cm (max {max})"),
+                &[
+                    ("width", &widgets::fmt_num(f64::from(d.settings.width_cm))),
+                    ("length", &cm_text(d.used_on(k))),
+                    ("max", &widgets::fmt_num(f64::from(d.settings.max_length_cm))),
+                ],
+            );
             let frame = egui::Frame::NONE
                 .fill(Color32::WHITE)
                 .stroke(Stroke::new(if active { 1.5 } else { 1.0 }, if active { t.text } else { t.card_border }))
@@ -2951,6 +3176,101 @@ fn confirm_dialog(app: &mut PhotocraftApp, ctx: &egui::Context, act: &mut Action
     }
 }
 
+/// The print size of the first SVG waiting, one window per file.
+fn svg_dialog(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let Some(d) = app.gang_sheet.as_mut() else { return };
+    if d.svg_queue.is_empty() || d.confirm_export {
+        return;
+    }
+    let t = Tokens::get(ctx);
+    let sheet = d.sheet();
+    let (cols, cell) = (d.cols(), sheet.cell_size(d.cols()));
+    let waiting = d.svg_queue.len() - 1;
+    let fit = |w: i64, pw: u32, ph: u32| {
+        let (iw, il) = sheet.inner();
+        let ratio = f64::from(ph.max(1)) / f64::from(pw.max(1));
+        w.min(iw.max(1)).min(((il.max(1) as f64) / ratio).floor() as i64).max(1)
+    };
+    let mut answer: Option<Option<i64>> = None;
+    {
+        let Some(p) = d.svg_queue.first_mut() else { return };
+        let (pw, ph) = (p.visual.width, p.visual.height);
+        if p.tex.is_none() {
+            p.tex = Some(ctx.load_texture(format!("gang-svg-{}", p.path), preview_image(&p.visual), egui::TextureOptions::LINEAR));
+        }
+        let physical = p.visual.vector.as_ref().is_some_and(|x| x.physical);
+        let set_w = |p: &mut PendingSvg, w: i64| {
+            let w = fit(w, pw, ph);
+            p.w_cm = units_cm(w);
+            p.h_cm = units_cm(gs::size_for_width(pw, ph, w).1);
+        };
+        egui::Modal::new(egui::Id::new("gang-svg-size")).show(ctx, |ui| {
+            ui.set_width(400.0);
+            ui.spacing_mut().item_spacing.y = 8.0;
+            ui.label(egui::RichText::new(tl!("SVG Print Size")).font(crate::theme::semibold(15.0)).color(t.text));
+            ui.label(egui::RichText::new(&p.visual.name).color(t.text_dim));
+            let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 150.0), Sense::hover());
+            widgets::checker(ui.painter(), r, 6.0);
+            if let Some(tex) = &p.tex {
+                let k = ((r.width() - 16.0) / pw.max(1) as f32).min((r.height() - 16.0) / ph.max(1) as f32);
+                let img = ERect::from_center_size(r.center(), vec2(pw as f32 * k, ph as f32 * k));
+                ui.painter().image(tex.id(), img, ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
+            }
+            let note = if physical {
+                tl!("Size given in the file.").to_string()
+            } else {
+                crate::i18n::fmt(tl!("No size in the file: {width} cm proposed."), &[("width", &cm_text(fit(if cell > 0 { cell } else { 1000 }, pw, ph)))])
+            };
+            ui.label(egui::RichText::new(note).size(11.5).color(t.text_faint));
+            ui.horizontal(|ui| {
+                fixed_label(ui, egui::RichText::new(tl!("Width:")).color(t.text), 70.0, 24.0);
+                let mut w = p.w_cm;
+                if widgets::typed_value_field(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                    set_w(p, cm_units(w));
+                }
+            });
+            ui.horizontal(|ui| {
+                fixed_label(ui, egui::RichText::new(tl!("Height:")).color(t.text), 70.0, 24.0);
+                let mut h = p.h_cm;
+                if widgets::typed_value_field(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                    set_w(p, gs::size_for_width(ph, pw, cm_units(h)).1);
+                }
+            });
+            if cols > 0 && cell > 0 {
+                ui.horizontal(|ui| {
+                    fixed_label(ui, egui::RichText::new(tl!("Width in cells:")).color(t.text), 110.0, 24.0);
+                    for n in 1..=cols.min(8) {
+                        if ui.add(egui::Button::new(n.to_string()).min_size(vec2(30.0, 24.0))).clicked() {
+                            set_w(p, cell * i64::from(n));
+                        }
+                    }
+                });
+            }
+            if waiting > 0 {
+                ui.label(egui::RichText::new(crate::i18n::fmt(tl!("SVG files still waiting: {n}"), &[("n", &waiting.to_string())])).size(11.5).color(t.text_faint));
+            }
+            ui.add_space(4.0);
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if let Some(role) = widgets::dialog_buttons(
+                    ui,
+                    &[
+                        widgets::DialogButton::new(widgets::ButtonRole::Default, tl!("Place"), 90.0),
+                        widgets::DialogButton::new(widgets::ButtonRole::Cancel, tl!("Skip"), 90.0),
+                    ],
+                ) {
+                    answer = Some((role == widgets::ButtonRole::Default).then(|| cm_units(p.w_cm)));
+                }
+            });
+        });
+    }
+    if ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
+        answer = Some(None);
+    }
+    if let Some(a) = answer {
+        d.answer_svg(a);
+    }
+}
+
 /// The sheet: rulers, film, visuals with their lines, overlay card, dragging and zoom.
 fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Tokens) {
     let sheet = d.sheet();
@@ -3021,8 +3341,43 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
         );
         clip.extend(dash);
     }
+    // The cells, dashed.
+    let cols = d.cols();
+    let (cell, rows) = (sheet.cell_size(cols), sheet.cell_rows(cols));
+    if cell > 0 && rows > 0 && cell as f32 * s >= 6.0 {
+        let stroke = Stroke::new(1.0, Color32::from_rgba_unmultiplied(29, 99, 235, 110));
+        let (x0, y0) = (sheet.edge, sheet.edge);
+        let (x1, y1) = (x0 + i64::from(cols) * cell, y0 + rows * cell);
+        for k in 0..=i64::from(cols) {
+            let x = x0 + k * cell;
+            clip.extend(Shape::dashed_line(&[to_screen(x, y0), to_screen(x, y1)], stroke, 4.0, 3.0));
+        }
+        for k in 0..=rows {
+            let y = y0 + k * cell;
+            clip.extend(Shape::dashed_line(&[to_screen(x0, y), to_screen(x1, y)], stroke, 4.0, 3.0));
+        }
+    }
     let items = d.items();
     let used = sheet.used_length(&items);
+    // Below the length the visuals need: hatched, not exported.
+    if used > 0 && used < sheet.max_length {
+        let r = ERect::from_min_max(to_screen(0, used), to_screen(sheet.width, sheet.max_length));
+        clip.rect_filled(r, 0.0, Color32::from_rgba_unmultiplied(226, 229, 234, 215));
+        let hatch = clip.with_clip_rect(r.intersect(area));
+        let step = 12.0;
+        let mut off = -r.height();
+        while off < r.width() {
+            hatch.line_segment([pos2(r.left() + off, r.bottom()), pos2(r.left() + off + r.height(), r.top())], Stroke::new(1.0, Color32::from_rgba_unmultiplied(150, 156, 166, 70)));
+            off += step;
+        }
+        if r.height() > 30.0 && r.width() > 120.0 {
+            let text = crate::i18n::fmt(tl!("Reserve up to {max} cm · not exported"), &[("max", &cm_text(sheet.max_length))]);
+            let galley = ui.painter().layout(text, FontId::proportional(11.5), t.text_dim, r.width() - 16.0);
+            let at = r.center() - galley.size() / 2.0;
+            hatch.rect_filled(ERect::from_min_size(at, galley.size()).expand(5.0), 4.0, Color32::from_white_alpha(225));
+            hatch.galley(at, galley, t.text_dim);
+        }
+    }
     if used > 0 {
         let y = origin.y + used as f32 * s;
         clip.extend(Shape::dashed_line(&[pos2(film_r.left(), y), pos2(film_r.right(), y)], Stroke::new(1.5, BLUE), 6.0, 4.0));
@@ -3095,6 +3450,9 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
             // Snapped as the box it moves as, against the visuals left where they are.
             let (others, gaps) = d.others(&list);
             b = sheet.clamp(sheet.snap(&others, &gaps, usize::MAX, b, d.block_gap(&list), (6.0 / s).round() as i64));
+        }
+        if d.cols() > 0 && d.settings.cells_snap {
+            b = sheet.snap_cells(b, d.cols());
         }
         let (dx, dy) = (b.x - dr.bbox.x, b.y - dr.bbox.y);
         if let Some(placed) = d.placed_mut() {
@@ -3406,10 +3764,71 @@ mod tests {
         menu(app, ctx, cmd::GANG_SHEET, &json!({"ui": ui})).unwrap().unwrap()
     }
 
+    /// The free layout most tests check: a 56 cm film, no cells.
     fn reset_settings() {
+        if let Ok(mut s) = LAST_SETTINGS.lock() {
+            *s = Some(Settings { width_cm: 56.0, cells_on: false, ..Settings::default() });
+        }
+    }
+
+    /// The window's own defaults: a 42 cm film in 4 columns of cells.
+    fn reset_to_defaults() {
         if let Ok(mut s) = LAST_SETTINGS.lock() {
             *s = None;
         }
+    }
+
+    /// A `w × h` cm red visual at `dpi`.
+    fn png_cm(dir: &std::path::Path, name: &str, w: u32, h: u32, dpi: f64) -> String {
+        let px = |cm: u32| (f64::from(cm) * dpi / 2.54).round() as u32;
+        let mut s = photocraft_engine::Session::new();
+        s.execute("file.new", json!({"width": px(w), "height": px(h), "resolution": dpi, "background": "transparent"})).unwrap();
+        s.execute("edit.fill", json!({"color": "#c03020"})).unwrap();
+        let path = dir.join(name).to_string_lossy().into_owned();
+        s.execute("file.saveACopy", json!({"path": path})).unwrap();
+        path
+    }
+
+    #[test]
+    fn imports_fill_square_cells_and_sheets_end_at_their_last_visual() {
+        reset_to_defaults();
+        let dir = std::env::temp_dir().join(format!("gang-cells-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        // 25.4 ppi: one pixel a millimetre, sizes exact.
+        let cm = [(10, 10), (10, 20), (20, 10), (20, 20), (20, 30), (30, 20), (30, 30), (40, 10), (40, 20), (40, 30)];
+        let files: Vec<String> = cm.iter().map(|(w, h)| png_cm(&dir, &format!("TEST_{w}x{h}.png"), *w, *h, 25.4)).collect();
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        // Other tests running alongside may have left their settings: the defaults, for sure.
+        if let Some(d) = app.gang_sheet.as_mut() {
+            d.settings = Settings::default();
+        }
+        let r = app.gang_sheet.as_ref().unwrap().describe();
+        // 42 cm film, 1 cm edges: 40 cm printed in 4 columns of 10 × 10 cm, 9 rows within 100 cm.
+        assert_eq!((r["filmWidth"].as_f64(), r["columns"].as_u64(), r["cellCm"].as_f64(), r["rows"].as_u64()), (Some(42.0), Some(4), Some(10.0), Some(9)));
+        let r = invoke(&mut app, &ctx, json!({"addFiles": files}));
+        // Every import lays the sheets out again: two sheets, as long as their visuals need.
+        let sheets = r["sheets"].as_array().unwrap();
+        assert_eq!(sheets.len(), 2, "{r}");
+        assert_eq!(sheets.iter().map(|s| s["images"].as_u64().unwrap()).sum::<u64>(), 10);
+        assert_eq!((sheets[0]["lengthCm"].as_f64(), sheets[1]["lengthCm"].as_f64()), (Some(92.0), Some(62.0)));
+        assert_eq!(r["conflicts"], 0);
+        // The 40 cm visuals take the whole printed width, unshrunk.
+        let wide = r["sources"].as_array().unwrap().iter().filter(|s| s["widthCm"] == 40.0).count();
+        assert_eq!(wide, 3);
+        // Cells touch: the first sheet's visuals start on the cell lines (1 cm edge + n × 10 cm).
+        let d = app.gang_sheet.as_ref().unwrap();
+        assert!(d.items().iter().all(|r| (r.x - 100) % 1000 == 0 && (r.y - 100) % 1000 == 0), "{:?}", d.items());
+        // A visual dragged by hand lands in the nearest cells; one smaller than its cell is centred.
+        let sheet = d.sheet();
+        assert_eq!(sheet.snap_cells(Item::new(1250, 2300, 800, 800), 4), Item::new(1200, 2200, 800, 800));
+        // Without cells, the import places the visual alone and the spacing comes back.
+        let r = invoke(&mut app, &ctx, json!({"set": {"columns": 0}}));
+        assert_eq!(r["columns"], 0);
+        assert_eq!(r["sheets"].as_array().unwrap().len(), 2, "turning the cells off moves nothing");
+        reset_settings();
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]
@@ -3721,6 +4140,53 @@ mod tests {
             h.render().unwrap().save(dir.join(format!("gang_groupes_{width}.png"))).unwrap();
         }
         reset_settings();
+    }
+
+    #[test]
+    fn svg_files_wait_for_their_size_and_stay_at_full_resolution() {
+        let dir = std::env::temp_dir().join(format!("gang-svg-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let logo = dir.join("logo.svg");
+        std::fs::write(&logo, br##"<svg xmlns="http://www.w3.org/2000/svg" width="12cm" height="6cm" viewBox="0 0 120 60"><rect width="120" height="60" fill="#c03020"/></svg>"##).unwrap();
+        let round = dir.join("round.svg");
+        std::fs::write(&round, br##"<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><circle cx="100" cy="100" r="100" fill="#2040c0"/></svg>"##).unwrap();
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        if let Some(d) = app.gang_sheet.as_mut() {
+            d.settings = Settings::default();
+        }
+        // Both wait for their size: the file's own (12 cm), else one 10 cm cell.
+        let r = invoke(&mut app, &ctx, json!({"addFiles": [logo.to_string_lossy(), round.to_string_lossy()]}));
+        assert_eq!(r["sources"].as_array().unwrap().len(), 0);
+        let pending = r["pendingSvg"].as_array().unwrap();
+        assert_eq!(pending.len(), 2);
+        assert_eq!((pending[0]["widthCm"].as_f64(), pending[0]["physical"].as_bool()), (Some(12.0), Some(true)));
+        assert_eq!((pending[1]["widthCm"].as_f64(), pending[1]["physical"].as_bool()), (Some(10.0), Some(false)));
+        // The first at its own size, the second two cells wide.
+        let r = invoke(&mut app, &ctx, json!({"svg": {}}));
+        assert_eq!(r["sources"][0]["widthCm"], 12.0);
+        assert_eq!(r["sources"][0]["vector"], true);
+        let r = invoke(&mut app, &ctx, json!({"svg": {"cells": 2}}));
+        assert_eq!((r["sources"][1]["widthCm"].as_f64(), r["sources"][1]["heightCm"].as_f64()), (Some(20.0), Some(20.0)));
+        assert_eq!(r["pendingSvg"].as_array().unwrap().len(), 0);
+        // Made larger later, still at 300 ppi: it is drawn again at its new size.
+        let r = invoke(&mut app, &ctx, json!({"source": {"index": 1, "widthCm": 40}}));
+        assert_eq!((r["sources"][1]["dpi"].as_f64(), r["sources"][1]["level"].as_str()), (Some(300.0), Some("optimal")));
+        assert!(menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({"ui": {"svg": "skip"}})).unwrap().is_err(), "nothing waiting");
+        // The export takes the SVG file at its print size.
+        let d = app.gang_sheet.as_ref().unwrap();
+        let k = (0..d.sheets.len()).find(|k| d.sheets[*k].placed.iter().any(|p| p.source == 1)).unwrap();
+        let p = d.params(&app, k).unwrap();
+        assert!(p["sources"].as_array().unwrap().iter().any(|s| s["path"].as_str().is_some_and(|x| x.ends_with("round.svg")) && s["widthCm"] == 40.0), "{p}");
+        let out = dir.join("sheet.png").to_string_lossy().into_owned();
+        let mut p = p;
+        p["output"] = json!(out);
+        p["open"] = json!(false);
+        let r = app.run(cmd::GANG_SHEET, p).unwrap();
+        assert_eq!(r["conflicts"], 0);
+        reset_settings();
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]

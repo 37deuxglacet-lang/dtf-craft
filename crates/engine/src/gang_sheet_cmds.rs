@@ -5,11 +5,18 @@
 //! `dtf.gangSheet` takes the visuals (`sources`: PNG files by path or open documents, each
 //! flattened and cropped to its opaque pixels) and either the layout drawn in the Gang Sheet
 //! window (`placements`, in centimetres) or nothing, in which case it builds one itself
-//! (`quantity` copies of each source, MaxRects, see [`photocraft_algo::gang_sheet`]). The sheet
-//! is as long as its content needs, up to `maxLength`; every visual is a layer of its own.
+//! (`quantity` copies of each source, MaxRects, see [`photocraft_algo::gang_sheet`]; with
+//! `columns`, the printed width is split into that many columns of square cells and each visual
+//! is centred in the whole cells it needs, cells touching). The sheet is as long as its content
+//! needs, up to `maxLength`; every visual is a layer of its own.
 //!
 //! The window loads its visuals with [`load_file`] and [`load_document`], so what it shows and
 //! measures is exactly what the command renders.
+//!
+//! SVG files go on the sheet too: the drawing (cropped to its visible part) is rendered straight
+//! at each copy's print size and resolution, never resampled, so it stays sharp at any size. Its
+//! own size is the one its root gives in cm, mm, in, pt or pc, else [`SVG_DEFAULT_WIDTH_CM`]
+//! wide.
 
 use photocraft_algo::gang_sheet::{self, Item, Sheet, UNITS_PER_CM};
 use photocraft_color::{ColorMode, PixelFormat, SampleType};
@@ -25,13 +32,18 @@ use crate::{EngineError, Result, Session};
 pub const GANG_SHEET: &str = "dtf.gangSheet";
 
 /// Film width (cm) the window starts with.
-pub const DEFAULT_FILM_WIDTH_CM: f64 = 56.0;
+pub const DEFAULT_FILM_WIDTH_CM: f64 = 42.0;
 /// Longest sheet (cm).
 pub const DEFAULT_MAX_LENGTH_CM: f64 = 100.0;
 /// Margin kept along the film edges (mm).
 pub const DEFAULT_EDGE_MM: f64 = 10.0;
 /// Spacing kept between two visuals (mm).
 pub const DEFAULT_SPACING_MM: f64 = 10.0;
+/// Columns of square cells the printed width is split into (the window's default: 40 cm printed
+/// on a 42 cm film, 10 × 10 cm cells).
+pub const DEFAULT_COLUMNS: u32 = 4;
+/// Most columns of cells.
+pub const MAX_COLUMNS: u32 = 24;
 /// Print resolution of the sheet.
 pub const DEFAULT_RESOLUTION: f64 = 300.0;
 
@@ -40,6 +52,10 @@ const MAX_SHEET_SIDE: i64 = 60_000;
 /// Most visuals (sources) and most placements one sheet takes.
 const MAX_SOURCES: usize = 200;
 const MAX_PLACEMENTS: usize = 2_000;
+/// Print width of an SVG whose root gives no physical size (one 10 cm cell).
+pub const SVG_DEFAULT_WIDTH_CM: f64 = 10.0;
+/// Longest side of the render an SVG is measured and previewed with.
+const SVG_PREVIEW_SIDE: f64 = 1200.0;
 /// Resolution assumed for a file that records none or an absurd one.
 const FALLBACK_DPI: f64 = 300.0;
 
@@ -78,6 +94,17 @@ pub struct Visual {
     pub dpi: f64,
     pub background: bool,
     pub semi_transparent: f64,
+    /// An SVG's drawing, rendered again at each size (`None` for pixels).
+    pub vector: Option<Vector>,
+}
+
+/// An SVG visual's drawing and its visible part (fractions of the whole drawing: left, top,
+/// right, bottom), and whether the file gives a physical size.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Vector {
+    pub bytes: std::sync::Arc<Vec<u8>>,
+    pub crop: [f64; 4],
+    pub physical: bool,
 }
 
 /// Share of semi-transparent pixels above which a visual is flagged (0.5 %: a few antialiased
@@ -146,19 +173,87 @@ pub fn load_document(doc: &Document, name: &str) -> Result<Visual> {
         width: r.width(),
         height: r.height(),
         dpi: f64::from(doc.resolution_dpi),
+        vector: None,
     })
 }
 
-/// A PNG file's visual (see [`load_document`]).
+/// An SVG file's visual: its drawing cropped to the visible part, previewed at
+/// [`SVG_PREVIEW_SIDE`] px, its print width the file's own (or [`SVG_DEFAULT_WIDTH_CM`]).
+pub fn load_svg(name: &str, bytes: &[u8]) -> Result<Visual> {
+    crate::allocation::checkpoint("reading an SVG for a gang sheet")?;
+    let err = |e: photocraft_io::IoError| bad(format!("{name}: {e}"));
+    let (dw, dh, physical) = photocraft_io::svg::drawing_size(bytes).map_err(err)?;
+    let (dw, dh) = (f64::from(dw).max(1e-3), f64::from(dh).max(1e-3));
+    let k = SVG_PREVIEW_SIDE / dw.max(dh);
+    let (fw, fh) = (dw * k, dh * k);
+    let (rw, rh) = (fw.ceil().max(1.0) as usize, fh.ceil().max(1.0) as usize);
+    let px = photocraft_io::svg::rasterize_region(bytes, fw, fh, 0.0, 0.0, rw as u32, rh as u32).map_err(err)?;
+    let alpha = |x: usize, y: usize| px.get((y * rw + x) * 4 + 3).copied().unwrap_or(0);
+    // Visible box; semi-transparent pixels counted inside the drawing only (the antialiased
+    // outline is not transparency).
+    let (mut x0, mut y0, mut x1, mut y1) = (usize::MAX, usize::MAX, 0, 0);
+    let (mut visible, mut semi) = (0u64, 0u64);
+    for y in 0..rh {
+        for x in 0..rw {
+            let a = alpha(x, y);
+            if a == 0 {
+                continue;
+            }
+            visible += 1;
+            (x0, y0, x1, y1) = (x0.min(x), y0.min(y), x1.max(x + 1), y1.max(y + 1));
+            let inside = x > 0 && y > 0 && x + 1 < rw && y + 1 < rh && [alpha(x - 1, y), alpha(x + 1, y), alpha(x, y - 1), alpha(x, y + 1)].iter().all(|n| *n > 0);
+            if a < 255 && inside {
+                semi += 1;
+            }
+        }
+    }
+    if visible == 0 {
+        return Err(bad(format!("{name}: the drawing is empty")));
+    }
+    let (cw, ch) = (x1 - x0, y1 - y0);
+    let mut crop = Vec::with_capacity(cw * ch * 4);
+    for y in y0..y1 {
+        crop.extend_from_slice(px.get((y * rw + x0) * 4..(y * rw + x1) * 4).unwrap_or_default());
+    }
+    let pixels = Surface::from_interleaved(format(), Rect::new(0, 0, cw as i32, ch as i32), &crop);
+    let fractions = [x0 as f64 / fw, y0 as f64 / fh, x1 as f64 / fw, y1 as f64 / fh];
+    // Print width of the visible part: the file's own, or one cell.
+    let units = if physical {
+        gang_sheet::from_px(dw * (fractions[2] - fractions[0]), 96.0).max(1)
+    } else {
+        cm(SVG_DEFAULT_WIDTH_CM)
+    };
+    let opaque = |x: usize, y: usize| px.get((y * rw + x) * 4 + 3).is_some_and(|a| *a == 255);
+    Ok(Visual {
+        name: name.to_string(),
+        background: opaque(x0, y0) && opaque(x1 - 1, y0) && opaque(x0, y1 - 1) && opaque(x1 - 1, y1 - 1),
+        semi_transparent: semi as f64 / visible as f64,
+        pixels,
+        width: cw as u32,
+        height: ch as u32,
+        dpi: cw as f64 / (units as f64 / gang_sheet::UNITS_PER_INCH),
+        vector: Some(Vector { bytes: std::sync::Arc::new(bytes.to_vec()), crop: fractions, physical }),
+    })
+}
+
+/// Whether `file` is an SVG drawing (`.svg`, `.svgz`).
+pub fn is_svg_file(file: &str) -> bool {
+    matches!(file_cmds::extension(file).as_deref(), Some("svg" | "svgz"))
+}
+
+/// A PNG or SVG file's visual (see [`load_document`] and [`load_svg`]).
 pub fn load_bytes(file: &str, bytes: &[u8]) -> Result<Visual> {
+    if is_svg_file(file) {
+        return load_svg(&file_cmds::stem(file), bytes);
+    }
     if file_cmds::extension(file).as_deref() != Some("png") {
-        return Err(bad(format!("{}: only PNG files go on a gang sheet", file_cmds::file_name(file))));
+        return Err(bad(format!("{}: only PNG and SVG files go on a gang sheet", file_cmds::file_name(file))));
     }
     let doc = file_cmds::import(&file_cmds::file_name(file), bytes)?;
     load_document(&doc, &file_cmds::stem(file))
 }
 
-/// A PNG file's visual, read from disk.
+/// A PNG or SVG file's visual, read from disk.
 pub fn load_file(path: &str) -> Result<Visual> {
     let bytes = file_cmds::read_file(path)?;
     load_bytes(path, &bytes)
@@ -224,6 +319,25 @@ fn oriented(v: &Visual, o: Orientation) -> (Surface, i64, i64) {
 /// The visual at `tw × th` pixels as placed (see [`oriented`]), at the origin.
 fn rendition(v: &Visual, tw: i64, th: i64, o: Orientation) -> Result<Surface> {
     crate::allocation::checkpoint("rendering a gang sheet visual")?;
+    // An SVG: its visible part drawn at exactly the size it prints at, then turned.
+    if let Some(vector) = &v.vector {
+        let (cw, ch) = if o.turned() { (th, tw) } else { (tw, th) };
+        if cw <= 0 || ch <= 0 {
+            return Err(bad(format!("{}: nothing to render", v.name)));
+        }
+        let [fx0, fy0, fx1, fy1] = vector.crop;
+        let (fw, fh) = (cw as f64 / (fx1 - fx0).max(1e-9), ch as f64 / (fy1 - fy0).max(1e-9));
+        let px = photocraft_io::svg::rasterize_region(&vector.bytes, fw, fh, fx0 * fw, fy0 * fh, cw as u32, ch as u32)
+            .map_err(|e| bad(format!("{}: {e}", v.name)))?;
+        let flat = Visual {
+            pixels: Surface::from_interleaved(format(), Rect::new(0, 0, cw as i32, ch as i32), &px),
+            width: cw as u32,
+            height: ch as u32,
+            vector: None,
+            ..v.clone()
+        };
+        return Ok(oriented(&flat, o).0);
+    }
     let (src, sw, sh) = oriented(v, o);
     if sw <= 0 || sh <= 0 || tw <= 0 || th <= 0 {
         return Err(bad(format!("{}: nothing to render", v.name)));
@@ -299,6 +413,8 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(p, "filmWidth", 1.0, 500.0)?;
     check_range(p, "maxLength", 1.0, 2000.0)?;
     check_range(p, "resolution", 72.0, 1200.0)?;
+    check_range(p, "columns", 0.0, f64::from(MAX_COLUMNS))?;
+    let columns = num(p, "columns", 0.0).round() as u32;
     let dpi = num(p, "resolution", DEFAULT_RESOLUTION);
     let mm = |v: f64| (v * 10.0).round() as i64;
     // `margin` (older params) sets both the edge margin and the spacing.
@@ -392,7 +508,8 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
             let sizes: Vec<(i64, i64)> = slots.iter().map(|i| visuals.get(*i).map_or((0, 0), |v| (v.1, v.2))).collect();
             // Packed at the largest spacing any visual asks for.
             let widest = visuals.iter().map(|v| v.4).fold(spacing, i64::max);
-            for (slot, spot) in slots.iter().zip(sheet.with_gap(widest).pack(&sizes, &[], rotate)) {
+            let spots = if columns > 0 { sheet.pack_cells(&sizes, &[], rotate, columns) } else { sheet.with_gap(widest).pack(&sizes, &[], rotate) };
+            for (slot, spot) in slots.iter().zip(spots) {
                 match spot {
                     Some(sp) => placed.push(Placed { source: *slot, x: sp.x, y: sp.y, orientation: Orientation { quarter: u8::from(sp.rotated), ..Orientation::default() }, group: 0 }),
                     None => unplaced += 1,
@@ -405,7 +522,9 @@ fn gang_sheet_cmd(s: &mut Session, p: &Value) -> Result<Value> {
         return Err(bad("nothing to place on the sheet"));
     }
     let items: Vec<Item> = placed.iter().map(|pl| visuals.get(pl.source).map_or_else(Item::default, |v| footprint(pl, v.1, v.2))).collect();
-    let gaps: Vec<i64> = placed.iter().map(|pl| visuals.get(pl.source).map_or(spacing, |v| v.4)).collect();
+    // Cells touch: no spacing between visuals.
+    let gaps: Vec<i64> = placed.iter().map(|pl| if columns > 0 { 0 } else { visuals.get(pl.source).map_or(spacing, |v| v.4) }).collect();
+    let sheet = if columns > 0 { sheet.with_gap(0) } else { sheet };
     let conflicts = sheet.conflicts(&items, &gaps).iter().filter(|c| **c).count();
     let length = sheet.used_length(&items).max(1);
     // Render: one layer per visual, in sheet pixels.
@@ -472,7 +591,7 @@ pub fn specs() -> Vec<CommandSpec> {
         label: "Gang Sheet…",
         menu: &["DTF"],
         shortcut: None,
-        params: r##"{"sources":[{"path":str|"document":int,"widthCm":0.1..500,"heightCm":0.1..2000 (print size; one alone keeps the proportions, both stretch; default the file's own size),"quantity":1..999=1,"marginMm":0..100 (this visual's spacing; default `spacing`)}],"placements":[{"source":int,"x":cm,"y":cm,"rotation":0|90|180|270 (clockwise),"flipH":bool,"flipV":bool}] (omit to build the layout automatically),"filmWidth":1..500=56 (cm),"maxLength":1..2000=100 (cm),"edgeMargin":0..100=10 (mm, along the film edges),"spacing":0..100=10 (mm, between visuals),"resolution":72..1200=300,"rotate":bool=true (automatic layout may turn visuals 90°),"name":str="Gang sheet","output":str (a .png path),"open":bool=true}"##,
+        params: r##"{"sources":[{"path":str (a PNG, or an SVG drawn at its print size)|"document":int,"widthCm":0.1..500,"heightCm":0.1..2000 (print size; one alone keeps the proportions, both stretch; default the file's own size),"quantity":1..999=1,"marginMm":0..100 (this visual's spacing; default `spacing`)}],"placements":[{"source":int,"x":cm,"y":cm,"rotation":0|90|180|270 (clockwise),"flipH":bool,"flipV":bool}] (omit to build the layout automatically),"filmWidth":1..500=42 (cm),"maxLength":1..2000=100 (cm),"edgeMargin":0..100=10 (mm, along the film edges),"spacing":0..100=10 (mm, between visuals),"resolution":72..1200=300,"rotate":bool=true (automatic layout may turn visuals 90°),"columns":0..24=0 (automatic layout in square cells: the width inside the edge margins split into that many columns, each visual centred in the whole cells it needs, no spacing; 0: free layout),"name":str="Gang sheet","output":str (a .png path),"open":bool=true}"##,
         enabled: crate::commands::always,
         run: gang_sheet_cmd,
         journal: true,
@@ -659,6 +778,62 @@ mod tests {
     }
 
     #[test]
+    fn svg_visuals_keep_their_size_and_render_sharp_at_print_size() {
+        let dir = temp_dir("svg");
+        // 10 × 5 cm, a red square on the left half, with 1 cm of empty room above it.
+        let cm = dir.join("logo.svg");
+        std::fs::write(&cm, br##"<svg xmlns="http://www.w3.org/2000/svg" width="10cm" height="6cm" viewBox="0 0 100 60"><rect x="0" y="10" width="50" height="50" fill="#c03020"/></svg>"##).unwrap();
+        let v = load_file(&cm.to_string_lossy()).unwrap();
+        assert!(v.vector.as_ref().is_some_and(|x| x.physical));
+        assert_eq!(v.name, "logo");
+        // The visible part: 5 × 5 cm.
+        assert_eq!(v.natural_width(&Sheet::new(4200, 10_000, 100, 0)), 500);
+        assert_eq!(v.semi_transparent, 0.0, "the outline's antialiasing is not transparency");
+        // No physical size: one 10 cm cell.
+        let px = dir.join("px.svg");
+        std::fs::write(&px, br##"<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150"><circle cx="75" cy="75" r="75" fill="#2040c0"/></svg>"##).unwrap();
+        let p = load_file(&px.to_string_lossy()).unwrap();
+        assert!(p.vector.as_ref().is_some_and(|x| !x.physical));
+        assert_eq!(p.natural_width(&Sheet::new(4200, 10_000, 100, 0)), 1000);
+        // Printed 30 cm wide at 254 ppi: drawn at 3000 px, sharp, the square filling it.
+        let mut s = Session::new();
+        let r = s
+            .execute(GANG_SHEET, json!({"sources": [{"path": cm.to_string_lossy(), "widthCm": 30}], "resolution": 254, "edgeMargin": 0, "open": true}))
+            .unwrap();
+        assert_eq!(r["images"], 1);
+        let st = s.active().unwrap();
+        let LayerContent::Raster(surf) = &st.doc.layers[0].content else { panic!("raster") };
+        let b = surf.content_bounds();
+        assert_eq!((b.width(), b.height()), (3000, 3000), "{b:?}");
+        assert!(surf.rgba(1500, 1500)[3] > 0.999 && surf.rgba(2, 2)[3] > 0.999, "opaque to its edges");
+        assert!(load_bytes("x.svg", b"not a drawing").is_err());
+        assert!(load_bytes("x.jpg", b"").is_err());
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn columns_lay_visuals_out_in_square_cells() {
+        let dir = temp_dir("cells");
+        // 1181 px at 300 ppi: 10 cm; 945 px: 8 cm.
+        let a = png(&dir, "a.png", 1181, 1181, 0, 300.0);
+        let b = png(&dir, "b.png", 945, 945, 0, 300.0);
+        let mut s = Session::new();
+        let r = s
+            .execute(GANG_SHEET, json!({"sources": [{"path": a, "quantity": 5}, {"path": b}], "columns": 4, "resolution": 254, "open": true}))
+            .unwrap();
+        // 42 cm film, 1 cm edges: 4 cells of 10 cm a row; 6 visuals take two rows.
+        assert_eq!((r["widthCm"].as_f64(), r["lengthCm"].as_f64()), (Some(42.0), Some(22.0)), "{r}");
+        assert_eq!((r["conflicts"].as_u64(), r["unplaced"].as_u64()), (Some(0), Some(0)));
+        // The 8 cm visual is centred in its cell: 1 cm in from the cell's corner.
+        let st = s.active().unwrap();
+        let small = st.doc.layers.iter().find(|l| l.name == "b").unwrap();
+        let LayerContent::Raster(px) = &small.content else { panic!("raster") };
+        let bx = px.content_bounds();
+        assert_eq!((bx.x0 % 1000, bx.y0 % 1000, bx.width()), (200, 200, 800), "{bx:?}");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
     fn bad_params_are_errors() {
         let mut s = Session::new();
         for p in [
@@ -688,6 +863,7 @@ mod tests {
             json!({"sources": [{"document": 0}], "placements": [{"source": 0, "x": 2, "y": 2, "rotation": 45}]}),
             json!({"sources": [{"document": 0, "marginMm": -1}]}),
             json!({"sources": [{"document": 0}], "spacing": 500}),
+            json!({"sources": [{"document": 0}], "columns": 99}),
         ] {
             assert!(s.execute(GANG_SHEET, p.clone()).is_err(), "{p}");
         }

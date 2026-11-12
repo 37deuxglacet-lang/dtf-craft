@@ -4093,3 +4093,32 @@ navigator	Zoom	Zvětšení
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Obkreslení obrazu z VectorCraft: jeho předvolby a všechna nastavení, pro DTF i jiné techniky.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorizace: Obkreslení obrazu z VectorCraft (ArtCraft Team a přispěvatelé VectorCraft, MIT OR Apache-2.0) a visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automaticky, nebo #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Buňky {size} × {size} cm · řady: {rows}
+	Cells touch: no spacing between images.	Buňky na sebe navazují: mezi obrázky není mezera.
+	No Cells	Bez buněk
+	Organize Automatically on Import	Při importu automaticky uspořádat
+	Printed width: {width} cm	Šířka tisku: {width} cm
+	Reserve up to {max} cm · not exported	Rezerva do {max} cm · neexportuje se
+	Snap to the Cells	Přichytávat k buňkám
+	Split the Width into Cells	Rozdělit šířku na buňky
+	{width} × {length} cm (max {max})	{width} × {length} cm (max. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Soubor neudává velikost: navrženo {width} cm.
+	Place	Umístit
+	SVG Print Size	Tisková velikost SVG
+	Size given in the file.	Velikost uvedená v souboru.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Podporované formáty: PNG (oříznuto na viditelné pixely) a SVG (vykresleno v tiskové velikosti)
+	Width in cells:	Šířka v buňkách:
+	SVG files still waiting: {n}	Čekající soubory SVG: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Pozadí {color} zprůhledněno
+	Copy for Vectorization	Kopie pro vektorizaci
+	Fringes removed, 2 px margin	Lemy odstraněny, okraj 2 px
+	JPEG: light median against the artefacts	JPEG: lehký medián proti artefaktům
+	Optimize for Vectorization	Optimalizovat pro vektorizaci
+	RGB 8 bits, sRGB	RGB 8 bitů, sRGB
+	Reduced: {from} → {to} px	Zmenšeno: {from} → {to} px
+	Size kept: {size} px	Velikost zachována: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Příliš mnoho barev ({n}): fotografie nebo přechod se k vektorizaci nehodí.

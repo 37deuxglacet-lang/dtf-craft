@@ -4163,3 +4163,33 @@ curves	Smooth	スムーズ
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft の画像トレース：プリセットとすべての設定、DTF やほかの技法に。
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	ベクトル化：VectorCraft の画像トレース（ArtCraft Team と VectorCraft の貢献者、MIT OR Apache-2.0）と visioncortex（MIT OR Apache-2.0）。
 	automatic, or #rrggbb #rrggbb…	自動、または #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm のセル · {rows} 行
+	Cells touch: no spacing between images.	セルは隣接: 画像の間隔なし。
+	No Cells	セルなし
+	Organize Automatically on Import	読み込み時に自動配置
+	Printed width: {width} cm	印刷幅: {width} cm
+	Reserve up to {max} cm · not exported	{max} cm までの予備 · 書き出されません
+	Snap to the Cells	セルに吸着
+	Split the Width into Cells	幅をセルに分割
+	{width} × {length} cm (max {max})	{width} × {length} cm（最大 {max}）
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	ファイルにサイズがありません: {width} cm を提案します。
+	Place	配置
+	SVG Print Size	SVG の印刷サイズ
+	Size given in the file.	ファイルに記載のサイズです。
+	Skip	スキップ
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	対応形式: PNG (表示ピクセルで切り抜き) と SVG (印刷サイズで描画)
+	Width in cells:	セル単位の幅:
+	SVG files still waiting: {n}	待機中の SVG ファイル: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	背景 {color} を透明にしました
+	Copy for Vectorization	ベクター化用のコピー
+	Fringes removed, 2 px margin	フリンジを除去、余白 2 px
+	JPEG: light median against the artefacts	JPEG: アーティファクト対策の軽いメディアン
+	Optimize for Vectorization	ベクター化用に最適化
+	RGB 8 bits, sRGB	RGB 8 ビット、sRGB
+	Reduced: {from} → {to} px	縮小: {from} → {to} px
+	Size kept: {size} px	サイズを維持: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	色が多すぎます ({n}): 写真やグラデーションはベクター化に向きません。

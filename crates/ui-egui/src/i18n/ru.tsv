@@ -3460,3 +3460,33 @@ curves	Smooth	Сгладить
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизация: трассировка изображения VectorCraft (ArtCraft Team и участники VectorCraft, MIT OR Apache-2.0) и visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	автоматически или #rrggbb #rrggbb…
 	Stroke Width	Толщина обводки
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Ячейки {size} × {size} см · рядов: {rows}
+	Cells touch: no spacing between images.	Ячейки примыкают: без интервала между изображениями.
+	No Cells	Без ячеек
+	Organize Automatically on Import	Автоматически раскладывать при импорте
+	Printed width: {width} cm	Ширина печати: {width} см
+	Reserve up to {max} cm · not exported	Резерв до {max} см · не экспортируется
+	Snap to the Cells	Привязка к ячейкам
+	Split the Width into Cells	Разделить ширину на ячейки
+	{width} × {length} cm (max {max})	{width} × {length} см (макс. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	В файле нет размера: предложено {width} см.
+	Place	Разместить
+	SVG Print Size	Размер печати SVG
+	Size given in the file.	Размер из файла.
+	Skip	Пропустить
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Поддерживаемые форматы: PNG (обрезается по видимым пикселям) и SVG (отрисовывается в размере печати)
+	Width in cells:	Ширина в ячейках:
+	SVG files still waiting: {n}	Ещё файлов SVG в очереди: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	ИИ ×{scale}: {from} → {to} px
+	Background {color} made transparent	Фон {color} сделан прозрачным
+	Copy for Vectorization	Копия для векторизации
+	Fringes removed, 2 px margin	Ореолы удалены, поле 2 px
+	JPEG: light median against the artefacts	JPEG: лёгкая медиана против артефактов
+	Optimize for Vectorization	Оптимизировать для векторизации
+	RGB 8 bits, sRGB	RGB 8 бит, sRGB
+	Reduced: {from} → {to} px	Уменьшено: {from} → {to} px
+	Size kept: {size} px	Размер сохранён: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Слишком много цветов ({n}): фото или градиент плохо подходят для векторизации.

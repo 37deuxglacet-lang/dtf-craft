@@ -4216,3 +4216,32 @@ cameraData	Lens	Lens
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft Görüntü İzleme: ön ayarları ve tüm ayarları, DTF ve diğer teknikler için.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektörleştirme: VectorCraft Görüntü İzleme (ArtCraft Team ve VectorCraft katkıcıları, MIT OR Apache-2.0) ve visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	otomatik veya #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm hücreler · {rows} satır
+	Cells touch: no spacing between images.	Hücreler bitişik: görseller arasında boşluk yok.
+	No Cells	Hücre yok
+	Organize Automatically on Import	İçe aktarırken otomatik düzenle
+	Printed width: {width} cm	Baskı genişliği: {width} cm
+	Reserve up to {max} cm · not exported	{max} cm'ye kadar yedek · dışa aktarılmaz
+	Snap to the Cells	Hücrelere yasla
+	Split the Width into Cells	Genişliği hücrelere böl
+	{width} × {length} cm (max {max})	{width} × {length} cm (en fazla {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Dosyada boyut yok: {width} cm önerildi.
+	Place	Yerleştir
+	SVG Print Size	SVG baskı boyutu
+	Size given in the file.	Dosyada belirtilen boyut.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Desteklenen biçimler: PNG (görünür piksellerine kırpılır) ve SVG (baskı boyutunda çizilir)
+	Width in cells:	Hücre cinsinden genişlik:
+	SVG files still waiting: {n}	Bekleyen SVG dosyaları: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	YZ ×{scale}: {from} → {to} px
+	Background {color} made transparent	{color} arka plan saydam yapıldı
+	Copy for Vectorization	Vektörleştirme kopyası
+	Fringes removed, 2 px margin	Saçaklar kaldırıldı, 2 px kenar
+	JPEG: light median against the artefacts	JPEG: artefaktlara karşı hafif medyan
+	Optimize for Vectorization	Vektörleştirme için optimize et
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Küçültüldü: {from} → {to} px
+	Size kept: {size} px	Boyut korundu: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Çok fazla renk ({n}): fotoğraf veya degrade vektörleştirmeye pek uygun değil.

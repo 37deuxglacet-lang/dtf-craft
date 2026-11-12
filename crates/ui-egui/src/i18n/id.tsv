@@ -3484,3 +3484,33 @@ curves	Smooth	Haluskan
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorisasi: Jiplak Gambar VectorCraft (ArtCraft Team dan kontributor VectorCraft, MIT OR Apache-2.0) dan visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	otomatis, atau #rrggbb #rrggbb…
 	Stroke Width	Tebal goresan
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Sel {size} × {size} cm · {rows} baris
+	Cells touch: no spacing between images.	Sel saling bersentuhan: tanpa jarak antargambar.
+	No Cells	Tanpa sel
+	Organize Automatically on Import	Atur otomatis saat impor
+	Printed width: {width} cm	Lebar cetak: {width} cm
+	Reserve up to {max} cm · not exported	Cadangan hingga {max} cm · tidak diekspor
+	Snap to the Cells	Rapatkan ke sel
+	Split the Width into Cells	Bagi lebar menjadi sel
+	{width} × {length} cm (max {max})	{width} × {length} cm (maks. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Tidak ada ukuran di berkas: diusulkan {width} cm.
+	Place	Tempatkan
+	SVG Print Size	Ukuran cetak SVG
+	Size given in the file.	Ukuran dari berkas.
+	Skip	Lewati
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Format yang didukung: PNG (dipangkas ke piksel yang terlihat) dan SVG (dirender pada ukuran cetak)
+	Width in cells:	Lebar dalam sel:
+	SVG files still waiting: {n}	Berkas SVG yang masih menunggu: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Latar {color} dibuat transparan
+	Copy for Vectorization	Salinan untuk vektorisasi
+	Fringes removed, 2 px margin	Pinggiran dihapus, margin 2 px
+	JPEG: light median against the artefacts	JPEG: median ringan terhadap artefak
+	Optimize for Vectorization	Optimalkan untuk vektorisasi
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Diperkecil: {from} → {to} px
+	Size kept: {size} px	Ukuran dipertahankan: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Terlalu banyak warna ({n}): foto atau gradien kurang cocok untuk vektorisasi.

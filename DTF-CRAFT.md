@@ -50,6 +50,15 @@ pixels. Les boutons ×2, ×3, ×4 lancent l'Agrandissement IA à la résolution 
 indiquent la taille obtenue (cm et px). La transparence est rognée avant le redimensionnement, en laissant
 2 px transparents autour du visuel. Le calque est renommé « origin » (champ Nom du calque).
 
+« Optimiser pour la vectorisation » (sous les boutons ×2, ×3, ×4) prépare une copie « nom vecto »,
+l'original restant intact : RVB 8 bits sRGB, sans fond de contrôle, en un seul calque transparent
+« Vectorisation » ; côté long sous 1 500 px : agrandissement IA automatique (×2, ×3 ou ×4, le plus
+proche de 2 500 px) ; au-delà de 4 000 px : réduction à 4 000 px (taille d'impression conservée) ;
+source JPEG : filtre médian de 1 px ; fond uni détecté sur les bords : rendu transparent (comme
+Détourage) ; franges supprimées (1 px) ; rognage avec 2 px de marge. Une notice résume ce qui a été
+fait et avertit au-delà de 64 couleurs dominantes (photo, dégradé : vectorisation peu adaptée).
+Commande `dtf.optimizeForVectorization`.
+
 Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès
 l'ouverture de la fenêtre ; « Afficher l'avant » montre l'image d'origine pour comparer.
 
@@ -66,12 +75,14 @@ DTF › Gang sheet… ouvre une fenêtre plein écran, toujours claire (quel que
 modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
 
 - **En-tête** : Annuler, Exporter le PNG… (ou Exporter les planches quand il y en a plusieurs).
-- **Barre d'outils** : format de la planche (laize × longueur), annuler / rétablir, grille, marge
+- **Barre d'outils** : format de la planche (laize × longueur), subdivision (sans, ou 2, 3, 4, 5,
+  6, 8 colonnes, affichées avec la taille des cases, par exemple « 4 × 10 cm »), annuler /
+  rétablir, grille, marge
   de l'image (masquée sur un écran étroit, toujours dans Paramètres), outils de la sélection
   (rotation 90° dans les deux sens, retournement horizontal et vertical, étirement à la laize ou à
   la longueur pour un visuel seul, centrage horizontal, vertical ou sur la planche, pousser à
   gauche, à droite, en haut, en bas, grouper, dégrouper, supprimer) et Construction auto.
-- **Accueil** (colonne de gauche) : zone d'import (« Importer des images », PNG uniquement, ou
+- **Accueil** (colonne de gauche) : zone d'import (« Importer des images », PNG ou SVG, ou
   fichiers glissés sur la fenêtre ; « Ajouter le document ouvert », aplati). Chaque visuel est
   rogné à ses pixels visibles et apparaît en vignette avec son nombre d'exemplaires sur la planche
   (clic : un exemplaire de plus ; × : retirer le visuel). Le visuel sélectionné se règle :
@@ -89,10 +100,27 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
   le déplacement, avertissement sur l'arrière-plan (coins opaques : fond non détouré),
   avertissement de transparence (plus de 0,5 % de pixels semi-transparents), grille 1 cm, fond de
   la planche (damier, gris, noir, blanc, couleur au choix), marge du plan de travail (le long des
-  bords, 1 cm par défaut), marge de l'image (entre les visuels, 1 cm par défaut), laize (56 cm par
-  défaut), longueur max (100 cm au plus), rotation autorisée pour la construction auto. Ces
-  réglages sont repris à l'ouverture suivante.
-- **Planche** : règles en cm, carte en haut à gauche (afficher les lignes en chevauchement et de
+  bords, 1 cm par défaut), marge de l'image (entre les visuels, 1 cm par défaut, sans objet avec
+  les cases), laize (42 cm par défaut) et largeur imprimable qui en découle (laize moins les deux
+  marges : 40 cm), longueur max (100 cm au plus), rotation autorisée pour la construction auto,
+  subdivision de la largeur en cases (activée par défaut : 4 colonnes), organisation automatique à
+  l'import, aimantation aux cases. Ces réglages sont repris à l'ouverture suivante.
+- **Cases** : la largeur imprimable est découpée en colonnes de cases carrées (40 cm en 4
+  colonnes : cases de 10 × 10 cm, 9 rangées entières dans les 98 cm entre les marges d'une planche
+  de 100 cm). Chaque visuel occupe les cases entières qu'il lui faut (0,5 mm de tolérance) et y est
+  centré en largeur et en hauteur ; les cases se touchent, sans espacement. Chaque import replace
+  tous les visuels (les plus grands d'abord, rotation si elle raccourcit la planche) et ouvre une
+  nouvelle planche quand une est pleine. Un visuel déplacé à la main se pose dans les cases les
+  plus proches. Les cases sont tracées en pointillés bleus (non imprimés).
+- **SVG** : chaque fichier SVG déposé ou importé ouvre une fenêtre « Taille d'impression du SVG »
+  (aperçu, largeur et hauteur liées, boutons « Largeur en cases » 1, 2, 3, 4…), une fenêtre par
+  fichier ; Placer ou Passer. Taille proposée : celle du fichier quand elle est en cm, mm, in, pt
+  ou pc, sinon une case (10 cm). Le dessin est rogné à sa partie visible et rendu directement à
+  sa taille d'impression à l'export (300 ppp), même agrandi après coup : jamais pixellisé. Les
+  textes utilisent les polices installées ; une image incluse garde sa propre résolution.
+- **Planche** : la longueur utile (bas du dernier visuel plus la marge) est marquée en bleu ; au
+  delà, jusqu'à la longueur max, la zone est hachurée (« Réserve jusqu'à 100 cm · non exportée »).
+  Règles en cm, carte en haut à gauche (afficher les lignes en chevauchement et de
   résolution, légende, et pour le visuel survolé ou sélectionné : position gauche / haut, largeur,
   hauteur, résolution, avertissements). Contours : vert ≥ 300 ppp, jaune ≥ 250, rouge ≥ 200, noir
   en dessous ; bleu pour un visuel en chevauchement ou trop proche. Molette : défilement ;
@@ -110,7 +138,8 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
   chaque visuel tourne avec lui ; retournement : le bloc est retourné. Flèches : 1 mm (Maj : 1 cm) ;
   Suppr, Ctrl+C / Ctrl+X / Ctrl+V, Ctrl+D, Ctrl+Z / Ctrl+Y ; clic droit : copier, coller,
   supprimer, dupliquer, grouper, dégrouper, tout sélectionner, remplissage automatique, rotation.
-- **Gang sheets actives** (colonne de droite) : une carte par planche (format, nom modifiable,
+- **Gang sheets actives** (colonne de droite) : une carte par planche (taille réelle, par exemple
+  « 42 × 62 cm (max 100) », nom modifiable,
   nombre d'images, quantité à imprimer, dupliquer, supprimer) ; Ajouter une nouvelle planche,
   Construction auto, Recommencer ; longueur utilisée.
 - **Construction auto** : tous les visuels avec largeur, hauteur, verrou des proportions,
@@ -126,7 +155,9 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
 La commande `dtf.gangSheet` fait le même travail sans fenêtre (actions, ligne de commande) : avec
 `sources` seulement, elle construit la planche elle-même ; avec `placements` (position, rotation,
 retournements), elle reprend la mise en place donnée. Marges : `edgeMargin` (bords) et `spacing`
-(entre visuels), en mm ; `marginMm` par visuel.
+(entre visuels), en mm ; `marginMm` par visuel. `columns` (construction par la commande) range
+les visuels dans les cases, sans espacement ; laize par défaut 42 cm. Un `path` SVG est rendu à
+sa taille d'impression.
 
 ## Agrandissement IA
 

@@ -3522,3 +3522,33 @@ curves	Smooth	Lisser
 # DTF Craft (20)
 	DTF Tools Training (1 h · €75)…	Formation aux outils DTF (1 h · 75 €)…
 	Request a Development Quote…	Demander un devis de développement…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Cases de {size} × {size} cm · {rows} rangées
+	Cells touch: no spacing between images.	Cases jointives : pas d'espacement entre les images.
+	No Cells	Sans subdivision
+	Organize Automatically on Import	Organiser automatiquement à l'import
+	Printed width: {width} cm	Largeur imprimable : {width} cm
+	Reserve up to {max} cm · not exported	Réserve jusqu'à {max} cm · non exportée
+	Snap to the Cells	Aimanter aux cases
+	Split the Width into Cells	Subdiviser la largeur en cases
+	{width} × {length} cm (max {max})	{width} × {length} cm (max {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Pas de taille dans le fichier : {width} cm proposés.
+	Place	Placer
+	SVG Print Size	Taille d'impression du SVG
+	Size given in the file.	Taille indiquée dans le fichier.
+	Skip	Passer
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Formats pris en charge : PNG (rogné à ses pixels visibles) et SVG (rendu à sa taille d'impression)
+	Width in cells:	Largeur en cases :
+	SVG files still waiting: {n}	Fichiers SVG encore en attente : {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	IA ×{scale} : {from} → {to} px
+	Background {color} made transparent	Fond {color} rendu transparent
+	Copy for Vectorization	Copie pour la vectorisation
+	Fringes removed, 2 px margin	Franges supprimées, marge de 2 px
+	JPEG: light median against the artefacts	JPEG : léger filtre médian contre les artefacts
+	Optimize for Vectorization	Optimiser pour la vectorisation
+	RGB 8 bits, sRGB	RVB 8 bits, sRGB
+	Reduced: {from} → {to} px	Réduction : {from} → {to} px
+	Size kept: {size} px	Taille conservée : {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Trop de couleurs ({n}) : une photo ou un dégradé convient mal à la vectorisation.

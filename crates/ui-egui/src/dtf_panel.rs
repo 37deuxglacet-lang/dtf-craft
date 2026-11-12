@@ -395,6 +395,52 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     run.is_some()
 }
 
+/// Print Conformity's Optimize for Vectorization: a copy "<name> vecto" made ready for the
+/// vectorizer (`dtf.optimizeForVectorization`), then what was done in a notice, with a warning
+/// when the visual has too many colours.
+fn optimize_button(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> bool {
+    use photocraft_engine::dtf_cmds::OPTIMIZE_VECTOR;
+    let Some(st) = app.session.active() else { return false };
+    let enabled = app.session.is_enabled(OPTIMIZE_VECTOR) && app.session.job_on(st.doc.id).is_none();
+    ui.add_space(8.0);
+    if !help(ui.add_enabled(enabled, egui::Button::new(tl!("Optimize for Vectorization"))), "dtf.conformity", "optimizeVector").clicked() {
+        return false;
+    }
+    match app.run(OPTIMIZE_VECTOR, json!({})) {
+        Ok(v) => vector_report(app, &v["plan"]),
+        Err(error) => crate::notices::error(app, error),
+    }
+    true
+}
+
+/// The notice after Optimize for Vectorization: the steps done, and the warning.
+fn vector_report(app: &mut PhotocraftApp, plan: &Value) {
+    let size = |v: &Value| format!("{} × {}", v[0], v[1]);
+    let (from, to) = (size(&plan["from"]), size(&plan["to"]));
+    let mut lines = Vec::new();
+    if let Some(k) = plan["scale"].as_u64() {
+        lines.push(crate::i18n::fmt(tl!("AI ×{scale}: {from} → {to} px"), &[("scale", &k.to_string()), ("from", &from), ("to", &to)]));
+    } else if plan["reduced"] == true {
+        lines.push(crate::i18n::fmt(tl!("Reduced: {from} → {to} px"), &[("from", &from), ("to", &to)]));
+    } else {
+        lines.push(crate::i18n::fmt(tl!("Size kept: {size} px"), &[("size", &from)]));
+    }
+    lines.push(tl!("RGB 8 bits, sRGB").to_string());
+    if plan["jpeg"] == true {
+        lines.push(tl!("JPEG: light median against the artefacts").to_string());
+    }
+    if let Some(c) = plan["background"].as_str() {
+        lines.push(crate::i18n::fmt(tl!("Background {color} made transparent"), &[("color", c)]));
+    }
+    lines.push(tl!("Fringes removed, 2 px margin").to_string());
+    let unsuitable = plan["unsuitable"] == true;
+    if unsuitable {
+        let n = plan["colors"].as_u64().unwrap_or(0).to_string();
+        lines.push(crate::i18n::fmt(tl!("Too many colours ({n}): a photo or a gradient is poorly suited to vectorization."), &[("n", &n)]));
+    }
+    crate::notices::post(app, tl!("Copy for Vectorization"), lines, unsuitable, None);
+}
+
 /// The cut-out's settings without the panel's own keys (`__…`): what Toggle Last State compares
 /// and restores.
 fn cutout_state(f: &Map<String, Value>) -> Map<String, Value> {
@@ -778,6 +824,7 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         link_dimensions(app, &before, &mut f);
         if have_doc {
             upscaled = upscale_buttons(app, ui, &f);
+            upscaled |= optimize_button(app, ui);
         }
     }
     let mut eraser = app.ui.dtf_panel.hole_eraser.is_some();

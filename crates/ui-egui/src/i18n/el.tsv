@@ -4185,3 +4185,32 @@ curves	Smooth	Εξομάλυνση
 	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Ανίχνευση εικόνας του VectorCraft: οι προρυθμίσεις του και όλες οι ρυθμίσεις του, για DTF και άλλες τεχνικές.
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Διανυσματοποίηση: Ανίχνευση εικόνας του VectorCraft (ArtCraft Team και οι συνεισφέροντες του VectorCraft, MIT OR Apache-2.0) και visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	αυτόματα, ή #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Κελιά {size} × {size} cm · {rows} σειρές
+	Cells touch: no spacing between images.	Τα κελιά εφάπτονται: χωρίς απόσταση μεταξύ εικόνων.
+	No Cells	Χωρίς κελιά
+	Organize Automatically on Import	Αυτόματη διάταξη κατά την εισαγωγή
+	Printed width: {width} cm	Πλάτος εκτύπωσης: {width} cm
+	Reserve up to {max} cm · not exported	Απόθεμα έως {max} cm · δεν εξάγεται
+	Snap to the Cells	Προσκόλληση στα κελιά
+	Split the Width into Cells	Διαίρεση του πλάτους σε κελιά
+	{width} × {length} cm (max {max})	{width} × {length} cm (μέγ. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Δεν υπάρχει μέγεθος στο αρχείο: προτείνονται {width} cm.
+	Place	Τοποθέτηση
+	SVG Print Size	Μέγεθος εκτύπωσης SVG
+	Size given in the file.	Μέγεθος από το αρχείο.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Υποστηριζόμενες μορφές: PNG (περικομμένο στα ορατά pixel) και SVG (αποδίδεται στο μέγεθος εκτύπωσης)
+	Width in cells:	Πλάτος σε κελιά:
+	SVG files still waiting: {n}	Αρχεία SVG σε αναμονή: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Το φόντο {color} έγινε διάφανο
+	Copy for Vectorization	Αντίγραφο για διανυσματοποίηση
+	Fringes removed, 2 px margin	Αφαιρέθηκαν οι άλως, περιθώριο 2 px
+	JPEG: light median against the artefacts	JPEG: ελαφρύ φίλτρο διάμεσου κατά των τεχνουργημάτων
+	Optimize for Vectorization	Βελτιστοποίηση για διανυσματοποίηση
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Σμίκρυνση: {from} → {to} px
+	Size kept: {size} px	Το μέγεθος διατηρήθηκε: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Πάρα πολλά χρώματα ({n}): μια φωτογραφία ή μια διαβάθμιση δεν ταιριάζει στη διανυσματοποίηση.

@@ -3187,3 +3187,33 @@ curves	Smooth	Suavizar
 	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vectorización: Calco de imagen de VectorCraft (ArtCraft Team y los colaboradores de VectorCraft, MIT OR Apache-2.0) y visioncortex (MIT OR Apache-2.0).
 	automatic, or #rrggbb #rrggbb…	automático, o #rrggbb #rrggbb…
 	Stroke Width	Grosor del trazo
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Celdas de {size} × {size} cm · {rows} filas
+	Cells touch: no spacing between images.	Celdas contiguas: sin espacio entre imágenes.
+	No Cells	Sin celdas
+	Organize Automatically on Import	Organizar automáticamente al importar
+	Printed width: {width} cm	Ancho de impresión: {width} cm
+	Reserve up to {max} cm · not exported	Reserva hasta {max} cm · no se exporta
+	Snap to the Cells	Ajustar a las celdas
+	Split the Width into Cells	Dividir el ancho en celdas
+	{width} × {length} cm (max {max})	{width} × {length} cm (máx. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Sin tamaño en el archivo: se proponen {width} cm.
+	Place	Colocar
+	SVG Print Size	Tamaño de impresión del SVG
+	Size given in the file.	Tamaño indicado en el archivo.
+	Skip	Omitir
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Formatos admitidos: PNG (recortado a sus píxeles visibles) y SVG (renderizado a su tamaño de impresión)
+	Width in cells:	Ancho en celdas:
+	SVG files still waiting: {n}	Archivos SVG aún en espera: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	IA ×{scale}: {from} → {to} px
+	Background {color} made transparent	Fondo {color} vuelto transparente
+	Copy for Vectorization	Copia para vectorizar
+	Fringes removed, 2 px margin	Halos eliminados, margen de 2 px
+	JPEG: light median against the artefacts	JPEG: mediana ligera contra los artefactos
+	Optimize for Vectorization	Optimizar para vectorizar
+	RGB 8 bits, sRGB	RGB 8 bits, sRGB
+	Reduced: {from} → {to} px	Reducido: {from} → {to} px
+	Size kept: {size} px	Tamaño conservado: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Demasiados colores ({n}): una foto o un degradado se presta mal a la vectorización.

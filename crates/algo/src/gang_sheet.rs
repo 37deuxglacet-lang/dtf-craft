@@ -11,6 +11,9 @@
 //! * [`Sheet::conflicts`] and [`Sheet::overlaps`]: which visuals are too close to another visual
 //!   or to an edge, or on top of another one, for the warnings drawn on the sheet.
 //! * [`Sheet::slide`] and [`Sheet::snap`]: alignment for manual placement.
+//! * [`Sheet::pack_cells`] and [`Sheet::snap_cells`]: the width split into square cells (a 40 cm
+//!   wide print area in 4 columns: 10 × 10 cm cells); each visual takes the whole cells it needs,
+//!   centred in them, and the cells touch.
 //! * [`effective_dpi`] and [`DpiLevel`]: the resolution a visual prints at and its rating.
 
 use serde::{Deserialize, Serialize};
@@ -268,6 +271,140 @@ impl Sheet {
         }
         out
     }
+
+    // ------------------------------------------------------------ cells
+
+    /// Side of one cell when the width inside the edge margins is split into `cols` square cells
+    /// (0 when there is no subdivision or no room).
+    pub fn cell_size(&self, cols: u32) -> i64 {
+        let (iw, _) = self.inner();
+        if cols == 0 || iw <= 0 { 0 } else { iw / i64::from(cols) }
+    }
+
+    /// Whole rows of cells the longest sheet holds inside its edge margins.
+    pub fn cell_rows(&self, cols: u32) -> i64 {
+        let c = self.cell_size(cols);
+        let (_, il) = self.inner();
+        if c <= 0 || il <= 0 { 0 } else { il / c }
+    }
+
+    /// Where a `w × h` visual sits when it takes the cells from column `col`, row `row`: centred
+    /// in its block of cells, both ways (against the block's corner when a hair larger).
+    fn in_cells(&self, c: i64, col: i64, row: i64, w: i64, h: i64) -> (i64, i64) {
+        let (cw, ch) = (cells_for(w, c), cells_for(h, c));
+        (self.edge + col * c + ((cw * c - w) / 2).max(0), self.edge + row * c + ((ch * c - h) / 2).max(0))
+    }
+
+    /// Places `sizes` (`(w, h)` as given, unrotated) on a sheet split into `cols` columns of square
+    /// cells, in the cells the `occupied` visuals leave: each visual takes the whole cells it
+    /// needs and is centred in them, largest first, each where it keeps the sheet shortest
+    /// (lowest bottom row, then leftmost column), turned 90° when `allow_rotate` and that is
+    /// better. Cells touch: there is no spacing between visuals. `None` for a visual that finds no
+    /// room (or with no subdivision).
+    pub fn pack_cells(&self, sizes: &[(i64, i64)], occupied: &[Item], allow_rotate: bool, cols: u32) -> Vec<Option<Spot>> {
+        let mut out = vec![None; sizes.len()];
+        let (c, rows, ncols) = (self.cell_size(cols), self.cell_rows(cols), i64::from(cols));
+        if c <= 0 || rows <= 0 || rows.saturating_mul(ncols) > 1_000_000 {
+            return out;
+        }
+        let mut taken = vec![false; (rows * ncols) as usize];
+        let at = |col: i64, row: i64| (row * ncols + col) as usize;
+        // Cells a visual already there covers (a hair over a line does not count).
+        for o in occupied {
+            let (x0, y0) = ((o.x - self.edge + CELL_TOLERANCE).div_euclid(c), (o.y - self.edge + CELL_TOLERANCE).div_euclid(c));
+            let (x1, y1) = (
+                (o.x.saturating_add(o.w) - self.edge - CELL_TOLERANCE).div_euclid(c),
+                (o.y.saturating_add(o.h) - self.edge - CELL_TOLERANCE).div_euclid(c),
+            );
+            for row in y0.max(0)..=y1.min(rows - 1) {
+                for col in x0.max(0)..=x1.min(ncols - 1) {
+                    if let Some(t) = taken.get_mut(at(col, row)) {
+                        *t = true;
+                    }
+                }
+            }
+        }
+        let span = |i: usize| sizes.get(i).map_or((0, 0), |&(w, h)| (cells_for(w, c), cells_for(h, c)));
+        let mut order: Vec<usize> = (0..sizes.len()).collect();
+        let key = |i: usize| {
+            let (cw, ch) = span(i);
+            (cw.saturating_mul(ch), cw.max(ch))
+        };
+        order.sort_by(|a, b| key(*b).cmp(&key(*a)).then(a.cmp(b)));
+        for i in order {
+            let Some(&(w, h)) = sizes.get(i) else { continue };
+            if w <= 0 || h <= 0 {
+                continue;
+            }
+            let (cw, ch) = span(i);
+            let mut best: Option<((i64, i64), i64, i64, bool)> = None;
+            let mut try_one = |bw: i64, bh: i64, rotated: bool| {
+                if bw > ncols || bh > rows {
+                    return;
+                }
+                for row in 0..=(rows - bh) {
+                    for col in 0..=(ncols - bw) {
+                        let score = (row + bh, col);
+                        if best.is_some_and(|(b, ..)| score >= b) {
+                            continue;
+                        }
+                        let free = (row..row + bh).all(|r| (col..col + bw).all(|k| !taken.get(at(k, r)).copied().unwrap_or(true)));
+                        if free {
+                            best = Some((score, col, row, rotated));
+                        }
+                    }
+                }
+            };
+            try_one(cw, ch, false);
+            if allow_rotate && cw != ch {
+                try_one(ch, cw, true);
+            }
+            let Some((_, col, row, rotated)) = best else { continue };
+            let (bw, bh, vw, vh) = if rotated { (ch, cw, h, w) } else { (cw, ch, w, h) };
+            for r in row..row + bh {
+                for k in col..col + bw {
+                    if let Some(t) = taken.get_mut(at(k, r)) {
+                        *t = true;
+                    }
+                }
+            }
+            let (x, y) = self.in_cells(c, col, row, vw, vh);
+            if let Some(slot) = out.get_mut(i) {
+                *slot = Some(Spot { x, y, rotated });
+            }
+        }
+        out
+    }
+
+    /// `r` moved onto the nearest block of cells it fits (sheet split into `cols` columns),
+    /// centred in it; unchanged with no subdivision.
+    pub fn snap_cells(&self, r: Item, cols: u32) -> Item {
+        let (c, rows, ncols) = (self.cell_size(cols), self.cell_rows(cols), i64::from(cols));
+        if c <= 0 || rows <= 0 {
+            return r;
+        }
+        let (cw, ch) = (cells_for(r.w, c), cells_for(r.h, c));
+        // The block's corner the visual's corner is nearest to.
+        let near = |v: i64, size: i64, n: i64, count: i64| {
+            let pad = ((n * c - size) / 2).max(0);
+            ((v - self.edge - pad) as f64 / c as f64).round().clamp(0.0, (count - n).max(0) as f64) as i64
+        };
+        let (col, row) = (near(r.x, r.w, cw, ncols), near(r.y, r.h, ch, rows));
+        let (x, y) = self.in_cells(c, col, row, r.w, r.h);
+        Item { x, y, ..r }
+    }
+}
+
+/// A visual this much longer than a whole number of cells still takes that number (0.5 mm: the
+/// rounding of a size read from pixels).
+pub const CELL_TOLERANCE: i64 = 5;
+
+/// How many cells of side `cell` a length takes (at least one).
+pub fn cells_for(len: i64, cell: i64) -> i64 {
+    if cell <= 0 {
+        return 1;
+    }
+    (len.saturating_sub(CELL_TOLERANCE).max(1).saturating_add(cell - 1) / cell).max(1)
 }
 
 /// The size, in layout units, of a `px_w × px_h` pixel visual printed `width` units wide (its
@@ -570,6 +707,73 @@ mod tests {
         assert_eq!(DpiLevel::of(f64::NAN), DpiLevel::Poor);
     }
 
+    /// 42 cm film, 1 cm edge (40 cm printed), 100 cm sheets, split in 4 columns: 10 cm cells,
+    /// 9 whole rows in the 98 cm left between the edges.
+    fn cells_film() -> Sheet {
+        Sheet::new(4200, 10_000, 100, 0)
+    }
+
+    #[test]
+    fn cells_are_square_and_whole() {
+        let sheet = cells_film();
+        assert_eq!((sheet.cell_size(4), sheet.cell_rows(4)), (1000, 9));
+        assert_eq!((sheet.cell_size(0), sheet.cell_rows(0)), (0, 0));
+        assert_eq!(cells_for(1000, 1000), 1);
+        assert_eq!(cells_for(1004, 1000), 1, "a hair over still takes one cell");
+        assert_eq!(cells_for(1010, 1000), 2);
+        assert_eq!(cells_for(1, 1000), 1);
+        assert_eq!(cells_for(3000, 0), 1);
+    }
+
+    #[test]
+    fn the_test_visuals_fill_cells_largest_first() {
+        let sheet = cells_film();
+        // The ten test visuals (cm): 10x10 … 40x30.
+        let cm = [(10, 10), (10, 20), (20, 10), (20, 20), (20, 30), (30, 20), (30, 30), (40, 10), (40, 20), (40, 30)];
+        let sizes: Vec<(i64, i64)> = cm.iter().map(|(w, h)| (w * 100, h * 100)).collect();
+        let spots = sheet.pack_cells(&sizes, &[], true, 4);
+        let placed = items(&sizes, &spots);
+        // 4 × 9 cells: 40x30, 30x30, 40x20, 40x10, 10x20 and 10x10 fill the 36 cells.
+        assert_eq!(placed.len(), 6, "{spots:?}");
+        assert_eq!(spots[9], Some(Spot { x: 100, y: 100, rotated: false }), "40x30 at the top");
+        assert_eq!(spots[1], Some(Spot { x: 3100, y: 3100, rotated: false }), "10x20 in the last column, beside 30x30");
+        assert_eq!(spots[0], Some(Spot { x: 3100, y: 5100, rotated: false }), "10x10 under it");
+        assert!(spots[5].is_none() && spots[4].is_none(), "30x20 and 20x30 wait for the next sheet");
+        assert_eq!(sheet.used_length(&placed), 9200, "9 rows of 10 cm plus the two edges");
+        assert!(sheet.overlaps(&placed).iter().all(|o| !o));
+        // The rest on a second sheet: 6 rows.
+        let rest: Vec<(i64, i64)> = sizes.iter().zip(&spots).filter(|(_, s)| s.is_none()).map(|(z, _)| *z).collect();
+        let more = sheet.pack_cells(&rest, &[], true, 4);
+        assert!(more.iter().all(Option::is_some), "{more:?}");
+        assert_eq!(more[2].map(|s| s.rotated), Some(true), "20x30 turned under 30x20");
+        assert_eq!(sheet.used_length(&items(&rest, &more)), 6200);
+    }
+
+    #[test]
+    fn a_visual_is_centred_in_its_cells_and_goes_around_others() {
+        let sheet = cells_film();
+        // 8 × 13 cm: one column, two rows, centred both ways.
+        let spots = sheet.pack_cells(&[(800, 1300)], &[], false, 4);
+        assert_eq!(spots[0], Some(Spot { x: 100 + 100, y: 100 + 350, rotated: false }));
+        // A visual already in the first cell (a hair over its lines): the next one goes beside.
+        let occupied = [Item::new(100, 100, 1002, 1000)];
+        let spots = sheet.pack_cells(&[(1000, 1000)], &occupied, false, 4);
+        assert_eq!(spots[0], Some(Spot { x: 1100, y: 100, rotated: false }));
+        // Too wide for 4 columns either way; no subdivision places nothing.
+        assert_eq!(sheet.pack_cells(&[(5000, 4500)], &[], true, 4), vec![None]);
+        assert_eq!(sheet.pack_cells(&[(500, 500)], &[], true, 0), vec![None]);
+    }
+
+    #[test]
+    fn snapping_puts_a_visual_in_the_nearest_cells() {
+        let sheet = cells_film();
+        // 8 × 8 cm dropped near the second column, third row: centred in that cell.
+        assert_eq!(sheet.snap_cells(Item::new(1250, 2300, 800, 800), 4), Item::new(1200, 2200, 800, 800));
+        // Past the last column: kept on the grid.
+        assert_eq!(sheet.snap_cells(Item::new(3900, 100, 2000, 1000), 4), Item::new(2100, 100, 2000, 1000));
+        assert_eq!(sheet.snap_cells(Item::new(7, 7, 800, 800), 0), Item::new(7, 7, 800, 800));
+    }
+
     #[test]
     fn hostile_values_do_not_panic() {
         let sheet = Sheet::new(-5, i64::MAX / 4, -1, -7);
@@ -582,5 +786,8 @@ mod tests {
         let _ = tiny.slide(&far, &[], 1, Side::Bottom);
         let _ = tiny.snap(&far, &[], 0, Item::new(5, 5, 1, 1), 2, 3);
         let _ = tiny.used_length(&[Item::new(0, i64::MAX / 2, 1, i64::MAX / 2)]);
+        let _ = sheet.pack_cells(&[(i64::MAX / 8, 3), (-1, -1)], &[Item::new(i64::MIN / 8, 0, 5, 5)], true, u32::MAX);
+        let _ = cells_film().pack_cells(&[(5, 5)], &far, true, 4);
+        let _ = cells_film().snap_cells(Item::new(i64::MIN / 8, i64::MAX / 8, 3, 3), 4);
     }
 }
