@@ -125,7 +125,6 @@ mod layout_keys;
 pub mod links;
 pub mod gang_sheet_ui;
 /// DTF Craft: the start screen's strip of Stéphane Glacet's sites.
-pub mod promo;
 pub mod offers;
 /// DTF Craft: the start screen's background illustration, from Pixabay.
 pub mod home_image;

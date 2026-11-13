@@ -2650,27 +2650,8 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     if !crate::home_image::paint(app, ui, area) {
         paint_dots(ui, area, app.session.prefs().interface.show_canvas_dots);
     }
-    // File › Open Recent, newest first (on the web there are no paths to reopen).
-    let recent: Vec<String> = if cfg!(target_arch = "wasm32") { Vec::new() } else { app.ui.recent_files.iter().take(HOME_RECENT).cloned().collect() };
-    let recent_h = if recent.is_empty() { 0.0 } else { 34.0 + recent.len() as f32 * HOME_RECENT_ROW };
-    // DTF Craft: the sites' strip along the bottom when there is room, the card centred above it.
-    let card_h = 330.0 + recent_h;
-    let promo_w = (area.width() - 48.0).min(1160.0);
-    let promo = (area.height() >= card_h + crate::promo::HEIGHT + 80.0 && promo_w >= crate::promo::min_width())
-        .then(|| Rect::from_center_size(egui::pos2(area.center().x, area.bottom() - 28.0 - crate::promo::HEIGHT / 2.0), egui::vec2(promo_w, crate::promo::HEIGHT)));
-    let above = promo.map_or(area, |p| Rect::from_min_max(area.min, egui::pos2(area.right(), p.top() - 12.0)));
-    // DTF Craft: with the offers' box (in French, room permitting), the card and the box are
-    // centred together.
-    let offers_w = if crate::offers::shown() { crate::offers::HOME_WIDTH + 40.0 } else { 0.0 };
-    let shift = if offers_w > 0.0 && above.width() >= 460.0 + offers_w + 48.0 { offers_w / 2.0 } else { 0.0 };
-    let card = Rect::from_center_size(egui::pos2(above.center().x - shift, above.center().y), egui::vec2(460.0, card_h));
-    if let Some(p) = promo {
-        crate::promo::strip(app, ui, p);
-    }
-    // DTF Craft: the training and quote offers beside the card, when there is room (in French).
-    if let Some(r) = crate::offers::home_rect(above, card, crate::offers::HOME_HEIGHT) {
-        crate::offers::home(app, ui, r);
-    }
+    // DTF Craft: a sober start screen, the card and the links under it, centred.
+    let card = Rect::from_center_size(area.center(), egui::vec2(460.0, 360.0));
     let new_label = crate::shortcuts::command_label(app, "New document…", "file.new");
     let open_label = crate::shortcuts::command_label(app, "Open…", "file.open");
     ui.scope_builder(egui::UiBuilder::new().max_rect(card), |ui| {
@@ -2714,12 +2695,9 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                 crate::icons::paint(ui, r, "image", 15.0, t.text_faint);
                 ui.label(egui::RichText::new(msg).color(t.text_faint));
             });
-            if !recent.is_empty() {
-                ui.add_space(22.0);
-                home_recent(app, ui, &recent);
-            }
+            // DTF Craft: Stéphane Glacet's sites, then GitHub and PhotoCraft's site.
             ui.add_space(26.0);
-            crate::links::link_row(app, ui);
+            crate::links::home_links(app, ui);
         });
     });
     crate::home_image::credit(app, ui, area);
@@ -2731,86 +2709,6 @@ fn start_screen_drop_hint(app: &PhotocraftApp) -> std::borrow::Cow<'static, str>
         crate::i18n::fmt(tl!("Use File › Open, or paste a copied image with {paste}."), &[("paste", &crate::notices::paste_hint(app))]).into()
     } else {
         tl!("Drop an image or PSD anywhere to open it.").into()
-    }
-}
-
-/// Recent files listed on the Home screen.
-const HOME_RECENT: usize = 6;
-/// Height of one Home-screen recent-file row.
-const HOME_RECENT_ROW: f32 = 30.0;
-
-/// The Home screen's "Recent" list: file name, its folder on the right, click to open. The
-/// hovered row shows a × that takes it off the list, and right-click offers Remove from Recent
-/// and Clear Recent Files (#2691).
-fn home_recent(app: &mut PhotocraftApp, ui: &mut egui::Ui, recent: &[String]) {
-    let t = crate::theme::Tokens::get(ui.ctx());
-    let width = 380.0;
-    ui.horizontal(|ui| {
-        // Line the heading up with the file icons.
-        ui.add_space(((ui.available_width() - width) / 2.0).max(0.0) + 8.0);
-        ui.label(egui::RichText::new(tl!("Recent")).font(crate::theme::semibold(12.5)).color(t.text_dim));
-    });
-    ui.add_space(4.0);
-    let mut open = None;
-    let mut remove = None;
-    let mut clear = false;
-    for path in recent {
-        let name = crate::file_open::display_name(path);
-        let folder = std::path::Path::new(path).parent().map(|d| d.to_string_lossy().into_owned()).unwrap_or_default();
-        let (row, resp) = ui.allocate_exact_size(egui::vec2(width, HOME_RECENT_ROW), Sense::click());
-        // The × sits on top of the row, so the row counts as hovered while the pointer is on it.
-        let hovered = ui.rect_contains_pointer(row);
-        if hovered {
-            ui.painter().rect_filled(row, t.radius_sm, t.hover);
-        }
-        let close = Rect::from_center_size(egui::pos2(row.right() - 16.0, row.center().y), egui::vec2(22.0, 22.0));
-        let right = if hovered { close.left() - 4.0 } else { row.right() - 10.0 };
-        let icon = Rect::from_center_size(egui::pos2(row.left() + 16.0, row.center().y), egui::vec2(16.0, 16.0));
-        crate::icons::paint(ui, icon, "file", 14.0, t.text_dim);
-        let x = row.left() + 32.0;
-        let name_g = crate::tab_strip::elided(ui, &name, egui::FontId::proportional(12.5), t.text, 170.0);
-        let name_w = name_g.size().x;
-        ui.painter().galley(egui::pos2(x, row.center().y - name_g.size().y / 2.0), name_g, t.text);
-        let folder_max = (right - (x + name_w + 14.0)).max(0.0);
-        if folder_max > 20.0 && !folder.is_empty() {
-            let fg = crate::tab_strip::elided(ui, &folder, egui::FontId::proportional(11.5), t.text_faint, folder_max);
-            ui.painter().galley(egui::pos2(right - fg.size().x, row.center().y - fg.size().y / 2.0), fg, t.text_faint);
-        }
-        resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, &name));
-        let resp = resp.on_hover_text(path).on_hover_cursor(egui::CursorIcon::PointingHand);
-        if hovered {
-            let x = ui.interact(close, resp.id.with("remove"), Sense::click());
-            let label = crate::i18n::fmt(tl!("Remove {name} from Recent"), &[("name", &name)]);
-            x.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, &label));
-            let color = crate::icons::button_chrome(ui, close, false, x.hovered());
-            crate::icons::paint(ui, close, "x", 12.0, color);
-            if x.on_hover_text(tl!("Remove from Recent")).clicked() {
-                remove = Some(path.clone());
-            }
-        }
-        if resp.clicked() && remove.is_none() {
-            open = Some(path.clone());
-        }
-        resp.context_menu(|ui| {
-            if ui.button(tl!("Remove from Recent")).clicked() {
-                remove = Some(path.clone());
-                ui.close();
-            }
-            if ui.button(tl!("Clear Recent Files")).clicked() {
-                clear = true;
-                ui.close();
-            }
-        });
-    }
-    if clear {
-        app.clear_recent();
-    } else if let Some(path) = remove {
-        app.remove_recent(&path);
-    }
-    if let Some(path) = open
-        && let Err(e) = app.open_path(&path)
-    {
-        app.open_failed(&crate::file_open::display_name(&path), &e);
     }
 }
 
@@ -6608,55 +6506,6 @@ mod tests {
         let hint = start_screen_drop_hint(&wayland);
         assert!(!hint.contains("Drop"), "{hint}");
         assert!(hint.ends_with(&format!("paste a copied image with {}.", crate::notices::paste_hint(&wayland))), "{hint}");
-    }
-
-    /// The Home screen's × takes a file off Recent without opening it, and its right-click menu
-    /// removes one entry or clears the list; the preferences keep the change (#2691).
-    #[test]
-    fn home_recent_entries_can_be_removed() {
-        use egui_kittest::kittest::Queryable;
-        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
-        for name in ["c.tif", "b.psd", "a.png"] {
-            app.push_recent(&format!("/tmp/photocraft-2691/{name}"));
-        }
-        let mut h = egui_kittest::Harness::builder().with_size(egui::vec2(900.0, 760.0)).build_ui_state(
-            |ui, (app, ready): &mut (PhotocraftApp, bool)| {
-                if *ready {
-                    egui::CentralPanel::default().frame(egui::Frame::NONE).show(ui, |ui| document_area(app, ui));
-                }
-            },
-            (app, false),
-        );
-        PhotocraftApp::setup_context(&h.ctx, crate::theme::ThemeKind::default());
-        h.state_mut().1 = true;
-        h.run_steps(3);
-        let listed = |h: &egui_kittest::Harness<'_, (PhotocraftApp, bool)>| {
-            let app = &h.state().0;
-            assert_eq!(app.session.prefs().file_handling.recent_files, app.ui.recent_files, "stored in the preferences");
-            app.ui.recent_files.iter().map(|p| crate::file_open::display_name(p)).collect::<Vec<_>>()
-        };
-        assert_eq!(listed(&h), ["a.png", "b.psd", "c.tif"]);
-        assert!(h.query_by_label("Remove b.psd from Recent").is_none(), "the × shows on the hovered row only");
-
-        h.get_by_label("b.psd").hover();
-        h.run_steps(2);
-        h.get_by_label("Remove b.psd from Recent").click();
-        h.run_steps(2);
-        assert_eq!(listed(&h), ["a.png", "c.tif"]);
-        assert!(h.state().0.session.documents().is_empty(), "the file was not opened");
-
-        h.get_by_label("c.tif").click_secondary();
-        h.run_steps(2);
-        h.get_by_label("Remove from Recent").click();
-        h.run_steps(2);
-        assert_eq!(listed(&h), ["a.png"]);
-
-        h.get_by_label("a.png").click_secondary();
-        h.run_steps(2);
-        h.get_by_label("Clear Recent Files").click();
-        h.run_steps(2);
-        assert!(listed(&h).is_empty());
-        assert!(h.state().0.session.documents().is_empty());
     }
 
     #[test]

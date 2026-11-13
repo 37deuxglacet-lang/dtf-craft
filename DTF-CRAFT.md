@@ -170,10 +170,12 @@ sur un processeur 8 cœurs.
 
 ## Accueil
 
-La page d'accueil présente, sous Nouveau document / Ouvrir, « Les services de Stéphane Glacet » :
-cinq cartes (Pixel-Net, Réparation DTF, Formation DTF, Chromilab, Stéphane Glacet) avec un visuel,
-une accroche et un bouton « Ouvrir le site » (navigateur). Le bandeau se masque quand la fenêtre est
-trop petite.
+Page d'accueil sobre : le bloc DTF Craft (version, Nouveau document / Ouvrir, dépôt de fichier),
+puis en liens texte les sites de Stéphane Glacet (dtfcraft.fr, pixel-net.fr, reparation-dtf.fr,
+formation-dtf.fr, chromilab.fr, stephane-glacet.com, dev-ia.fr) et, plus petits, GitHub et le site
+ArtCraft / PhotoCraft. Ni fichiers récents (menu Fichier › Ouvrir récent), ni encarts : la
+formation (75 €) et le devis (régie 375 € HT / jour) restent dans les menus DTF et Aide et les
+fiches d'aide.
 
 En fond, une illustration Pixabay (recherche « pop art », illustrations, format paysage, tout
 public), une nouvelle à chaque ouverture, sous un voile qui garde l'accueil lisible ; la source est

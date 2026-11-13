@@ -39,9 +39,36 @@ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
 /// (the platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable
 /// `ctx.open_url`.
 pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
-    let t = crate::theme::Tokens::get(ui.ctx());
     let links = [(tl!("Website"), crate::brand::WEBSITE), (tl!("Contact"), crate::brand::CONTACT), (tl!("GitHub"), crate::brand::GITHUB), (tl!("PhotoCraft website"), APP_PAGE)];
-    let font = egui::FontId::proportional(12.5);
+    centred_links(app, ui, &links, 12.5);
+}
+
+/// Stéphane Glacet's sites, linked on the start screen: (label, url).
+pub const SITES: [(&str, &str); 7] = [
+    ("dtfcraft.fr", crate::brand::WEBSITE),
+    ("pixel-net.fr", "https://www.pixel-net.fr"),
+    ("reparation-dtf.fr", "https://www.reparation-dtf.fr"),
+    ("formation-dtf.fr", "https://www.formation-dtf.fr"),
+    ("chromilab.fr", "https://www.chromilab.fr"),
+    ("stephane-glacet.com", "https://www.stephane-glacet.com"),
+    ("dev-ia.fr", "https://www.dev-ia.fr"),
+];
+
+/// DTF Craft's start screen, under the card: the sites on two lines, then GitHub and PhotoCraft's
+/// site (ArtCraft), smaller.
+pub fn home_links(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+    let (first, second) = SITES.split_at(4);
+    centred_links(app, ui, first, 13.0);
+    ui.add_space(4.0);
+    centred_links(app, ui, second, 13.0);
+    ui.add_space(10.0);
+    centred_links(app, ui, &[(tl!("GitHub"), crate::brand::GITHUB), (tl!("ArtCraft / PhotoCraft website"), APP_PAGE)], 12.0);
+}
+
+/// `links` (label, url) on one centred line, separated by dots, each opening through [`open`].
+fn centred_links(app: &mut PhotocraftApp, ui: &mut egui::Ui, links: &[(&str, &str)], size: f32) {
+    let t = crate::theme::Tokens::get(ui.ctx());
+    let font = egui::FontId::proportional(size);
     let sep = "  ·  ";
     let width: f32 = links.iter().map(|(l, _)| ui.painter().layout_no_wrap((*l).into(), font.clone(), t.text).size().x).sum::<f32>()
         + (links.len() - 1) as f32 * ui.painter().layout_no_wrap(sep.into(), font.clone(), t.text).size().x;

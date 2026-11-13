@@ -7,10 +7,10 @@
 //!
 //! Both are asked for by e-mail: a message ready to complete opens in the user's mail program
 //! (`mailto:`), to [`CONTACT`], with DTF Craft's version, the system and the tool concerned.
-//! Nothing is sent without the user. They are offered in the DTF and Help menus, in each DTF
-//! tool's help sheet and on the start screen.
+//! Nothing is sent without the user. They are offered in the DTF and Help menus and in each DTF
+//! tool's help sheet.
 
-use egui::{Rect, RichText, Sense, pos2, vec2};
+use egui::RichText;
 use serde_json::{Value, json};
 
 use crate::PhotocraftApp;
@@ -33,8 +33,6 @@ pub const HELP_QUOTE: &str = "help.quote";
 pub const TRAINING_LABEL: &str = "DTF Tools Training (1 h · €75)…";
 pub const QUOTE_LABEL: &str = "Request a Development Quote…";
 
-/// The width of the start screen's box.
-pub const HOME_WIDTH: f32 = 340.0;
 
 /// What the user asks for.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -214,75 +212,6 @@ pub fn help_links(ui: &mut egui::Ui, command: &str) {
     ui.label(RichText::new("Un message à compléter s'ouvre dans votre messagerie.").small().color(t.text_faint));
 }
 
-/// The start screen's box beside the card: the two offers, their price and a button each. `None`
-/// when there is no room right of `card` within `area`.
-pub fn home_rect(area: Rect, card: Rect, height: f32) -> Option<Rect> {
-    let left = card.right() + 40.0;
-    (shown() && left + HOME_WIDTH <= area.right() - 24.0).then(|| Rect::from_min_size(pos2(left, card.center().y - height / 2.0), vec2(HOME_WIDTH, height)))
-}
-
-/// The box's height.
-pub const HOME_HEIGHT: f32 = 300.0;
-
-/// The start screen's box (see [`home_rect`]).
-pub fn home(app: &mut PhotocraftApp, ui: &mut egui::Ui, rect: Rect) {
-    let t = Tokens::get(ui.ctx());
-    let mut request = None;
-    ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
-        egui::Frame::new()
-            .fill(t.card)
-            .stroke(egui::Stroke::new(1.0, t.accent_border))
-            .corner_radius(8.0)
-            .inner_margin(egui::Margin::same(16))
-            .show(ui, |ui| {
-                ui.set_width(rect.width() - 34.0);
-                ui.horizontal(|ui| {
-                    let (r, _) = ui.allocate_exact_size(vec2(18.0, 18.0), Sense::hover());
-                    crate::icons::paint(ui, r, "graduation-cap", 16.0, t.accent);
-                    ui.label(RichText::new("Avec Stéphane Glacet, formateur DTF").strong().color(t.text));
-                });
-                ui.add_space(10.0);
-                let offer = |ui: &mut egui::Ui, title: &str, price: &str, text: &str, button: &str, primary: bool| -> bool {
-                    ui.horizontal(|ui| {
-                        ui.label(RichText::new(title).strong().size(14.0).color(t.text));
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label(RichText::new(price).strong().size(14.0).color(t.text));
-                        });
-                    });
-                    ui.label(RichText::new(text).color(t.text_dim));
-                    ui.add_space(4.0);
-                    if primary { crate::widgets::primary_button(ui, button, 0.0).clicked() } else { crate::widgets::secondary_button(ui, button, 0.0).clicked() }
-                };
-                if offer(
-                    ui,
-                    "Formation aux outils DTF",
-                    TRAINING_PRICE,
-                    "1 h en visio, sur vos propres visuels. Net de TVA, réglé par PayPal à la confirmation du rendez-vous.",
-                    "Demander un rendez-vous",
-                    true,
-                ) {
-                    request = Some(Request::Training);
-                }
-                ui.add_space(12.0);
-                crate::widgets::hairline(ui);
-                ui.add_space(12.0);
-                if offer(
-                    ui,
-                    "Outil sur mesure ou évolution",
-                    DAY_RATE,
-                    "Un développement spécifique pour votre atelier, ou une évolution d'un outil existant. En régie, sur devis.",
-                    "Demander un devis",
-                    false,
-                ) {
-                    request = Some(Request::Quote);
-                }
-            });
-    });
-    if let Some(r) = request {
-        open(app, ui.ctx(), r, None);
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -361,17 +290,5 @@ mod tests {
         assert_eq!(urls.len(), 3);
         assert!(urls[0].contains("formation") && urls[1].contains("devis") && urls[2].contains("Nettet%C3%A9"), "{urls:?}");
         assert!(app.ui.status.contains("messagerie"));
-    }
-
-    #[test]
-    fn the_start_screen_box_needs_room_and_french() {
-        let area = Rect::from_min_size(pos2(0.0, 0.0), vec2(1440.0, 900.0));
-        let card = Rect::from_center_size(area.center(), vec2(460.0, 400.0));
-        assert!(home_rect(area, card, HOME_HEIGHT).is_none(), "English");
-        let _fr = french();
-        let r = home_rect(area, card, HOME_HEIGHT).unwrap();
-        assert!(r.left() > card.right() && r.right() <= area.right());
-        let narrow = Rect::from_min_size(pos2(0.0, 0.0), vec2(1000.0, 900.0));
-        assert!(home_rect(narrow, Rect::from_center_size(narrow.center(), vec2(460.0, 400.0)), HOME_HEIGHT).is_none());
     }
 }
