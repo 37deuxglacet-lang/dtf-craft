@@ -90,7 +90,10 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
 - **Accueil** (colonne de gauche) : zone d'import (« Importer des images », PNG ou SVG, ou
   fichiers glissés sur la fenêtre ; « Ajouter le document ouvert », aplati). Chaque visuel est
   rogné à ses pixels visibles et apparaît en vignette avec son nombre d'exemplaires sur la planche
-  (clic : un exemplaire de plus ; × : retirer le visuel). Le visuel sélectionné se règle :
+  (clic : afficher ses réglages ; double-clic : un exemplaire de plus ; × : retirer le visuel ; le
+  visuel affiché est encadré). Les réglages du dernier visuel sélectionné, importé ou modifié
+  restent affichés à droite tant qu'il y a des visuels, même quand les planches sont reconstruites.
+  Le visuel affiché se règle :
   largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
   d'images (en mode cases : la quantité totale, toutes planches confondues ; les planches sont
   reconstruites et générées autant qu'il en faut, 124 logos de 10 cm donnent 36 + 36 + 36 + 16 ;

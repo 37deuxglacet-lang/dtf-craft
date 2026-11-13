@@ -379,6 +379,10 @@ pub struct GangSheetDialog {
     undo: Vec<Snapshot>,
     /// Per visual, the copies the last Auto Build could place nowhere (part of its quantity).
     unplaced: Vec<usize>,
+    /// The visual whose settings the right column shows when nothing is selected on the sheet
+    /// (the last one selected, imported or edited): they stay there while the sheets are laid
+    /// out again.
+    focus: Option<usize>,
     redo: Vec<Snapshot>,
     /// The last edit's key: edits of the same field in a row make one undo step.
     last_edit: Option<String>,
@@ -411,6 +415,7 @@ impl GangSheetDialog {
             settings,
             svg_queue: Vec::new(),
             unplaced: Vec::new(),
+            focus: None,
             sources: Vec::new(),
             sheets: vec![SheetDoc::new(1)],
             active: 0,
@@ -613,6 +618,7 @@ impl GangSheetDialog {
     /// are laid out again at once, as many as needed; else it is what Auto Build places.
     fn set_quantity(&mut self, source: usize, q: usize) {
         let q = q.min(MAX_QUANTITY);
+        self.focus = Some(source);
         if self.sources.get(source).is_none_or(|s| s.quantity == q) {
             return;
         }
@@ -781,6 +787,7 @@ impl GangSheetDialog {
     /// Sets a source's size (layout units, unturned); with the lock on, `w` or `h` (whichever is
     /// `Some`) drives the other. Never larger than the film.
     fn set_size(&mut self, source: usize, w: Option<i64>, h: Option<i64>) {
+        self.focus = Some(source);
         let (iw, il) = self.sheet().inner();
         let longest = iw.max(il).max(10);
         let Some(s) = self.sources.get_mut(source) else { return };
@@ -835,6 +842,7 @@ impl GangSheetDialog {
             tex: None,
         });
         let s = self.sources.len() - 1;
+        self.focus = Some(s);
         if self.organizes() {
             self.relayout_keeping(Some(s));
             return;
@@ -908,6 +916,11 @@ impl GangSheetDialog {
         if source < self.unplaced.len() {
             self.unplaced.remove(source);
         }
+        self.focus = match self.focus {
+            Some(f) if f == source => None,
+            Some(f) if f > source => Some(f - 1),
+            f => f,
+        };
         for doc in &mut self.sheets {
             doc.placed.retain(|p| p.source != source);
             for p in &mut doc.placed {
@@ -935,6 +948,17 @@ impl GangSheetDialog {
     }
 
     // ---------------------------------------------------------------- selection and groups
+
+    /// The visual whose settings the right column shows with nothing selected: the one last
+    /// shown, else the last imported (`None` without visuals).
+    pub fn shown_source(&self) -> Option<usize> {
+        let n = self.sources.len();
+        if n == 0 {
+            return None;
+        }
+        let single = self.single().and_then(|i| self.placed().get(i).map(|p| p.source));
+        Some(single.or(self.focus.filter(|f| *f < n)).unwrap_or(n - 1))
+    }
 
     /// The selected visuals that are on the active sheet, sorted.
     pub fn sel(&self) -> Vec<usize> {
@@ -2303,8 +2327,11 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
             }
         });
     });
-    // Thumbnails: click to add a copy, × to remove the visual, the badge counts its copies.
+    // Thumbnails: click shows the visual's settings, double-click adds a copy, × removes the
+    // visual; the badge counts its copies on this sheet, the visual shown is framed.
+    let shown = d.shown_source();
     let mut add = None;
+    let mut pick = None;
     let mut remove = None;
     if !d.sources.is_empty() {
         let cell = 80.0;
@@ -2322,7 +2349,8 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
                         let ir = ERect::from_center_size(img.center(), vec2(s.px.0 as f32 * k, s.px.1 as f32 * k));
                         ui.painter().image(tex.id(), ir, ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
                     }
-                    ui.painter().rect_stroke(img, 4.0, Stroke::new(1.0, if resp.hovered() { t.text } else { t.card_border }), StrokeKind::Inside);
+                    let stroke = if shown == Some(i) { Stroke::new(2.0, t.accent) } else { Stroke::new(1.0, if resp.hovered() { t.text } else { t.card_border }) };
+                    ui.painter().rect_stroke(img, 4.0, stroke, StrokeKind::Inside);
                     let name_r = ERect::from_min_size(pos2(r.left(), img.bottom()), vec2(cell, 16.0));
                     ui.painter().rect_filled(name_r, 0.0, t.primary_bg);
                     let name = if s.name.chars().count() > 12 { format!("{}…", s.name.chars().take(11).collect::<String>()) } else { s.name.clone() };
@@ -2337,8 +2365,13 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
                     crate::icons::image("x", 10.0, Color32::WHITE).paint_at(ui, ERect::from_center_size(x.center(), vec2(10.0, 10.0)));
                     if xr.on_hover_text(tl!("Remove")).clicked() {
                         remove = Some(i);
-                    } else if resp.on_hover_text(tl!("Add a copy to the sheet")).clicked() {
-                        add = Some(i);
+                    } else {
+                        let resp = resp.on_hover_text(tl!("Click: its settings · Double-click: add a copy to the sheet"));
+                        if resp.double_clicked() {
+                            add = Some(i);
+                        } else if resp.clicked() {
+                            pick = Some(i);
+                        }
                     }
                 }
             });
@@ -2347,8 +2380,14 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
     if let Some(i) = remove {
         d.remove_source(i);
     }
+    if let Some(i) = pick {
+        // Its first copy on this sheet selected, else just its settings shown.
+        d.focus = Some(i);
+        d.selected = d.placed().iter().position(|p| p.source == i).into_iter().collect();
+    }
     if let Some(i) = add {
         d.checkpoint(None);
+        d.focus = Some(i);
         if d.add_copies(i, 1) == 0 {
             d.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
         } else {
@@ -2361,7 +2400,20 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
         multi_panel(&mut panel, d, &list, t);
         return;
     }
-    let Some(i) = list.first().copied() else {
+    // One visual selected on the sheet: its settings; none: those of the visual last shown, so
+    // the fields stay while the sheets are laid out again.
+    if let Some(i) = list.first().copied() {
+        if let Some(source) = d.placed().get(i).map(|p| p.source) {
+            d.focus = Some(source);
+            selection_panel(&mut panel, d, source, Some(i), t);
+        }
+        return;
+    }
+    if let Some(source) = d.shown_source() {
+        selection_panel(&mut panel, d, source, None, t);
+        return;
+    }
+    {
         panel.add_space(30.0);
         panel.vertical_centered(|ui| {
             let (r, _) = ui.allocate_exact_size(vec2(90.0, 90.0), Sense::hover());
@@ -2370,13 +2422,11 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
             ui.add_space(12.0);
             ui.label(egui::RichText::new(tl!("Select an object to edit.")).color(t.text));
         });
-        return;
-    };
-    selection_panel(&mut panel, d, i, t);
+    }
 }
 
-fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, i: usize, t: &Tokens) {
-    let Some(source) = d.placed().get(i).map(|p| p.source) else { return };
+/// The settings of visual `source`; `placed`: its copy selected on the sheet, if any.
+fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, source: usize, placed: Option<usize>, t: &Tokens) {
     let Some(src) = d.sources.get(source).cloned() else { return };
     ui.label(egui::RichText::new(&src.name).font(crate::theme::medium(13.0)).color(t.text));
     let (mut w, mut h) = (units_cm(src.w), units_cm(src.h));
@@ -2470,7 +2520,16 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, i: usize, t: &Tok
             }
             if widgets::primary_button(ui, tl!("Duplicate Image"), bw).clicked() {
                 d.checkpoint(None);
-                d.duplicate_block(&[i]);
+                match placed {
+                    Some(i) => {
+                        d.duplicate_block(&[i]);
+                    }
+                    None => {
+                        if d.add_copies(source, 1) == 0 {
+                            d.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
+                        }
+                    }
+                }
             }
         });
     });
@@ -4217,6 +4276,36 @@ mod tests {
             h.render().unwrap().save(dir.join(format!("gang_groupes_{width}.png"))).unwrap();
         }
         reset_settings();
+    }
+
+    /// A value typed in the right column lays the sheets out again (cells): the visual's fields
+    /// stay; a thumbnail click shows another visual's.
+    #[test]
+    fn the_settings_stay_while_the_sheets_are_laid_out_again() {
+        let dir = std::env::temp_dir().join(format!("gang-focus-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let a = png_cm(&dir, "a.png", 10, 10, 25.4);
+        let b = png_cm(&dir, "b.png", 20, 10, 25.4);
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        if let Some(d) = app.gang_sheet.as_mut() {
+            d.settings = Settings::default();
+        }
+        invoke(&mut app, &ctx, json!({"addFiles": [a, b]}));
+        let d = app.gang_sheet.as_mut().unwrap();
+        assert_eq!(d.shown_source(), Some(1), "the last imported");
+        d.focus = Some(0);
+        d.selected = vec![0];
+        d.set_quantity(0, 4);
+        assert!(d.sel().is_empty(), "the layout clears the selection");
+        assert_eq!(d.shown_source(), Some(0), "but the fields stay on the visual");
+        d.set_size(1, Some(1500), None);
+        assert_eq!(d.shown_source(), Some(1));
+        d.remove_source(0);
+        assert_eq!(d.shown_source(), Some(0), "the index follows the removal");
+        reset_settings();
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     /// 124 logos: the sheets are generated, as many as needed; copies deleted by hand stay
