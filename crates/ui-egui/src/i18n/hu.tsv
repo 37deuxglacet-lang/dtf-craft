@@ -4436,3 +4436,21 @@ cameraRaw	Yellow	Sárga
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Túl sok szín ({n}): fénykép vagy színátmenet rosszul vektorizálható.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft webhely
+# DTF Craft (25)
+	Analyzing the colors…	Színek elemzése…
+	Background kept	Háttér megtartva
+	Sheets used: {sheets}	Felhasznált ívek: {sheets}
+	The vectorization stopped unexpectedly.	A vektorizálás váratlanul leállt.
+	Tracing the shapes…	Alakzatok körvonalazása…
+	Tracing with VectorCraft…	Körvonalazás a VectorCrafttal…
+	{n} new sheets added	{n} új ív hozzáadva
+# DTF Craft (26)
+	AI upscale…	MI-nagyítás…
+	Not Suited to Vectorization	Kevéssé alkalmas vektorizálásra
+	On white	Fehér alapon
+	Preparation cancelled	Előkészítés megszakítva
+	Prepared for vectorization: {steps}	Vektorizálásra előkészítve: {steps}
+	Preparing for Vectorization	Előkészítés vektorizáláshoz
+	Preparing the visual…	A kép előkészítése…
+	The document changed during the preparation.	A dokumentum megváltozott az előkészítés közben.
+	The preparation stopped unexpectedly.	Az előkészítés váratlanul leállt.

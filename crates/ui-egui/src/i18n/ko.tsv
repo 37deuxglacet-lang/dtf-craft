@@ -3697,3 +3697,21 @@ curves	Smooth	매끄럽게
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	색이 너무 많습니다({n}): 사진이나 그라디언트는 벡터화에 적합하지 않습니다.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft 웹사이트
+# DTF Craft (25)
+	Analyzing the colors…	색상 분석 중…
+	Background kept	배경 유지
+	Sheets used: {sheets}	사용한 시트: {sheets}
+	The vectorization stopped unexpectedly.	벡터화가 예기치 않게 중지되었습니다.
+	Tracing the shapes…	도형 추적 중…
+	Tracing with VectorCraft…	VectorCraft로 추적 중…
+	{n} new sheets added	새 시트 {n}장 추가됨
+# DTF Craft (26)
+	AI upscale…	AI 확대 중…
+	Not Suited to Vectorization	벡터화에 적합하지 않음
+	On white	흰 배경
+	Preparation cancelled	준비 취소됨
+	Prepared for vectorization: {steps}	벡터화 준비 완료: {steps}
+	Preparing for Vectorization	벡터화 준비
+	Preparing the visual…	이미지 준비 중…
+	The document changed during the preparation.	준비 중에 문서가 변경되었습니다.
+	The preparation stopped unexpectedly.	준비가 예기치 않게 중지되었습니다.

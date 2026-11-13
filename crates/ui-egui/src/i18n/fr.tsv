@@ -3554,3 +3554,21 @@ curves	Smooth	Lisser
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Trop de couleurs ({n}) : une photo ou un dégradé convient mal à la vectorisation.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Site ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analyse des couleurs…
+	Background kept	Fond conservé
+	Sheets used: {sheets}	Feuilles utilisées : {sheets}
+	The vectorization stopped unexpectedly.	La vectorisation s'est arrêtée de façon inattendue.
+	Tracing the shapes…	Tracé des formes…
+	Tracing with VectorCraft…	Tracé avec VectorCraft…
+	{n} new sheets added	{n} nouvelles feuilles ajoutées
+# DTF Craft (26)
+	AI upscale…	Agrandissement IA…
+	Not Suited to Vectorization	Peu adapté à la vectorisation
+	On white	Sur fond blanc
+	Preparation cancelled	Préparation annulée
+	Prepared for vectorization: {steps}	Préparé pour la vectorisation : {steps}
+	Preparing for Vectorization	Préparation pour la vectorisation
+	Preparing the visual…	Préparation du visuel…
+	The document changed during the preparation.	Le document a changé pendant la préparation.
+	The preparation stopped unexpectedly.	La préparation s'est arrêtée de façon inattendue.

@@ -4216,3 +4216,21 @@ curves	Smooth	Εξομάλυνση
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Πάρα πολλά χρώματα ({n}): μια φωτογραφία ή μια διαβάθμιση δεν ταιριάζει στη διανυσματοποίηση.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Ιστότοπος ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Ανάλυση χρωμάτων…
+	Background kept	Το φόντο διατηρήθηκε
+	Sheets used: {sheets}	Φύλλα σε χρήση: {sheets}
+	The vectorization stopped unexpectedly.	Η διανυσματοποίηση σταμάτησε απρόσμενα.
+	Tracing the shapes…	Ιχνηλάτηση σχημάτων…
+	Tracing with VectorCraft…	Ιχνηλάτηση με το VectorCraft…
+	{n} new sheets added	Προστέθηκαν {n} νέα φύλλα
+# DTF Craft (26)
+	AI upscale…	Μεγέθυνση AI…
+	Not Suited to Vectorization	Ελάχιστα κατάλληλο για διανυσματοποίηση
+	On white	Σε λευκό
+	Preparation cancelled	Η προετοιμασία ακυρώθηκε
+	Prepared for vectorization: {steps}	Έτοιμο για διανυσματοποίηση: {steps}
+	Preparing for Vectorization	Προετοιμασία για διανυσματοποίηση
+	Preparing the visual…	Προετοιμασία της εικόνας…
+	The document changed during the preparation.	Το έγγραφο άλλαξε κατά την προετοιμασία.
+	The preparation stopped unexpectedly.	Η προετοιμασία σταμάτησε απρόσμενα.

@@ -4005,3 +4005,21 @@ curves	Smooth	Làm mượt
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Quá nhiều màu ({n}): ảnh chụp hoặc dải chuyển màu khó vector hóa.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Trang web ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Đang phân tích màu…
+	Background kept	Giữ nguyên nền
+	Sheets used: {sheets}	Số tờ đã dùng: {sheets}
+	The vectorization stopped unexpectedly.	Quá trình vector hóa dừng bất ngờ.
+	Tracing the shapes…	Đang dò hình…
+	Tracing with VectorCraft…	Đang dò bằng VectorCraft…
+	{n} new sheets added	Đã thêm {n} tờ mới
+# DTF Craft (26)
+	AI upscale…	Phóng to bằng AI…
+	Not Suited to Vectorization	Không phù hợp để vector hóa
+	On white	Trên nền trắng
+	Preparation cancelled	Đã hủy chuẩn bị
+	Prepared for vectorization: {steps}	Đã chuẩn bị để vector hóa: {steps}
+	Preparing for Vectorization	Chuẩn bị để vector hóa
+	Preparing the visual…	Đang chuẩn bị hình…
+	The document changed during the preparation.	Tài liệu đã thay đổi trong lúc chuẩn bị.
+	The preparation stopped unexpectedly.	Quá trình chuẩn bị dừng bất ngờ.

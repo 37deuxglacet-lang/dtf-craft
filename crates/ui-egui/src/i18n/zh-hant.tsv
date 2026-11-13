@@ -3131,3 +3131,21 @@ curves	Smooth	平滑
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	顏色過多（{n}）：照片或漸層不適合向量化。
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft 網站
+# DTF Craft (25)
+	Analyzing the colors…	正在分析顏色…
+	Background kept	保留背景
+	Sheets used: {sheets}	已用版面：{sheets}
+	The vectorization stopped unexpectedly.	向量化意外停止。
+	Tracing the shapes…	正在描摹形狀…
+	Tracing with VectorCraft…	正在用 VectorCraft 描摹…
+	{n} new sheets added	已新增 {n} 張新版面
+# DTF Craft (26)
+	AI upscale…	AI 放大中…
+	Not Suited to Vectorization	不適合向量化
+	On white	白色背景上
+	Preparation cancelled	已取消準備
+	Prepared for vectorization: {steps}	已為向量化準備：{steps}
+	Preparing for Vectorization	為向量化做準備
+	Preparing the visual…	正在準備圖像…
+	The document changed during the preparation.	準備期間文件已變更。
+	The preparation stopped unexpectedly.	準備意外停止。

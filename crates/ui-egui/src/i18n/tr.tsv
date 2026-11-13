@@ -4247,3 +4247,21 @@ cameraData	Lens	Lens
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Çok fazla renk ({n}): fotoğraf veya degrade vektörleştirmeye pek uygun değil.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft web sitesi
+# DTF Craft (25)
+	Analyzing the colors…	Renkler analiz ediliyor…
+	Background kept	Arka plan korundu
+	Sheets used: {sheets}	Kullanılan sayfalar: {sheets}
+	The vectorization stopped unexpectedly.	Vektörleştirme beklenmedik şekilde durdu.
+	Tracing the shapes…	Şekiller çiziliyor…
+	Tracing with VectorCraft…	VectorCraft ile çiziliyor…
+	{n} new sheets added	{n} yeni sayfa eklendi
+# DTF Craft (26)
+	AI upscale…	YZ büyütme…
+	Not Suited to Vectorization	Vektörleştirmeye pek uygun değil
+	On white	Beyaz üzerinde
+	Preparation cancelled	Hazırlık iptal edildi
+	Prepared for vectorization: {steps}	Vektörleştirmeye hazırlandı: {steps}
+	Preparing for Vectorization	Vektörleştirme için hazırlık
+	Preparing the visual…	Görsel hazırlanıyor…
+	The document changed during the preparation.	Hazırlık sırasında belge değişti.
+	The preparation stopped unexpectedly.	Hazırlık beklenmedik şekilde durdu.

@@ -6,6 +6,9 @@
 //! at the document's print size (`dtf.vectorize`), optionally opened in a new tab as shape layers.
 //! The document is never changed.
 //!
+//! The analysis and the tracing run beside the window (a thread), a progress bar over the preview
+//! (the share of colours traced); the window stays responsive meanwhile and the exports wait.
+//!
 //! Two engines: DTF Craft's own, and VectorCraft's Image Trace ([`photocraft_algo::vectorize_vc`])
 //! with its presets and all its settings (mode, palette, paths, corners, noise, method, ignore
 //! colour, shapes, gradients, strokes). The palette table, the swatch book, the PDF sheet and the
@@ -177,6 +180,35 @@ pub struct Vectorizer {
     /// The tracing settings changed: trace again.
     retrace: bool,
     help: bool,
+    /// The analysis or tracing running beside the window.
+    busy: Option<Busy>,
+    /// The PNG the export traces instead of the document (a visual prepared for vectorization).
+    pub image: Option<String>,
+}
+
+/// A computation running beside the window: its result to come, its progress (0–1, an `f32`'s
+/// bits) and what it does.
+struct Busy {
+    rx: std::sync::mpsc::Receiver<Done>,
+    progress: std::sync::Arc<std::sync::atomic::AtomicU32>,
+    stage: Stage,
+}
+
+/// What a [`Busy`] computation does, for its label.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Stage {
+    /// DTF Craft's engine: the colours, then the shapes (from 30 %).
+    Colors,
+    Shapes,
+    /// VectorCraft's trace (no progress of its own).
+    VectorCraft,
+}
+
+/// A computation's result.
+enum Done {
+    Dtf(Result<Quantized, String>, Option<Result<Traced, String>>),
+    Trace(Result<Traced, String>),
+    Vc(Result<VcTraced, String>),
 }
 
 /// What a settings change asks for.
@@ -280,10 +312,17 @@ impl Vectorizer {
             requantize: false,
             retrace: false,
             help: false,
+            busy: None,
+            image: None,
         };
         v.logo_text = v.settings.vc.logo_colors.join(" ");
         v.ignore_text = v.settings.vc.ignore_color.clone().unwrap_or_default();
-        v.quantize();
+        // The window computes beside itself once shown; tests and automation get the result now.
+        if cfg!(test) {
+            v.quantize();
+        } else {
+            v.requantize = true;
+        }
         v
     }
 
@@ -421,6 +460,135 @@ impl Vectorizer {
         }
     }
 
+    /// Whether the analysis or tracing is running beside the window.
+    pub fn busy(&self) -> bool {
+        self.busy.is_some()
+    }
+
+    /// Starts the pending analysis or tracing beside the window (a thread), `ctx` repainted as it
+    /// progresses; see [`Vectorizer::poll`].
+    pub fn start(&mut self, ctx: &egui::Context) {
+        use std::sync::atomic::{AtomicU32, Ordering};
+        let progress = std::sync::Arc::new(AtomicU32::new(0f32.to_bits()));
+        let (tx, rx) = std::sync::mpsc::channel();
+        let shared = progress.clone();
+        let repaint = ctx.clone();
+        let set = move |f: f32| {
+            shared.store(f.clamp(0.0, 1.0).to_bits(), Ordering::Relaxed);
+            repaint.request_repaint();
+        };
+        let (w, h) = (self.w, self.h);
+        let job: Box<dyn FnOnce() -> Done + Send>;
+        let stage;
+        if self.requantize {
+            self.requantize = false;
+            self.retrace = false;
+            if self.settings.engine == Engine::VectorCraft {
+                stage = Stage::VectorCraft;
+                let (params, px) = (self.vc_params(), self.px.clone());
+                job = Box::new(move || Done::Vc(params.and_then(|p| vc::trace(w, h, &px, &p).map_err(|e| vc_error(&e)))));
+            } else {
+                stage = Stage::Colors;
+                let (s, px, excluded, mut o) = (self.palette_settings(), self.px.clone(), self.excluded.clone(), self.trace_options());
+                job = Box::new(move || {
+                    let q = vectorize::quantize(w, h, &px, &s);
+                    set(0.3);
+                    let traced = q.as_ref().ok().map(|q| {
+                        o.excluded = q.palette.iter().map(|c| excluded.contains(&vectorize::hex(c.rgb))).collect();
+                        q.trace_with(&o, &|f| set(0.3 + 0.7 * f))
+                    });
+                    Done::Dtf(q, traced)
+                });
+            }
+        } else if self.retrace {
+            if self.settings.engine == Engine::VectorCraft {
+                // Only the colours left out change: quick, done here.
+                self.trace();
+                return;
+            }
+            self.retrace = false;
+            stage = Stage::Shapes;
+            let (q, o) = (self.quantized.clone(), self.trace_options());
+            job = Box::new(move || Done::Trace(q.map_or_else(|| Err("nothing to trace".into()), |q| q.trace_with(&o, &set))));
+        } else {
+            return;
+        }
+        let spawned = std::thread::Builder::new().name("dtf-vectorize".into()).spawn(move || {
+            let _ = tx.send(job());
+        });
+        match spawned {
+            Ok(_) => self.busy = Some(Busy { rx, progress, stage }),
+            Err(e) => {
+                self.error = Some(e.to_string());
+                self.revision += 1;
+            }
+        }
+    }
+
+    /// Takes the result of the computation started by [`Vectorizer::start`] once it is there.
+    pub fn poll(&mut self) {
+        let Some(b) = self.busy.as_ref() else { return };
+        let done = match b.rx.try_recv() {
+            Ok(done) => done,
+            Err(std::sync::mpsc::TryRecvError::Empty) => return,
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                self.busy = None;
+                self.traced = None;
+                self.error = Some(tl!("The vectorization stopped unexpectedly.").to_string());
+                self.revision += 1;
+                return;
+            }
+        };
+        self.busy = None;
+        match done {
+            Done::Dtf(Ok(q), traced) => {
+                self.quantized = Some(q);
+                if let Some(t) = traced {
+                    self.set_traced(t);
+                }
+            }
+            Done::Dtf(Err(e), _) => {
+                self.quantized = None;
+                self.set_traced(Err(e));
+            }
+            Done::Trace(t) => self.set_traced(t),
+            Done::Vc(Ok(r)) => {
+                self.vc = Some(r);
+                self.trace();
+                return;
+            }
+            Done::Vc(Err(e)) => {
+                self.vc = None;
+                self.set_traced(Err(e));
+            }
+        }
+        self.revision += 1;
+    }
+
+    fn set_traced(&mut self, t: Result<Traced, String>) {
+        match t {
+            Ok(t) => {
+                self.traced = Some(t);
+                self.error = None;
+            }
+            Err(e) => {
+                self.traced = None;
+                self.error = Some(e);
+            }
+        }
+    }
+
+    /// The running computation's progress (0–1, `None` when it has none) and label.
+    fn busy_status(&self) -> Option<(Option<f32>, &'static str)> {
+        let b = self.busy.as_ref()?;
+        let p = f32::from_bits(b.progress.load(std::sync::atomic::Ordering::Relaxed));
+        Some(match b.stage {
+            Stage::Colors if p < 0.3 => (Some(p), tl!("Analyzing the colors…")),
+            Stage::Colors | Stage::Shapes => (Some(p), tl!("Tracing the shapes…")),
+            Stage::VectorCraft => (None, tl!("Tracing with VectorCraft…")),
+        })
+    }
+
     /// Runs the pending analysis or tracing.
     pub fn update(&mut self) {
         if self.requantize {
@@ -535,9 +703,16 @@ impl Vectorizer {
             {
                 p["swatches"] = json!(params.swatches.iter().map(|c| vectorize::hex(*c)).collect::<Vec<_>>());
             }
+            if let Some(image) = &self.image {
+                p["image"] = json!(image);
+            }
             return p;
         }
-        json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "sealSeams": s.seal, "exclude": exclude, "replace": replace})
+        let mut p = json!({"colors": s.colors, "kind": kind, "detail": detail, "smoothing": smoothing, "removeBackground": s.remove_background, "sealSeams": s.seal, "exclude": exclude, "replace": replace});
+        if let Some(image) = &self.image {
+            p["image"] = json!(image);
+        }
+        p
     }
 
     /// The SVG as it is exported (print size in mm).
@@ -741,6 +916,28 @@ pub fn open(app: &mut PhotocraftApp) -> Result<Value, String> {
     Ok(json!({"colors": colors}))
 }
 
+/// The module on a visual prepared for vectorization (Print Conformity's Optimize for
+/// Vectorization): its pixels instead of the document's, `image` the same as a PNG for the
+/// export; the document's print size.
+#[allow(clippy::too_many_arguments)]
+pub fn open_prepared(
+    app: &mut PhotocraftApp,
+    doc: photocraft_doc::DocId,
+    name: &str,
+    path: Option<String>,
+    size: (u32, u32),
+    dpi: f64,
+    mm: (f64, f64),
+    px: &[[f32; 4]],
+    image: String,
+) -> Result<Value, String> {
+    let mode = crate::i18n::fmt(tl!("RGB {bits} bits"), &[("bits", "8")]);
+    let mut v = Vectorizer::new(doc, name, path, size, dpi, mm, mode, px, load_settings(app), analyzer::load_book(app));
+    v.image = Some(image);
+    app.vectorizer = Some(v);
+    Ok(json!({}))
+}
+
 /// Menu entry point: DTF › Vectorization… without parameters opens the module; with parameters the
 /// command runs (for automation).
 pub fn menu(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Value, String>> {
@@ -825,14 +1022,23 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     {
         change_reference(ctx, v);
     }
-    if let Some(v) = app.vectorizer.as_mut()
-        && (v.requantize || v.retrace)
-    {
-        if ctx.input(|i| i.pointer.any_down()) {
-            ctx.request_repaint();
-        } else {
-            v.update();
-            ctx.request_repaint();
+    if let Some(v) = app.vectorizer.as_mut() {
+        v.poll();
+        if !v.busy() && (v.requantize || v.retrace) {
+            if ctx.input(|i| i.pointer.any_down()) {
+                ctx.request_repaint();
+            } else {
+                // Beside the window (native), else here.
+                if cfg!(any(test, target_arch = "wasm32")) {
+                    v.update();
+                } else {
+                    v.start(ctx);
+                }
+                ctx.request_repaint();
+            }
+        }
+        if v.busy() {
+            ctx.request_repaint_after(std::time::Duration::from_millis(80));
         }
     }
     let escape = app.vectorizer.as_ref().is_some_and(|v| v.changing.is_none())
@@ -884,6 +1090,7 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
     painter.rect_filled(right, 0.0, t.dock);
     painter.line_segment([right.left_top(), right.left_bottom()], Stroke::new(1.0, t.separator));
     preview(ui, v, left);
+    busy_overlay(ui, v, left);
     let mut action = None;
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(right.shrink2(vec2(0.0, 8.0))));
     egui::ScrollArea::vertical().id_salt("dtf-vectorizer-panel").auto_shrink([false, false]).show(&mut panel, |ui| {
@@ -900,7 +1107,7 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
     painter.rect_filled(foot, 0.0, t.dock);
     painter.line_segment([foot.left_top(), foot.right_top()], Stroke::new(1.0, t.separator));
     let mut buttons = ui.new_child(egui::UiBuilder::new().max_rect(foot.shrink2(vec2(16.0, 10.0))).layout(egui::Layout::right_to_left(egui::Align::Center)));
-    let ready = v.traced.as_ref().is_some_and(|t| !t.paths.is_empty());
+    let ready = !v.busy() && v.traced.as_ref().is_some_and(|t| !t.paths.is_empty());
     let export = buttons
         .add_enabled_ui(ready, |ui| crate::widgets::primary_button(ui, tl!("Export SVG…"), 120.0))
         .inner
@@ -918,6 +1125,37 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
         action = Some(Action::Close);
     }
     action
+}
+
+/// The progress bar over the preview while the analysis or tracing runs: what it does, the share
+/// done (a moving band when there is none).
+fn busy_overlay(ui: &mut egui::Ui, v: &Vectorizer, area: Rect) {
+    let Some((progress, label)) = v.busy_status() else { return };
+    let t = Tokens::get(ui.ctx());
+    let card = Rect::from_center_size(area.center(), vec2(360.0, 92.0));
+    let painter = ui.painter();
+    painter.rect_filled(card.expand(1.0), 10.0, t.separator);
+    painter.rect_filled(card, 10.0, t.dock);
+    let text = match progress {
+        Some(p) => format!("{label}  {} %", (p * 100.0).round() as i32),
+        None => label.to_string(),
+    };
+    painter.text(pos2(card.center().x, card.top() + 28.0), Align2::CENTER_CENTER, text, FontId::proportional(14.0), t.text);
+    let bar = Rect::from_min_size(pos2(card.left() + 24.0, card.top() + 52.0), vec2(card.width() - 48.0, 10.0));
+    painter.rect_filled(bar, 5.0, t.canvas);
+    let fill = match progress {
+        Some(p) => Rect::from_min_size(bar.min, vec2(bar.width() * p.clamp(0.0, 1.0), bar.height())),
+        None => {
+            // A band going back and forth.
+            let phase = (ui.input(|i| i.time) * 0.8).fract() as f32;
+            let k = if phase < 0.5 { phase * 2.0 } else { 2.0 - phase * 2.0 };
+            let w = bar.width() * 0.3;
+            Rect::from_min_size(pos2(bar.left() + (bar.width() - w) * k, bar.top()), vec2(w, bar.height()))
+        }
+    };
+    if fill.width() > 0.5 {
+        painter.rect_filled(fill, 5.0, t.accent);
+    }
 }
 
 /// The preview: its toolbar (views, contours, checkerboard), the visuals fitted below and the
@@ -1543,6 +1781,34 @@ fn change_reference(ctx: &egui::Context, v: &mut Vectorizer) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The analysis and tracing run beside the window: the result comes through `poll`, with the
+    /// progress the bar shows on the way.
+    #[test]
+    fn the_vectorization_runs_beside_the_window() {
+        let px: Vec<[f32; 4]> = (0..64 * 48).map(|i| if (i % 64) < 32 { [0.9, 0.1, 0.1, 1.0] } else { [0.1, 0.2, 0.9, 1.0] }).collect();
+        let mut v = Vectorizer::new(photocraft_doc::DocId(1), "t", None, (64, 48), 300.0, (5.0, 4.0), "RGB 8 bits".into(), &px, Settings::default(), None);
+        let ctx = egui::Context::default();
+        v.requantize = true;
+        v.start(&ctx);
+        assert!(v.busy() && v.busy_status().is_some());
+        let started = std::time::Instant::now();
+        while v.busy() {
+            assert!(started.elapsed().as_secs() < 30, "the trace never came back");
+            std::thread::sleep(std::time::Duration::from_millis(5));
+            v.poll();
+        }
+        assert!(v.traced.as_ref().is_some_and(|t| !t.paths.is_empty()), "{:?}", v.error);
+        assert_eq!(v.palette().len(), 2);
+        // Tracing only.
+        v.retrace = true;
+        v.start(&ctx);
+        while v.busy() {
+            std::thread::sleep(std::time::Duration::from_millis(5));
+            v.poll();
+        }
+        assert!(v.traced.is_some() && !v.retrace && !v.requantize);
+    }
     use egui_kittest::kittest::Queryable;
 
     const BLUE: [f32; 3] = [31.0 / 255.0, 79.0 / 255.0, 181.0 / 255.0];

@@ -4195,3 +4195,21 @@ curves	Smooth	スムーズ
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	色が多すぎます ({n}): 写真やグラデーションはベクター化に向きません。
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft のサイト
+# DTF Craft (25)
+	Analyzing the colors…	色を解析中…
+	Background kept	背景を保持
+	Sheets used: {sheets}	使用シート数: {sheets}
+	The vectorization stopped unexpectedly.	ベクター化が予期せず停止しました。
+	Tracing the shapes…	形状をトレース中…
+	Tracing with VectorCraft…	VectorCraft でトレース中…
+	{n} new sheets added	新しいシートを {n} 枚追加しました
+# DTF Craft (26)
+	AI upscale…	AI 拡大中…
+	Not Suited to Vectorization	ベクター化に不向き
+	On white	白背景
+	Preparation cancelled	準備をキャンセルしました
+	Prepared for vectorization: {steps}	ベクター化用に準備しました: {steps}
+	Preparing for Vectorization	ベクター化の準備
+	Preparing the visual…	画像を準備中…
+	The document changed during the preparation.	準備中にドキュメントが変更されました。
+	The preparation stopped unexpectedly.	準備が予期せず停止しました。

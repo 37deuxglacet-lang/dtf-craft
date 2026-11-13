@@ -3219,3 +3219,21 @@ curves	Smooth	Suavizar
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Demasiados colores ({n}): una foto o un degradado se presta mal a la vectorización.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Sitio de ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analizando los colores…
+	Background kept	Fondo conservado
+	Sheets used: {sheets}	Hojas usadas: {sheets}
+	The vectorization stopped unexpectedly.	La vectorización se detuvo de forma inesperada.
+	Tracing the shapes…	Trazando las formas…
+	Tracing with VectorCraft…	Trazando con VectorCraft…
+	{n} new sheets added	{n} hojas nuevas añadidas
+# DTF Craft (26)
+	AI upscale…	Ampliación IA…
+	Not Suited to Vectorization	Poco adecuado para vectorizar
+	On white	Sobre blanco
+	Preparation cancelled	Preparación cancelada
+	Prepared for vectorization: {steps}	Preparado para vectorizar: {steps}
+	Preparing for Vectorization	Preparación para vectorizar
+	Preparing the visual…	Preparando el visual…
+	The document changed during the preparation.	El documento cambió durante la preparación.
+	The preparation stopped unexpectedly.	La preparación se detuvo de forma inesperada.

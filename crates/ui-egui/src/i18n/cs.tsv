@@ -4124,3 +4124,21 @@ navigator	Zoom	Zvětšení
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Příliš mnoho barev ({n}): fotografie nebo přechod se k vektorizaci nehodí.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Web ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analýza barev…
+	Background kept	Pozadí zachováno
+	Sheets used: {sheets}	Použité archy: {sheets}
+	The vectorization stopped unexpectedly.	Vektorizace se neočekávaně zastavila.
+	Tracing the shapes…	Obkreslování tvarů…
+	Tracing with VectorCraft…	Obkreslování ve VectorCraftu…
+	{n} new sheets added	Přidané nové archy: {n}
+# DTF Craft (26)
+	AI upscale…	Zvětšení AI…
+	Not Suited to Vectorization	Málo vhodné k vektorizaci
+	On white	Na bílé
+	Preparation cancelled	Příprava zrušena
+	Prepared for vectorization: {steps}	Připraveno k vektorizaci: {steps}
+	Preparing for Vectorization	Příprava k vektorizaci
+	Preparing the visual…	Příprava motivu…
+	The document changed during the preparation.	Dokument se během přípravy změnil.
+	The preparation stopped unexpectedly.	Příprava se neočekávaně zastavila.

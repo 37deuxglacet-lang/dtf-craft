@@ -4275,3 +4275,21 @@ curves	Smooth	Vloeiend maken
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Te veel kleuren ({n}): een foto of verloop is slecht geschikt voor vectorisatie.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Website van ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Kleuren analyseren…
+	Background kept	Achtergrond behouden
+	Sheets used: {sheets}	Gebruikte vellen: {sheets}
+	The vectorization stopped unexpectedly.	De vectorisatie is onverwacht gestopt.
+	Tracing the shapes…	Vormen overtrekken…
+	Tracing with VectorCraft…	Overtrekken met VectorCraft…
+	{n} new sheets added	{n} nieuwe vellen toegevoegd
+# DTF Craft (26)
+	AI upscale…	AI-vergroting…
+	Not Suited to Vectorization	Weinig geschikt voor vectorisatie
+	On white	Op wit
+	Preparation cancelled	Voorbereiding geannuleerd
+	Prepared for vectorization: {steps}	Voorbereid voor vectorisatie: {steps}
+	Preparing for Vectorization	Voorbereiden voor vectorisatie
+	Preparing the visual…	Afbeelding voorbereiden…
+	The document changed during the preparation.	Het document is tijdens de voorbereiding gewijzigd.
+	The preparation stopped unexpectedly.	De voorbereiding is onverwacht gestopt.

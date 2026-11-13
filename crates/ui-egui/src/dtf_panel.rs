@@ -395,50 +395,148 @@ fn upscale_buttons(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &Map<String, V
     run.is_some()
 }
 
-/// Print Conformity's Optimize for Vectorization: a copy "<name> vecto" made ready for the
-/// vectorizer (`dtf.optimizeForVectorization`), then what was done in a notice, with a warning
-/// when the visual has too many colours.
+/// Print Conformity's Optimize for Vectorization: the visible pixels prepared for the vectorizer
+/// beside the window (laid on white, enlarged by the network when small, a JPEG smoothed), a
+/// progress bar meanwhile, then the Vectorization module opens on them. No copy: the document
+/// is not changed.
 fn optimize_button(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> bool {
     use photocraft_engine::dtf_cmds::OPTIMIZE_VECTOR;
     let Some(st) = app.session.active() else { return false };
-    let enabled = app.session.is_enabled(OPTIMIZE_VECTOR) && app.session.job_on(st.doc.id).is_none();
+    let enabled = app.session.is_enabled(OPTIMIZE_VECTOR) && app.session.job_on(st.doc.id).is_none() && app.vector_prep.is_none();
     ui.add_space(8.0);
     if !help(ui.add_enabled(enabled, egui::Button::new(tl!("Optimize for Vectorization"))), "dtf.conformity", "optimizeVector").clicked() {
         return false;
     }
-    match app.run(OPTIMIZE_VECTOR, json!({})) {
-        Ok(v) => vector_report(app, &v["plan"]),
-        Err(error) => crate::notices::error(app, error),
+    if let Err(e) = start_vector_prep(app, ui.ctx()) {
+        crate::notices::error(app, e);
     }
     true
 }
 
-/// The notice after Optimize for Vectorization: the steps done, and the warning.
-fn vector_report(app: &mut PhotocraftApp, plan: &Value) {
-    let size = |v: &Value| format!("{} × {}", v[0], v[1]);
-    let (from, to) = (size(&plan["from"]), size(&plan["to"]));
-    let mut lines = Vec::new();
-    if let Some(k) = plan["scale"].as_u64() {
-        lines.push(crate::i18n::fmt(tl!("AI ×{scale}: {from} → {to} px"), &[("scale", &k.to_string()), ("from", &from), ("to", &to)]));
-    } else if plan["reduced"] == true {
-        lines.push(crate::i18n::fmt(tl!("Reduced: {from} → {to} px"), &[("from", &from), ("to", &to)]));
+/// The visual being prepared for the Vectorization module, beside the window.
+pub(crate) struct VectorPrep {
+    doc: photocraft_doc::DocId,
+    name: String,
+    path: Option<String>,
+    dpi: f64,
+    mm: (f64, f64),
+    from: (u32, u32),
+    rx: std::sync::mpsc::Receiver<Result<photocraft_engine::dtf_cmds::Prepared, String>>,
+    progress: std::sync::Arc<std::sync::atomic::AtomicU32>,
+    cancel: std::sync::Arc<std::sync::atomic::AtomicBool>,
+}
+
+/// Starts preparing the active document's visual (a thread; on the web, here).
+pub(crate) fn start_vector_prep(app: &mut PhotocraftApp, ctx: &egui::Context) -> Result<(), String> {
+    use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+    let st = app.session.active().ok_or("no document")?;
+    let (w, h, px) = photocraft_engine::dtf_vector_cmds::visual_pixels(&st.doc).map_err(|e| e.to_string())?;
+    if !px.iter().any(|q| q[3] >= 0.5) {
+        return Err(tl!("No visible pixels to vectorize.").to_string());
+    }
+    let jpeg = photocraft_engine::dtf_cmds::from_jpeg(st.path.as_deref(), &st.doc.name);
+    let (doc, name, path) = (st.doc.id, st.doc.name.clone(), st.path.clone());
+    let (dpi, mm) = (photocraft_engine::dtf_vector_cmds::dpi(&st.doc), photocraft_engine::dtf_vector_cmds::size_mm(&st.doc));
+    let progress = std::sync::Arc::new(AtomicU32::new(0f32.to_bits()));
+    let cancel = std::sync::Arc::new(AtomicBool::new(false));
+    let (tx, rx) = std::sync::mpsc::channel();
+    let (p, c, repaint) = (progress.clone(), cancel.clone(), ctx.clone());
+    let job = move || {
+        let report = |f: f32| {
+            p.store(f.clamp(0.0, 1.0).to_bits(), Ordering::Relaxed);
+            repaint.request_repaint();
+        };
+        let stop = || c.load(Ordering::Relaxed);
+        let ir = photocraft_raster::Interrupt::new(&stop, &report);
+        let r = photocraft_engine::dtf_cmds::prepare_for_vectorization(w, h, &px, jpeg, &ir).map_err(|e| e.to_string());
+        let _ = tx.send(r);
+        repaint.request_repaint();
+    };
+    if cfg!(target_arch = "wasm32") {
+        job();
     } else {
-        lines.push(crate::i18n::fmt(tl!("Size kept: {size} px"), &[("size", &from)]));
+        std::thread::Builder::new().name("dtf-vector-prep".into()).spawn(job).map_err(|e| e.to_string())?;
     }
-    lines.push(tl!("RGB 8 bits, sRGB").to_string());
-    if plan["jpeg"] == true {
-        lines.push(tl!("JPEG: light median against the artefacts").to_string());
+    app.vector_prep = Some(VectorPrep { doc, name, path, dpi, mm, from: (w, h), rx, progress, cancel });
+    Ok(())
+}
+
+/// Each frame while a visual is prepared: the progress bar (with Cancel), then the Vectorization
+/// module on the result.
+pub(crate) fn poll_vectorize(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    use std::sync::atomic::Ordering;
+    let Some(p) = app.vector_prep.as_ref() else { return };
+    let result = match p.rx.try_recv() {
+        Ok(r) => r,
+        Err(std::sync::mpsc::TryRecvError::Disconnected) => Err(tl!("The preparation stopped unexpectedly.").to_string()),
+        Err(std::sync::mpsc::TryRecvError::Empty) => {
+            let t = crate::theme::Tokens::get(ctx);
+            let f = f32::from_bits(p.progress.load(Ordering::Relaxed));
+            let mut cancel = false;
+            egui::Modal::new(egui::Id::new("dtf-vector-prep")).show(ctx, |ui| {
+                ui.set_width(380.0);
+                ui.label(egui::RichText::new(tl!("Preparing for Vectorization")).font(crate::theme::semibold(15.0)).color(t.text));
+                ui.label(egui::RichText::new(&p.name).color(t.text_dim));
+                ui.add_space(6.0);
+                let text = if f > 0.0 { format!("{}  {} %", tl!("AI upscale…"), (f * 100.0).round() as i32) } else { tl!("Preparing the visual…").to_string() };
+                ui.add(egui::ProgressBar::new(f).text(text).animate(true));
+                ui.add_space(6.0);
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.button(tl!("Cancel")).clicked() {
+                        cancel = true;
+                    }
+                });
+            });
+            if cancel || ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
+                p.cancel.store(true, Ordering::Relaxed);
+            }
+            ctx.request_repaint_after(std::time::Duration::from_millis(100));
+            return;
+        }
+    };
+    let Some(p) = app.vector_prep.take() else { return };
+    if p.cancel.load(Ordering::Relaxed) {
+        app.ui.status = tl!("Preparation cancelled").to_string();
+        return;
     }
-    if let Some(c) = plan["background"].as_str() {
-        lines.push(crate::i18n::fmt(tl!("Background {color} made transparent"), &[("color", c)]));
+    match result.and_then(|prepared| open_prepared(app, &p, &prepared)) {
+        Ok(()) => {}
+        Err(e) => crate::notices::error(app, e),
     }
-    lines.push(tl!("Fringes removed, 2 px margin").to_string());
-    let unsuitable = plan["unsuitable"] == true;
-    if unsuitable {
-        let n = plan["colors"].as_u64().unwrap_or(0).to_string();
-        lines.push(crate::i18n::fmt(tl!("Too many colours ({n}): a photo or a gradient is poorly suited to vectorization."), &[("n", &n)]));
+}
+
+/// The Vectorization module on the prepared visual; the export traces the same pixels (written
+/// as a PNG beside the system's temporary files).
+fn open_prepared(app: &mut PhotocraftApp, p: &VectorPrep, prepared: &photocraft_engine::dtf_cmds::Prepared) -> Result<(), String> {
+    if app.session.active().map(|d| d.doc.id) != Some(p.doc) {
+        return Err(tl!("The document changed during the preparation.").to_string());
     }
-    crate::notices::post(app, tl!("Copy for Vectorization"), lines, unsuitable, None);
+    let file = std::env::temp_dir().join(format!("dtf-craft-vectorisation-{}.png", p.doc.0)).to_string_lossy().into_owned();
+    let png = prepared.png().map_err(|e| e.to_string())?;
+    let write = app.services.write.as_mut().ok_or("no writer configured")?;
+    write(&file, &png)?;
+    let k = prepared.scale.map_or(1.0, f64::from);
+    crate::vectorizer_ui::open_prepared(app, p.doc, &p.name, p.path.clone(), (prepared.width, prepared.height), p.dpi * k, p.mm, &prepared.px, file)?;
+    // What was done, on the status line; the warning as a notice.
+    let mut steps = Vec::new();
+    if let Some(k) = prepared.scale {
+        let size = |w: u32, h: u32| format!("{w} × {h}");
+        steps.push(crate::i18n::fmt(
+            tl!("AI ×{scale}: {from} → {to} px"),
+            &[("scale", &k.to_string()), ("from", &size(p.from.0, p.from.1)), ("to", &size(prepared.width, prepared.height))],
+        ));
+    }
+    steps.push(tl!("On white").to_string());
+    if prepared.jpeg {
+        steps.push(tl!("JPEG: light median against the artefacts").to_string());
+    }
+    app.ui.status = crate::i18n::fmt(tl!("Prepared for vectorization: {steps}"), &[("steps", &steps.join(" · "))]);
+    if prepared.unsuitable() {
+        let n = prepared.colours.to_string();
+        let line = crate::i18n::fmt(tl!("Too many colours ({n}): a photo or a gradient is poorly suited to vectorization."), &[("n", &n)]);
+        crate::notices::post(app, tl!("Not Suited to Vectorization"), vec![line], true, None);
+    }
+    Ok(())
 }
 
 /// The cut-out's settings without the panel's own keys (`__…`): what Toggle Last State compares
@@ -937,6 +1035,39 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
 mod tests {
     use super::*;
     use egui::vec2;
+
+    /// Optimize for Vectorization: the visual prepared beside the window, then the Vectorization
+    /// module on it, its export tracing the same pixels; the document unchanged, no copy.
+    #[test]
+    fn optimize_for_vectorization_opens_the_module_on_the_prepared_visual() {
+        let services = crate::Services {
+            write: Some(Box::new(|p: &str, b: &[u8]| std::fs::write(p, b).map_err(|e| e.to_string()))),
+            ..Default::default()
+        };
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+        app.run("file.new", json!({"width": 40, "height": 30, "resolution": 100, "background": "transparent", "name": "logo.jpg"})).unwrap();
+        app.run("edit.fill", json!({"color": "#c03020"})).unwrap();
+        let ctx = egui::Context::default();
+        PhotocraftApp::setup_context(&ctx, Default::default());
+        start_vector_prep(&mut app, &ctx).unwrap();
+        let started = std::time::Instant::now();
+        while app.vector_prep.is_some() {
+            assert!(started.elapsed().as_secs() < 60, "the preparation never came back");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+            let mut out = ctx.run_ui(egui::RawInput::default(), |ui| poll_vectorize(&mut app, ui.ctx()));
+            out.textures_delta.clear();
+        }
+        assert_eq!(app.session.documents().len(), 1, "no copy");
+        let v = app.vectorizer.as_ref().expect("the module is open");
+        // 40 px long side: ×4 by the network; the print size kept.
+        assert_eq!(v.size, (160, 120));
+        assert!((v.dpi - 400.0).abs() < 1e-6);
+        let image = v.image.clone().unwrap();
+        assert!(std::fs::metadata(&image).is_ok());
+        assert_eq!(v.params()["image"], json!(image));
+        assert!(app.ui.status.contains("×4"), "{}", app.ui.status);
+        let _ = std::fs::remove_file(image);
+    }
 
     #[test]
     fn every_tool_is_a_command_with_a_title() {

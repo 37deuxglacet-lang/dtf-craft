@@ -776,6 +776,11 @@ impl Quantized {
 
     /// The traced shapes: one compound path per colour kept.
     pub fn trace(&self, o: &TraceOptions) -> Result<Traced, String> {
+        self.trace_with(o, &|_| {})
+    }
+
+    /// [`Quantized::trace`], telling `progress` the share done (0–1) after each colour.
+    pub fn trace_with(&self, o: &TraceOptions, progress: &dyn Fn(f32)) -> Result<Traced, String> {
         let (w, h) = (self.width, self.height);
         let index = self.without_background(o.remove_background);
         let mode = match o.smoothing {
@@ -783,7 +788,9 @@ impl Quantized {
             Smoothing::Corners => PathSimplifyMode::Polygon,
         };
         let mut paths = Vec::new();
+        let n = self.palette.len().max(1) as f32;
         for color in 0..self.palette.len() {
+            progress(color as f32 / n);
             if o.excluded.get(color).copied().unwrap_or(false) {
                 continue;
             }
@@ -805,6 +812,7 @@ impl Quantized {
                 paths.push(ColorPath { color, d, shapes, points, paint: Paint::Fill });
             }
         }
+        progress(1.0);
         Ok(Traced { width: w, height: h, paths })
     }
 }

@@ -4478,3 +4478,21 @@ navigator	Zoom	Zoom
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Troppi colori ({n}): una foto o una sfumatura si presta male alla vettorializzazione.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Sito ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analisi dei colori…
+	Background kept	Sfondo mantenuto
+	Sheets used: {sheets}	Fogli usati: {sheets}
+	The vectorization stopped unexpectedly.	La vettorializzazione si è interrotta in modo imprevisto.
+	Tracing the shapes…	Tracciamento delle forme…
+	Tracing with VectorCraft…	Tracciamento con VectorCraft…
+	{n} new sheets added	{n} nuovi fogli aggiunti
+# DTF Craft (26)
+	AI upscale…	Ingrandimento IA…
+	Not Suited to Vectorization	Poco adatto alla vettorializzazione
+	On white	Su bianco
+	Preparation cancelled	Preparazione annullata
+	Prepared for vectorization: {steps}	Preparato per la vettorializzazione: {steps}
+	Preparing for Vectorization	Preparazione per la vettorializzazione
+	Preparing the visual…	Preparazione del visual…
+	The document changed during the preparation.	Il documento è cambiato durante la preparazione.
+	The preparation stopped unexpectedly.	La preparazione si è interrotta in modo imprevisto.

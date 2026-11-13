@@ -4219,3 +4219,21 @@ curves	Smooth	Згладити
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Забагато кольорів ({n}): фото чи градієнт погано підходять для векторизації.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Сайт ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Аналіз кольорів…
+	Background kept	Тло збережено
+	Sheets used: {sheets}	Використано аркушів: {sheets}
+	The vectorization stopped unexpectedly.	Векторизація неочікувано зупинилася.
+	Tracing the shapes…	Трасування фігур…
+	Tracing with VectorCraft…	Трасування у VectorCraft…
+	{n} new sheets added	Додано нових аркушів: {n}
+# DTF Craft (26)
+	AI upscale…	Збільшення ШІ…
+	Not Suited to Vectorization	Погано підходить для векторизації
+	On white	На білому
+	Preparation cancelled	Підготовку скасовано
+	Prepared for vectorization: {steps}	Підготовлено до векторизації: {steps}
+	Preparing for Vectorization	Підготовка до векторизації
+	Preparing the visual…	Підготовка зображення…
+	The document changed during the preparation.	Документ змінився під час підготовки.
+	The preparation stopped unexpectedly.	Підготовка неочікувано зупинилася.

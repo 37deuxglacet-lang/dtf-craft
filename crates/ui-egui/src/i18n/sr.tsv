@@ -4589,3 +4589,21 @@ shape	Appearance	Izgled
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Previše boja ({n}): fotografija ili prelaz se loše vektorizuju.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Sajt ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analiza boja…
+	Background kept	Pozadina zadržana
+	Sheets used: {sheets}	Iskorišćeni listovi: {sheets}
+	The vectorization stopped unexpectedly.	Vektorizacija se neočekivano zaustavila.
+	Tracing the shapes…	Iscrtavanje oblika…
+	Tracing with VectorCraft…	Iscrtavanje pomoću VectorCraft-a…
+	{n} new sheets added	Dodato novih listova: {n}
+# DTF Craft (26)
+	AI upscale…	AI uvećanje…
+	Not Suited to Vectorization	Slabo pogodno za vektorizaciju
+	On white	Na beloj
+	Preparation cancelled	Priprema otkazana
+	Prepared for vectorization: {steps}	Pripremljeno za vektorizaciju: {steps}
+	Preparing for Vectorization	Priprema za vektorizaciju
+	Preparing the visual…	Priprema slike…
+	The document changed during the preparation.	Dokument se promenio tokom pripreme.
+	The preparation stopped unexpectedly.	Priprema se neočekivano zaustavila.

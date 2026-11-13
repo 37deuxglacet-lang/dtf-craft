@@ -83,6 +83,8 @@ const NUDGE_SHIFT: i64 = 100;
 const MAX_LENGTH_CM: f32 = 100.0;
 /// Most sheets and undo steps kept.
 const MAX_SHEETS: usize = 50;
+/// Most copies of one visual.
+const MAX_QUANTITY: usize = 999;
 const MAX_UNDO: usize = 100;
 /// Film widths offered in the toolbar (cm).
 const FILM_PRESETS: [f32; 6] = [30.0, 40.0, 42.0, 56.0, 57.0, 60.0];
@@ -375,6 +377,8 @@ pub struct GangSheetDialog {
     zoom: f32,
     scroll: Vec2,
     undo: Vec<Snapshot>,
+    /// Per visual, the copies the last Auto Build could place nowhere (part of its quantity).
+    unplaced: Vec<usize>,
     redo: Vec<Snapshot>,
     /// The last edit's key: edits of the same field in a row make one undo step.
     last_edit: Option<String>,
@@ -406,6 +410,7 @@ impl GangSheetDialog {
         GangSheetDialog {
             settings,
             svg_queue: Vec::new(),
+            unplaced: Vec::new(),
             sources: Vec::new(),
             sheets: vec![SheetDoc::new(1)],
             active: 0,
@@ -604,15 +609,48 @@ impl GangSheetDialog {
         n
     }
 
-    /// Sets the copies of `source` on the active sheet: adds where there is room, or takes the
-    /// last placed off.
+    /// A visual's quantity, every sheet together. In the cells (organized on import) the sheets
+    /// are laid out again at once, as many as needed; else it is what Auto Build places.
+    fn set_quantity(&mut self, source: usize, q: usize) {
+        let q = q.min(MAX_QUANTITY);
+        if self.sources.get(source).is_none_or(|s| s.quantity == q) {
+            return;
+        }
+        self.checkpoint(Some(format!("qty{source}")));
+        if let Some(s) = self.sources.get_mut(source) {
+            s.quantity = q;
+        }
+        if self.organizes() {
+            self.relayout_keeping(Some(source));
+        }
+    }
+
+    /// Sets the copies of `source` on the active sheet: adds where there is room (the rest on new
+    /// sheets after the last one), or takes the last placed off.
     fn set_copies_on_sheet(&mut self, source: usize, want: usize) {
         let have = self.copies_on_sheet(source);
         if want > have {
-            let placed = self.add_copies(source, want - have);
-            if placed < want - have {
-                self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", &(want - have - placed).to_string())]);
+            let mut left = want - have - self.add_copies(source, want - have);
+            // What does not fit goes on new sheets, as many as needed.
+            let back = self.active;
+            let mut added = 0;
+            while left > 0 && self.sheets.len() < MAX_SHEETS {
+                self.sheets.push(SheetDoc::new(self.sheets.len() + 1));
+                self.active = self.sheets.len() - 1;
+                let placed = self.add_copies(source, left);
+                if placed == 0 {
+                    self.sheets.pop();
+                    break;
+                }
+                left -= placed;
+                added += 1;
             }
+            self.active = back;
+            self.status = match (left, added) {
+                (0, 0) => String::new(),
+                (0, n) => crate::i18n::fmt(tl!("{n} new sheets added"), &[("n", &n.to_string())]),
+                (l, _) => crate::i18n::fmt(tl!("{n} not placed"), &[("n", &l.to_string())]),
+            };
         } else {
             for _ in want..have {
                 if let Some(list) = self.placed_mut()
@@ -717,6 +755,12 @@ impl GangSheetDialog {
         }
         self.active = 0;
         self.selected.clear();
+        self.unplaced = vec![0; self.sources.len()];
+        for s in queue.iter().copied().chain(blocks.iter().flat_map(|b| b.members.iter().map(|m| m.0))) {
+            if let Some(n) = self.unplaced.get_mut(s) {
+                *n += 1;
+            }
+        }
         queue.len() + blocks.iter().map(|b| b.members.len()).sum::<usize>()
     }
 
@@ -792,7 +836,7 @@ impl GangSheetDialog {
         });
         let s = self.sources.len() - 1;
         if self.organizes() {
-            self.relayout();
+            self.relayout_keeping(Some(s));
             return;
         }
         if self.add_copies(s, 1) == 0 {
@@ -834,6 +878,24 @@ impl GangSheetDialog {
 
     /// Every sheet laid out again (Auto Build), what fits nowhere told on the status line.
     fn relayout(&mut self) {
+        self.relayout_keeping(None);
+    }
+
+    /// [`relayout`](Self::relayout), each visual's quantity first taken from the sheets (copies
+    /// placed, deleted or duplicated by hand count, and those that found no room), except
+    /// `keep`'s (a quantity just typed, a visual just imported).
+    fn relayout_keeping(&mut self, keep: Option<usize>) {
+        let mut on_sheets = vec![0usize; self.sources.len()];
+        for p in self.sheets.iter().flat_map(|d| &d.placed) {
+            if let Some(n) = on_sheets.get_mut(p.source) {
+                *n += 1;
+            }
+        }
+        for (i, src) in self.sources.iter_mut().enumerate() {
+            if Some(i) != keep {
+                src.quantity = on_sheets.get(i).copied().unwrap_or(0) + self.unplaced.get(i).copied().unwrap_or(0);
+            }
+        }
         let left = self.auto_build();
         self.status = if left > 0 { crate::i18n::fmt(tl!("{n} not placed"), &[("n", &left.to_string())]) } else { String::new() };
     }
@@ -843,6 +905,9 @@ impl GangSheetDialog {
             return;
         }
         self.checkpoint(None);
+        if source < self.unplaced.len() {
+            self.unplaced.remove(source);
+        }
         for doc in &mut self.sheets {
             doc.placed.retain(|p| p.source != source);
             for p in &mut doc.placed {
@@ -1691,10 +1756,8 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         if w.is_some() || h.is_some() {
             d.set_size(i, w, h);
         }
-        if let Some(q) = s.get("quantity").and_then(Value::as_u64)
-            && let Some(src) = d.sources.get_mut(i)
-        {
-            src.quantity = (q as usize).min(999);
+        if let Some(q) = s.get("quantity").and_then(Value::as_u64) {
+            d.set_quantity(i, q as usize);
         }
         if let Some(q) = s.get("onSheet").and_then(Value::as_u64) {
             d.set_copies_on_sheet(i, (q as usize).min(999));
@@ -2353,14 +2416,30 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, i: usize, t: &Tok
     warnings_lines(ui, d, &src, t);
     card_frame(t).show(ui, |ui| {
         ui.set_width(ui.available_width());
-        let mut q = d.copies_on_sheet(source) as f32;
+        // In the cells: the copies on every sheet (the sheets laid out again, as many as
+        // needed); else the copies on this sheet (what does not fit goes on new sheets).
+        let organized = d.organizes();
+        let mut q = if organized { src.quantity } else { d.copies_on_sheet(source) } as f32;
         ui.horizontal(|ui| {
             fixed_label(ui, egui::RichText::new(tl!("Number of Images:")).color(t.text), 128.0, 24.0);
-            if widgets::typed_value_field(ui, &mut q, 0.0..=999.0, "", 70.0, 0).changed() {
-                d.checkpoint(Some(format!("q{source}")));
-                d.set_copies_on_sheet(source, q.round().max(0.0) as usize);
+            if widgets::typed_value_field(ui, &mut q, 0.0..=MAX_QUANTITY as f32, "", 70.0, 0).changed() {
+                let q = q.round().max(0.0) as usize;
+                if organized {
+                    d.set_quantity(source, q);
+                } else {
+                    d.checkpoint(Some(format!("q{source}")));
+                    d.set_copies_on_sheet(source, q);
+                }
             }
         });
+        if organized {
+            let sheets = d.sheets.iter().filter(|s| s.placed.iter().any(|p| p.source == source)).count();
+            ui.label(
+                egui::RichText::new(crate::i18n::fmt(tl!("Sheets used: {sheets}"), &[("sheets", &sheets.to_string())]))
+                    .size(11.5)
+                    .color(t.text_faint),
+            );
+        }
         let mut own = src.margin.is_some();
         let mut m = units_cm(src.margin.unwrap_or_else(|| d.gap()));
         ui.horizontal(|ui| {
@@ -2872,11 +2951,9 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
                     if tool_button(&mut b, "plus", tl!("One copy more"), src.quantity < 999, 0.0, false).clicked() {
                         q += 1.0;
                     }
-                    let q = q.round().clamp(0.0, 999.0) as usize;
-                    if (typed || q != src.quantity)
-                        && let Some(s) = d.sources.get_mut(i)
-                    {
-                        s.quantity = q;
+                    let q = q.round().clamp(0.0, MAX_QUANTITY as f32) as usize;
+                    if typed || q != src.quantity {
+                        d.set_quantity(i, q);
                     }
                     let room = b.available_width() - 80.0 - 90.0 - 8.0;
                     b.add_space(room.max(0.0));
@@ -4140,6 +4217,46 @@ mod tests {
             h.render().unwrap().save(dir.join(format!("gang_groupes_{width}.png"))).unwrap();
         }
         reset_settings();
+    }
+
+    /// 124 logos: the sheets are generated, as many as needed; copies deleted by hand stay
+    /// deleted at the next import; without cells, what does not fit goes on new sheets.
+    #[test]
+    fn a_quantity_generates_the_sheets_it_needs() {
+        let dir = std::env::temp_dir().join(format!("gang-qty-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let logo = png_cm(&dir, "logo.png", 10, 10, 25.4);
+        let other = png_cm(&dir, "other.png", 10, 10, 25.4);
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        if let Some(d) = app.gang_sheet.as_mut() {
+            d.settings = Settings::default();
+        }
+        invoke(&mut app, &ctx, json!({"addFiles": [logo]}));
+        // 4 × 9 cells a sheet: 36, 36, 36 and 16.
+        let r = invoke(&mut app, &ctx, json!({"source": {"index": 0, "quantity": 124}}));
+        let counts: Vec<u64> = r["sheets"].as_array().unwrap().iter().map(|s| s["images"].as_u64().unwrap()).collect();
+        assert_eq!(counts, [36, 36, 36, 16], "{r}");
+        assert_eq!(r["sheets"][3]["lengthCm"], 42.0, "the last sheet ends at its last row");
+        // One copy deleted by hand, then another visual imported: 123 left, plus the new one.
+        let d = app.gang_sheet.as_mut().unwrap();
+        d.delete_block(&[0]);
+        let r = invoke(&mut app, &ctx, json!({"addFiles": [other]}));
+        assert_eq!((r["sources"][0]["quantity"].as_u64(), r["sources"][1]["quantity"].as_u64()), (Some(123), Some(1)));
+        let total: u64 = r["sheets"].as_array().unwrap().iter().map(|s| s["images"].as_u64().unwrap()).sum();
+        assert_eq!(total, 124);
+        // Without cells: the copies asked for on this sheet overflow onto new sheets.
+        let r = invoke(&mut app, &ctx, json!({"set": {"columns": 0}, "autoBuild": false}));
+        let before = r["sheets"].as_array().unwrap().len();
+        let count = |app: &PhotocraftApp| app.gang_sheet.as_ref().unwrap().sheets.iter().flat_map(|s| &s.placed).filter(|p| p.source == 1).count();
+        let elsewhere = count(&app) - app.gang_sheet.as_ref().unwrap().sheets[0].placed.iter().filter(|p| p.source == 1).count();
+        let r = invoke(&mut app, &ctx, json!({"sheet": 0, "source": {"index": 1, "onSheet": 80}}));
+        let after = r["sheets"].as_array().unwrap();
+        assert!(after.len() > before, "{r}");
+        assert_eq!(count(&app), 80 + elsewhere);
+        reset_settings();
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]

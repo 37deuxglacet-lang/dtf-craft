@@ -50,14 +50,19 @@ pixels. Les boutons ×2, ×3, ×4 lancent l'Agrandissement IA à la résolution 
 indiquent la taille obtenue (cm et px). La transparence est rognée avant le redimensionnement, en laissant
 2 px transparents autour du visuel. Le calque est renommé « origin » (champ Nom du calque).
 
-« Optimiser pour la vectorisation » (sous les boutons ×2, ×3, ×4) prépare une copie « nom vecto »,
-l'original restant intact : RVB 8 bits sRGB, sans fond de contrôle, en un seul calque transparent
-« Vectorisation » ; côté long sous 1 500 px : agrandissement IA automatique (×2, ×3 ou ×4, le plus
-proche de 2 500 px) ; au-delà de 4 000 px : réduction à 4 000 px (taille d'impression conservée) ;
-source JPEG : filtre médian de 1 px ; fond uni détecté sur les bords : rendu transparent (comme
-Détourage) ; franges supprimées (1 px) ; rognage avec 2 px de marge. Une notice résume ce qui a été
-fait et avertit au-delà de 64 couleurs dominantes (photo, dégradé : vectorisation peu adaptée).
-Commande `dtf.optimizeForVectorization`.
+« Optimiser pour la vectorisation » (sous les boutons ×2, ×3, ×4) prépare le visuel et ouvre
+directement le module Vectorisation, sans copie et sans modifier le document : pixels visibles
+posés sur fond blanc ; côté long sous 1 500 px : agrandissement IA (×2, ×3 ou ×4, le plus proche de
+2 500 px, la taille d'impression conservée ; le module travaille de toute façon sur 2 500 px au
+plus) ; source JPEG : filtre médian de 1 px (bords répétés). La préparation tourne à côté de la
+fenêtre avec une barre de progression (Annuler), puis le module s'ouvre ; son export trace les
+mêmes pixels (PNG temporaire, paramètre `image` de `dtf.vectorize`). Au-delà de 64 couleurs
+dominantes, une notice avertit que le visuel convient mal à la vectorisation (photo, dégradé). Le
+fond blanc est à retirer dans le module. Commande `dtf.optimizeForVectorization` (`path` : PNG
+préparé).
+
+Module Vectorisation : l'analyse des couleurs et le tracé tournent à côté de la fenêtre, avec une
+barre de progression sur l'aperçu (part des couleurs tracées) ; les exports attendent la fin.
 
 Retouches (Netteté, Saturation, Pixels transparents, Supprimer franges) : l'aperçu s'affiche dès
 l'ouverture de la fenêtre ; « Afficher l'avant » montre l'image d'origine pour comparer.
@@ -87,8 +92,12 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
   rogné à ses pixels visibles et apparaît en vignette avec son nombre d'exemplaires sur la planche
   (clic : un exemplaire de plus ; × : retirer le visuel). Le visuel sélectionné se règle :
   largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
-  d'images sur la planche, marge propre (interrupteur), Remplissage automatique (remplit la place
-  restante), Dupliquer l'image. Plusieurs visuels sélectionnés (ou un groupe) : leur nombre, la
+  d'images (en mode cases : la quantité totale, toutes planches confondues ; les planches sont
+  reconstruites et générées autant qu'il en faut, 124 logos de 10 cm donnent 36 + 36 + 36 + 16 ;
+  sans cases : la quantité sur la planche, l'excédent part sur de nouvelles planches), marge propre
+  (interrupteur), Remplissage automatique (remplit la place restante), Dupliquer l'image. En mode
+  cases, un exemplaire supprimé ou dupliqué à la main compte dans la quantité à la réorganisation
+  suivante. Plusieurs visuels sélectionnés (ou un groupe) : leur nombre, la
   taille de leur cadre, Aligner (bords gauches, centres horizontaux, bords droits, bords hauts,
   centres verticaux, bords bas, sur le cadre de la sélection ; 2 blocs au moins), Répartir
   (horizontalement ou verticalement, à espacement égal, le premier et le dernier restant en place ;

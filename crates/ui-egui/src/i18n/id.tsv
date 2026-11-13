@@ -3516,3 +3516,21 @@ curves	Smooth	Haluskan
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Terlalu banyak warna ({n}): foto atau gradien kurang cocok untuk vektorisasi.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Situs ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Menganalisis warna…
+	Background kept	Latar dipertahankan
+	Sheets used: {sheets}	Lembar terpakai: {sheets}
+	The vectorization stopped unexpectedly.	Vektorisasi berhenti secara tak terduga.
+	Tracing the shapes…	Menjiplak bentuk…
+	Tracing with VectorCraft…	Menjiplak dengan VectorCraft…
+	{n} new sheets added	{n} lembar baru ditambahkan
+# DTF Craft (26)
+	AI upscale…	Perbesaran AI…
+	Not Suited to Vectorization	Kurang cocok untuk vektorisasi
+	On white	Di atas putih
+	Preparation cancelled	Persiapan dibatalkan
+	Prepared for vectorization: {steps}	Disiapkan untuk vektorisasi: {steps}
+	Preparing for Vectorization	Persiapan vektorisasi
+	Preparing the visual…	Menyiapkan gambar…
+	The document changed during the preparation.	Dokumen berubah selama persiapan.
+	The preparation stopped unexpectedly.	Persiapan berhenti secara tak terduga.

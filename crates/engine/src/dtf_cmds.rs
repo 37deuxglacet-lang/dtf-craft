@@ -413,13 +413,9 @@ pub const OPTIMIZE_VECTOR: &str = "dtf.optimizeForVectorization";
 pub const VECTOR_MIN_SIDE: u32 = 1500;
 /// The long side the network enlargement aims for.
 pub const VECTOR_TARGET_SIDE: u32 = 2500;
-/// Over this long side the copy is reduced to it.
-pub const VECTOR_MAX_SIDE: u32 = 4000;
 /// More colours than this (covering 98 % of the opaque pixels, close shades merged): a photo or a
 /// gradient, poorly suited to vectorization.
 pub const VECTOR_MAX_COLOURS: usize = 64;
-/// Name of the copy's single layer.
-pub const VECTOR_LAYER: &str = "Vectorisation";
 
 /// The network factor (2, 3 or 4) that brings a `long` px side closest to [`VECTOR_TARGET_SIDE`]
 /// (the larger on a tie), or `None` when the side is long enough already.
@@ -457,164 +453,143 @@ pub fn dominant_colours(rgba: &[f32]) -> usize {
     counts.len()
 }
 
-/// Optimize for Vectorization (Print Conformity): a copy of the document ("<name> vecto", like
-/// the ×2/×3/×4 buttons) made ready for the vectorizer, the original untouched:
-/// 1. RGB 8 bits sRGB, the control background left out, everything in one transparent layer
-///    (before the size: the network takes RGB);
-/// 2. long side under 1 500 px: enlarged by the network (×2, ×3 or ×4, towards 2 500 px); over
-///    4 000 px: reduced to 4 000 px; the print size kept;
-/// 3. a JPEG source: a 1 px median against its artefacts;
-/// 4. a plain background on the edges: made transparent (as Remove White Background does);
-/// 5. fringes removed (1 px);
-/// 6. trimmed to the visual with 2 px of transparency around it.
-///
-/// The reply's `plan` says what is done and whether the visual has too many colours for a clean
-/// vectorization (`unsuitable`).
-fn optimize_vector(s: &mut Session, _: &Value) -> Result<Value> {
-    let st = s.active().ok_or(EngineError::NoDocument)?;
-    let jpeg = [st.path.as_deref(), Some(st.doc.name.as_str())].into_iter().flatten().any(|n| {
-        std::path::Path::new(n).extension().and_then(|e| e.to_str()).is_some_and(|e| e.eq_ignore_ascii_case("jpg") || e.eq_ignore_ascii_case("jpeg"))
-    });
-    let (name, hint) = vector_copy_name(&st.doc.name, st.path.as_deref());
-    s.keeping_background(|s| s.execute("image.duplicate", json!({"name": name})))?;
-    if let Some(copy) = s.active_mut() {
-        copy.save_hint = hint;
-    }
-    // RGB 8 bits sRGB, without the control background.
-    let doc = &s.active().ok_or(EngineError::NoDocument)?.doc;
-    if doc.walk().iter().any(|(_, _, l)| l.name == BACKFILL) {
-        s.execute(REMOVE_CONTROL_BACKGROUND, json!({}))?;
-    }
-    let doc = &s.active().ok_or(EngineError::NoDocument)?.doc;
-    if doc.mode != photocraft_color::ColorMode::Rgb {
-        s.execute("image.mode.rgb", json!({}))?;
-    }
-    if s.active().is_some_and(|d| d.doc.depth != photocraft_color::SampleType::U8) {
-        s.execute("image.mode.bits8", json!({}))?;
-    }
-    s.execute("edit.convertToProfile", json!({"profile": "srgb"}))?;
-    // One transparent layer: what is visible.
-    let fmt = photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::U8, true);
-    s.edit("Flatten for Vectorization", |doc, active| {
-        let surf = crate::file_cmds::flattened(doc, fmt);
-        let layer = photocraft_doc::Layer::new(VECTOR_LAYER, photocraft_doc::LayerContent::Raster(surf));
-        *active = Some(layer.id);
-        doc.layers = vec![layer];
-        Ok(())
-    })?;
-    let st = s.active().ok_or(EngineError::NoDocument)?;
-    let id = st.active_layer.ok_or(EngineError::NoDocument)?;
-    let (ow, oh) = (st.doc.size.width, st.doc.size.height);
-    let long = ow.max(oh);
-    let scale = vector_scale(long);
-    let reduce = (long > VECTOR_MAX_SIDE).then(|| f64::from(VECTOR_MAX_SIDE) / f64::from(long));
-    let k = scale.map(f64::from).or(reduce).unwrap_or(1.0);
-    let (nw, nh) = ((f64::from(ow) * k).round().max(1.0) as u32, (f64::from(oh) * k).round().max(1.0) as u32);
-    crate::image_cmds::check_resample_budget(OPTIMIZE_VECTOR, &st.doc, nw, nh, "")?;
-    let background = detected_background(&st.doc, id, 10.0);
-    let colours = st.doc.layer(id).and_then(photocraft_doc::Layer::surface).map_or(0, |surf| dominant_colours(&photocraft_algo::Image::read(surf, st.doc.bounds()).data));
-    let model = match scale {
-        Some(_) => Some(photocraft_algo::upscale::SrModel::bundled().map_err(|e| EngineError::Other(format!("AI model: {e}")))?),
-        None => None,
-    };
-    let hex = background.map(|c| {
-        let b = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
-        format!("#{:02x}{:02x}{:02x}", b(c[0]), b(c[1]), b(c[2]))
-    });
-    let plan = json!({
-        "from": [ow, oh], "to": [nw, nh], "scale": scale, "reduced": reduce.is_some(),
-        "jpeg": jpeg, "background": hex, "colors": colours, "unsuitable": colours > VECTOR_MAX_COLOURS,
-    });
-    let mut out = crate::jobs::edit_job(
-        s,
-        "Optimize for Vectorization",
-        move |doc, _, ctx| {
-            // 2. Size.
-            let canvas = doc.bounds();
-            let original = doc.layer(id).and_then(photocraft_doc::Layer::surface).cloned();
-            if (nw, nh) != (ow, oh) {
-                let smoother = if scale.is_some() { photocraft_algo::resample::Resample::BicubicSmoother } else { photocraft_algo::resample::Resample::BicubicAutomatic };
-                crate::image_cmds::resample_doc(doc, nw, nh, smoother);
-                doc.resolution_dpi = (f64::from(doc.resolution_dpi) * k).clamp(1.0, 10_000.0) as f32;
-            }
-            if let (Some(model), Some(k), Some(original)) = (model, scale, original) {
-                let big = ctx
-                    .stage(0.0, 0.85, "AI Upscale", |ir| upscale_surface(model, &original, canvas, f64::from(k), true, ir))
-                    .ok_or(EngineError::Cancelled)?;
-                if let Some(target) = doc.layer_mut(id).and_then(photocraft_doc::Layer::surface_mut) {
-                    *target = big;
-                }
-            }
-            let bounds = doc.bounds();
-            let mode = doc.mode;
-            let surf = doc.layer_mut(id).and_then(photocraft_doc::Layer::surface_mut).ok_or(EngineError::NoDocument)?;
-            // 3. A JPEG's artefacts.
-            if jpeg {
-                *surf = photocraft_algo::apply(surf, &FilterParams::Median { radius: 1.0 }, bounds, bounds, None);
-            }
-            // 4. The plain background, transparent.
-            if let Some(rgb) = background {
-                let img = photocraft_algo::Image::read(surf, bounds);
-                let actx = photocraft_algo::Ctx { bounds, mode, alpha: true };
-                let spec = CutoutSpec { color: Some(rgb), ..CutoutSpec::default() };
-                let plan = ctx
-                    .stage(0.85, 0.95, "Remove White Background", |ir| photocraft_algo::dtf::CutoutPlan::prepare(&img, &actx, &spec, ir))
-                    .ok_or(EngineError::Cancelled)?;
-                let data = plan.apply(&img, bounds, &actx);
-                surf.write_region(bounds, &data);
-            }
-            // 5. Fringes; 6. trimmed with a 2 px margin.
-            let (w, h) = (bounds.width() as usize, bounds.height() as usize);
-            let flat = surf.read_region(bounds);
-            let mut px: Vec<[f32; 4]> = flat.chunks_exact(4).map(|p| [p[0], p[1], p[2], p[3]]).collect();
-            crate::layer_menu_cmds::defringe(&mut px, w, h, 1);
-            let (mut x0, mut y0, mut x1, mut y1) = (w, h, 0, 0);
-            for (i, p) in px.iter().enumerate() {
-                if p[3] > 0.0 {
-                    let (x, y) = (i % w, i / w);
-                    (x0, y0, x1, y1) = (x0.min(x), y0.min(y), x1.max(x + 1), y1.max(y + 1));
-                }
-            }
-            if x1 <= x0 || y1 <= y0 {
-                return Err(EngineError::Other("nothing is left of the visual once its background is removed".into()));
-            }
-            let m = TRIM_MARGIN as usize;
-            let (tw, th) = (x1 - x0 + 2 * m, y1 - y0 + 2 * m);
-            let mut data = vec![0.0f32; tw * th * 4];
-            for y in y0..y1 {
-                for x in x0..x1 {
-                    let (Some(src), Some(dst)) = (px.get(y * w + x), data.get_mut(((y - y0 + m) * tw + (x - x0 + m)) * 4..((y - y0 + m) * tw + (x - x0 + m)) * 4 + 4)) else { continue };
-                    dst.copy_from_slice(src);
-                }
-            }
-            let rect = photocraft_geom::Rect::new(0, 0, tw as i32, th as i32);
-            let mut fresh = photocraft_raster::Surface::new(surf.format());
-            fresh.write_region(rect, &data);
-            fresh.prune();
-            *surf = fresh;
-            doc.size = photocraft_geom::Size::new(tw as u32, th as u32);
-            Ok(json!({"width": tw, "height": th, "resolution": doc.resolution_dpi}))
-        },
-        |r| r,
-    )?;
-    out["plan"] = plan;
-    Ok(out)
+/// A visual prepared for the Vectorization module (straight RGBA, opaque), and what was done.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Prepared {
+    pub width: u32,
+    pub height: u32,
+    pub px: Vec<[f32; 4]>,
+    /// The network's factor when the visual was enlarged.
+    pub scale: Option<u32>,
+    pub jpeg: bool,
+    /// Dominant colours: more than [`VECTOR_MAX_COLOURS`] suits vectorization poorly.
+    pub colours: usize,
 }
 
-/// The optimized copy's name ("BOISERIE vecto") and its Save As hint, as for the AI upscale.
-fn vector_copy_name(doc_name: &str, path: Option<&str>) -> (String, Option<String>) {
-    let (upscaled, hint) = upscale_copy_name(doc_name, path, 2.0);
-    let stem = upscaled.strip_suffix(" x2").unwrap_or(&upscaled).to_string();
-    let name = format!("{stem} vecto");
-    let hint = hint.map(|h| {
-        let p = std::path::Path::new(&h);
-        let file = match p.extension().and_then(|e| e.to_str()) {
-            Some(ext) => format!("{name}.{ext}"),
-            None => name.clone(),
-        };
-        p.with_file_name(file).to_string_lossy().into_owned()
-    });
-    (name, hint)
+impl Prepared {
+    pub fn unsuitable(&self) -> bool {
+        self.colours > VECTOR_MAX_COLOURS
+    }
+
+    /// The prepared visual as a PNG file's bytes (RGBA 8 bits).
+    pub fn png(&self) -> Result<Vec<u8>> {
+        let to8 = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
+        let data: Vec<u8> = self.px.iter().flat_map(|p| [to8(p[0]), to8(p[1]), to8(p[2]), to8(p[3])]).collect();
+        let e = |e: photocraft_codecs::CodecError| EngineError::Other(e.to_string());
+        let img = photocraft_codecs::Image::from_u8(self.width, self.height, photocraft_codecs::ChannelLayout::Rgba, data).map_err(e)?;
+        photocraft_codecs::encode(&img, photocraft_codecs::Format::Png, &photocraft_codecs::EncodeOptions::default()).map_err(e)
+    }
+}
+
+/// Optimize for Vectorization (Print Conformity): the visible pixels (`w × h`, straight RGBA,
+/// sRGB, as the Vectorization module reads them) prepared for the vectorizer, nothing else
+/// changed:
+/// 1. laid on white (opaque: the white background is the vectorizer's to drop);
+/// 2. long side under 1 500 px: enlarged by the network (×2, ×3 or ×4, towards 2 500 px; the
+///    module works on at most 2 500 px a side anyway);
+/// 3. a JPEG source: a 1 px median against its artefacts.
+///
+/// `ir` reports the progress (the network's) and can cancel.
+pub fn prepare_for_vectorization(w: u32, h: u32, px: &[[f32; 4]], jpeg: bool, ir: &photocraft_raster::Interrupt) -> Result<Prepared> {
+    let (wu, hu) = (w as usize, h as usize);
+    if wu == 0 || hu == 0 || px.len() != wu * hu {
+        return Err(EngineError::Other(format!("{w} × {h} px does not match {} pixels", px.len())));
+    }
+    // 1. On white.
+    let flat: Vec<f32> = px
+        .iter()
+        .flat_map(|p| {
+            let a = p[3].clamp(0.0, 1.0);
+            [p[0] * a + 1.0 - a, p[1] * a + 1.0 - a, p[2] * a + 1.0 - a, 1.0]
+        })
+        .collect();
+    let colours = dominant_colours(&flat);
+    // 2. Size.
+    let scale = vector_scale(w.max(h));
+    let (mut out, mut ow, mut oh) = (flat, wu, hu);
+    if let Some(k) = scale {
+        let model = photocraft_algo::upscale::SrModel::bundled().map_err(|e| EngineError::Other(format!("AI model: {e}")))?;
+        let big = model.upscale(&out, wu, hu, 4, false, 128, 16, ir).ok_or(EngineError::Cancelled)?;
+        let s4 = photocraft_algo::upscale::SCALE;
+        let fmt = photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, true);
+        let mut surf = photocraft_raster::Surface::new(fmt);
+        surf.write_region(photocraft_geom::Rect::new(0, 0, (wu * s4) as i32, (hu * s4) as i32), &big);
+        let f = f64::from(k) / s4 as f64;
+        if (f - 1.0).abs() > 1e-9 {
+            surf = photocraft_algo::resample::resize_surface(&surf, f, f, photocraft_algo::resample::Resample::BicubicSharper);
+        }
+        (ow, oh) = (wu * k as usize, hu * k as usize);
+        out = surf.read_region(photocraft_geom::Rect::new(0, 0, ow as i32, oh as i32));
+        for a in out.iter_mut().skip(3).step_by(4) {
+            *a = 1.0;
+        }
+    }
+    // 3. A JPEG's artefacts.
+    if jpeg {
+        out = median3(&out, ow, oh);
+    }
+    Ok(Prepared {
+        width: ow as u32,
+        height: oh as u32,
+        px: out.chunks_exact(4).map(|p| [p[0], p[1], p[2], p[3]]).collect(),
+        scale,
+        jpeg,
+        colours,
+    })
+}
+
+/// Whether the document comes from a JPEG (its file or its name).
+pub fn from_jpeg(path: Option<&str>, name: &str) -> bool {
+    [path, Some(name)].into_iter().flatten().any(|n| {
+        std::path::Path::new(n).extension().and_then(|e| e.to_str()).is_some_and(|e| e.eq_ignore_ascii_case("jpg") || e.eq_ignore_ascii_case("jpeg"))
+    })
+}
+
+/// `dtf.optimizeForVectorization`: the active document's visual prepared
+/// ([`prepare_for_vectorization`]), written as a PNG to `path` when given; the document is not
+/// changed. The window opens the Vectorization module on it instead.
+fn optimize_vector(s: &mut Session, p: &Value) -> Result<Value> {
+    let st = s.active().ok_or(EngineError::NoDocument)?;
+    let jpeg = from_jpeg(st.path.as_deref(), &st.doc.name);
+    let (w, h, px) = crate::dtf_color_cmds::visual_pixels(&st.doc)?;
+    let prepared = prepare_for_vectorization(w, h, &px, jpeg, &photocraft_raster::Interrupt::NONE)?;
+    let path = p.get("path").and_then(Value::as_str).filter(|v| !v.trim().is_empty());
+    if let Some(path) = path {
+        crate::file_cmds::write_file(path, &prepared.png()?)?;
+    }
+    Ok(json!({
+        "width": prepared.width, "height": prepared.height, "scale": prepared.scale, "jpeg": jpeg,
+        "colors": prepared.colours, "unsuitable": prepared.unsuitable(), "path": path,
+    }))
+}
+
+/// A 3 × 3 median of the colours of straight RGBA pixels (`w × h`), the edges repeated past the
+/// image's border; the alpha kept.
+pub fn median3(px: &[f32], w: usize, h: usize) -> Vec<f32> {
+    let mut out = px.to_vec();
+    let at = |x: usize, y: usize, c: usize| px.get((y * w + x) * 4 + c).copied().unwrap_or(0.0);
+    for y in 0..h {
+        for x in 0..w {
+            for c in 0..3 {
+                let mut v = [0.0f32; 9];
+                let mut n = 0;
+                for dy in [-1i64, 0, 1] {
+                    for dx in [-1i64, 0, 1] {
+                        let (sx, sy) = ((x as i64 + dx).clamp(0, w as i64 - 1) as usize, (y as i64 + dy).clamp(0, h as i64 - 1) as usize);
+                        if let Some(slot) = v.get_mut(n) {
+                            *slot = at(sx, sy, c);
+                        }
+                        n += 1;
+                    }
+                }
+                v.sort_unstable_by(f32::total_cmp);
+                if let Some(o) = out.get_mut((y * w + x) * 4 + c) {
+                    *o = v[4];
+                }
+            }
+        }
+    }
+    out
 }
 
 // ---------------------------------------------------------------- BRODERIE workflow windows
@@ -823,10 +798,10 @@ pub fn specs() -> Vec<CommandSpec> {
             // Run from Print Conformity's button, not the DTF menu.
             menu: &[],
             shortcut: None,
-            params: r##"{} → {width,height,resolution,plan:{from,to,scale,reduced,jpeg,background,colors,unsuitable}}. A copy "<name> vecto": RGB 8 bits sRGB in one transparent layer, long side under 1 500 px enlarged by the network (×2/×3/×4 towards 2 500 px) or over 4 000 px reduced to 4 000 px, a JPEG's artefacts smoothed (1 px median), a plain background made transparent, fringes removed, trimmed with 2 px around; unsuitable: more than 64 colours (photo or gradient)"##,
+            params: r##"{"path":str (optional: where to write the prepared visual as PNG)} → {width,height,scale,jpeg,colors,unsuitable,path}. The visible pixels prepared for the vectorizer, the document unchanged: laid on white, long side under 1 500 px enlarged by the network (×2/×3/×4 towards 2 500 px), a JPEG's artefacts smoothed (1 px median); unsuitable: more than 64 colours (photo or gradient). The app opens the Vectorization module on the result"##,
             enabled: has_doc,
             run: optimize_vector,
-            journal: true,
+            journal: false,
         },
         CommandSpec {
             id: UPSCALE,
@@ -1049,65 +1024,40 @@ mod tests {
         assert_eq!(dominant_colours(&[0.3, 0.3, 0.3, 0.0]), 0, "transparent pixels don't count");
     }
 
-    /// A small JPEG logo on white: a copy enlarged ×4 by the network, the white made transparent,
-    /// trimmed with 2 px around; the original untouched.
+    /// A small transparent logo from a JPEG: laid on white, enlarged ×4 by the network, its edges
+    /// white (not black, not transparent).
     #[test]
-    fn optimize_for_vectorization_prepares_a_copy() {
-        let mut s = Session::new();
-        s.execute("file.new", json!({"width": 30, "height": 20, "resolution": 72, "background": "white", "name": "logo.jpg"})).unwrap();
-        s.edit("Logo", |doc, active| {
-            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
-            for y in 6..14 {
-                for x in 9..21 {
-                    surf.write_pixel(x, y, &[0.8, 0.1, 0.1, 1.0]);
-                }
-            }
-            Ok(())
-        })
-        .unwrap();
-        let r = s.execute(OPTIMIZE_VECTOR, json!({})).unwrap();
-        let plan = &r["plan"];
-        assert_eq!((plan["scale"].as_u64(), plan["jpeg"].as_bool(), plan["background"].as_str()), (Some(4), Some(true), Some("#ffffff")), "{r}");
-        assert_eq!((plan["unsuitable"].as_bool(), plan["to"].clone()), (Some(false), json!([120, 80])));
-        let d = s.active().unwrap();
-        assert_eq!(d.doc.name, "logo vecto");
-        assert_eq!(d.doc.layers.len(), 1);
-        assert_eq!(d.doc.layers[0].name, VECTOR_LAYER);
-        assert!((d.doc.resolution_dpi - 288.0).abs() < 0.01, "print size kept");
-        // The 12 × 8 px logo at ×4 (48 × 32) with 2 px around, give or take the network's edge.
-        let (w, h) = (d.doc.size.width, d.doc.size.height);
-        assert!((50..=58).contains(&w) && (34..=42).contains(&h), "{w} × {h}");
-        let surf = d.doc.layers[0].surface().unwrap();
-        assert_eq!(surf.pixel(0, 0)[3], 0.0, "transparent margin");
-        let c = surf.pixel(w as i32 / 2, h as i32 / 2);
-        assert!(c[3] > 0.99 && c[0] > 0.6 && c[1] < 0.3, "{c:?}");
-        // The original is untouched.
-        assert_eq!(s.documents().len(), 2);
-        assert_eq!((s.documents()[0].doc.size.width, s.documents()[0].doc.layers.len()), (30, 1));
+    fn optimize_for_vectorization_prepares_the_pixels() {
+        let (w, h) = (30u32, 20u32);
+        let px: Vec<[f32; 4]> = (0..w * h).map(|i| if (6..14).contains(&(i / w)) && (9..21).contains(&(i % w)) { [0.8, 0.1, 0.1, 1.0] } else { [0.0, 0.0, 0.0, 0.0] }).collect();
+        let p = prepare_for_vectorization(w, h, &px, true, &photocraft_raster::Interrupt::NONE).unwrap();
+        assert_eq!((p.width, p.height, p.scale, p.unsuitable()), (120, 80, Some(4), false));
+        let at = |x: u32, y: u32| p.px[(y * p.width + x) as usize];
+        for c in [at(0, 0), at(119, 79), at(60, 2)] {
+            assert!(c[3] == 1.0 && c[0] > 0.95 && c[1] > 0.95 && c[2] > 0.95, "white: {c:?}");
+        }
+        let c = at(60, 40);
+        assert!(c[0] > 0.6 && c[1] < 0.3, "{c:?}");
+        assert!(!p.png().unwrap().is_empty());
+        // Long enough: as it is, on white; a gradient is flagged.
+        let (w, h) = (1600u32, 40u32);
+        let grad: Vec<[f32; 4]> = (0..w * h).map(|i| [(i % w) as f32 / w as f32, (i / w) as f32 / h as f32, 0.4, 1.0]).collect();
+        let p = prepare_for_vectorization(w, h, &grad, false, &photocraft_raster::Interrupt::NONE).unwrap();
+        assert_eq!((p.width, p.scale, p.unsuitable()), (1600, None, true));
+        assert!(from_jpeg(None, "logo.JPG") && from_jpeg(Some("/a/b.jpeg"), "x") && !from_jpeg(Some("/a/b.png"), "b.png"));
     }
 
-    /// Over 4 000 px: reduced to 4 000, no network; a gradient is flagged as unsuited.
+    /// The command leaves the document alone and writes the prepared PNG.
     #[test]
-    fn optimize_for_vectorization_reduces_large_files_and_flags_gradients() {
+    fn optimize_for_vectorization_writes_a_png() {
         let mut s = Session::new();
-        s.execute("file.new", json!({"width": 4400, "height": 200, "resolution": 300, "background": "transparent"})).unwrap();
-        s.edit("Band", |doc, active| {
-            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
-            for y in 50..150 {
-                for x in 0..4400 {
-                    surf.write_pixel(x, y, &[x as f32 / 4400.0, (y - 50) as f32 / 100.0, 0.4, 1.0]);
-                }
-            }
-            Ok(())
-        })
-        .unwrap();
-        let r = s.execute(OPTIMIZE_VECTOR, json!({})).unwrap();
-        let plan = &r["plan"];
-        assert_eq!((plan["scale"].as_u64(), plan["reduced"].as_bool(), plan["background"].as_str()), (None, Some(true), None), "{r}");
-        assert_eq!(plan["unsuitable"], true);
-        let d = s.active().unwrap();
-        assert_eq!(d.doc.size.width, 4000 + 2 * TRIM_MARGIN);
-        assert!((d.doc.resolution_dpi - 300.0 * 4000.0 / 4400.0).abs() < 0.1);
+        s.execute("file.new", json!({"width": 1600, "height": 100, "resolution": 300, "background": "white"})).unwrap();
+        let path = std::env::temp_dir().join(format!("dtf-vecto-{}.png", std::process::id())).to_string_lossy().into_owned();
+        let r = s.execute(OPTIMIZE_VECTOR, json!({"path": path})).unwrap();
+        assert_eq!((r["width"].as_u64(), r["scale"].as_u64()), (Some(1600), None), "{r}");
+        assert!(std::fs::metadata(&path).is_ok_and(|m| m.len() > 0));
+        assert_eq!(s.documents().len(), 1);
+        let _ = std::fs::remove_file(path);
     }
 
     /// A resolution given (Print Conformity's buttons) sets the copy's ppi, whatever keepPrintSize.

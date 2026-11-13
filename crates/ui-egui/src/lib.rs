@@ -695,6 +695,8 @@ pub struct PhotocraftApp {
     pub(crate) color_analyzer: Option<color_analyzer_ui::ColorAnalyzer>,
     /// DTF › Vectorization (DTF Craft), while it is open.
     pub(crate) vectorizer: Option<vectorizer_ui::Vectorizer>,
+    /// DTF Craft: a visual being prepared for the Vectorization module (Print Conformity).
+    pub(crate) vector_prep: Option<dtf_panel::VectorPrep>,
     /// A raw file just opened interactively, waiting for the open-time Camera Raw dialog (shown
     /// on the next frame, which has the egui context).
     pub(crate) pending_raw_open: Option<camera_raw_ui::RawOpen>,
@@ -897,6 +899,7 @@ impl PhotocraftApp {
             camera_raw: None,
             color_analyzer: None,
             vectorizer: None,
+            vector_prep: None,
             pending_raw_open: None,
             raw_redevelop: None,
             wide_angle: None,
@@ -1922,6 +1925,7 @@ impl eframe::App for PhotocraftApp {
         vectorizer_ui::show(self, &ctx);
         // DTF Craft: a training or quote request asked for from a help sheet.
         offers::poll(self, &ctx);
+        dtf_panel::poll_vectorize(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         gang_sheet_ui::show(self, &ctx);
         canvas::extra_windows(self, &ctx);

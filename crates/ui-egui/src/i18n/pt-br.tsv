@@ -4305,3 +4305,21 @@ layerLabel	No Color	Sem cor
 	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Cores demais ({n}): uma foto ou um degradê não se presta bem à vetorização.
 # DTF Craft (24)
 	ArtCraft / PhotoCraft website	Site do ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analisando as cores…
+	Background kept	Fundo mantido
+	Sheets used: {sheets}	Folhas usadas: {sheets}
+	The vectorization stopped unexpectedly.	A vetorização parou inesperadamente.
+	Tracing the shapes…	Traçando as formas…
+	Tracing with VectorCraft…	Traçando com o VectorCraft…
+	{n} new sheets added	{n} novas folhas adicionadas
+# DTF Craft (26)
+	AI upscale…	Ampliação por IA…
+	Not Suited to Vectorization	Pouco adequado à vetorização
+	On white	Sobre branco
+	Preparation cancelled	Preparação cancelada
+	Prepared for vectorization: {steps}	Preparado para vetorização: {steps}
+	Preparing for Vectorization	Preparação para vetorização
+	Preparing the visual…	Preparando o visual…
+	The document changed during the preparation.	O documento mudou durante a preparação.
+	The preparation stopped unexpectedly.	A preparação parou inesperadamente.
