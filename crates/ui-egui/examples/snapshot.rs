@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Render the full PhotoCraft UI offscreen (no window, no focus stealing) and save a PNG.
 //!
 //! ```sh
@@ -42,6 +44,8 @@ fn main() {
     let scale: f32 = arg(&args, "--scale").and_then(|s| s.parse().ok()).unwrap_or(2.0);
     let wayland_notice = args.iter().any(|a| a == "--wayland-notice");
     let update_notice = args.iter().any(|a| a == "--update-notice");
+    // DTF Craft: `--dtf-craft` starts as the DTF Craft app does (its start screen, menus, workspace).
+    let dtf_craft = args.iter().any(|a| a == "--dtf-craft");
     let script: Vec<(String, Value)> =
         arg(&args, "--script").map(|s| serde_json::from_str::<Vec<(String, Value)>>(&s).expect("--script must be [[method, params], …]")).unwrap_or_default();
 
@@ -96,6 +100,9 @@ fn main() {
                 };
             }
             app.background_jobs = background_jobs;
+            if dtf_craft {
+                photocraft_ui_egui::dtf_panel::dtf_craft_startup(&mut app);
+            }
             app.custom_titlebar = custom_titlebar;
             // `--safe-gpu`: the CPU canvas, as the desktop app's `--safe-gpu` launch.
             if safe_gpu {

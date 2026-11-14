@@ -8,7 +8,7 @@ lists every file changed from that base (`PHOTOCRAFT-BASE.toml` records it for u
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (94)
+## Modified (95)
 
 The DTF code lives in the added files; the PhotoCraft files below only hook it in.
 
@@ -55,6 +55,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/engine/src/shell_commands.rs` | Help › About DTF Craft |
 | `crates/io/src/svg.rs` | declares `svg/dtf.rs` (gang sheet SVG helpers) |
 | `crates/ui-egui/build.rs` | adds `src/i18n/dtf/<locale>.tsv` to each craft-i18n catalog |
+| `crates/ui-egui/examples/snapshot.rs` | `--dtf-craft` flag for DTF captures |
 | `crates/ui-egui/src/app.rs` | initial state of the DTF modules |
 | `crates/ui-egui/src/app/commands.rs` | cut-out's Toggle Last State |
 | `crates/ui-egui/src/app/files.rs` | Save As starts from the save hint |
