@@ -156,7 +156,7 @@ fn seed() -> u64 {
 }
 
 /// The worker: the search (cached for 24 hours), one illustration and its image.
-fn load(get: crate::HttpGetFn, key: &str, query: &str, cache: Cache, seed: u64) -> Result<Loaded, String> {
+fn load(get: crate::services::HttpGetFn, key: &str, query: &str, cache: Cache, seed: u64) -> Result<Loaded, String> {
     let now = now_secs();
     let mut cache = if cache.fresh(now, query) {
         cache

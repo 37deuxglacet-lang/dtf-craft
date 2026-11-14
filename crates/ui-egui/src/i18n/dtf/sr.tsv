@@ -289,7 +289,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG није означен: боја се изоставља из SVG-а; њени облици се уклањају, не спајају.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Заједничко са Анализатором боја. Формати: .ase, .aco, .csv; разлика у ΔE 2000.
 	{name} vectorized color sheet	{name} лист боја векторизације
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ означено: облици добијају боју референце и у SVG-у носе њено име. ΔE: до 2 = неприметно · од 2 до 5 = видљиво изблиза · више = друга нијанса
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ означено: облици добијају боју референце и у SVG-у носе њено име. ΔE: до 2 = неприметно · од 2 до 5 = видљиво изблиза · више = друга нијанса
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	„{color}” није боја: напишите је као #rrggbb.
 	16 Colors	16 боја

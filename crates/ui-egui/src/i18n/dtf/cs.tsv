@@ -291,7 +291,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG nezaškrtnuto: barva je z SVG vynechána; její tvary se odstraní, nesloučí.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Sdíleno s Analyzátorem barev. Formáty: .ase, .aco, .csv; rozdíl v ΔE 2000.
 	{name} vectorized color sheet	{name} barevný list vektorizace
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ zaškrtnuto: tvary převezmou barvu reference a v SVG nesou její název. ΔE: do 2 = nepostřehnutelné · 2 až 5 = viditelné zblízka · víc = jiný odstín
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ zaškrtnuto: tvary převezmou barvu reference a v SVG nesou její název. ΔE: do 2 = nepostřehnutelné · 2 až 5 = viditelné zblízka · víc = jiný odstín
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	„{color}“ není barva: zapište ji jako #rrggbb.
 	16 Colors	16 barev

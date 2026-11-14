@@ -149,7 +149,7 @@ fn light_scope<R>(ctx: &egui::Context, f: impl FnOnce() -> R) -> R {
     let (light, dark) = (ctx.style_of(egui::Theme::Light), ctx.style_of(egui::Theme::Dark));
     crate::theme::apply_tokens(ctx, light_tokens());
     let r = f();
-    ctx.data_mut(|d| d.insert_temp(egui::Id::new("photocraft-theme"), saved));
+    ctx.data_mut(|d| d.insert_temp(egui::Id::unique("photocraft-theme"), saved));
     ctx.set_style_of(egui::Theme::Light, light);
     ctx.set_style_of(egui::Theme::Dark, dark);
     r
@@ -2252,7 +2252,7 @@ fn regions(full: ERect) -> Regions {
 
 fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut Actions) {
     let screen = ctx.content_rect();
-    egui::Area::new(egui::Id::new("gang-sheet-dialog")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
+    egui::Area::new(egui::Id::unique("gang-sheet-dialog")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
         let Some(d) = app.gang_sheet.as_mut() else { return };
         let t = Tokens::get(ctx);
         // Previews become textures here, where the context is.
@@ -2300,7 +2300,7 @@ fn blue_button(ui: &mut egui::Ui, label: &str, width: f32, on: bool) -> egui::Re
     };
     ui.painter().rect_filled(r, 7.0, fill);
     ui.painter().text(r.center(), Align2::CENTER_CENTER, label, crate::theme::medium(12.5), Color32::WHITE);
-    resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, label));
+    resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, label));
     resp.on_hover_cursor(egui::CursorIcon::PointingHand)
 }
 
@@ -2322,8 +2322,8 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
     let (wa, wb) = (ga.size().x, gb.size().x);
     p.galley(pos2(x, y), ga, t.text);
     p.galley(pos2(x + wa, y), gb, MAGENTA);
-    ui.interact(ERect::from_min_size(pos2(x, y), vec2(wa + wb, 20.0)), ui.id().with("gang-title"), Sense::hover())
-        .widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Label, true, title));
+    ui.interact(ERect::from_min_size(pos2(x, y), vec2(wa + wb, 20.0)), ui.scope_id().with("gang-title"), Sense::hover())
+        .widget_info(|| egui::WidgetInfo::labeled(egui::Role::Label, true, title));
     x += wa + wb + 28.0;
     // Cancel and Export, right-aligned.
     let buttons = ERect::from_min_max(pos2(rect.right() - 330.0, rect.top()), rect.max).shrink2(vec2(16.0, 10.0));
@@ -2355,7 +2355,7 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
             break;
         }
         let r = ERect::from_min_size(pos2(x, top), vec2(w, tab_h));
-        let resp = ui.interact(r, ui.id().with(("gang-tab", k)), Sense::click());
+        let resp = ui.interact(r, ui.scope_id().with(("gang-tab", k)), Sense::click());
         let fill = if active {
             TAB_ACTIVE
         } else if resp.hovered() {
@@ -2369,7 +2369,7 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
             p.rect_filled(ERect::from_min_size(r.min, vec2(w, 2.0)), corners, MAGENTA);
         }
         p.galley(pos2(r.left() + 13.0, r.center().y - g.size().y / 2.0), g, color);
-        resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, &label));
+        resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, &label));
         let resp = resp.on_hover_text(tl!("Click: show the sheet · Double-click: rename it")).on_hover_cursor(egui::CursorIcon::PointingHand);
         if resp.double_clicked() {
             rename = Some(k);
@@ -2384,7 +2384,7 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
         x += 30.0;
     }
     let plus = ERect::from_min_size(pos2(x + 2.0, top + 3.0), vec2(26.0, 26.0));
-    let resp = ui.interact(plus, ui.id().with("gang-tab-new"), Sense::click());
+    let resp = ui.interact(plus, ui.scope_id().with("gang-tab-new"), Sense::click());
     if resp.hovered() {
         p.rect_filled(plus, 6.0, t.hover);
     }
@@ -2496,12 +2496,12 @@ fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &To
             ui.painter().galley(pos2(img.right() + 10.0, row.top() + 29.0), sub, t.text_faint);
             // Remove: × at the top right corner, while the pointer is over the row.
             let x = ERect::from_min_size(pos2(row.right() - 17.0, row.top() + 3.0), vec2(14.0, 14.0));
-            let xr = ui.interact(x, ui.id().with(("gang-x", i)), Sense::click());
+            let xr = ui.interact(x, ui.scope_id().with(("gang-x", i)), Sense::click());
             if resp.hovered() || xr.hovered() {
                 ui.painter().rect_filled(x, 3.0, if xr.hovered() { t.danger } else { t.text_faint });
                 crate::icons::image("x", 10.0, Color32::WHITE).paint_at(ui, ERect::from_center_size(x.center(), vec2(10.0, 10.0)));
             }
-            resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, &s.name));
+            resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, &s.name));
             if xr.on_hover_text(tl!("Remove")).clicked() {
                 remove = Some(i);
             } else {
@@ -2557,7 +2557,7 @@ fn section(ui: &mut egui::Ui, d: &mut GangSheetDialog, k: usize, title: &str, t:
         ui.painter().text(r.left_center(), Align2::LEFT_CENTER, title, crate::theme::semibold(13.0), t.text);
         let icon = if open { "chevron-down" } else { "chevron-right" };
         crate::icons::image(icon, 14.0, t.text_dim).paint_at(ui, ERect::from_center_size(r.right_center() - vec2(8.0, 0.0), vec2(14.0, 14.0)));
-        resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::CollapsingHeader, true, title));
+        resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::DisclosureTriangle, true, title));
         if resp.on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
             d.closed[k] = open;
         }
@@ -2590,7 +2590,7 @@ fn sheet_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let mut rename_done = None;
     ui.horizontal(|ui| match d.renaming.as_mut() {
         Some((rk, text)) if *rk == k => {
-            let r = widgets::text_field(ui, egui::Id::new(("gang-rename", k)), text, "", ui.available_width() - 4.0, false);
+            let r = widgets::text_field(ui, egui::Id::unique(("gang-rename", k)), text, "", ui.available_width() - 4.0, false);
             r.request_focus();
             if r.lost_focus() {
                 rename_done = Some(text.clone());
@@ -2661,7 +2661,7 @@ fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let opts: Vec<(f32, &str)> = labels.iter().map(|(w, l)| (*w, l.as_str())).collect();
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(tl!("Film Width")).color(t.text), 128.0, 24.0);
-        if widgets::dropdown(ui, "gang-film", &mut width, &opts, 120.0) {
+        if widgets::dropdown(ui, "gang-film", tl!("Film Width"), &mut width, &opts, 120.0) {
             s.width_cm = width;
         }
     });
@@ -2681,7 +2681,7 @@ fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let cell_opts: Vec<(u32, &str)> = cell_labels.iter().map(|(n, l)| (*n, l.as_str())).collect();
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(tl!("Cells")).color(t.text), 128.0, 24.0);
-        if widgets::dropdown(ui, "gang-cells", &mut cols, &cell_opts, 120.0) {
+        if widgets::dropdown(ui, "gang-cells", tl!("Cells"), &mut cols, &cell_opts, 120.0) {
             s.cells_on = cols > 0;
             if cols > 0 {
                 s.cells_cols = cols;
@@ -2759,7 +2759,7 @@ fn display_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     ui.horizontal(|ui| {
         ui.label(egui::RichText::new(tl!("Sheet Background")).color(t.text));
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            let r = widgets::color_edit_button_srgb(ui, &mut s.custom).on_hover_text(tl!("Custom Color"));
+            let r = widgets::color_edit_button_srgb(ui, &mut s.custom, tl!("Custom Color")).on_hover_text(tl!("Custom Color"));
             if r.changed() || r.clicked() {
                 s.backdrop = Backdrop::Color(Color32::from_rgb(s.custom[0], s.custom[1], s.custom[2]));
             }
@@ -3010,7 +3010,7 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, source: usize, pl
         ui.painter().rect_stroke(r, 6.0, Stroke::new(1.0, t.field_border), StrokeKind::Inside);
         ui.painter().text(r.left_center() + vec2(8.0, 0.0), Align2::LEFT_CENTER, widgets::fmt_num_prec(ratio, 2), FontId::proportional(12.0), t.text);
         let lock_r = ERect::from_center_size(r.right_center() - vec2(14.0, 0.0), vec2(20.0, 20.0));
-        let lr = ui.interact(lock_r, ui.id().with(("gang-lock", source)), Sense::click());
+        let lr = ui.interact(lock_r, ui.scope_id().with(("gang-lock", source)), Sense::click());
         crate::icons::image(if src.lock { "lock" } else { "lock-open" }, 14.0, t.text).paint_at(ui, ERect::from_center_size(lock_r.center(), vec2(14.0, 14.0)));
         if lr.on_hover_text(tl!("Lock Proportions")).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
             d.checkpoint(None);
@@ -3457,7 +3457,7 @@ fn confirm_dialog(app: &mut PhotocraftApp, ctx: &egui::Context, act: &mut Action
     }
     let n = d.all_conflicts();
     let mut answer = None;
-    egui::Modal::new(egui::Id::new("gang-sheet-confirm")).show(ctx, |ui| {
+    egui::Modal::new(egui::Id::unique("gang-sheet-confirm")).show(ctx, |ui| {
         ui.set_max_width(400.0);
         ui.label(crate::i18n::fmt(tl!("{n} visuals are closer than the margin to another visual or to an edge. Export anyway?"), &[("n", &n.to_string())]));
         ui.add_space(10.0);
@@ -3513,7 +3513,7 @@ fn svg_dialog(app: &mut PhotocraftApp, ctx: &egui::Context) {
             p.w_cm = units_cm(w);
             p.h_cm = units_cm(gs::size_for_width(pw, ph, w).1);
         };
-        egui::Modal::new(egui::Id::new("gang-svg-size")).show(ctx, |ui| {
+        egui::Modal::new(egui::Id::unique("gang-svg-size")).show(ctx, |ui| {
             ui.set_width(400.0);
             ui.spacing_mut().item_spacing.y = 8.0;
             ui.label(egui::RichText::new(tl!("SVG Print Size")).font(crate::theme::semibold(15.0)).color(t.text));
@@ -3591,7 +3591,7 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     // The tool palette floats at the left: the sheet fits in the room beside it.
     let beside = PALETTE_ROOM;
     let fit = ((area.width() - beside - 40.0) / sw).min((area.height() - 40.0) / sl).max(1e-4);
-    let resp = ui.interact(area, ui.id().with("gang-sheet-view"), Sense::click_and_drag());
+    let resp = ui.interact(area, ui.scope_id().with("gang-sheet-view"), Sense::click_and_drag());
     if resp.hovered() {
         let (zoom_delta, scroll) = ui.input(|i| (i.zoom_delta(), i.smooth_scroll_delta));
         if (zoom_delta - 1.0).abs() > 1e-4 {
@@ -4276,7 +4276,8 @@ mod tests {
         app.run("edit.fill", json!({"color": "#c03020"})).unwrap();
         let ctx = egui::Context::default();
         invoke(&mut app, &ctx, json!({"set": {"rotate": false}, "addDocument": true, "source": {"index": 0, "onSheet": 3}}));
-        let mut h = Harness::builder().with_size(egui::vec2(1600.0, 1000.0)).build_ui_state(
+        // Some of the sheet's fields have no accessible name yet (egui 0.37 checks).
+        let mut h = Harness::builder().with_size(egui::vec2(1600.0, 1000.0)).with_accessibility_check(false).build_ui_state(
             |ui, s: &mut (PhotocraftApp, bool)| {
                 // Drawn once the app's fonts are in.
                 if s.1 {

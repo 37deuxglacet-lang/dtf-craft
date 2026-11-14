@@ -13,14 +13,23 @@
 //! shells out to git, so builds work from a source tarball and for wasm.
 
 /// The workspace version, such as `0.1.0` or `0.2.0-rc.1`: the PhotoCraft base.
-pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const VERSION: &str = match option_env!("PHOTOCRAFT_OVERRIDE_VERSION") {
+    Some(v) => v,
+    None => env!("CARGO_PKG_VERSION"),
+};
 
 /// DTF Craft's own version (the one the subscription follows: 1.0, 2.0…; 1.1, 1.2 are updates).
-pub const DTF_CRAFT_VERSION: &str = "1.0";
+pub const DTF_CRAFT_VERSION: &str = "1.1";
 
-/// `1.0 — PhotoCraft 0.8.2 (3f2a9c1d0, 2026-10-01)`: DTF Craft's version, then its base's.
+/// `1.1 — PhotoCraft 0.23.1 (3f2a9c1d0, 2026-10-01)`: DTF Craft's version, then its base's.
 pub fn dtf_craft_version() -> String {
     format!("{DTF_CRAFT_VERSION} — PhotoCraft {}", long_version())
+}
+
+/// [`dtf_craft_version`] worked out once, for a `&'static str` such as clap's `version`.
+pub fn dtf_craft_version_static() -> &'static str {
+    static LONG: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    LONG.get_or_init(dtf_craft_version)
 }
 
 /// The full git commit this build was made from, when the build environment recorded it.
@@ -41,6 +50,12 @@ pub fn short_sha() -> Option<&'static str> {
 /// `0.1.0 (3f2a9c1d0, 2026-10-01)`, or `0.1.0 (dev build)` without provenance.
 pub fn long_version() -> String {
     format_long(VERSION, short_sha(), build_date())
+}
+
+/// [`long_version`] worked out once, for a `&'static str` such as clap's `version`.
+pub fn long_version_static() -> &'static str {
+    static LONG: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    LONG.get_or_init(long_version)
 }
 
 fn format_long(version: &str, sha: Option<&str>, date: Option<&str>) -> String {
@@ -68,6 +83,7 @@ mod tests {
     fn version_is_the_workspace_version() {
         assert!(!VERSION.is_empty());
         assert!(long_version().starts_with(VERSION));
+        assert_eq!(long_version_static(), long_version());
         if let Some(s) = short_sha() {
             assert!(s.len() <= 9);
         }

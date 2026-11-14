@@ -57,7 +57,7 @@ fn rgb_document(doc: &Document) -> Result<Document> {
 pub fn visual_pixels(doc: &Document) -> Result<(u32, u32, Vec<[f32; 4]>)> {
     let doc = rgb_document(doc)?;
     let buf = photocraft_compose::flatten(&doc);
-    Ok((doc.size.width, doc.size.height, buf.px))
+    Ok((doc.size.width, doc.size.height, buf.into_px()))
 }
 
 /// A regular sample of at most [`ANALYSIS_PIXELS`] pixels.
@@ -230,7 +230,7 @@ fn replace(s: &mut Session, p: &Value) -> Result<Value> {
     let (name, hint) = replaced_name(&st.doc.name, st.path.as_deref());
     let name = p.get("name").and_then(Value::as_str).filter(|n| !n.trim().is_empty()).map_or(name, str::to_string);
     let mut doc = rgb_document(&st.doc)?;
-    let mut px = photocraft_compose::flatten(&doc).px;
+    let mut px = photocraft_compose::flatten(&doc).into_px();
     let original = (!ranges.is_empty()).then(|| px.clone());
     dtf_color::replace(&mut px, &centers);
     if let Some(original) = original {

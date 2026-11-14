@@ -445,7 +445,7 @@ fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
                     _ => None,
                 })
                 .collect();
-            crate::image_cmds::resample_doc(doc, nw, nh, photocraft_algo::resample::Resample::BicubicSmoother);
+            crate::image_cmds::resample_doc(doc, UPSCALE, nw, nh, photocraft_algo::resample::Resample::BicubicSmoother)?;
             if let Some(dpi) = resolution {
                 doc.resolution_dpi = dpi as f32;
             } else if keep_print {

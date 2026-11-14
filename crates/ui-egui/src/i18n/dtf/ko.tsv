@@ -296,7 +296,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG 선택 해제: 색상이 SVG에서 빠지며 그 도형은 병합되지 않고 삭제됩니다.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	색상 분석기와 공유. 형식: .ase, .aco, .csv; 차이는 ΔE 2000.
 	{name} vectorized color sheet	{name} 벡터화 색상 시트
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 선택: 도형이 기준 색상을 가지며 SVG에서 그 이름이 붙습니다. ΔE: 2 이하 = 인지 불가 · 2~5 = 가까이서 보임 · 그 이상 = 다른 색조
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ 선택: 도형이 기준 색상을 가지며 SVG에서 그 이름이 붙습니다. ΔE: 2 이하 = 인지 불가 · 2~5 = 가까이서 보임 · 그 이상 = 다른 색조
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	"{color}"은(는) 색이 아닙니다: #rrggbb 형식으로 쓰세요.
 	16 Colors	16색

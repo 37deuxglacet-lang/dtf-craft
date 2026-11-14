@@ -292,7 +292,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG bỏ chọn: màu bị loại khỏi SVG; các hình của nó bị xóa, không gộp.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dùng chung với Trình phân tích màu. Định dạng: .ase, .aco, .csv; chênh lệch theo ΔE 2000.
 	{name} vectorized color sheet	{name} bảng màu vector hóa
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ được chọn: các hình lấy màu của tham chiếu và mang tên của nó trong SVG. ΔE: đến 2 = không nhận ra · 2 đến 5 = thấy khi nhìn gần · cao hơn = sắc độ khác
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ được chọn: các hình lấy màu của tham chiếu và mang tên của nó trong SVG. ΔE: đến 2 = không nhận ra · 2 đến 5 = thấy khi nhìn gần · cao hơn = sắc độ khác
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	"{color}" không phải là màu: hãy viết dạng #rrggbb.
 	16 Colors	16 màu

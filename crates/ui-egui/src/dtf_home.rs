@@ -15,7 +15,7 @@ pub(crate) fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     crate::home_image::start(app);
     crate::home_image::poll(app, ui.ctx());
     if !crate::home_image::paint(app, ui, area) {
-        crate::canvas::paint_dots(ui, area, app.session.prefs().interface.show_canvas_dots);
+        crate::canvas::tabs::paint_dots(ui, area, app.session.prefs().interface.show_canvas_dots);
     }
     // DTF Craft: a sober start screen, the card and the links under it, centred.
     let card = Rect::from_center_size(area.center(), egui::vec2(460.0, 360.0));

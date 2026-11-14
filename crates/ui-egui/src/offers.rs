@@ -158,6 +158,9 @@ fn item(id: &str, label: &str, top: &str) -> MenuItem {
 /// The offers in the menus, in French only: at the end of the DTF menu after a separator, and in
 /// the Help menu before System Info.
 pub fn insert_menu_items(items: &mut Vec<MenuItem>) {
+    // DTF Craft has no Help › Check for Updates (PhotoCraft's releases): its versions are
+    // announced on dtfcraft.fr and by e-mail.
+    items.retain(|i| i.id != "help.checkForUpdates");
     if !shown() {
         return;
     }
@@ -179,12 +182,12 @@ pub fn insert_menu_items(items: &mut Vec<MenuItem>) {
 const PENDING: &str = "dtf-offer-request";
 
 fn ask(ctx: &egui::Context, request: Request, tool: Option<&'static str>) {
-    ctx.data_mut(|d| d.insert_temp(egui::Id::new(PENDING), (request, tool)));
+    ctx.data_mut(|d| d.insert_temp(egui::Id::unique(PENDING), (request, tool)));
 }
 
 /// Opens the message a help sheet asked for.
 pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
-    let pending = ctx.data_mut(|d| d.remove_temp::<(Request, Option<&'static str>)>(egui::Id::new(PENDING)));
+    let pending = ctx.data_mut(|d| d.remove_temp::<(Request, Option<&'static str>)>(egui::Id::unique(PENDING)));
     if let Some((request, tool)) = pending {
         open(app, ctx, request, tool);
     }

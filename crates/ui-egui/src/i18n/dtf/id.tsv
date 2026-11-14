@@ -300,7 +300,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG tidak dicentang: warna dikeluarkan dari SVG; bentuknya dihapus, tidak digabung.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dipakai bersama Penganalisis Warna. Format: .ase, .aco, .csv; selisih dalam ΔE 2000.
 	{name} vectorized color sheet	{name} lembar warna vektorisasi
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ dicentang: bentuk mengambil warna referensi dan diberi namanya di SVG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ dicentang: bentuk mengambil warna referensi dan diberi namanya di SVG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	"{color}" bukan warna: tulis sebagai #rrggbb.
 	16 Colors	16 warna

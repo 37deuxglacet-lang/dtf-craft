@@ -1013,7 +1013,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let before = v.settings.clone();
     let mut action = None;
     let screen = ctx.content_rect();
-    egui::Area::new(egui::Id::new("dtf-vectorizer")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
+    egui::Area::new(egui::Id::unique("dtf-vectorizer")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
         let Some(v) = app.vectorizer.as_mut() else { return };
         action = draw(ui, v, screen);
     });
@@ -1214,7 +1214,7 @@ fn preview(ui: &mut egui::Ui, v: &mut Vectorizer, area: Rect) {
     let base = fit(frame0).size();
     // Zoom and pan: the pointer over either frame moves both.
     for (k, (frame, _)) in frames.iter().enumerate() {
-        let resp = ui.interact(*frame, ui.id().with(("dtf-vectorizer-view", k)), Sense::click_and_drag());
+        let resp = ui.interact(*frame, ui.scope_id().with(("dtf-vectorizer-view", k)), Sense::click_and_drag());
         if resp.hovered() {
             let (zoom_delta, scroll) = ui.input(|i| (i.zoom_delta(), i.smooth_scroll_delta));
             if (zoom_delta - 1.0).abs() > 1e-4
@@ -1656,7 +1656,7 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
 }
 
 /// The palette: each colour with its share, the background marked, and its swatch-book reference;
-/// unchecked colours are left out of the SVG, colours checked in ⇄ take their reference's colour
+/// unchecked colours are left out of the SVG, colours checked in ↔ take their reference's colour
 /// and name in the SVG.
 fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui::Ui, &str)) {
     let t = Tokens::get(ui.ctx());
@@ -1743,7 +1743,7 @@ fn palette_ui(ui: &mut egui::Ui, v: &mut Vectorizer, section: &dyn Fn(&mut egui:
     ui.add_space(4.0);
     ui.label(RichText::new(tl!("SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.")).small().color(t.text_faint));
     ui.label(
-        RichText::new(tl!("⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue"))
+        RichText::new(tl!("↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue"))
             .small()
             .color(t.text_faint),
     );
@@ -2100,9 +2100,9 @@ mod tests {
         let (mut app, _) = app();
         open(&mut app).unwrap();
         app.vectorizer.as_mut().unwrap().view = View::Vectorized;
-        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).with_accessibility_check(false).build_ui_state(
             |ui, app: &mut PhotocraftApp| {
-                let ready = egui::Id::new("vectorizer-zoom-fonts");
+                let ready = egui::Id::unique("vectorizer-zoom-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));
@@ -2130,9 +2130,9 @@ mod tests {
     fn the_module_draws_over_the_window_and_closes_with_escape() {
         let (mut app, _) = app();
         open(&mut app).unwrap();
-        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).with_accessibility_check(false).build_ui_state(
             |ui, app: &mut PhotocraftApp| {
-                let ready = egui::Id::new("vectorizer-test-fonts");
+                let ready = egui::Id::unique("vectorizer-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));
@@ -2225,9 +2225,9 @@ mod tests {
         let (mut app, _) = app();
         crate::color_analyzer_ui::save_book(&mut app, &book());
         open(&mut app).unwrap();
-        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).with_accessibility_check(false).build_ui_state(
             |ui, app: &mut PhotocraftApp| {
-                let ready = egui::Id::new("vectorizer-test-fonts");
+                let ready = egui::Id::unique("vectorizer-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));
@@ -2315,9 +2315,9 @@ mod tests {
         open(&mut app).unwrap();
         app.vectorizer.as_mut().unwrap().settings.engine = Engine::VectorCraft;
         app.vectorizer.as_mut().unwrap().quantize();
-        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 900.0)).build_ui_state(
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 900.0)).with_accessibility_check(false).build_ui_state(
             |ui, app: &mut PhotocraftApp| {
-                let ready = egui::Id::new("vectorizer-test-fonts");
+                let ready = egui::Id::unique("vectorizer-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));

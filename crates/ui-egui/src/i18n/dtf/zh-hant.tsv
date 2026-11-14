@@ -308,7 +308,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG 未勾選：該顏色不進入 SVG；其形狀被刪除，而不是合併。
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	與顏色分析器共用。格式：.ase、.aco、.csv；差異以 ΔE 2000 計。
 	{name} vectorized color sheet	{name} 向量化色卡
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 勾選：形狀採用參考色，並在 SVG 中以其命名。ΔE：2 以內 = 難以察覺 · 2 到 5 = 近看可見 · 以上 = 另一色相
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ 勾選：形狀採用參考色，並在 SVG 中以其命名。ΔE：2 以內 = 難以察覺 · 2 到 5 = 近看可見 · 以上 = 另一色相
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	「{color}」不是顏色：請寫成 #rrggbb。
 	16 Colors	16 色
