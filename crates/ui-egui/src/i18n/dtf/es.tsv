@@ -1,0 +1,431 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	Semitono DTF…
+	Remove Semi-Transparent Pixels…	Eliminar píxeles semitransparentes…
+	Gang Sheet…	Hoja de impresión (gang sheet)…
+	AI Upscale…	Ampliación con IA…
+	Print Conformity…	Conformidad de impresión…
+	Control Background…	Fondo de control…
+	Remove Control Background	Eliminar fondo de control
+	Saturation…	Saturación…
+	Target	Objetivo
+	Dark Garment	Prenda oscura
+	Light Garment	Prenda clara
+	Min Dot	Punto mínimo
+	Max Dot	Punto máximo
+	Ellipse	Elipse
+	About DTF Craft	Acerca de DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — basado en PhotoCraft
+	based on PhotoCraft · open source	basado en PhotoCraft · código abierto
+	Website	Sitio web
+	Contact	Contacto
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — herramientas DTF de Stéphane GLACET, basado en:
+	DTF Settings	Ajustes DTF
+	Open a document to use the DTF settings.	Abra un documento para usar los ajustes DTF.
+	Semi-Transparent Pixels Only	Solo píxeles semitransparentes
+	Whole Visual — Dark Garment	Diseño completo — prenda oscura
+	Whole Visual — Light Garment	Diseño completo — prenda clara
+# DTF Craft (3)
+	Print Conformity	Conformidad de impresión
+	Control Background	Fondo de control
+	Remove Semi-Transparent Pixels	Eliminar píxeles semitransparentes
+	Defringe	Eliminar halos
+	Smart Sharpen	Enfoque suavizado
+	Current size: {width} × {height} cm at {resolution} ppi	Tamaño actual: {width} × {height} cm a {resolution} ppp
+	Width (cm, 0 = proportional)	Anchura (cm, 0 = proporcional)
+	Height (cm, 0 = proportional)	Altura (cm, 0 = proporcional)
+	Conformity	Conformidad
+	No Background	Sin fondo
+	Fringe	Halos
+	Sharpness	Nitidez
+# DTF Craft (4)
+	Remove White Background…	Eliminar fondo blanco…
+	Remove White Background	Eliminar fondo blanco
+	Cutout	Recorte
+	Detect Color	Detectar color de fondo
+	Remove Halo	Eliminar halo
+	Interior Holes	Huecos interiores
+	Min Hole Size	Tamaño mín. de hueco (px)
+# DTF Craft (5)
+	Transparent Pixels	Píxeles transparentes
+	Remove Fringe	Eliminar halos
+	Show Background	Mostrar fondo
+	Delete Background	Eliminar fondo
+# DTF Craft (6)
+	Layer Name	Nombre de capa
+	Preview Background	Fondo de vista previa
+	Add Holes (Magic Wand)	Añadir huecos (varita mágica)
+	Show Before	Mostrar antes
+	Click an enclosed area to make it transparent.	Haga clic en una zona cerrada para hacerla transparente.
+	Interior Hole	Hueco interior
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — versión beta
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Esta es una versión beta de DTF Craft para pruebas: algunas herramientas aún pueden cambiar o contener errores.
+	Release planned for November 2, 2026.	Lanzamiento previsto el 2 de noviembre de 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) a {resolution} ppp
+	AI Upscale	Ampliación con IA
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Añadir huecos (borrador mágico)
+	Eraser Tolerance	Tolerancia del borrador
+# DTF Craft (11)
+	Color Analyzer…	Analizador de color…
+	Color Analyzer	Analizador de color
+	Replace Colors with Swatches	Reemplazar colores por muestras
+	the document is not modified	el documento no se modifica
+	Original Colors	Colores originales
+	Replaced Colors	Colores reemplazados
+	With Patches	Con parches
+	Add a color with the eyedropper: click the visual.	Añadir un color con el cuentagotas: haga clic en el diseño.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Una copia con los colores marcados reemplazados por sus referencias, guardada como PNG y abierta en una nueva pestaña.
+	PDF Sheet…	Ficha PDF…
+	An A4 sheet with the visual, its colors and their references.	Una ficha A4 con el diseño, sus colores y sus referencias.
+	Export PNG…	Exportar PNG…
+	Analyzed Pixels	Píxeles analizados
+	Visible, transparency ignored	Visibles, transparencia ignorada
+	RGB {bits} bits	RGB {bits} bits
+	Maximum Colors	Colores máximos
+	Grouping (ΔE)	Agrupación (ΔE)
+	Colors closer than this difference are counted as one.	Los colores más cercanos que esta diferencia cuentan como uno.
+	Ignore colors under 0.5 % of the area	Ignorar colores por debajo del 0,5 % de la superficie
+	Reference Swatch Book	Muestrario de referencia
+	None loaded	Ninguno cargado
+	{name} · {n} colors	{name} · {n} colores
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formatos: .ase, .aco, .csv (ref; R; G; B o L*a*b*). Diferencia medida en ΔE 2000.
+	Detected Colors: {n}	Colores detectados: {n}
+	Patches · on-screen check and PDF sheet	Parches · control en pantalla y ficha PDF
+	Below	Debajo
+	Reference	Referencia
+	Hex	Hex
+	Client	Cliente
+	On the PDF sheet	En la ficha PDF
+	Replaced in the PNG export	Reemplazado en la exportación PNG
+	Visual	Diseño
+	Area	Superficie
+	Match	Correspondencia
+	Remove this color	Quitar este color
+	Change…	Cambiar…
+	Load a swatch book to find the references.	Cargue un muestrario para encontrar las referencias.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Marcado: el color del diseño se reemplaza por la referencia al exportar PNG. ΔE: hasta 2 = imperceptible · 2 a 5 = visible de cerca · más = otro tono
+	Reference for {hex}	Referencia para {hex}
+	Nearest (automatic)	La más cercana (automático)
+	No visible pixels to analyze.	No hay píxeles visibles que analizar.
+	Swatch book loaded: {name}, {n} colors	Muestrario cargado: {name}, {n} colores
+	{name} color sheet	{name} ficha de color
+	Color sheet saved: {path}	Ficha de color guardada: {path}
+	Color Sheet	Ficha de color
+	Date	Fecha
+	Profile	Perfil
+	Swatch Book	Muestrario
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Colores detectados: {n}
+	No swatch book loaded: the colors have no reference.	Ningún muestrario cargado: los colores no tienen referencia.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Correspondencias con ΔE 2 o menos: {good}; por revisar (ΔE 2 a 5): {check}; más de 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Tamaño del diseño: {w} × {h} px, {wcm} × {hcm} cm a {dpi} ppp.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: hasta 2 = diferencia imperceptible · 2 a 5 = visible de cerca · más de 5 = otro tono.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Colores mostrados en sRGB: el resultado impreso depende de la impresora, las tintas y el soporte.
+	Sheet made with DTF Craft	Ficha creada con DTF Craft
+	RGB	RGB
+	Color Profile	Perfil de color
+# DTF Craft (12)
+	Add Holes	Añadir agujeros
+	Add Hole	Añadir agujero
+# DTF Craft (13)
+	Pick the Background Colour	Color de fondo con cuentagotas
+	Click the background colour to remove.	Haga clic en el color de fondo que desea quitar.
+	Click a visible pixel of the background.	Haga clic en un píxel visible del fondo.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	No se detectó un fondo liso: el fondo ya es transparente, o elija su color con el cuentagotas.
+	Holes: {n}	Agujeros: {n}
+	Remove Last Hole	Quitar el último agujero
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Hoja de impresión (gang sheet)
+	Visuals	Diseños
+	Add PNG Files…	Añadir archivos PNG…
+	Add Open Document	Añadir el documento abierto
+	Add PNG files or the open document.	Añada archivos PNG o el documento abierto.
+	Sheet	Hoja
+	Film Width	Ancho del film
+	Max Length	Longitud máx.
+	Allow Rotation	Permitir rotación
+	Auto Build	Montaje automático
+	Selected Visual	Diseño seleccionado
+	Rotate 90°	Girar 90°
+	Length used: {length} cm	Longitud usada: {length} cm
+	{n} not placed	Sin colocar: {n}
+	{n} too close or overlapping	Demasiado cerca o superpuestos: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Arrastre un diseño para moverlo. Flechas: 1 mm (Mayús: 1 cm). Supr lo quita de la hoja.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Diseños más cerca que el margen de otro diseño o de un borde: {n}. ¿Exportar de todos modos?
+	Too close to another visual	Demasiado cerca de otro diseño
+	No room to turn this visual	No hay espacio para girar este diseño
+	Open a document first	Abra primero un documento
+	the document was closed	el documento se cerró
+	Duplicate	Duplicar
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Hojas activas
+	Add a New Sheet	Añadir una hoja nueva
+	Add a copy to the sheet	Añadir una copia a la hoja
+	Along the edges	A lo largo de los bordes
+	Auto Build May Rotate	Permitir rotación (automático)
+	Auto Build — every image at once	Montaje automático — todas las imágenes a la vez
+	Auto Fill	Relleno automático
+	Background Warning:	Aviso de fondo:
+	Background not removed (opaque corners)	Fondo sin quitar (esquinas opacas)
+	Between images	Entre imágenes
+	Center Horizontally	Centrar horizontalmente
+	Center Vertically	Centrar verticalmente
+	Center on the Sheet	Centrar en la hoja
+	Copies of this sheet to print	Copias de esta hoja a imprimir
+	Custom Color	Color personalizado
+	Delete (Del)	Eliminar (Supr)
+	Delete the Sheet	Eliminar la hoja
+	Drag and drop a file here or click to	Arrastre un archivo aquí o haga clic para
+	Duplicate Image	Duplicar imagen
+	Export Sheets (PNG)…	Exportar hojas (PNG)…
+	Fill the room left on the sheet with this visual	Rellenar el espacio libre de la hoja con este diseño
+	Flip Horizontally	Voltear horizontalmente
+	Flip Vertically	Voltear verticalmente
+	Good	Buena
+	Good resolution >= 250 dpi	Buena resolución >= 250 dpi
+	Grid (1 cm)	Cuadrícula (1 cm)
+	Image Margin	Margen de la imagen
+	Import Images	Importar imágenes
+	Lock Proportions	Bloquear proporciones
+	Margin (cm)	Margen (cm)
+	No image yet: import PNG files or add the open document.	Aún no hay imágenes: importe archivos PNG o añada el documento abierto.
+	No room left on the sheet	No queda espacio en la hoja
+	Number of Images:	Número de imágenes:
+	One copy less	Una copia menos
+	One copy more	Una copia más
+	Optimal	Óptima
+	Optimal resolution >= 300 dpi	Resolución óptima >= 300 dpi
+	Overlap Lines	Líneas de superposición
+	Overlapping or too close	Superpuesto o demasiado cerca
+	Poor	Mala
+	Poor resolution >= 200 dpi	Mala resolución >= 200 dpi
+	Proportions:	Proporciones:
+	Push Down	Empujar abajo
+	Push Left	Empujar a la izquierda
+	Push Right	Empujar a la derecha
+	Push Up	Empujar arriba
+	Qty:	Cant.:
+	Redo (Ctrl+Y)	Rehacer (Ctrl+Y)
+	Rotate 90° Counterclockwise	Girar 90° en sentido antihorario
+	Same image, another size	Misma imagen, otro tamaño
+	Select an object to edit.	Seleccione un objeto para editarlo.
+	Semi-transparent pixels: {p} %	Píxeles semitransparentes: {p} %
+	Settings	Ajustes
+	Sheet Background	Fondo de la hoja
+	Sheet Margin	Margen de la hoja
+	Show Overlap Lines	Mostrar líneas de superposición
+	Show Resolution Lines	Mostrar líneas de resolución
+	Snap While Moving	Alinear al mover
+	Start Over	Empezar de nuevo
+	Stretch to the Film Width	Estirar al ancho del film
+	Stretch to the Sheet Length	Estirar al largo de la hoja
+	Supported format: PNG (cropped to its visible pixels)	Formato admitido: PNG (recortado a sus píxeles visibles)
+	Transparency Warning:	Aviso de transparencia:
+	Undo (Ctrl+Z)	Deshacer (Ctrl+Z)
+	Very Poor	Muy mala
+	Very poor resolution < 200 dpi	Resolución muy mala < 200 dpi
+	With the image margin	Con el margen de la imagen
+	With the sheet margin	Con el margen de la hoja
+	copy	copia
+	{n} images	{n} imágenes
+# DTF Craft (14)
+	Vectorization…	Vectorización…
+	Vectorization	Vectorización
+	Vectorized	Vectorizado
+	Side by Side	Lado a lado
+	Show Contours	Mostrar contornos
+	Checkerboard under Transparency	Cuadrícula bajo la transparencia
+	{colors} colors · {shapes} shapes · {points} points	{colors} colores · {shapes} formas · {points} puntos
+	Cut-out shapes, no overlap	Formas recortadas, sin superposición
+	Open document, flattened	Documento abierto, acoplado
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm a {dpi} ppp
+	Type of Visual	Tipo de imagen
+	Logo · flat colors	Logotipo · colores planos
+	Illustration · shades	Ilustración · matices
+	Number of Colors	Número de colores
+	Detail Level	Nivel de detalle
+	Sharp Corners	Esquinas vivas
+	Remove the Background	Eliminar el fondo
+	read on the visual's edge	leído en el borde de la imagen
+	No background found: the visual is already cut out.	No se encontró fondo: la imagen ya está recortada.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	{n} colores · {k} en el SVG
+	Edge Background	Fondo
+	Keep {hex} in the SVG	Conservar {hex} en el SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Sin marcar: el color se excluye del SVG; sus formas se eliminan, no se fusionan.
+	SVG · cut-out shapes	SVG · formas recortadas
+	{w} × {h} mm (document size)	{w} × {h} mm (tamaño del documento)
+	Open the SVG in DTF Craft after the export	Abrir el SVG en DTF Craft después de exportar
+	Export SVG…	Exportar SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Formas recortadas al tamaño de impresión del documento, guardadas como SVG.
+	SVG saved: {path}	SVG guardado: {path}
+	No visible pixels to vectorize.	No hay píxeles visibles que vectorizar.
+	Nothing to export: every color is left out.	Nada que exportar: todos los colores están excluidos.
+	High	Alto
+	Low	Bajo
+	Low Detail	Bajo
+	Medium Detail	Medio
+	High Detail	Alto
+	Close the Seams between Colors	Cerrar las juntas entre colores
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Cada forma se superpone medio píxel a sus vecinas, para que no aparezca ninguna línea transparente entre dos colores al imprimir. Desmarque para formas estrictamente recortadas (plóter de corte).
+# DTF Craft (14)
+	Conformity…	Conformidad…
+	Cutout…	Recorte…
+	Transparent Pixels…	Píxeles transparentes…
+	Remove Fringe…	Eliminar halos…
+	Sharpness…	Nitidez…
+# DTF Craft (15)
+	Group the Selection	Agrupar
+	Ungroup	Desagrupar
+	Group (Ctrl+G)	Agrupar (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Desagrupar (Ctrl+Mayús+G)
+	Duplicate (Ctrl+D)	Duplicar (Ctrl+D)
+	{n} visuals selected	{n} diseños seleccionados
+	Colors kept: {n}	Colores conservados: {n}
+# DTF Craft (16)
+	Applied Ranges	Gamas aplicadas
+	Click: a color · Shift+click: add · Alt+click: remove	Clic: un color · Mayús+clic: añadir · Alt+clic: quitar
+	Contiguous Pixels	Píxeles contiguos
+	Pick a color on the visual.	Elija un color en el diseño.
+	Remove this range	Quitar esta gama
+	Replacement Color	Color de sustitución
+	Turn on Color Range above the visual, then click a color.	Active Gama de colores sobre el diseño y haga clic en un color.
+	{p} % of the visible pixels	{p} % de los píxeles visibles
+# DTF Craft (17)
+	Hide the image	Ocultar la imagen
+	Illustration: {user} on Pixabay	Ilustración: {user} en Pixabay
+	Show an illustration	Mostrar una ilustración
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Una hoja A4 con el visual, el resultado vectorizado, sus colores y sus referencias.
+	Detected Colors	Colores detectados
+	Replaced by the reference in the SVG	Sustituido por la referencia en el SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG sin marcar: el color se excluye del SVG; sus formas se eliminan, no se fusionan.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Compartido con el Analizador de color. Formatos: .ase, .aco, .csv; diferencia en ΔE 2000.
+	{name} vectorized color sheet	{name} ficha de color vectorizada
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ marcado: las formas toman el color de la referencia y llevan su nombre en el SVG. ΔE: hasta 2 = imperceptible · de 2 a 5 = visible de cerca · más = otro tono
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	«{color}» no es un color: escríbalo como #rrggbb.
+	16 Colors	16 colores
+	3 Colors	3 colores
+	6 Colors	6 colores
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Un círculo, una elipse, un rectángulo o un polígono regular sale exactamente con esa forma.
+	Abutting	Contiguas
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Contiguas: cada color tiene su propia zona, las formas comparten sus bordes. Superpuestas: cada capa se extiende bajo las de encima, sin huecos entre colores.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Una zona cuyo color cambia de forma regular en una dirección es una sola forma rellena con un degradado lineal.
+	Areas smaller than this many pixels are ignored.	Se ignoran las zonas con menos píxeles que este valor.
+	Black and White	Blanco y negro
+	Black and White Logo	Logotipo en blanco y negro
+	Cut-out shapes, contours cleaned for DTF printing.	Formas recortadas, contornos limpios para la impresión DTF.
+	Engine	Motor
+	Exact Shapes	Formas exactas
+	Fills	Rellenos
+	Flat Logo	Logotipo plano
+	Full Tone	Tono continuo
+	Grays	Grises
+	High Fidelity Photo	Foto de alta fidelidad
+	Higher keeps more sharp corners.	Más alto conserva más esquinas vivas.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Fidelidad de las curvas a los píxeles: más alto es más fiel, con más puntos.
+	Ignore Color	Ignorar color
+	Limited	Limitada
+	Line Art	Dibujo lineal
+	Lines as Strokes	Líneas como trazos
+	Lines no wider than the stroke width are traced as stroked center lines.	Las líneas no más anchas que el grosor del trazo se calcan como líneas centrales con trazo.
+	Load a swatch book to use it as the palette.	Cargue un libro de muestras para usarlo como paleta.
+	Logo Colors	Colores del logotipo
+	Low Fidelity Photo	Foto de baja fidelidad
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Las curvas casi rectas pasan a ser líneas rectas; en Logotipo plano, las partes de círculo pasan a ser arcos verdaderos.
+	Nothing to trace: everything is ignored or transparent.	Nada que calcar: todo está ignorado o es transparente.
+	Outline	Contorno
+	Overlapping	Superpuestas
+	Pixels darker than this are black.	Los píxeles más oscuros que este valor son negros.
+	Shades of Gray	Tonos de gris
+	Silhouettes	Siluetas
+	Sketched Art	Boceto
+	Snap Curves to Lines	Ajustar curvas a líneas
+	Technical Drawing	Dibujo técnico
+	The areas of this color are left out (white when the field is empty).	Las zonas de este color se excluyen (blanco si el campo está vacío).
+	The colors of the reference swatch book below, at most this many.	Los colores del libro de muestras de referencia de abajo, como máximo este número.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Este visual no es un logotipo de colores planos ({p} % de sus zonas sólidas son planas): elija el modo Color.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Demasiados puntos: aumente Ruido, o reduzca Trazados o Colores.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Calco de imagen de VectorCraft: sus ajustes preestablecidos y todos sus ajustes, para DTF y otras técnicas.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vectorización: Calco de imagen de VectorCraft (ArtCraft Team y los colaboradores de VectorCraft, MIT OR Apache-2.0) y visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automático, o #rrggbb #rrggbb…
+	Stroke Width	Grosor del trazo
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Celdas de {size} × {size} cm · {rows} filas
+	Cells touch: no spacing between images.	Celdas contiguas: sin espacio entre imágenes.
+	No Cells	Sin celdas
+	Organize Automatically on Import	Organizar automáticamente al importar
+	Printed width: {width} cm	Ancho de impresión: {width} cm
+	Reserve up to {max} cm · not exported	Reserva hasta {max} cm · no se exporta
+	Snap to the Cells	Ajustar a las celdas
+	Split the Width into Cells	Dividir el ancho en celdas
+	{width} × {length} cm (max {max})	{width} × {length} cm (máx. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Sin tamaño en el archivo: se proponen {width} cm.
+	Place	Colocar
+	SVG Print Size	Tamaño de impresión del SVG
+	Size given in the file.	Tamaño indicado en el archivo.
+	Skip	Omitir
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Formatos admitidos: PNG (recortado a sus píxeles visibles) y SVG (renderizado a su tamaño de impresión)
+	Width in cells:	Ancho en celdas:
+	SVG files still waiting: {n}	Archivos SVG aún en espera: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	IA ×{scale}: {from} → {to} px
+	Background {color} made transparent	Fondo {color} vuelto transparente
+	Copy for Vectorization	Copia para vectorizar
+	Fringes removed, 2 px margin	Halos eliminados, margen de 2 px
+	JPEG: light median against the artefacts	JPEG: mediana ligera contra los artefactos
+	Optimize for Vectorization	Optimizar para vectorizar
+	RGB 8 bits, sRGB	RGB 8 bits, sRGB
+	Reduced: {from} → {to} px	Reducido: {from} → {to} px
+	Size kept: {size} px	Tamaño conservado: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Demasiados colores ({n}): una foto o un degradado se presta mal a la vectorización.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Sitio de ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analizando los colores…
+	Background kept	Fondo conservado
+	Sheets used: {sheets}	Hojas usadas: {sheets}
+	The vectorization stopped unexpectedly.	La vectorización se detuvo de forma inesperada.
+	Tracing the shapes…	Trazando las formas…
+	Tracing with VectorCraft…	Trazando con VectorCraft…
+	{n} new sheets added	{n} hojas nuevas añadidas
+# DTF Craft (26)
+	AI upscale…	Ampliación IA…
+	Not Suited to Vectorization	Poco adecuado para vectorizar
+	On white	Sobre blanco
+	Preparation cancelled	Preparación cancelada
+	Prepared for vectorization: {steps}	Preparado para vectorizar: {steps}
+	Preparing for Vectorization	Preparación para vectorizar
+	Preparing the visual…	Preparando el visual…
+	The document changed during the preparation.	El documento cambió durante la preparación.
+	The preparation stopped unexpectedly.	La preparación se detuvo de forma inesperada.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Clic: sus ajustes · Doble clic: añadir una copia a la hoja
+# DTF Craft (28)
+	Locked	Bloqueado
+	Unlocked	Desbloqueado
+# DTF Craft (29)
+	Manual	Manual
+	Black T-Shirt	Camiseta negra
+	Soft Black T-Shirt	Camiseta negra suave
+	White T-Shirt	Camiseta blanca
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Capas de retoque (brillo +32, saturación +16), ocultas
+# DTF Craft (30)
+	Cells	Celdas
+	Click: show the sheet · Double-click: rename it	Clic: mostrar la hoja · Doble clic: cambiar el nombre
+	Copies to Print	Copias a imprimir
+	Custom Width	Ancho personalizado
+	Display	Visualización
+	Drop PNG or SVG files here	Suelte aquí archivos PNG o SVG
+	Duplicate the Sheet	Duplicar la hoja
+	Every sheet emptied, the visuals kept	Todas las hojas vaciadas, los diseños se conservan
+	Every visual's size and copies, then lay the sheets out	Tamaño y copias de cada diseño, luego organizar las hojas
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Total: {sheets} hojas · {visuals} diseños

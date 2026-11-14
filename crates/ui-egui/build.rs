@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Bake the contributor credits into the binary as static Rust tables (craftrules
 //! standards/contributors.md). Nothing is read at run time.
 //!
@@ -97,7 +99,15 @@ fn pack_catalogs() {
             let path = entry?.path();
             let Some(name) = path.file_name().and_then(|n| n.to_str()).filter(|n| n.ends_with(".tsv")) else { continue };
             println!("cargo::rerun-if-changed={}", path.display());
-            catalogs.push((name.to_owned(), std::fs::read_to_string(&path)?));
+            let mut text = std::fs::read_to_string(&path)?;
+            // DTF Craft: the DTF strings live in `src/i18n/dtf/<code>.tsv`, appended to the
+            // PhotoCraft catalog, so PhotoCraft updates of `<code>.tsv` merge without conflict.
+            let dtf = src.join("dtf").join(name);
+            if dtf.is_file() {
+                println!("cargo::rerun-if-changed={}", dtf.display());
+                text.push_str(&std::fs::read_to_string(&dtf)?);
+            }
+            catalogs.push((name.to_owned(), text));
         }
         // Largest first, then by name: the key order (and so the output) is reproducible.
         catalogs.sort_by(|a, b| b.1.len().cmp(&a.1.len()).then_with(|| a.0.cmp(&b.0)));

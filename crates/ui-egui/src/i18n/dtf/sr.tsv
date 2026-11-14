@@ -1,0 +1,406 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	DTF raster…
+	Remove Semi-Transparent Pixels…	Ukloni poluprozirne piksele…
+	Gang Sheet…	Zbirni list…
+	AI Upscale…	AI uvećanje…
+	Print Conformity…	Priprema za štampu…
+	Control Background…	Kontrolna pozadina…
+	Remove Control Background	Ukloni kontrolnu pozadinu
+	Saturation…	Zasićenost…
+	Dark Garment	Tamna tkanina
+	Light Garment	Svetla tkanina
+	Min Dot	Min. tačka
+	Max Dot	Maks. tačka
+	Ellipse	Elipsa
+	About DTF Craft	O programu DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — zasnovano na PhotoCraft-u
+	based on PhotoCraft · open source	zasnovano na PhotoCraft-u · otvoreni kod
+	Website	Veb-sajt
+	Contact	Kontakt
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — DTF alati autora Stéphane GLACET, zasnovano na:
+	DTF Settings	DTF podešavanja
+	Open a document to use the DTF settings.	Otvorite dokument da biste koristili DTF podešavanja.
+	Semi-Transparent Pixels Only	Samo poluprozirni pikseli
+	Whole Visual — Dark Garment	Ceo motiv — tamna tkanina
+	Whole Visual — Light Garment	Ceo motiv — svetla tkanina
+# DTF Craft (3)
+	Print Conformity	Priprema za štampu
+	Control Background	Kontrolna pozadina
+	Remove Semi-Transparent Pixels	Ukloni poluprozirne piksele
+	Current size: {width} × {height} cm at {resolution} ppi	Trenutna veličina: {width} × {height} cm pri {resolution} ppi
+	Width (cm, 0 = proportional)	Širina (cm, 0 = srazmerno)
+	Height (cm, 0 = proportional)	Visina (cm, 0 = srazmerno)
+	Conformity	Priprema
+	No Background	Bez pozadine
+	Fringe	Ivice
+# DTF Craft (4)
+	Remove White Background…	Уклони белу позадину…
+	Remove White Background	Уклони белу позадину
+	Detect Color	Препознај боју позадине
+	Remove Halo	Уклони ореол
+	Interior Holes	Унутрашње рупе
+	Min Hole Size	Мин. величина рупе (px)
+# DTF Craft (5)
+	Transparent Pixels	Providni pikseli
+	Remove Fringe	Ukloni ivice
+	Show Background	Prikaži pozadinu
+	Delete Background	Obriši pozadinu
+# DTF Craft (6)
+	Layer Name	Ime sloja
+	Preview Background	Pozadina pregleda
+	Add Holes (Magic Wand)	Dodaj rupe (čarobni štapić)
+	Show Before	Prikaži pre
+	Click an enclosed area to make it transparent.	Kliknite u zatvorenu oblast da biste je učinili providnom.
+	Interior Hole	Unutrašnja rupa
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — beta verzija
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Ovo je beta verzija programa DTF Craft za testiranje: neki alati se još mogu promeniti ili sadržati greške.
+	Release planned for November 2, 2026.	Objavljivanje planirano za 2. novembar 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) pri {resolution} ppi
+	AI Upscale	AI uvećanje
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Dodaj rupe (čarobna gumica)
+	Eraser Tolerance	Tolerancija gumice
+# DTF Craft (11)
+	Color Analyzer…	Analizator boja…
+	Color Analyzer	Analizator boja
+	Replace Colors with Swatches	Zameni boje uzorcima
+	the document is not modified	dokument se ne menja
+	Original Colors	Originalne boje
+	Replaced Colors	Zamenjene boje
+	With Patches	Sa uzorcima
+	Add a color with the eyedropper: click the visual.	Dodaj boju pipetom: kliknite na motiv.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Kopija u kojoj su označene boje zamenjene referencama, sačuvana kao PNG i otvorena u novoj kartici.
+	PDF Sheet…	PDF list…
+	An A4 sheet with the visual, its colors and their references.	List A4 sa motivom, njegovim bojama i referencama.
+	Export PNG…	Izvezi PNG…
+	Analyzed Pixels	Analizirani pikseli
+	Visible, transparency ignored	Vidljivi, providnost zanemarena
+	RGB {bits} bits	RGB {bits} bita
+	Maximum Colors	Najviše boja
+	Grouping (ΔE)	Grupisanje (ΔE)
+	Colors closer than this difference are counted as one.	Boje bliže od ove razlike računaju se kao jedna.
+	Ignore colors under 0.5 % of the area	Zanemari boje ispod 0,5 % površine
+	Reference Swatch Book	Referentna karta boja
+	None loaded	Nije učitana
+	{name} · {n} colors	{name} · boja: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formati: .ase, .aco, .csv (ref; R; G; B ili L*a*b*). Razlika merena u ΔE 2000.
+	Detected Colors: {n}	Pronađene boje: {n}
+	Patches · on-screen check and PDF sheet	Uzorci · provera na ekranu i PDF list
+	Below	Ispod
+	Reference	Referenca
+	Hex	Hex
+	Client	Klijent
+	On the PDF sheet	Na PDF listu
+	Replaced in the PNG export	Zamenjuje se pri izvozu PNG
+	Visual	Motiv
+	Match	Podudaranje
+	Remove this color	Ukloni ovu boju
+	Load a swatch book to find the references.	Učitajte kartu boja da biste pronašli reference.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Označeno: boja motiva se pri izvozu PNG zamenjuje referencom. ΔE: do 2 = neprimetno · 2 do 5 = vidljivo izbliza · iznad = druga nijansa
+	Reference for {hex}	Referenca za {hex}
+	Nearest (automatic)	Najbliža (automatski)
+	No visible pixels to analyze.	Nema vidljivih piksela za analizu.
+	Swatch book loaded: {name}, {n} colors	Karta boja učitana: {name}, boja: {n}
+	{name} color sheet	{name} list boja
+	Color sheet saved: {path}	List boja sačuvan: {path}
+	Color Sheet	List boja
+	Swatch Book	Karta boja
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Pronađene boje: {n}
+	No swatch book loaded: the colors have no reference.	Karta boja nije učitana: boje nemaju referencu.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Podudaranja na ΔE 2 ili manje: {good}; za proveru (ΔE 2 do 5): {check}; iznad 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Veličina motiva: {w} × {h} px, {wcm} × {hcm} cm na {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = neprimetna razlika · 2 do 5 = vidljivo izbliza · iznad 5 = druga nijansa.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Boje prikazane u sRGB: rezultat štampe zavisi od štampača, mastila i podloge.
+	Sheet made with DTF Craft	List napravljen u DTF Craft
+# DTF Craft (12)
+	Add Holes	Dodaj rupe
+	Add Hole	Dodaj rupu
+# DTF Craft (13)
+	Pick the Background Colour	Boja pozadine pipetom
+	Click the background colour to remove.	Kliknite na boju pozadine koju treba ukloniti.
+	Click a visible pixel of the background.	Kliknite na vidljiv piksel pozadine.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nije pronađena jednobojna pozadina: pozadina je već providna, ili izaberite njenu boju pipetom.
+	Holes: {n}	Rupe: {n}
+	Remove Last Hole	Ukloni poslednju rupu
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Zbirni list
+	Visuals	Motivi
+	Add PNG Files…	Dodaj PNG datoteke…
+	Add Open Document	Dodaj otvoreni dokument
+	Add PNG files or the open document.	Dodajte PNG datoteke ili otvoreni dokument.
+	Sheet	List
+	Film Width	Širina folije
+	Max Length	Maks. dužina
+	Allow Rotation	Dozvoli rotaciju
+	Auto Build	Automatski raspored
+	Selected Visual	Izabrani motiv
+	Rotate 90°	Rotiraj 90°
+	Length used: {length} cm	Iskorišćena dužina: {length} cm
+	{n} not placed	Nije postavljeno: {n}
+	{n} too close or overlapping	Preblizu ili preklapanje: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Prevucite motiv da ga pomerite. Strelice: 1 mm (Shift: 1 cm). Delete ga uklanja sa lista.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motivi bliži od margine drugom motivu ili ivici: {n}. Ipak izvesti?
+	Too close to another visual	Preblizu drugom motivu
+	No room to turn this visual	Nema mesta za rotiranje ovog motiva
+	Open a document first	Prvo otvorite dokument
+	the document was closed	dokument je zatvoren
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktivni zbirni listovi
+	Add a New Sheet	Dodaj novi list
+	Add a copy to the sheet	Dodaj kopiju na list
+	Along the edges	Duž ivica
+	Auto Build May Rotate	Dozvoli rotaciju (automatski)
+	Auto Build — every image at once	Automatski raspored — sve slike odjednom
+	Auto Fill	Automatsko popunjavanje
+	Background Warning:	Upozorenje o pozadini:
+	Background not removed (opaque corners)	Pozadina nije uklonjena (neprozirni uglovi)
+	Between images	Između slika
+	Center Horizontally	Centriraj vodoravno
+	Center Vertically	Centriraj uspravno
+	Center on the Sheet	Centriraj na listu
+	Copies of this sheet to print	Broj kopija ovog lista za štampu
+	Custom Color	Prilagođena boja
+	Delete (Del)	Obriši (Del)
+	Delete the Sheet	Obriši list
+	Drag and drop a file here or click to	Prevucite datoteku ovde ili kliknite da
+	Duplicate Image	Dupliraj sliku
+	Export Sheets (PNG)…	Izvezi listove (PNG)…
+	Fill the room left on the sheet with this visual	Popuni slobodan prostor lista ovim motivom
+	Flip Horizontally	Preslikaj vodoravno
+	Flip Vertically	Preslikaj uspravno
+	Good resolution >= 250 dpi	Dobra rezolucija >= 250 dpi
+	Grid (1 cm)	Mreža (1 cm)
+	Image Margin	Margina slike
+	Import Images	Uvezi slike
+	Lock Proportions	Zaključaj proporcije
+	Margin (cm)	Margina (cm)
+	No image yet: import PNG files or add the open document.	Još nema slika: uvezite PNG datoteke ili dodajte otvoreni dokument.
+	No room left on the sheet	Nema više mesta na listu
+	Number of Images:	Broj slika:
+	One copy less	Jedna kopija manje
+	One copy more	Jedna kopija više
+	Optimal	Optimalna
+	Optimal resolution >= 300 dpi	Optimalna rezolucija >= 300 dpi
+	Overlap Lines	Linije preklapanja
+	Overlapping or too close	Preklapa se ili je preblizu
+	Poor	Loša
+	Poor resolution >= 200 dpi	Loša rezolucija >= 200 dpi
+	Proportions:	Proporcije:
+	Push Down	Gurni dole
+	Push Right	Gurni desno
+	Push Up	Gurni gore
+	Qty:	Kol.:
+	Redo (Ctrl+Y)	Ponovi (Ctrl+Y)
+	Rotate 90° Counterclockwise	Rotiraj 90° suprotno od kazaljke
+	Same image, another size	Ista slika, druga veličina
+	Select an object to edit.	Izaberite objekat za uređivanje.
+	Semi-transparent pixels: {p} %	Poluprozirni pikseli: {p} %
+	Sheet Background	Pozadina lista
+	Sheet Margin	Margina lista
+	Show Overlap Lines	Prikaži linije preklapanja
+	Show Resolution Lines	Prikaži linije rezolucije
+	Snap While Moving	Poravnaj pri pomeranju
+	Start Over	Počni iznova
+	Stretch to the Film Width	Rastegni na širinu folije
+	Stretch to the Sheet Length	Rastegni na dužinu lista
+	Supported format: PNG (cropped to its visible pixels)	Podržani format: PNG (isečen na vidljive piksele)
+	Transparency Warning:	Upozorenje o providnosti:
+	Undo (Ctrl+Z)	Opozovi (Ctrl+Z)
+	Very Poor	Veoma loša
+	Very poor resolution < 200 dpi	Veoma loša rezolucija < 200 dpi
+	With the image margin	Sa marginom slike
+	With the sheet margin	Sa marginom lista
+	copy	kopija
+	{n} images	Slike: {n}
+# DTF Craft (14)
+	Vectorization…	Vektorizacija…
+	Vectorization	Vektorizacija
+	Vectorized	Vektorizovano
+	Side by Side	Uporedo
+	Show Contours	Prikaži konture
+	Checkerboard under Transparency	Šahovska tabla ispod providnosti
+	{colors} colors · {shapes} shapes · {points} points	Boje: {colors} · oblici: {shapes} · tačke: {points}
+	Cut-out shapes, no overlap	Isečeni oblici, bez preklapanja
+	Open document, flattened	Otvoreni dokument, spljošten
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm pri {dpi} ppi
+	Type of Visual	Vrsta slike
+	Logo · flat colors	Logo · ravne boje
+	Illustration · shades	Ilustracija · nijanse
+	Number of Colors	Broj boja
+	Detail Level	Nivo detalja
+	Sharp Corners	Oštri uglovi
+	Remove the Background	Ukloni pozadinu
+	read on the visual's edge	očitano na ivici slike
+	No background found: the visual is already cut out.	Pozadina nije pronađena: slika je već isečena.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	Boje: {n} · u SVG-u: {k}
+	Edge Background	Pozadina
+	Keep {hex} in the SVG	Zadrži {hex} u SVG-u
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Neoznačeno: boja se izostavlja iz SVG-a; njeni oblici se uklanjaju, ne spajaju.
+	SVG · cut-out shapes	SVG · isečeni oblici
+	{w} × {h} mm (document size)	{w} × {h} mm (veličina dokumenta)
+	Open the SVG in DTF Craft after the export	Otvori SVG u DTF Craft posle izvoza
+	Export SVG…	Izvezi SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Isečeni oblici u veličini štampe dokumenta, sačuvani kao SVG.
+	SVG saved: {path}	SVG sačuvan: {path}
+	No visible pixels to vectorize.	Nema vidljivih piksela za vektorizaciju.
+	Nothing to export: every color is left out.	Nema šta da se izveze: sve boje su izostavljene.
+	Low Detail	Nizak
+	Medium Detail	Srednji
+	High Detail	Visok
+	Close the Seams between Colors	Zatvori spojeve između boja
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Svaki oblik prelazi preko susednih za pola piksela, da se pri štampi ne pojavi providna linija između dve boje. Isključite za strogo isečene oblike (ploter za sečenje).
+# DTF Craft (14)
+	Conformity…	Priprema…
+	Cutout…	Isečak od papira…
+	Transparent Pixels…	Providni pikseli…
+	Remove Fringe…	Ukloni ivice…
+	Sharpness…	Oštrina…
+# DTF Craft (15)
+	Group the Selection	Grupiši
+	Group (Ctrl+G)	Grupiši (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Razgrupiši (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Dupliraj (Ctrl+D)
+	{n} visuals selected	Izabranih vizuala: {n}
+	Colors kept: {n}	Zadržane boje: {n}
+# DTF Craft (16)
+	Applied Ranges	Primenjeni opsezi
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: boja · Shift+klik: dodaj · Alt+klik: ukloni
+	Contiguous Pixels	Susedni pikseli
+	Pick a color on the visual.	Izaberite boju na vizualu.
+	Remove this range	Ukloni ovaj opseg
+	Replacement Color	Boja zamene
+	Turn on Color Range above the visual, then click a color.	Uključite Opseg boja iznad vizuala, pa kliknite boju.
+	{p} % of the visible pixels	{p} % vidljivih piksela
+# DTF Craft (17)
+	Hide the image	Sakrij sliku
+	Illustration: {user} on Pixabay	Ilustracija: {user} na Pixabay
+	Show an illustration	Prikaži ilustraciju
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	A4 лист са мотивом, векторизованим резултатом, његовим бојама и њиховим референцама.
+	Detected Colors	Пронађене боје
+	Replaced by the reference in the SVG	Замењује се референцом у SVG-у
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG није означен: боја се изоставља из SVG-а; њени облици се уклањају, не спајају.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Заједничко са Анализатором боја. Формати: .ase, .aco, .csv; разлика у ΔE 2000.
+	{name} vectorized color sheet	{name} лист боја векторизације
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ означено: облици добијају боју референце и у SVG-у носе њено име. ΔE: до 2 = неприметно · од 2 до 5 = видљиво изблиза · више = друга нијанса
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}” није боја: напишите је као #rrggbb.
+	16 Colors	16 боја
+	3 Colors	3 боје
+	6 Colors	6 боја
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Круг, елипса, правоугаоник или правилан многоугао излази тачно као тај облик.
+	Abutting	Суседни
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Суседни: свака боја има своју област, облици деле ивице. Преклопљени: сваки слој се протеже испод слојева изнад, без размака између боја.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Област чија се боја равномерно мења у једном правцу постаје један облик испуњен линеарним прелазом.
+	Areas smaller than this many pixels are ignored.	Области мање од овог броја пиксела се занемарују.
+	Black and White	Црно-бело
+	Black and White Logo	Црно-бели лого
+	Cut-out shapes, contours cleaned for DTF printing.	Исечени облици, контуре очишћене за DTF штампу.
+	Engine	Мотор
+	Exact Shapes	Тачни облици
+	Fills	Испуне
+	Flat Logo	Равни лого
+	Full Tone	Непрекидни тон
+	Grays	Сиве
+	High Fidelity Photo	Фотографија високе верности
+	Higher keeps more sharp corners.	Веће задржава више оштрих углова.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Колико тачно криве прате пикселе: веће је верније, са више тачака.
+	Ignore Color	Занемари боју
+	Limited	Ограничена
+	Line Art	Цртеж линијама
+	Lines as Strokes	Линије као потези
+	Lines no wider than the stroke width are traced as stroked center lines.	Линије не шире од дебљине потеза прецртавају се као средишње линије са потезом.
+	Load a swatch book to use it as the palette.	Учитајте књигу узорака да бисте је користили као палету.
+	Logo Colors	Боје логоа
+	Low Fidelity Photo	Фотографија ниске верности
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Скоро праве криве постају праве линије; у Равном логоу делови круга постају прави лукови.
+	Nothing to trace: everything is ignored or transparent.	Нема шта да се прецрта: све је занемарено или провидно.
+	Outline	Обрис
+	Overlapping	Преклопљени
+	Pixels darker than this are black.	Пиксели тамнији од ове вредности постају црни.
+	Shades of Gray	Нијансе сиве
+	Silhouettes	Силуете
+	Sketched Art	Скица
+	Snap Curves to Lines	Привуци криве на линије
+	Technical Drawing	Технички цртеж
+	The areas of this color are left out (white when the field is empty).	Области ове боје се изостављају (бела ако је поље празно).
+	The colors of the reference swatch book below, at most this many.	Боје референтне књиге узорака испод, највише толико.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Овај мотив није лого у равним бојама ({p} % пуних површина је једнобојно): изаберите режим Боја.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Превише тачака: повећајте Шум или смањите Путање или Боје.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Прецртавање слике из VectorCraft-а: његова подешавања и сва његова подешавања, за DTF и друге технике.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизација: Прецртавање слике из VectorCraft-а (ArtCraft Team и сарадници VectorCraft-а, MIT OR Apache-2.0) и visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	аутоматски, или #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Ćelije {size} × {size} cm · redova: {rows}
+	Cells touch: no spacing between images.	Ćelije se dodiruju: bez razmaka između slika.
+	No Cells	Bez ćelija
+	Organize Automatically on Import	Automatski rasporedi pri uvozu
+	Printed width: {width} cm	Širina štampe: {width} cm
+	Reserve up to {max} cm · not exported	Rezerva do {max} cm · ne izvozi se
+	Snap to the Cells	Prianjanje uz ćelije
+	Split the Width into Cells	Podeli širinu na ćelije
+	{width} × {length} cm (max {max})	{width} × {length} cm (maks. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Datoteka nema veličinu: predloženo {width} cm.
+	Place	Postavi
+	SVG Print Size	Veličina štampe SVG-a
+	Size given in the file.	Veličina navedena u datoteci.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Podržani formati: PNG (isečen na vidljive piksele) i SVG (iscrtan u veličini štampe)
+	Width in cells:	Širina u ćelijama:
+	SVG files still waiting: {n}	Još SVG datoteka na čekanju: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Pozadina {color} postala providna
+	Copy for Vectorization	Kopija za vektorizaciju
+	Fringes removed, 2 px margin	Rubovi uklonjeni, margina 2 px
+	JPEG: light median against the artefacts	JPEG: blagi medijan protiv artefakata
+	Optimize for Vectorization	Optimizuj za vektorizaciju
+	RGB 8 bits, sRGB	RGB 8 bita, sRGB
+	Reduced: {from} → {to} px	Smanjeno: {from} → {to} px
+	Size kept: {size} px	Veličina zadržana: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Previše boja ({n}): fotografija ili prelaz se loše vektorizuju.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Sajt ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analiza boja…
+	Background kept	Pozadina zadržana
+	Sheets used: {sheets}	Iskorišćeni listovi: {sheets}
+	The vectorization stopped unexpectedly.	Vektorizacija se neočekivano zaustavila.
+	Tracing the shapes…	Iscrtavanje oblika…
+	Tracing with VectorCraft…	Iscrtavanje pomoću VectorCraft-a…
+	{n} new sheets added	Dodato novih listova: {n}
+# DTF Craft (26)
+	AI upscale…	AI uvećanje…
+	Not Suited to Vectorization	Slabo pogodno za vektorizaciju
+	On white	Na beloj
+	Preparation cancelled	Priprema otkazana
+	Prepared for vectorization: {steps}	Pripremljeno za vektorizaciju: {steps}
+	Preparing for Vectorization	Priprema za vektorizaciju
+	Preparing the visual…	Priprema slike…
+	The document changed during the preparation.	Dokument se promenio tokom pripreme.
+	The preparation stopped unexpectedly.	Priprema se neočekivano zaustavila.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Klik: njegova podešavanja · Dvoklik: dodaj kopiju na list
+# DTF Craft (29)
+	Black T-Shirt	Crna majica
+	Soft Black T-Shirt	Crna majica – meko
+	White T-Shirt	Bela majica
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Slojevi retuša (svetlina +32, zasićenost +16), skriveni
+# DTF Craft (30)
+	Cells	Ćelije
+	Click: show the sheet · Double-click: rename it	Klik: prikaži list · Dvoklik: preimenuj
+	Copies to Print	Primeraka za štampu
+	Custom Width	Prilagođena širina
+	Drop PNG or SVG files here	Prevucite ovde PNG ili SVG datoteke
+	Duplicate the Sheet	Dupliraj list
+	Every sheet emptied, the visuals kept	Svi listovi ispražnjeni, slike zadržane
+	Every visual's size and copies, then lay the sheets out	Veličina i broj primeraka svake slike, zatim raspored listova
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Ukupno: {sheets} listova · {visuals} slika

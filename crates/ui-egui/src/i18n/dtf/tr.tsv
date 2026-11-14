@@ -1,0 +1,407 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	DTF yarım ton…
+	Remove Semi-Transparent Pixels…	Yarı saydam pikselleri kaldır…
+	Gang Sheet…	Toplu baskı sayfası…
+	AI Upscale…	Yapay zekâ ile büyütme…
+	Print Conformity…	Baskıya uygunluk…
+	Control Background…	Kontrol arka planı…
+	Remove Control Background	Kontrol arka planını kaldır
+	Saturation…	Doygunluk…
+	Dark Garment	Koyu kumaş
+	Light Garment	Açık kumaş
+	Min Dot	En küçük nokta
+	Max Dot	En büyük nokta
+	Ellipse	Elips
+	About DTF Craft	DTF Craft Hakkında
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — PhotoCraft tabanlı
+	based on PhotoCraft · open source	PhotoCraft tabanlı · açık kaynak
+	Website	Web sitesi
+	Contact	İletişim
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — Stéphane GLACET'in DTF araçları, temel aldığı:
+	DTF Settings	DTF Ayarları
+	Open a document to use the DTF settings.	DTF ayarlarını kullanmak için bir belge açın.
+	Semi-Transparent Pixels Only	Yalnızca yarı saydam pikseller
+	Whole Visual — Dark Garment	Tüm tasarım — koyu kumaş
+	Whole Visual — Light Garment	Tüm tasarım — açık kumaş
+# DTF Craft (3)
+	Print Conformity	Baskıya uygunluk
+	Control Background	Kontrol arka planı
+	Remove Semi-Transparent Pixels	Yarı saydam pikselleri kaldır
+	Current size: {width} × {height} cm at {resolution} ppi	Geçerli boyut: {width} × {height} cm, {resolution} ppi
+	Width (cm, 0 = proportional)	Genişlik (cm, 0 = orantılı)
+	Height (cm, 0 = proportional)	Yükseklik (cm, 0 = orantılı)
+	Conformity	Uygunluk
+	No Background	Arka plansız
+	Fringe	Kenar
+# DTF Craft (4)
+	Remove White Background…	Beyaz arka planı kaldır…
+	Remove White Background	Beyaz arka planı kaldır
+	Detect Color	Arka plan rengini algıla
+	Remove Halo	Haleyi kaldır
+	Interior Holes	İç boşluklar
+	Min Hole Size	Min. boşluk boyutu (px)
+# DTF Craft (5)
+	Transparent Pixels	Saydam pikseller
+	Remove Fringe	Saçakları kaldır
+	Show Background	Arka planı göster
+	Delete Background	Arka planı sil
+# DTF Craft (6)
+	Layer Name	Katman adı
+	Preview Background	Önizleme arka planı
+	Add Holes (Magic Wand)	Delik ekle (sihirli değnek)
+	Show Before	Öncesini göster
+	Click an enclosed area to make it transparent.	Saydam yapmak için kapalı bir alana tıklayın.
+	Interior Hole	İç delik
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — beta sürümü
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Bu, test amaçlı bir DTF Craft beta sürümüdür: bazı araçlar hâlâ değişebilir veya hata içerebilir.
+	Release planned for November 2, 2026.	Yayın tarihi 2 Kasım 2026 olarak planlanıyor.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
+	AI Upscale	Yapay zekâ ile büyütme
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Delik ekle (sihirli silgi)
+	Eraser Tolerance	Silgi toleransı
+# DTF Craft (11)
+	Color Analyzer…	Renk Analizcisi…
+	Color Analyzer	Renk Analizcisi
+	Replace Colors with Swatches	Renkleri renk örnekleriyle değiştir
+	the document is not modified	belge değiştirilmez
+	Original Colors	Özgün renkler
+	Replaced Colors	Değiştirilen renkler
+	With Patches	Yamalarla
+	Add a color with the eyedropper: click the visual.	Damlalıkla renk ekle: görsele tıklayın.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	İşaretli renklerin referanslarıyla değiştirildiği bir kopya; PNG olarak kaydedilir ve yeni sekmede açılır.
+	PDF Sheet…	PDF Sayfası…
+	An A4 sheet with the visual, its colors and their references.	Görseli, renklerini ve referanslarını içeren A4 sayfası.
+	Export PNG…	PNG Dışa Aktar…
+	Analyzed Pixels	Çözümlenen pikseller
+	Visible, transparency ignored	Görünür, saydamlık yok sayılır
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	En fazla renk
+	Grouping (ΔE)	Gruplama (ΔE)
+	Colors closer than this difference are counted as one.	Bu farktan daha yakın renkler tek renk sayılır.
+	Ignore colors under 0.5 % of the area	Alanın %0,5'inden az renkleri yok say
+	Reference Swatch Book	Referans renk kataloğu
+	None loaded	Yüklenmedi
+	{name} · {n} colors	{name} · {n} renk
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Biçimler: .ase, .aco, .csv (ref; R; G; B veya L*a*b*). Fark ΔE 2000 ile ölçülür.
+	Detected Colors: {n}	Algılanan renkler: {n}
+	Patches · on-screen check and PDF sheet	Yamalar · ekranda kontrol ve PDF sayfası
+	Below	Altta
+	Reference	Referans
+	Hex	Onaltılık
+	Client	Müşteri
+	On the PDF sheet	PDF sayfasında
+	Replaced in the PNG export	PNG dışa aktarımda değiştirilir
+	Visual	Görsel
+	Match	Eşleşme
+	Remove this color	Bu rengi kaldır
+	Load a swatch book to find the references.	Referansları bulmak için bir renk kataloğu yükleyin.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Işaretli: görselin rengi PNG dışa aktarımında referansla değiştirilir. ΔE: 2'ye kadar = fark edilmez · 2–5 = yakından görünür · üstü = başka ton
+	Reference for {hex}	{hex} için referans
+	Nearest (automatic)	En yakın (otomatik)
+	No visible pixels to analyze.	Çözümlenecek görünür piksel yok.
+	Swatch book loaded: {name}, {n} colors	Renk kataloğu yüklendi: {name}, {n} renk
+	{name} color sheet	{name} renk sayfası
+	Color sheet saved: {path}	Renk sayfası kaydedildi: {path}
+	Color Sheet	Renk Sayfası
+	Swatch Book	Renk kataloğu
+	Hex · RGB	Onaltılık · RGB
+	Colors detected: {n}	Algılanan renkler: {n}
+	No swatch book loaded: the colors have no reference.	Renk kataloğu yüklenmedi: renklerin referansı yok.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	ΔE 2 veya altı eşleşmeler: {good}; kontrol edilecek (ΔE 2–5): {check}; 5 üstü: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Görsel boyutu: {w} × {h} px, {dpi} ppi'de {wcm} × {hcm} cm.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: 2'ye kadar = fark edilmez · 2–5 = yakından görünür · 5 üstü = başka ton.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Renkler sRGB olarak gösterilir: baskı sonucu yazıcıya, mürekkeplere ve malzemeye bağlıdır.
+	Sheet made with DTF Craft	DTF Craft ile hazırlanan sayfa
+# DTF Craft (12)
+	Add Holes	Delik ekle
+	Add Hole	Delik ekle
+# DTF Craft (13)
+	Pick the Background Colour	Damlalıkla arka plan rengi
+	Click the background colour to remove.	Kaldırılacak arka plan rengine tıklayın.
+	Click a visible pixel of the background.	Arka planın görünür bir pikseline tıklayın.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Düz arka plan algılanmadı: arka plan zaten saydam, ya da rengini damlalıkla seçin.
+	Holes: {n}	Delikler: {n}
+	Remove Last Hole	Son deliği kaldır
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Toplu baskı sayfası
+	Visuals	Tasarımlar
+	Add PNG Files…	PNG dosyası ekle…
+	Add Open Document	Açık belgeyi ekle
+	Add PNG files or the open document.	PNG dosyaları veya açık belgeyi ekleyin.
+	Sheet	Sayfa
+	Film Width	Film genişliği
+	Max Length	Maks. uzunluk
+	Allow Rotation	Döndürmeye izin ver
+	Auto Build	Otomatik yerleşim
+	Selected Visual	Seçili tasarım
+	Rotate 90°	90° döndür
+	Length used: {length} cm	Kullanılan uzunluk: {length} cm
+	{n} not placed	Yerleştirilemeyen: {n}
+	{n} too close or overlapping	Çok yakın veya çakışan: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Taşımak için bir tasarımı sürükleyin. Oklar: 1 mm (Shift: 1 cm). Delete onu sayfadan kaldırır.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Başka bir tasarıma veya kenara kenar boşluğundan daha yakın tasarım: {n}. Yine de dışa aktarılsın mı?
+	Too close to another visual	Başka bir tasarıma çok yakın
+	No room to turn this visual	Bu tasarımı döndürmek için yer yok
+	Open a document first	Önce bir belge açın
+	the document was closed	belge kapatıldı
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Etkin sayfalar
+	Add a New Sheet	Yeni sayfa ekle
+	Add a copy to the sheet	Sayfaya bir kopya ekle
+	Along the edges	Kenarlar boyunca
+	Auto Build May Rotate	Döndürmeye izin ver (otomatik)
+	Auto Build — every image at once	Otomatik yerleşim — tüm görseller bir arada
+	Auto Fill	Otomatik doldur
+	Background Warning:	Arka plan uyarısı:
+	Background not removed (opaque corners)	Arka plan kaldırılmamış (opak köşeler)
+	Between images	Görseller arası
+	Center Horizontally	Yatay ortala
+	Center Vertically	Dikey ortala
+	Center on the Sheet	Sayfada ortala
+	Copies of this sheet to print	Bu sayfadan basılacak kopya
+	Custom Color	Özel renk
+	Delete (Del)	Sil (Del)
+	Delete the Sheet	Sayfayı sil
+	Drag and drop a file here or click to	Bir dosyayı buraya sürükleyin veya tıklayın:
+	Duplicate Image	Görseli çoğalt
+	Export Sheets (PNG)…	Sayfaları dışa aktar (PNG)…
+	Fill the room left on the sheet with this visual	Sayfadaki boş alanı bu tasarımla doldur
+	Flip Horizontally	Yatay çevir
+	Flip Vertically	Dikey çevir
+	Good resolution >= 250 dpi	İyi çözünürlük >= 250 dpi
+	Grid (1 cm)	Izgara (1 cm)
+	Image Margin	Görsel kenar boşluğu
+	Import Images	Görselleri içe aktar
+	Lock Proportions	Oranları kilitle
+	Margin (cm)	Kenar boşluğu (cm)
+	No image yet: import PNG files or add the open document.	Henüz görsel yok: PNG dosyalarını içe aktarın veya açık belgeyi ekleyin.
+	No room left on the sheet	Sayfada yer kalmadı
+	Number of Images:	Görsel sayısı:
+	One copy less	Bir kopya eksik
+	One copy more	Bir kopya fazla
+	Optimal	Optimum
+	Optimal resolution >= 300 dpi	Optimum çözünürlük >= 300 dpi
+	Overlap Lines	Çakışma çizgileri
+	Overlapping or too close	Çakışıyor veya çok yakın
+	Poor	Kötü
+	Poor resolution >= 200 dpi	Kötü çözünürlük >= 200 dpi
+	Proportions:	Oranlar:
+	Push Down	Aşağı it
+	Push Left	Sola it
+	Push Right	Sağa it
+	Push Up	Yukarı it
+	Qty:	Adet:
+	Redo (Ctrl+Y)	Yinele (Ctrl+Y)
+	Rotate 90° Counterclockwise	90° saat yönünün tersine döndür
+	Same image, another size	Aynı görsel, başka boyut
+	Select an object to edit.	Düzenlemek için bir nesne seçin.
+	Semi-transparent pixels: {p} %	Yarı saydam pikseller: {p} %
+	Sheet Background	Sayfa arka planı
+	Sheet Margin	Sayfa kenar boşluğu
+	Show Overlap Lines	Çakışma çizgilerini göster
+	Show Resolution Lines	Çözünürlük çizgilerini göster
+	Snap While Moving	Taşırken hizala
+	Start Over	Baştan başla
+	Stretch to the Film Width	Film genişliğine uzat
+	Stretch to the Sheet Length	Sayfa uzunluğuna uzat
+	Supported format: PNG (cropped to its visible pixels)	Desteklenen biçim: PNG (görünür piksellere kırpılır)
+	Transparency Warning:	Saydamlık uyarısı:
+	Undo (Ctrl+Z)	Geri al (Ctrl+Z)
+	Very Poor	Çok kötü
+	Very poor resolution < 200 dpi	Çok kötü çözünürlük < 200 dpi
+	With the image margin	Görsel kenar boşluğuyla
+	With the sheet margin	Sayfa kenar boşluğuyla
+	copy	kopya
+	{n} images	{n} görsel
+# DTF Craft (14)
+	Vectorization…	Vektörleştirme…
+	Vectorization	Vektörleştirme
+	Vectorized	Vektörleştirilmiş
+	Side by Side	Yan yana
+	Show Contours	Konturları Göster
+	Checkerboard under Transparency	Saydamlık Altında Dama Deseni
+	{colors} colors · {shapes} shapes · {points} points	{colors} renk · {shapes} şekil · {points} nokta
+	Cut-out shapes, no overlap	Kesilmiş şekiller, üst üste binme yok
+	Open document, flattened	Açık belge, düzleştirilmiş
+	{w} × {h} mm at {dpi} ppi	{dpi} ppi'de {w} × {h} mm
+	Type of Visual	Görsel Türü
+	Logo · flat colors	Logo · düz renkler
+	Illustration · shades	İllüstrasyon · tonlar
+	Number of Colors	Renk Sayısı
+	Detail Level	Ayrıntı Düzeyi
+	Sharp Corners	Keskin Köşeler
+	Remove the Background	Arka Planı Kaldır
+	read on the visual's edge	görselin kenarından okundu
+	No background found: the visual is already cut out.	Arka plan bulunamadı: görsel zaten kesilmiş.
+	Palette	Palet
+	{n} colors · {k} in the SVG	{n} renk · SVG'de {k}
+	Edge Background	Arka plan
+	Keep {hex} in the SVG	{hex} rengini SVG'de tut
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	İşaretsiz: renk SVG'ye dahil edilmez; şekilleri birleştirilmez, kaldırılır.
+	SVG · cut-out shapes	SVG · kesilmiş şekiller
+	{w} × {h} mm (document size)	{w} × {h} mm (belge boyutu)
+	Open the SVG in DTF Craft after the export	Dışa aktardıktan sonra SVG'yi DTF Craft'ta aç
+	Export SVG…	SVG Dışa Aktar…
+	Cut-out shapes at the document's print size, saved as SVG.	Belgenin baskı boyutunda kesilmiş şekiller, SVG olarak kaydedilir.
+	SVG saved: {path}	SVG kaydedildi: {path}
+	No visible pixels to vectorize.	Vektörleştirilecek görünür piksel yok.
+	Nothing to export: every color is left out.	Dışa aktarılacak bir şey yok: tüm renkler hariç tutuldu.
+	Low Detail	Düşük
+	Medium Detail	Orta
+	High Detail	Yüksek
+	Close the Seams between Colors	Renkler Arasındaki Ekleri Kapat
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Her şekil komşularıyla yarım piksel örtüşür; böylece baskıda iki renk arasında saydam kıl çizgisi görünmez. Tam kesilmiş şekiller için işareti kaldırın (kesim plotteri).
+# DTF Craft (14)
+	Conformity…	Uygunluk…
+	Cutout…	Kesim…
+	Transparent Pixels…	Saydam pikseller…
+	Remove Fringe…	Saçakları kaldır…
+	Sharpness…	Keskinlik…
+# DTF Craft (15)
+	Group the Selection	Grupla
+	Group (Ctrl+G)	Grupla (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Grubu çöz (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Çoğalt (Ctrl+D)
+	{n} visuals selected	{n} görsel seçildi
+	Colors kept: {n}	Korunan renkler: {n}
+# DTF Craft (16)
+	Applied Ranges	Uygulanan aralıklar
+	Click: a color · Shift+click: add · Alt+click: remove	Tıkla: bir renk · Shift+tıkla: ekle · Alt+tıkla: çıkar
+	Contiguous Pixels	Bitişik pikseller
+	Pick a color on the visual.	Görselde bir renk seçin.
+	Remove this range	Bu aralığı kaldır
+	Replacement Color	Yerine geçecek renk
+	Turn on Color Range above the visual, then click a color.	Görselin üstündeki Renk Aralığı'nı açın, ardından bir renge tıklayın.
+	{p} % of the visible pixels	Görünür piksellerin %{p}'i
+# DTF Craft (17)
+	Hide the image	Görseli gizle
+	Illustration: {user} on Pixabay	İllüstrasyon: {user}, Pixabay
+	Show an illustration	İllüstrasyon göster
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Görseli, vektörleştirilmiş sonucu, renklerini ve referanslarını içeren bir A4 sayfa.
+	Detected Colors	Algılanan renkler
+	Replaced by the reference in the SVG	SVG'de referansla değiştirilir
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG işaretsiz: renk SVG'ye alınmaz; şekilleri birleştirilmez, kaldırılır.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Renk Analizcisi ile ortak. Biçimler: .ase, .aco, .csv; fark ΔE 2000 ile.
+	{name} vectorized color sheet	{name} vektörleştirilmiş renk sayfası
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ işaretli: şekiller referansın rengini alır ve SVG'de onun adını taşır. ΔE: 2'ye kadar = fark edilmez · 2 ile 5 arası = yakından görülür · üstü = başka ton
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}" bir renk değil: #rrggbb olarak yazın.
+	16 Colors	16 renk
+	3 Colors	3 renk
+	6 Colors	6 renk
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Bir daire, elips, dikdörtgen veya düzgün çokgen tam olarak o şekil olarak çıkar.
+	Abutting	Bitişik
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Bitişik: her rengin kendi alanı vardır, şekiller kenarlarını paylaşır. Üst üste: her katman üstündekilerin altına uzanır, renkler arasında boşluk kalmaz.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Rengi tek yönde düzenli değişen bir alan, doğrusal degradeyle doldurulmuş tek bir şekil olur.
+	Areas smaller than this many pixels are ignored.	Bu kadar pikselden küçük alanlar yok sayılır.
+	Black and White	Siyah beyaz
+	Black and White Logo	Siyah beyaz logo
+	Cut-out shapes, contours cleaned for DTF printing.	Kesilmiş şekiller, DTF baskı için temizlenmiş konturlar.
+	Engine	Motor
+	Exact Shapes	Tam şekiller
+	Fills	Dolgular
+	Flat Logo	Düz logo
+	Full Tone	Sürekli ton
+	Grays	Griler
+	High Fidelity Photo	Yüksek doğruluklu fotoğraf
+	Higher keeps more sharp corners.	Yüksek değer daha çok keskin köşe korur.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Eğrilerin piksellere ne kadar yakın gittiği: yüksek daha sadık, daha çok nokta.
+	Ignore Color	Rengi yok say
+	Limited	Sınırlı
+	Line Art	Çizgi çizim
+	Lines as Strokes	Çizgiler kontur olarak
+	Lines no wider than the stroke width are traced as stroked center lines.	Kontur kalınlığından geniş olmayan çizgiler konturlu orta çizgiler olarak izlenir.
+	Load a swatch book to use it as the palette.	Palet olarak kullanmak için bir renk örneği kitabı yükleyin.
+	Logo Colors	Logo renkleri
+	Low Fidelity Photo	Düşük doğruluklu fotoğraf
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Neredeyse düz eğriler düz çizgi olur; Düz logoda daire parçaları gerçek yaylar olur.
+	Nothing to trace: everything is ignored or transparent.	İzlenecek bir şey yok: her şey yok sayıldı veya saydam.
+	Outline	Anahat
+	Overlapping	Üst üste
+	Pixels darker than this are black.	Bu değerden koyu pikseller siyah olur.
+	Shades of Gray	Gri tonları
+	Silhouettes	Siluetler
+	Sketched Art	Eskiz
+	Snap Curves to Lines	Eğrileri çizgilere yasla
+	Technical Drawing	Teknik çizim
+	The areas of this color are left out (white when the field is empty).	Bu rengin alanları çıkarılır (alan boşsa beyaz).
+	The colors of the reference swatch book below, at most this many.	Aşağıdaki referans renk örneği kitabının renkleri, en fazla bu kadar.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Bu görsel düz renkli bir logo değil (dolu alanlarının %{p} kadarı düz): Renk modunu seçin.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Çok fazla nokta: Gürültüyü artırın veya Yolları ya da Renkleri azaltın.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft Görüntü İzleme: ön ayarları ve tüm ayarları, DTF ve diğer teknikler için.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektörleştirme: VectorCraft Görüntü İzleme (ArtCraft Team ve VectorCraft katkıcıları, MIT OR Apache-2.0) ve visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	otomatik veya #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm hücreler · {rows} satır
+	Cells touch: no spacing between images.	Hücreler bitişik: görseller arasında boşluk yok.
+	No Cells	Hücre yok
+	Organize Automatically on Import	İçe aktarırken otomatik düzenle
+	Printed width: {width} cm	Baskı genişliği: {width} cm
+	Reserve up to {max} cm · not exported	{max} cm'ye kadar yedek · dışa aktarılmaz
+	Snap to the Cells	Hücrelere yasla
+	Split the Width into Cells	Genişliği hücrelere böl
+	{width} × {length} cm (max {max})	{width} × {length} cm (en fazla {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Dosyada boyut yok: {width} cm önerildi.
+	Place	Yerleştir
+	SVG Print Size	SVG baskı boyutu
+	Size given in the file.	Dosyada belirtilen boyut.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Desteklenen biçimler: PNG (görünür piksellerine kırpılır) ve SVG (baskı boyutunda çizilir)
+	Width in cells:	Hücre cinsinden genişlik:
+	SVG files still waiting: {n}	Bekleyen SVG dosyaları: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	YZ ×{scale}: {from} → {to} px
+	Background {color} made transparent	{color} arka plan saydam yapıldı
+	Copy for Vectorization	Vektörleştirme kopyası
+	Fringes removed, 2 px margin	Saçaklar kaldırıldı, 2 px kenar
+	JPEG: light median against the artefacts	JPEG: artefaktlara karşı hafif medyan
+	Optimize for Vectorization	Vektörleştirme için optimize et
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Küçültüldü: {from} → {to} px
+	Size kept: {size} px	Boyut korundu: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Çok fazla renk ({n}): fotoğraf veya degrade vektörleştirmeye pek uygun değil.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft web sitesi
+# DTF Craft (25)
+	Analyzing the colors…	Renkler analiz ediliyor…
+	Background kept	Arka plan korundu
+	Sheets used: {sheets}	Kullanılan sayfalar: {sheets}
+	The vectorization stopped unexpectedly.	Vektörleştirme beklenmedik şekilde durdu.
+	Tracing the shapes…	Şekiller çiziliyor…
+	Tracing with VectorCraft…	VectorCraft ile çiziliyor…
+	{n} new sheets added	{n} yeni sayfa eklendi
+# DTF Craft (26)
+	AI upscale…	YZ büyütme…
+	Not Suited to Vectorization	Vektörleştirmeye pek uygun değil
+	On white	Beyaz üzerinde
+	Preparation cancelled	Hazırlık iptal edildi
+	Prepared for vectorization: {steps}	Vektörleştirmeye hazırlandı: {steps}
+	Preparing for Vectorization	Vektörleştirme için hazırlık
+	Preparing the visual…	Görsel hazırlanıyor…
+	The document changed during the preparation.	Hazırlık sırasında belge değişti.
+	The preparation stopped unexpectedly.	Hazırlık beklenmedik şekilde durdu.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Tıklama: ayarları · Çift tıklama: sayfaya bir kopya ekle
+# DTF Craft (29)
+	Black T-Shirt	Siyah tişört
+	Soft Black T-Shirt	Siyah tişört – yumuşak
+	White T-Shirt	Beyaz tişört
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Rötuş katmanları (parlaklık +32, doygunluk +16), gizli
+# DTF Craft (30)
+	Cells	Hücreler
+	Click: show the sheet · Double-click: rename it	Tıklama: sayfayı göster · Çift tıklama: yeniden adlandır
+	Copies to Print	Basılacak kopya
+	Custom Width	Özel genişlik
+	Drop PNG or SVG files here	PNG veya SVG dosyalarını buraya bırakın
+	Duplicate the Sheet	Sayfayı çoğalt
+	Every sheet emptied, the visuals kept	Tüm sayfalar boşaltılır, görseller kalır
+	Every visual's size and copies, then lay the sheets out	Her görselin boyutu ve adedi, ardından sayfa yerleşimi
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Toplam: {sheets} sayfa · {visuals} görsel

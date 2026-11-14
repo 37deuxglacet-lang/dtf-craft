@@ -1,0 +1,408 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	Rastr DTF…
+	Remove Semi-Transparent Pixels…	Odstranit poloprůhledné pixely…
+	Gang Sheet…	Sdružený arch…
+	AI Upscale…	Zvětšení AI…
+	Print Conformity…	Příprava pro tisk…
+	Control Background…	Kontrolní pozadí…
+	Remove Control Background	Odstranit kontrolní pozadí
+	Saturation…	Sytost…
+	Dark Garment	Tmavá látka
+	Light Garment	Světlá látka
+	Min Dot	Min. bod
+	Max Dot	Max. bod
+	Ellipse	Elipsa
+	About DTF Craft	O aplikaci DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — založeno na PhotoCraft
+	based on PhotoCraft · open source	založeno na PhotoCraft · otevřený zdrojový kód
+	Website	Web
+	Contact	Kontakt
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — nástroje DTF od Stéphana GLACETA, založeno na:
+	DTF Settings	Nastavení DTF
+	Open a document to use the DTF settings.	Otevřete dokument a použijte nastavení DTF.
+	Semi-Transparent Pixels Only	Pouze poloprůhledné pixely
+	Whole Visual — Dark Garment	Celý motiv — tmavá textilie
+	Whole Visual — Light Garment	Celý motiv — světlá textilie
+# DTF Craft (3)
+	Print Conformity	Příprava pro tisk
+	Control Background	Kontrolní pozadí
+	Remove Semi-Transparent Pixels	Odstranit poloprůhledné pixely
+	Current size: {width} × {height} cm at {resolution} ppi	Aktuální velikost: {width} × {height} cm při {resolution} ppi
+	Width (cm, 0 = proportional)	Šířka (cm, 0 = poměrně)
+	Height (cm, 0 = proportional)	Výška (cm, 0 = poměrně)
+	Conformity	Příprava
+	No Background	Bez pozadí
+	Fringe	Lemy
+# DTF Craft (4)
+	Remove White Background…	Odstranit bílé pozadí…
+	Remove White Background	Odstranit bílé pozadí
+	Detect Color	Rozpoznat barvu pozadí
+	Remove Halo	Odstranit halo
+	Interior Holes	Vnitřní otvory
+	Min Hole Size	Min. velikost otvoru (px)
+# DTF Craft (5)
+	Transparent Pixels	Průhledné pixely
+	Remove Fringe	Odstranit lemy
+	Show Background	Zobrazit pozadí
+	Delete Background	Smazat pozadí
+# DTF Craft (6)
+	Layer Name	Název vrstvy
+	Preview Background	Pozadí náhledu
+	Add Holes (Magic Wand)	Přidat otvory (kouzelná hůlka)
+	Show Before	Zobrazit před
+	Click an enclosed area to make it transparent.	Klepněte do uzavřené oblasti, aby byla průhledná.
+	Interior Hole	Vnitřní otvor
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — beta verze
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Toto je beta verze DTF Craft určená k testování: některé nástroje se ještě mohou změnit nebo obsahovat chyby.
+	Release planned for November 2, 2026.	Vydání plánováno na 2. listopadu 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) při {resolution} ppi
+	AI Upscale	Zvětšení AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Přidat otvory (kouzelná guma)
+	Eraser Tolerance	Tolerance gumy
+# DTF Craft (11)
+	Color Analyzer…	Analyzátor barev…
+	Color Analyzer	Analyzátor barev
+	Replace Colors with Swatches	Nahradit barvy vzorky
+	the document is not modified	dokument se nemění
+	Original Colors	Původní barvy
+	Replaced Colors	Nahrazené barvy
+	With Patches	Se vzorky
+	Add a color with the eyedropper: click the visual.	Přidat barvu kapátkem: klikněte do motivu.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Kopie, v níž jsou zaškrtnuté barvy nahrazeny referencemi, uložená jako PNG a otevřená na nové kartě.
+	PDF Sheet…	List PDF…
+	An A4 sheet with the visual, its colors and their references.	List A4 s motivem, jeho barvami a jejich referencemi.
+	Export PNG…	Exportovat PNG…
+	Analyzed Pixels	Analyzované pixely
+	Visible, transparency ignored	Viditelné, průhlednost ignorována
+	RGB {bits} bits	RGB {bits} bitů
+	Maximum Colors	Maximum barev
+	Grouping (ΔE)	Seskupení (ΔE)
+	Colors closer than this difference are counted as one.	Barvy bližší než tento rozdíl se počítají jako jedna.
+	Ignore colors under 0.5 % of the area	Ignorovat barvy pod 0,5 % plochy
+	Reference Swatch Book	Referenční vzorník
+	None loaded	Žádný nenačten
+	{name} · {n} colors	{name} · barev: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formáty: .ase, .aco, .csv (ref; R; G; B nebo L*a*b*). Rozdíl měřen v ΔE 2000.
+	Detected Colors: {n}	Zjištěné barvy: {n}
+	Patches · on-screen check and PDF sheet	Vzorky · kontrola na obrazovce a list PDF
+	Below	Pod
+	Reference	Reference
+	Hex	Hex
+	Client	Zákazník
+	On the PDF sheet	Na listu PDF
+	Replaced in the PNG export	Nahrazeno při exportu PNG
+	Visual	Motiv
+	Match	Shoda
+	Remove this color	Odebrat tuto barvu
+	Change…	Změnit…
+	Load a swatch book to find the references.	Načtěte vzorník pro nalezení referencí.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Zaškrtnuto: barva motivu se při exportu PNG nahradí referencí. ΔE: do 2 = nepostřehnutelné · 2 až 5 = viditelné zblízka · výše = jiný odstín
+	Reference for {hex}	Reference pro {hex}
+	Nearest (automatic)	Nejbližší (automaticky)
+	No visible pixels to analyze.	Žádné viditelné pixely k analýze.
+	Swatch book loaded: {name}, {n} colors	Vzorník načten: {name}, barev: {n}
+	{name} color sheet	{name} list barev
+	Color sheet saved: {path}	List barev uložen: {path}
+	Color Sheet	List barev
+	Swatch Book	Vzorník
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Zjištěné barvy: {n}
+	No swatch book loaded: the colors have no reference.	Není načten vzorník: barvy nemají referenci.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Shody při ΔE 2 nebo méně: {good}; ke kontrole (ΔE 2 až 5): {check}; nad 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Velikost motivu: {w} × {h} px, {wcm} × {hcm} cm při {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: do 2 = nepostřehnutelný rozdíl · 2 až 5 = viditelné zblízka · nad 5 = jiný odstín.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Barvy zobrazené v sRGB: výsledek tisku závisí na tiskárně, inkoustech a materiálu.
+	Sheet made with DTF Craft	List vytvořen v DTF Craft
+# DTF Craft (12)
+	Add Holes	Přidat otvory
+	Add Hole	Přidat otvor
+# DTF Craft (13)
+	Pick the Background Colour	Barva pozadí kapátkem
+	Click the background colour to remove.	Klikněte na barvu pozadí, kterou chcete odstranit.
+	Click a visible pixel of the background.	Klikněte na viditelný pixel pozadí.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nebylo zjištěno jednobarevné pozadí: pozadí je již průhledné, nebo vyberte jeho barvu kapátkem.
+	Holes: {n}	Otvory: {n}
+	Remove Last Hole	Odebrat poslední otvor
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Sdružený arch
+	Visuals	Motivy
+	Add PNG Files…	Přidat soubory PNG…
+	Add Open Document	Přidat otevřený dokument
+	Add PNG files or the open document.	Přidejte soubory PNG nebo otevřený dokument.
+	Sheet	Arch
+	Film Width	Šířka fólie
+	Max Length	Max. délka
+	Allow Rotation	Povolit otáčení
+	Auto Build	Automaticky rozmístit
+	Selected Visual	Vybraný motiv
+	Rotate 90°	Otočit o 90°
+	Length used: {length} cm	Využitá délka: {length} cm
+	{n} not placed	Neumístěno: {n}
+	{n} too close or overlapping	Příliš blízko nebo přes sebe: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Motiv přesunete tažením. Šipky: 1 mm (Shift: 1 cm). Delete jej odebere z archu.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Motivy blíže než okraj k jinému motivu nebo k hraně: {n}. Přesto exportovat?
+	Too close to another visual	Příliš blízko jinému motivu
+	No room to turn this visual	Není místo na otočení tohoto motivu
+	Open a document first	Nejprve otevřete dokument
+	the document was closed	dokument byl zavřen
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktivní archy
+	Add a New Sheet	Přidat nový arch
+	Add a copy to the sheet	Přidat kopii na arch
+	Along the edges	Podél okrajů
+	Auto Build May Rotate	Povolit otáčení (automaticky)
+	Auto Build — every image at once	Automatické rozmístění — všechny obrázky najednou
+	Auto Fill	Automaticky vyplnit
+	Background Warning:	Upozornění na pozadí:
+	Background not removed (opaque corners)	Pozadí neodstraněno (neprůhledné rohy)
+	Between images	Mezi obrázky
+	Center Horizontally	Zarovnat na střed vodorovně
+	Center Vertically	Zarovnat na střed svisle
+	Center on the Sheet	Na střed archu
+	Copies of this sheet to print	Počet kopií archu k tisku
+	Custom Color	Vlastní barva
+	Delete (Del)	Odstranit (Del)
+	Delete the Sheet	Odstranit arch
+	Drag and drop a file here or click to	Přetáhněte sem soubor nebo klikněte a
+	Duplicate Image	Duplikovat obrázek
+	Export Sheets (PNG)…	Exportovat archy (PNG)…
+	Fill the room left on the sheet with this visual	Vyplnit volné místo archu tímto motivem
+	Flip Horizontally	Převrátit vodorovně
+	Flip Vertically	Převrátit svisle
+	Good resolution >= 250 dpi	Dobré rozlišení >= 250 dpi
+	Grid (1 cm)	Mřížka (1 cm)
+	Image Margin	Okraj obrázku
+	Import Images	Importovat obrázky
+	Lock Proportions	Zamknout proporce
+	Margin (cm)	Okraj (cm)
+	No image yet: import PNG files or add the open document.	Zatím žádný obrázek: importujte soubory PNG nebo přidejte otevřený dokument.
+	No room left on the sheet	Na archu už není místo
+	Number of Images:	Počet obrázků:
+	One copy less	O kopii méně
+	One copy more	O kopii více
+	Optimal	Optimální
+	Optimal resolution >= 300 dpi	Optimální rozlišení >= 300 dpi
+	Overlap Lines	Čáry překrytí
+	Overlapping or too close	Překrývá se nebo je příliš blízko
+	Poor	Špatné
+	Poor resolution >= 200 dpi	Špatné rozlišení >= 200 dpi
+	Proportions:	Proporce:
+	Push Down	Posunout dolů
+	Push Left	Posunout doleva
+	Push Right	Posunout doprava
+	Push Up	Posunout nahoru
+	Qty:	Počet:
+	Redo (Ctrl+Y)	Znovu (Ctrl+Y)
+	Rotate 90° Counterclockwise	Otočit o 90° proti směru hodin
+	Same image, another size	Stejný obrázek, jiná velikost
+	Select an object to edit.	Vyberte objekt k úpravě.
+	Semi-transparent pixels: {p} %	Poloprůhledné pixely: {p} %
+	Sheet Background	Pozadí archu
+	Sheet Margin	Okraj archu
+	Show Overlap Lines	Zobrazit čáry překrytí
+	Show Resolution Lines	Zobrazit čáry rozlišení
+	Snap While Moving	Zarovnávat při přesunu
+	Start Over	Začít znovu
+	Stretch to the Film Width	Roztáhnout na šířku fólie
+	Stretch to the Sheet Length	Roztáhnout na délku archu
+	Supported format: PNG (cropped to its visible pixels)	Podporovaný formát: PNG (oříznutý na viditelné pixely)
+	Transparency Warning:	Upozornění na průhlednost:
+	Undo (Ctrl+Z)	Zpět (Ctrl+Z)
+	Very Poor	Velmi špatné
+	Very poor resolution < 200 dpi	Velmi špatné rozlišení < 200 dpi
+	With the image margin	S okrajem obrázku
+	With the sheet margin	S okrajem archu
+	copy	kopie
+	{n} images	Obrázky: {n}
+# DTF Craft (14)
+	Vectorization…	Vektorizace…
+	Vectorization	Vektorizace
+	Vectorized	Vektorizováno
+	Side by Side	Vedle sebe
+	Show Contours	Zobrazit obrysy
+	Checkerboard under Transparency	Šachovnice pod průhledností
+	{colors} colors · {shapes} shapes · {points} points	Barvy: {colors} · tvary: {shapes} · body: {points}
+	Cut-out shapes, no overlap	Vyříznuté tvary bez překrývání
+	Open document, flattened	Otevřený dokument, sloučený
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm při {dpi} ppi
+	Type of Visual	Typ obrázku
+	Logo · flat colors	Logo · plné barvy
+	Illustration · shades	Ilustrace · odstíny
+	Number of Colors	Počet barev
+	Detail Level	Úroveň detailů
+	Sharp Corners	Ostré rohy
+	Remove the Background	Odstranit pozadí
+	read on the visual's edge	zjištěno na okraji obrázku
+	No background found: the visual is already cut out.	Pozadí nenalezeno: obrázek je již vyříznutý.
+	Palette	Paleta
+	{n} colors · {k} in the SVG	Barvy: {n} · v SVG: {k}
+	Edge Background	Pozadí
+	Keep {hex} in the SVG	Ponechat {hex} v SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Nezaškrtnuto: barva se z SVG vynechá; její tvary se odstraní, nesloučí.
+	SVG · cut-out shapes	SVG · vyříznuté tvary
+	{w} × {h} mm (document size)	{w} × {h} mm (velikost dokumentu)
+	Open the SVG in DTF Craft after the export	Po exportu otevřít SVG v DTF Craft
+	Export SVG…	Exportovat SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Vyříznuté tvary ve velikosti tisku dokumentu, uložené jako SVG.
+	SVG saved: {path}	SVG uloženo: {path}
+	No visible pixels to vectorize.	Žádné viditelné pixely k vektorizaci.
+	Nothing to export: every color is left out.	Není co exportovat: všechny barvy jsou vynechány.
+	Low Detail	Nízká
+	Medium Detail	Střední
+	High Detail	Vysoká
+	Close the Seams between Colors	Uzavřít spáry mezi barvami
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Každý tvar přesahuje sousední o půl pixelu, aby se při tisku mezi dvěma barvami neobjevila průhledná linka. Zrušte zaškrtnutí pro přesně vyříznuté tvary (řezací plotr).
+# DTF Craft (14)
+	Conformity…	Příprava…
+	Cutout…	Vystřihovánka…
+	Transparent Pixels…	Průhledné pixely…
+	Remove Fringe…	Odstranit lemy…
+	Sharpness…	Ostrost…
+# DTF Craft (15)
+	Group the Selection	Seskupit
+	Group (Ctrl+G)	Seskupit (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Zrušit seskupení (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Duplikovat (Ctrl+D)
+	{n} visuals selected	Vybrané vizuály: {n}
+	Colors kept: {n}	Ponechané barvy: {n}
+# DTF Craft (16)
+	Applied Ranges	Použité rozsahy
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: barva · Shift+klik: přidat · Alt+klik: odebrat
+	Contiguous Pixels	Souvislé pixely
+	Pick a color on the visual.	Vyberte barvu na motivu.
+	Remove this range	Odebrat tento rozsah
+	Replacement Color	Náhradní barva
+	Turn on Color Range above the visual, then click a color.	Zapněte Rozsah barev nad motivem a klikněte na barvu.
+	{p} % of the visible pixels	{p} % viditelných pixelů
+# DTF Craft (17)
+	Hide the image	Skrýt obrázek
+	Illustration: {user} on Pixabay	Ilustrace: {user} na Pixabay
+	Show an illustration	Zobrazit ilustraci
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	List A4 s motivem, vektorizovaným výsledkem, jeho barvami a jejich referencemi.
+	Detected Colors	Zjištěné barvy
+	Replaced by the reference in the SVG	Nahrazeno referencí v SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG nezaškrtnuto: barva je z SVG vynechána; její tvary se odstraní, nesloučí.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Sdíleno s Analyzátorem barev. Formáty: .ase, .aco, .csv; rozdíl v ΔE 2000.
+	{name} vectorized color sheet	{name} barevný list vektorizace
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ zaškrtnuto: tvary převezmou barvu reference a v SVG nesou její název. ΔE: do 2 = nepostřehnutelné · 2 až 5 = viditelné zblízka · víc = jiný odstín
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}“ není barva: zapište ji jako #rrggbb.
+	16 Colors	16 barev
+	3 Colors	3 barvy
+	6 Colors	6 barev
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Kruh, elipsa, obdélník nebo pravidelný mnohoúhelník vyjde přesně jako tento tvar.
+	Abutting	Sousedící
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Sousedící: každá barva má vlastní plochu, tvary sdílejí okraje. Překrývající: každá vrstva sahá pod vrstvy nad ní, mezi barvami není mezera.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Plocha, jejíž barva se plynule mění jedním směrem, je jeden tvar vyplněný lineárním přechodem.
+	Areas smaller than this many pixels are ignored.	Plochy menší než tento počet pixelů se ignorují.
+	Black and White	Černobílý
+	Black and White Logo	Černobílé logo
+	Cut-out shapes, contours cleaned for DTF printing.	Vyříznuté tvary, obrysy vyčištěné pro tisk DTF.
+	Engine	Modul
+	Exact Shapes	Přesné tvary
+	Fills	Výplně
+	Flat Logo	Plošné logo
+	Full Tone	Spojitý tón
+	Grays	Šedé
+	High Fidelity Photo	Fotografie vysoké věrnosti
+	Higher keeps more sharp corners.	Vyšší zachová více ostrých rohů.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Jak přesně křivky sledují pixely: vyšší je věrnější, s více body.
+	Ignore Color	Ignorovat barvu
+	Limited	Omezená
+	Line Art	Kresba
+	Lines as Strokes	Čáry jako tahy
+	Lines no wider than the stroke width are traced as stroked center lines.	Čáry ne širší než tloušťka tahu se obkreslí jako středové čáry s tahem.
+	Load a swatch book to use it as the palette.	Načtěte vzorník, abyste ho použili jako paletu.
+	Logo Colors	Barvy loga
+	Low Fidelity Photo	Fotografie nízké věrnosti
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Téměř rovné křivky se stanou úsečkami; v Plošném logu se části kruhů stanou skutečnými oblouky.
+	Nothing to trace: everything is ignored or transparent.	Nic k obkreslení: vše je ignorováno nebo průhledné.
+	Outline	Obrys
+	Overlapping	Překrývající
+	Pixels darker than this are black.	Pixely tmavší než tato hodnota jsou černé.
+	Shades of Gray	Odstíny šedé
+	Silhouettes	Siluety
+	Sketched Art	Skica
+	Snap Curves to Lines	Přichytit křivky k čarám
+	Technical Drawing	Technický výkres
+	The areas of this color are left out (white when the field is empty).	Plochy této barvy se vynechají (bílá, když je pole prázdné).
+	The colors of the reference swatch book below, at most this many.	Barvy referenčního vzorníku níže, nejvýše tolik.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Tento motiv není logo v plných barvách ({p} % plných ploch je jednolitých): zvolte režim Barva.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Příliš mnoho bodů: zvyšte Šum, nebo snižte Cesty či Barvy.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Obkreslení obrazu z VectorCraft: jeho předvolby a všechna nastavení, pro DTF i jiné techniky.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorizace: Obkreslení obrazu z VectorCraft (ArtCraft Team a přispěvatelé VectorCraft, MIT OR Apache-2.0) a visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automaticky, nebo #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Buňky {size} × {size} cm · řady: {rows}
+	Cells touch: no spacing between images.	Buňky na sebe navazují: mezi obrázky není mezera.
+	No Cells	Bez buněk
+	Organize Automatically on Import	Při importu automaticky uspořádat
+	Printed width: {width} cm	Šířka tisku: {width} cm
+	Reserve up to {max} cm · not exported	Rezerva do {max} cm · neexportuje se
+	Snap to the Cells	Přichytávat k buňkám
+	Split the Width into Cells	Rozdělit šířku na buňky
+	{width} × {length} cm (max {max})	{width} × {length} cm (max. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Soubor neudává velikost: navrženo {width} cm.
+	Place	Umístit
+	SVG Print Size	Tisková velikost SVG
+	Size given in the file.	Velikost uvedená v souboru.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Podporované formáty: PNG (oříznuto na viditelné pixely) a SVG (vykresleno v tiskové velikosti)
+	Width in cells:	Šířka v buňkách:
+	SVG files still waiting: {n}	Čekající soubory SVG: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Pozadí {color} zprůhledněno
+	Copy for Vectorization	Kopie pro vektorizaci
+	Fringes removed, 2 px margin	Lemy odstraněny, okraj 2 px
+	JPEG: light median against the artefacts	JPEG: lehký medián proti artefaktům
+	Optimize for Vectorization	Optimalizovat pro vektorizaci
+	RGB 8 bits, sRGB	RGB 8 bitů, sRGB
+	Reduced: {from} → {to} px	Zmenšeno: {from} → {to} px
+	Size kept: {size} px	Velikost zachována: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Příliš mnoho barev ({n}): fotografie nebo přechod se k vektorizaci nehodí.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Web ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Analýza barev…
+	Background kept	Pozadí zachováno
+	Sheets used: {sheets}	Použité archy: {sheets}
+	The vectorization stopped unexpectedly.	Vektorizace se neočekávaně zastavila.
+	Tracing the shapes…	Obkreslování tvarů…
+	Tracing with VectorCraft…	Obkreslování ve VectorCraftu…
+	{n} new sheets added	Přidané nové archy: {n}
+# DTF Craft (26)
+	AI upscale…	Zvětšení AI…
+	Not Suited to Vectorization	Málo vhodné k vektorizaci
+	On white	Na bílé
+	Preparation cancelled	Příprava zrušena
+	Prepared for vectorization: {steps}	Připraveno k vektorizaci: {steps}
+	Preparing for Vectorization	Příprava k vektorizaci
+	Preparing the visual…	Příprava motivu…
+	The document changed during the preparation.	Dokument se během přípravy změnil.
+	The preparation stopped unexpectedly.	Příprava se neočekávaně zastavila.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Klepnutí: jeho nastavení · Dvojklik: přidat kopii na arch
+# DTF Craft (29)
+	Black T-Shirt	Černé tričko
+	Soft Black T-Shirt	Černé tričko – jemně
+	White T-Shirt	Bílé tričko
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Retušovací vrstvy (jas +32, sytost +16), skryté
+# DTF Craft (30)
+	Cells	Buňky
+	Click: show the sheet · Double-click: rename it	Klepnutí: zobrazit arch · Dvojklepnutí: přejmenovat
+	Copies to Print	Kopie k tisku
+	Custom Width	Vlastní šířka
+	Drop PNG or SVG files here	Sem přetáhněte soubory PNG nebo SVG
+	Duplicate the Sheet	Duplikovat arch
+	Every sheet emptied, the visuals kept	Všechny archy vyprázdněny, motivy zachovány
+	Every visual's size and copies, then lay the sheets out	Velikost a počet kopií každého motivu, pak rozvržení archů
+	Film	Fólie
+	Total: {sheets} sheets · {visuals} visuals	Celkem: {sheets} archů · {visuals} motivů

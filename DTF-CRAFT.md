@@ -218,3 +218,19 @@ GitHub Actions compile la version Windows (`.github/workflows/dtf-craft-windows.
 envoi sur la branche `main` ; le zip portable est dans les artefacts de l'exécution (conservés
 un jour). Aucun binaire n'est joint aux releases publiques ; sur une étiquette ou un lancement manuel
 (`upload_name`), le zip est envoyé sur l'hébergement Nuxit quand les secrets `NUXIT_FTP_*` sont définis.
+
+## Mise à niveau de PhotoCraft
+
+L'historique Git de DTF Craft n'est pas relié à celui de PhotoCraft (import en un commit).
+`PHOTOCRAFT-BASE.toml` enregistre le commit PhotoCraft de départ ; `scripts/dtf-sync-photocraft.sh`
+s'en sert comme ancêtre commun pour fusionner une nouvelle version :
+
+```sh
+scripts/dtf-sync-photocraft.sh start v0.23.1   # branche sync/… (à ne pas pousser), conflits listés
+scripts/dtf-sync-photocraft.sh finish          # branche maj/photocraft-v0.23.1, un seul commit
+scripts/dtf-sync-photocraft.sh abort           # abandon
+```
+
+Les workflows GitHub de PhotoCraft restent retirés à chaque fusion. Pour limiter les conflits, le
+code DTF reste dans ses propres fichiers (liste dans `MODIFICATIONS.md`) ; les traductions DTF sont
+dans `crates/ui-egui/src/i18n/dtf/<langue>.tsv`, ajoutées au catalogue PhotoCraft à la compilation.

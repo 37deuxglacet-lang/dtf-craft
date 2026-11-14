@@ -1,0 +1,410 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	Ράστερ DTF…
+	Remove Semi-Transparent Pixels…	Αφαίρεση ημιδιαφανών εικονοστοιχείων…
+	Gang Sheet…	Συγκεντρωτικό φύλλο…
+	AI Upscale…	Μεγέθυνση ΤΝ…
+	Print Conformity…	Προετοιμασία εκτύπωσης…
+	Control Background…	Φόντο ελέγχου…
+	Remove Control Background	Αφαίρεση φόντου ελέγχου
+	Saturation…	Κορεσμός…
+	Target	Στόχος
+	Dark Garment	Σκούρο ύφασμα
+	Light Garment	Ανοιχτό ύφασμα
+	Min Dot	Ελάχ. κουκκίδα
+	Max Dot	Μέγ. κουκκίδα
+	Ellipse	Έλλειψη
+	About DTF Craft	Πληροφορίες για το DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — βασισμένο στο PhotoCraft
+	based on PhotoCraft · open source	βασισμένο στο PhotoCraft · ανοιχτού κώδικα
+	Website	Ιστότοπος
+	Contact	Επικοινωνία
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — εργαλεία DTF από τον Stéphane GLACET, βασισμένο στο:
+	DTF Settings	Ρυθμίσεις DTF
+	Open a document to use the DTF settings.	Ανοίξτε ένα έγγραφο για να χρησιμοποιήσετε τις ρυθμίσεις DTF.
+	Semi-Transparent Pixels Only	Μόνο ημιδιαφανή εικονοστοιχεία
+	Whole Visual — Dark Garment	Ολόκληρο το σχέδιο — σκούρο ύφασμα
+	Whole Visual — Light Garment	Ολόκληρο το σχέδιο — ανοιχτόχρωμο ύφασμα
+# DTF Craft (3)
+	Print Conformity	Προετοιμασία εκτύπωσης
+	Control Background	Φόντο ελέγχου
+	Remove Semi-Transparent Pixels	Αφαίρεση ημιδιαφανών εικονοστοιχείων
+	Current size: {width} × {height} cm at {resolution} ppi	Τρέχον μέγεθος: {width} × {height} cm στα {resolution} ppi
+	Width (cm, 0 = proportional)	Πλάτος (cm, 0 = αναλογικά)
+	Height (cm, 0 = proportional)	Ύψος (cm, 0 = αναλογικά)
+	Conformity	Προετοιμασία
+	No Background	Χωρίς φόντο
+	Fringe	Περιθώρια
+# DTF Craft (4)
+	Remove White Background…	Αφαίρεση λευκού φόντου…
+	Remove White Background	Αφαίρεση λευκού φόντου
+	Detect Color	Εντοπισμός χρώματος φόντου
+	Remove Halo	Αφαίρεση άλω
+	Interior Holes	Εσωτερικές οπές
+	Min Hole Size	Ελάχ. μέγεθος οπής (px)
+# DTF Craft (5)
+	Transparent Pixels	Διαφανή εικονοστοιχεία
+	Remove Fringe	Αφαίρεση περιγράμματος
+	Show Background	Εμφάνιση φόντου
+	Delete Background	Διαγραφή φόντου
+# DTF Craft (6)
+	Layer Name	Όνομα επιπέδου
+	Preview Background	Φόντο προεπισκόπησης
+	Add Holes (Magic Wand)	Προσθήκη οπών (μαγικό ραβδί)
+	Show Before	Εμφάνιση πριν
+	Click an enclosed area to make it transparent.	Κάντε κλικ σε κλειστή περιοχή για να γίνει διαφανής.
+	Interior Hole	Εσωτερική οπή
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — έκδοση beta
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Αυτή είναι μια έκδοση beta του DTF Craft για δοκιμές: ορισμένα εργαλεία μπορεί ακόμη να αλλάξουν ή να έχουν σφάλματα.
+	Release planned for November 2, 2026.	Η κυκλοφορία προγραμματίζεται για τις 2 Νοεμβρίου 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) στα {resolution} ppi
+	AI Upscale	Μεγέθυνση ΤΝ
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Προσθήκη οπών (μαγική γόμα)
+	Eraser Tolerance	Ανοχή γόμας
+# DTF Craft (11)
+	Color Analyzer…	Αναλυτής χρωμάτων…
+	Color Analyzer	Αναλυτής χρωμάτων
+	Replace Colors with Swatches	Αντικατάσταση χρωμάτων με δείγματα
+	the document is not modified	το έγγραφο δεν τροποποιείται
+	Original Colors	Αρχικά χρώματα
+	Replaced Colors	Αντικατεστημένα χρώματα
+	With Patches	Με δείγματα
+	Add a color with the eyedropper: click the visual.	Προσθήκη χρώματος με το σταγονόμετρο: κάντε κλικ στο σχέδιο.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Αντίγραφο με τα επιλεγμένα χρώματα αντικατεστημένα από τις αναφορές τους, αποθηκευμένο ως PNG και ανοιγμένο σε νέα καρτέλα.
+	PDF Sheet…	Φύλλο PDF…
+	An A4 sheet with the visual, its colors and their references.	Φύλλο A4 με το σχέδιο, τα χρώματά του και τις αναφορές τους.
+	Export PNG…	Εξαγωγή PNG…
+	Analyzed Pixels	Πίξελ που αναλύονται
+	Visible, transparency ignored	Ορατά, η διαφάνεια αγνοείται
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Μέγιστος αριθμός χρωμάτων
+	Grouping (ΔE)	Ομαδοποίηση (ΔE)
+	Colors closer than this difference are counted as one.	Χρώματα πιο κοντά από αυτή τη διαφορά μετρούν ως ένα.
+	Ignore colors under 0.5 % of the area	Παράβλεψη χρωμάτων κάτω από 0,5 % της επιφάνειας
+	Reference Swatch Book	Δειγματολόγιο αναφοράς
+	None loaded	Δεν φορτώθηκε
+	{name} · {n} colors	{name} · {n} χρώματα
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Μορφές: .ase, .aco, .csv (ref; R; G; B ή L*a*b*). Διαφορά σε ΔE 2000.
+	Detected Colors: {n}	Χρώματα που εντοπίστηκαν: {n}
+	Patches · on-screen check and PDF sheet	Δείγματα · έλεγχος στην οθόνη και φύλλο PDF
+	Below	Κάτω
+	Reference	Αναφορά
+	Hex	Hex
+	Client	Πελάτης
+	On the PDF sheet	Στο φύλλο PDF
+	Replaced in the PNG export	Αντικαθίσταται στην εξαγωγή PNG
+	Visual	Σχέδιο
+	Match	Αντιστοιχία
+	Remove this color	Αφαίρεση αυτού του χρώματος
+	Load a swatch book to find the references.	Φορτώστε ένα δειγματολόγιο για να βρείτε τις αναφορές.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Επιλεγμένο: το χρώμα του σχεδίου αντικαθίσταται από την αναφορά στην εξαγωγή PNG. ΔE: έως 2 = ανεπαίσθητο · 2 έως 5 = ορατό από κοντά · πάνω = άλλη απόχρωση
+	Reference for {hex}	Αναφορά για {hex}
+	Nearest (automatic)	Πλησιέστερο (αυτόματα)
+	No visible pixels to analyze.	Δεν υπάρχουν ορατά πίξελ για ανάλυση.
+	Swatch book loaded: {name}, {n} colors	Φορτώθηκε δειγματολόγιο: {name}, {n} χρώματα
+	{name} color sheet	{name} φύλλο χρωμάτων
+	Color sheet saved: {path}	Το φύλλο χρωμάτων αποθηκεύτηκε: {path}
+	Color Sheet	Φύλλο χρωμάτων
+	Swatch Book	Δειγματολόγιο
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Χρώματα που εντοπίστηκαν: {n}
+	No swatch book loaded: the colors have no reference.	Δεν φορτώθηκε δειγματολόγιο: τα χρώματα δεν έχουν αναφορά.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Αντιστοιχίες με ΔE 2 ή λιγότερο: {good}· για έλεγχο (ΔE 2 έως 5): {check}· πάνω από 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Μέγεθος σχεδίου: {w} × {h} px, {wcm} × {hcm} cm στα {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: έως 2 = ανεπαίσθητη διαφορά · 2 έως 5 = ορατή από κοντά · πάνω από 5 = άλλη απόχρωση.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Χρώματα σε sRGB: το εκτυπωμένο αποτέλεσμα εξαρτάται από τον εκτυπωτή, τα μελάνια και το υπόστρωμα.
+	Sheet made with DTF Craft	Φύλλο που δημιουργήθηκε με το DTF Craft
+	RGB	RGB
+# DTF Craft (12)
+	Add Holes	Προσθήκη οπών
+	Add Hole	Προσθήκη οπής
+# DTF Craft (13)
+	Pick the Background Colour	Χρώμα φόντου με σταγονόμετρο
+	Click the background colour to remove.	Κάντε κλικ στο χρώμα φόντου που θα αφαιρεθεί.
+	Click a visible pixel of the background.	Κάντε κλικ σε ορατό πίξελ του φόντου.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Δεν εντοπίστηκε ομοιόμορφο φόντο: το φόντο είναι ήδη διαφανές ή επιλέξτε το χρώμα του με το σταγονόμετρο.
+	Holes: {n}	Οπές: {n}
+	Remove Last Hole	Αφαίρεση τελευταίας οπής
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Συγκεντρωτικό φύλλο
+	Visuals	Σχέδια
+	Add PNG Files…	Προσθήκη αρχείων PNG…
+	Add Open Document	Προσθήκη ανοιχτού εγγράφου
+	Add PNG files or the open document.	Προσθέστε αρχεία PNG ή το ανοιχτό έγγραφο.
+	Sheet	Φύλλο
+	Film Width	Πλάτος φιλμ
+	Max Length	Μέγ. μήκος
+	Allow Rotation	Να επιτρέπεται η περιστροφή
+	Auto Build	Αυτόματη διάταξη
+	Selected Visual	Επιλεγμένο σχέδιο
+	Rotate 90°	Περιστροφή 90°
+	Length used: {length} cm	Μήκος σε χρήση: {length} cm
+	{n} not placed	Δεν τοποθετήθηκαν: {n}
+	{n} too close or overlapping	Πολύ κοντά ή επικαλύπτονται: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Σύρετε ένα σχέδιο για να το μετακινήσετε. Βέλη: 1 mm (Shift: 1 cm). Το Delete το αφαιρεί από το φύλλο.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Σχέδια πιο κοντά από το περιθώριο σε άλλο σχέδιο ή σε άκρη: {n}. Εξαγωγή παρ' όλα αυτά;
+	Too close to another visual	Πολύ κοντά σε άλλο σχέδιο
+	No room to turn this visual	Δεν υπάρχει χώρος για περιστροφή αυτού του σχεδίου
+	Open a document first	Ανοίξτε πρώτα ένα έγγραφο
+	the document was closed	το έγγραφο έκλεισε
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Ενεργά φύλλα
+	Add a New Sheet	Προσθήκη νέου φύλλου
+	Add a copy to the sheet	Προσθήκη αντιγράφου στο φύλλο
+	Along the edges	Κατά μήκος των άκρων
+	Auto Build May Rotate	Να επιτρέπεται η περιστροφή (αυτόματα)
+	Auto Build — every image at once	Αυτόματη διάταξη — όλες οι εικόνες μαζί
+	Auto Fill	Αυτόματο γέμισμα
+	Background Warning:	Προειδοποίηση φόντου:
+	Background not removed (opaque corners)	Το φόντο δεν αφαιρέθηκε (αδιαφανείς γωνίες)
+	Between images	Μεταξύ εικόνων
+	Center Horizontally	Οριζόντια στοίχιση στο κέντρο
+	Center Vertically	Κατακόρυφη στοίχιση στο κέντρο
+	Center on the Sheet	Στο κέντρο του φύλλου
+	Copies of this sheet to print	Αντίτυπα αυτού του φύλλου για εκτύπωση
+	Custom Color	Προσαρμοσμένο χρώμα
+	Delete (Del)	Διαγραφή (Del)
+	Delete the Sheet	Διαγραφή φύλλου
+	Drag and drop a file here or click to	Σύρετε ένα αρχείο εδώ ή κάντε κλικ για
+	Duplicate Image	Διπλασιασμός εικόνας
+	Export Sheets (PNG)…	Εξαγωγή φύλλων (PNG)…
+	Fill the room left on the sheet with this visual	Γέμισμα του ελεύθερου χώρου του φύλλου με αυτό το σχέδιο
+	Flip Horizontally	Οριζόντια αναστροφή
+	Flip Vertically	Κατακόρυφη αναστροφή
+	Good	Καλή
+	Good resolution >= 250 dpi	Καλή ανάλυση >= 250 dpi
+	Grid (1 cm)	Πλέγμα (1 cm)
+	Image Margin	Περιθώριο εικόνας
+	Import Images	Εισαγωγή εικόνων
+	Lock Proportions	Κλείδωμα αναλογιών
+	Margin (cm)	Περιθώριο (cm)
+	No image yet: import PNG files or add the open document.	Καμία εικόνα: εισαγάγετε αρχεία PNG ή προσθέστε το ανοιχτό έγγραφο.
+	No room left on the sheet	Δεν υπάρχει χώρος στο φύλλο
+	Number of Images:	Αριθμός εικόνων:
+	One copy less	Ένα αντίγραφο λιγότερο
+	One copy more	Ένα αντίγραφο περισσότερο
+	Optimal	Βέλτιστη
+	Optimal resolution >= 300 dpi	Βέλτιστη ανάλυση >= 300 dpi
+	Overlap Lines	Γραμμές επικάλυψης
+	Overlapping or too close	Επικαλύπτεται ή πολύ κοντά
+	Poor	Κακή
+	Poor resolution >= 200 dpi	Κακή ανάλυση >= 200 dpi
+	Proportions:	Αναλογίες:
+	Push Down	Ώθηση κάτω
+	Push Left	Ώθηση αριστερά
+	Push Right	Ώθηση δεξιά
+	Push Up	Ώθηση πάνω
+	Qty:	Ποσ.:
+	Redo (Ctrl+Y)	Επανάληψη (Ctrl+Y)
+	Rotate 90° Counterclockwise	Περιστροφή 90° αριστερόστροφα
+	Same image, another size	Ίδια εικόνα, άλλο μέγεθος
+	Select an object to edit.	Επιλέξτε ένα αντικείμενο για επεξεργασία.
+	Semi-transparent pixels: {p} %	Ημιδιαφανή pixel: {p} %
+	Sheet Background	Φόντο φύλλου
+	Sheet Margin	Περιθώριο φύλλου
+	Show Overlap Lines	Εμφάνιση γραμμών επικάλυψης
+	Show Resolution Lines	Εμφάνιση γραμμών ανάλυσης
+	Snap While Moving	Ευθυγράμμιση κατά τη μετακίνηση
+	Start Over	Από την αρχή
+	Stretch to the Film Width	Τέντωμα στο πλάτος του φιλμ
+	Stretch to the Sheet Length	Τέντωμα στο μήκος του φύλλου
+	Supported format: PNG (cropped to its visible pixels)	Υποστηριζόμενη μορφή: PNG (περικομμένο στα ορατά pixel)
+	Transparency Warning:	Προειδοποίηση διαφάνειας:
+	Undo (Ctrl+Z)	Αναίρεση (Ctrl+Z)
+	Very Poor	Πολύ κακή
+	Very poor resolution < 200 dpi	Πολύ κακή ανάλυση < 200 dpi
+	With the image margin	Με το περιθώριο εικόνας
+	With the sheet margin	Με το περιθώριο φύλλου
+	copy	αντίγραφο
+	{n} images	Εικόνες: {n}
+# DTF Craft (14)
+	Vectorization…	Διανυσματοποίηση…
+	Vectorization	Διανυσματοποίηση
+	Vectorized	Διανυσματοποιημένο
+	Side by Side	Δίπλα-δίπλα
+	Show Contours	Εμφάνιση περιγραμμάτων
+	Checkerboard under Transparency	Σκακιέρα κάτω από τη διαφάνεια
+	{colors} colors · {shapes} shapes · {points} points	Χρώματα: {colors} · σχήματα: {shapes} · σημεία: {points}
+	Cut-out shapes, no overlap	Αποκομμένα σχήματα, χωρίς επικάλυψη
+	Open document, flattened	Ανοιχτό έγγραφο, ισοπεδωμένο
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm στα {dpi} ppi
+	Type of Visual	Τύπος εικόνας
+	Logo · flat colors	Λογότυπο · συμπαγή χρώματα
+	Illustration · shades	Εικονογράφηση · αποχρώσεις
+	Number of Colors	Αριθμός χρωμάτων
+	Detail Level	Επίπεδο λεπτομέρειας
+	Sharp Corners	Αιχμηρές γωνίες
+	Remove the Background	Αφαίρεση φόντου
+	read on the visual's edge	από την άκρη της εικόνας
+	No background found: the visual is already cut out.	Δεν βρέθηκε φόντο: η εικόνα είναι ήδη αποκομμένη.
+	Palette	Παλέτα
+	{n} colors · {k} in the SVG	Χρώματα: {n} · στο SVG: {k}
+	Edge Background	Φόντο
+	Keep {hex} in the SVG	Διατήρηση του {hex} στο SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Χωρίς επιλογή: το χρώμα εξαιρείται από το SVG· τα σχήματά του αφαιρούνται, δεν συγχωνεύονται.
+	SVG · cut-out shapes	SVG · αποκομμένα σχήματα
+	{w} × {h} mm (document size)	{w} × {h} mm (μέγεθος εγγράφου)
+	Open the SVG in DTF Craft after the export	Άνοιγμα του SVG στο DTF Craft μετά την εξαγωγή
+	Export SVG…	Εξαγωγή SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Αποκομμένα σχήματα στο μέγεθος εκτύπωσης του εγγράφου, αποθηκευμένα ως SVG.
+	SVG saved: {path}	Το SVG αποθηκεύτηκε: {path}
+	No visible pixels to vectorize.	Δεν υπάρχουν ορατά pixel για διανυσματοποίηση.
+	Nothing to export: every color is left out.	Τίποτα για εξαγωγή: όλα τα χρώματα εξαιρούνται.
+	Low Detail	Χαμηλό
+	Medium Detail	Μεσαίο
+	High Detail	Υψηλό
+	Close the Seams between Colors	Κλείσιμο ενώσεων μεταξύ χρωμάτων
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Κάθε σχήμα επικαλύπτει τα γειτονικά κατά μισό pixel, ώστε να μην εμφανίζεται διαφανής γραμμή ανάμεσα σε δύο χρώματα στην εκτύπωση. Απενεργοποιήστε για αυστηρά αποκομμένα σχήματα (plotter κοπής).
+# DTF Craft (14)
+	Conformity…	Προετοιμασία…
+	Cutout…	Αποκοπή…
+	Transparent Pixels…	Διαφανή εικονοστοιχεία…
+	Remove Fringe…	Αφαίρεση περιγράμματος…
+	Sharpness…	Οξύτητα…
+# DTF Craft (15)
+	Group the Selection	Ομαδοποίηση
+	Group (Ctrl+G)	Ομαδοποίηση (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Κατάργηση ομαδοποίησης (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Αντιγραφή (Ctrl+D)
+	{n} visuals selected	{n} επιλεγμένα γραφικά
+	Colors kept: {n}	Χρώματα που διατηρήθηκαν: {n}
+# DTF Craft (16)
+	Applied Ranges	Εφαρμοσμένα εύρη
+	Click: a color · Shift+click: add · Alt+click: remove	Κλικ: ένα χρώμα · Shift+κλικ: προσθήκη · Alt+κλικ: αφαίρεση
+	Contiguous Pixels	Συνεχόμενα εικονοστοιχεία
+	Pick a color on the visual.	Επιλέξτε ένα χρώμα στο γραφικό.
+	Remove this range	Αφαίρεση αυτού του εύρους
+	Replacement Color	Χρώμα αντικατάστασης
+	Turn on Color Range above the visual, then click a color.	Ενεργοποιήστε το Εύρος χρωμάτων πάνω από το γραφικό και κάντε κλικ σε ένα χρώμα.
+	{p} % of the visible pixels	{p} % των ορατών εικονοστοιχείων
+# DTF Craft (17)
+	Hide the image	Απόκρυψη εικόνας
+	Illustration: {user} on Pixabay	Εικονογράφηση: {user} στο Pixabay
+	Show an illustration	Εμφάνιση εικονογράφησης
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Φύλλο A4 με το γραφικό, το διανυσματοποιημένο αποτέλεσμα, τα χρώματά του και τις αναφορές τους.
+	Detected Colors	Χρώματα που εντοπίστηκαν
+	Replaced by the reference in the SVG	Αντικαθίσταται από την αναφορά στο SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG χωρίς επιλογή: το χρώμα παραλείπεται από το SVG· τα σχήματά του αφαιρούνται, δεν συγχωνεύονται.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Κοινό με τον Αναλυτή χρωμάτων. Μορφές: .ase, .aco, .csv· διαφορά σε ΔE 2000.
+	{name} vectorized color sheet	{name} φύλλο χρωμάτων διανυσματοποίησης
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ επιλεγμένο: τα σχήματα παίρνουν το χρώμα της αναφοράς και φέρουν το όνομά της στο SVG. ΔE: έως 2 = ανεπαίσθητη · 2 έως 5 = ορατή από κοντά · πάνω = άλλη απόχρωση
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	Το «{color}» δεν είναι χρώμα: γράψτε το ως #rrggbb.
+	16 Colors	16 χρώματα
+	3 Colors	3 χρώματα
+	6 Colors	6 χρώματα
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Ένας κύκλος, μια έλλειψη, ένα ορθογώνιο ή ένα κανονικό πολύγωνο βγαίνει ακριβώς ως αυτό το σχήμα.
+	Abutting	Γειτονικά
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Γειτονικά: κάθε χρώμα έχει τη δική του περιοχή, τα σχήματα μοιράζονται τα άκρα τους. Επικαλυπτόμενα: κάθε επίπεδο εκτείνεται κάτω από τα επάνω, χωρίς κενό ανάμεσα στα χρώματα.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Μια περιοχή της οποίας το χρώμα αλλάζει ομαλά προς μία κατεύθυνση γίνεται ένα σχήμα με γραμμική διαβάθμιση.
+	Areas smaller than this many pixels are ignored.	Οι περιοχές μικρότερες από αυτόν τον αριθμό pixel αγνοούνται.
+	Black and White	Ασπρόμαυρο
+	Black and White Logo	Ασπρόμαυρο λογότυπο
+	Cut-out shapes, contours cleaned for DTF printing.	Κομμένα σχήματα, περιγράμματα καθαρισμένα για εκτύπωση DTF.
+	Engine	Μηχανή
+	Exact Shapes	Ακριβή σχήματα
+	Fills	Γεμίσματα
+	Flat Logo	Επίπεδο λογότυπο
+	Full Tone	Συνεχής τόνος
+	Grays	Γκρι
+	High Fidelity Photo	Φωτογραφία υψηλής πιστότητας
+	Higher keeps more sharp corners.	Υψηλότερη τιμή κρατά περισσότερες αιχμηρές γωνίες.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Πόσο πιστά ακολουθούν οι καμπύλες τα pixel: υψηλότερη τιμή είναι πιο πιστή, με περισσότερα σημεία.
+	Ignore Color	Παράβλεψη χρώματος
+	Limited	Περιορισμένη
+	Line Art	Γραμμικό σχέδιο
+	Lines as Strokes	Γραμμές ως πινελιές
+	Lines no wider than the stroke width are traced as stroked center lines.	Οι γραμμές που δεν είναι φαρδύτερες από το πάχος πινελιάς σχεδιάζονται ως κεντρικές γραμμές με πινελιά.
+	Load a swatch book to use it as the palette.	Φορτώστε ένα βιβλίο δειγμάτων για να το χρησιμοποιήσετε ως παλέτα.
+	Logo Colors	Χρώματα λογοτύπου
+	Low Fidelity Photo	Φωτογραφία χαμηλής πιστότητας
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Οι σχεδόν ευθείες καμπύλες γίνονται ευθείες γραμμές· στο Επίπεδο λογότυπο, τα τμήματα κύκλου γίνονται πραγματικά τόξα.
+	Nothing to trace: everything is ignored or transparent.	Τίποτα για ανίχνευση: όλα αγνοούνται ή είναι διαφανή.
+	Outline	Περίγραμμα
+	Overlapping	Επικαλυπτόμενα
+	Pixels darker than this are black.	Τα pixel πιο σκούρα από αυτή την τιμή γίνονται μαύρα.
+	Shades of Gray	Αποχρώσεις του γκρι
+	Silhouettes	Σιλουέτες
+	Sketched Art	Σκίτσο
+	Snap Curves to Lines	Προσκόλληση καμπυλών σε γραμμές
+	Technical Drawing	Τεχνικό σχέδιο
+	The areas of this color are left out (white when the field is empty).	Οι περιοχές αυτού του χρώματος παραλείπονται (λευκό αν το πεδίο είναι κενό).
+	The colors of the reference swatch book below, at most this many.	Τα χρώματα του βιβλίου δειγμάτων αναφοράς παρακάτω, το πολύ τόσα.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Αυτό το γραφικό δεν είναι λογότυπο με επίπεδα χρώματα ({p} % των συμπαγών περιοχών είναι μονόχρωμες): επιλέξτε τη λειτουργία Χρώμα.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Πάρα πολλά σημεία: αυξήστε τον Θόρυβο ή μειώστε τις Διαδρομές ή τα Χρώματα.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Ανίχνευση εικόνας του VectorCraft: οι προρυθμίσεις του και όλες οι ρυθμίσεις του, για DTF και άλλες τεχνικές.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Διανυσματοποίηση: Ανίχνευση εικόνας του VectorCraft (ArtCraft Team και οι συνεισφέροντες του VectorCraft, MIT OR Apache-2.0) και visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	αυτόματα, ή #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Κελιά {size} × {size} cm · {rows} σειρές
+	Cells touch: no spacing between images.	Τα κελιά εφάπτονται: χωρίς απόσταση μεταξύ εικόνων.
+	No Cells	Χωρίς κελιά
+	Organize Automatically on Import	Αυτόματη διάταξη κατά την εισαγωγή
+	Printed width: {width} cm	Πλάτος εκτύπωσης: {width} cm
+	Reserve up to {max} cm · not exported	Απόθεμα έως {max} cm · δεν εξάγεται
+	Snap to the Cells	Προσκόλληση στα κελιά
+	Split the Width into Cells	Διαίρεση του πλάτους σε κελιά
+	{width} × {length} cm (max {max})	{width} × {length} cm (μέγ. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Δεν υπάρχει μέγεθος στο αρχείο: προτείνονται {width} cm.
+	Place	Τοποθέτηση
+	SVG Print Size	Μέγεθος εκτύπωσης SVG
+	Size given in the file.	Μέγεθος από το αρχείο.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Υποστηριζόμενες μορφές: PNG (περικομμένο στα ορατά pixel) και SVG (αποδίδεται στο μέγεθος εκτύπωσης)
+	Width in cells:	Πλάτος σε κελιά:
+	SVG files still waiting: {n}	Αρχεία SVG σε αναμονή: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Το φόντο {color} έγινε διάφανο
+	Copy for Vectorization	Αντίγραφο για διανυσματοποίηση
+	Fringes removed, 2 px margin	Αφαιρέθηκαν οι άλως, περιθώριο 2 px
+	JPEG: light median against the artefacts	JPEG: ελαφρύ φίλτρο διάμεσου κατά των τεχνουργημάτων
+	Optimize for Vectorization	Βελτιστοποίηση για διανυσματοποίηση
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Σμίκρυνση: {from} → {to} px
+	Size kept: {size} px	Το μέγεθος διατηρήθηκε: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Πάρα πολλά χρώματα ({n}): μια φωτογραφία ή μια διαβάθμιση δεν ταιριάζει στη διανυσματοποίηση.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Ιστότοπος ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Ανάλυση χρωμάτων…
+	Background kept	Το φόντο διατηρήθηκε
+	Sheets used: {sheets}	Φύλλα σε χρήση: {sheets}
+	The vectorization stopped unexpectedly.	Η διανυσματοποίηση σταμάτησε απρόσμενα.
+	Tracing the shapes…	Ιχνηλάτηση σχημάτων…
+	Tracing with VectorCraft…	Ιχνηλάτηση με το VectorCraft…
+	{n} new sheets added	Προστέθηκαν {n} νέα φύλλα
+# DTF Craft (26)
+	AI upscale…	Μεγέθυνση AI…
+	Not Suited to Vectorization	Ελάχιστα κατάλληλο για διανυσματοποίηση
+	On white	Σε λευκό
+	Preparation cancelled	Η προετοιμασία ακυρώθηκε
+	Prepared for vectorization: {steps}	Έτοιμο για διανυσματοποίηση: {steps}
+	Preparing for Vectorization	Προετοιμασία για διανυσματοποίηση
+	Preparing the visual…	Προετοιμασία της εικόνας…
+	The document changed during the preparation.	Το έγγραφο άλλαξε κατά την προετοιμασία.
+	The preparation stopped unexpectedly.	Η προετοιμασία σταμάτησε απρόσμενα.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Κλικ: οι ρυθμίσεις του · Διπλό κλικ: προσθήκη αντιγράφου στο φύλλο
+# DTF Craft (29)
+	Black T-Shirt	Μαύρο μπλουζάκι
+	Soft Black T-Shirt	Μαύρο μπλουζάκι – απαλό
+	White T-Shirt	Λευκό μπλουζάκι
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Επίπεδα ρετούς (φωτεινότητα +32, κορεσμός +16), κρυφά
+# DTF Craft (30)
+	Cells	Κελιά
+	Click: show the sheet · Double-click: rename it	Κλικ: εμφάνιση φύλλου · Διπλό κλικ: μετονομασία
+	Copies to Print	Αντίτυπα για εκτύπωση
+	Custom Width	Προσαρμοσμένο πλάτος
+	Drop PNG or SVG files here	Αποθέστε εδώ αρχεία PNG ή SVG
+	Duplicate the Sheet	Αντιγραφή φύλλου
+	Every sheet emptied, the visuals kept	Όλα τα φύλλα αδειάζουν, τα σχέδια μένουν
+	Every visual's size and copies, then lay the sheets out	Μέγεθος και αντίτυπα κάθε σχεδίου, μετά διάταξη των φύλλων
+	Film	Φιλμ
+	Total: {sheets} sheets · {visuals} visuals	Σύνολο: {sheets} φύλλα · {visuals} σχέδια

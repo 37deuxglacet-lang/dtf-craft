@@ -2,101 +2,89 @@
 
 DTF Craft is derived from PhotoCraft (https://github.com/storytold/photocraft), commit
 `ed7df56` (version 0.8.2+). As required by section 4(b) of the Apache License 2.0, this file
-lists every file changed from that base. Modified Rust source files also carry a notice at the top.
+lists every file changed from that base (`PHOTOCRAFT-BASE.toml` records it for updates, see
+`scripts/dtf-sync-photocraft.sh`). Modified Rust source files also carry a notice at the top.
 
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (86)
+## Modified (69)
 
-- `Cargo.lock`
-- `LICENSE-MIT`
-- `NOTICE`
-- `README.md`
-- `apps/photocraft-cli/build.rs`
-- `apps/photocraft/build.rs`
-- `apps/photocraft/src/app_dirs.rs`
-- `apps/photocraft/src/main.rs`
-- `assets/app-icon/README.md`
-- `assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/16x16/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/24x24/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/256x256/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/32x32/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/48x48/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/512x512/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/64x64/apps/ai.storyteller.photocraft.png`
-- `assets/app-icon/hicolor/scalable/apps/ai.storyteller.photocraft.svg`
-- `assets/app-icon/photocraft-1024.png`
-- `assets/app-icon/photocraft.icns`
-- `assets/app-icon/photocraft.ico`
-- `crates/algo/Cargo.toml`
-- `crates/algo/src/lib.rs`
-- `crates/algo/src/quantize.rs`
-- `crates/engine/src/commands.rs`
-- `crates/engine/src/filters.rs`
-- `crates/engine/src/image_cmds.rs`
-- `crates/engine/src/jobs.rs`
-- `crates/engine/src/lib.rs`
-- `crates/ui-egui/src/brand.rs`
-- `crates/ui-egui/src/canvas.rs`
-- `crates/ui-egui/src/credits_tests.rs`
-- `crates/ui-egui/src/dialogs.rs`
-- `crates/ui-egui/src/dock.rs`
-- `crates/ui-egui/src/dock_tests.rs`
-- `crates/ui-egui/src/file_ui.rs`
-- `crates/ui-egui/src/filter_dialog.rs`
-- `crates/ui-egui/src/filter_preview_worker.rs`
-- `crates/ui-egui/src/gpu_status.rs`
-- `crates/ui-egui/src/i18n/cs.tsv`
-- `crates/ui-egui/src/i18n/de.tsv`
-- `crates/ui-egui/src/i18n/el.tsv`
-- `crates/ui-egui/src/i18n/es.tsv`
-- `crates/ui-egui/src/i18n/fr.tsv`
-- `crates/ui-egui/src/i18n/hu.tsv`
-- `crates/ui-egui/src/i18n/id.tsv`
-- `crates/ui-egui/src/i18n/it.tsv`
-- `crates/ui-egui/src/i18n/ja.tsv`
-- `crates/ui-egui/src/i18n/ko.tsv`
-- `crates/ui-egui/src/i18n/live_tests.rs`
-- `crates/ui-egui/src/i18n/nl.tsv`
-- `crates/ui-egui/src/i18n/pl.tsv`
-- `crates/ui-egui/src/i18n/pt-br.tsv`
-- `crates/ui-egui/src/i18n/ru.tsv`
-- `crates/ui-egui/src/i18n/sr.tsv`
-- `crates/ui-egui/src/i18n/tr.tsv`
-- `crates/ui-egui/src/i18n/uk.tsv`
-- `crates/ui-egui/src/i18n/vi.tsv`
-- `crates/ui-egui/src/i18n/zh-hans.tsv`
-- `crates/ui-egui/src/i18n/zh-hant.tsv`
-- `crates/ui-egui/src/kys_import.rs`
-- `crates/ui-egui/src/kys_import_tests.rs`
-- `crates/ui-egui/src/lib.rs`
-- `crates/ui-egui/src/links.rs`
-- `crates/ui-egui/src/menu_catalog.rs`
-- `crates/ui-egui/src/menus.rs`
-- `crates/ui-egui/src/native_menu.rs`
-- `crates/ui-egui/src/panel_docking.rs`
-- `crates/ui-egui/src/panels.rs`
-- `crates/ui-egui/src/prefs_ui.rs`
-- `crates/ui-egui/src/screen_picker.rs`
-- `crates/ui-egui/src/shortcuts.rs`
-- `crates/ui-egui/src/state.rs`
-- `crates/ui-egui/src/theme.rs`
-- `crates/ui-egui/src/titlebar.rs`
-- `crates/ui-egui/src/view_cmds.rs`
-- `crates/ui-egui/src/workspace_ui.rs`
-- `ATTRIBUTION.md`
-- `apps/photocraft/Cargo.toml`
-- `apps/photocraft/src/services.rs`
-- `crates/ui-egui/src/icon_data.rs`
-- `crates/ui-egui/src/widgets.rs`
-- `apps/photocraft-cli/src/lib.rs`
-- `apps/photocraft-cli/tests/cli.rs`
-- `crates/engine/src/build_info.rs`
-- `crates/io/src/svg.rs`
+The DTF code lives in the added files; the PhotoCraft files below only hook it in.
 
-## Added (35)
+| File | DTF change |
+|---|---|
+| `ATTRIBUTION.md` | DTF Craft's icons excluded from the PhotoCraft icon row |
+| `Cargo.lock` | dependencies of the DTF modules (regenerate after a PhotoCraft update) |
+| `LICENSE-MIT` | DTF Craft copyright line |
+| `NOTICE` | DTF Craft notice and base |
+| `README.md` | DTF Craft README (PhotoCraft's kept as README-PhotoCraft.md) |
+| `apps/photocraft-cli/build.rs` | Windows metadata of dtfcraft-cli |
+| `apps/photocraft-cli/src/lib.rs` | `--version`: DTF Craft's version, then the PhotoCraft base |
+| `apps/photocraft-cli/tests/cli.rs` | test of that version line |
+| `apps/photocraft/Cargo.toml` | HTTPS client for the start-screen illustration |
+| `apps/photocraft/build.rs` | Windows metadata and icon of DTF Craft.exe |
+| `apps/photocraft/src/app_dirs.rs` | settings folder `DTF Craft` (kept apart from PhotoCraft's) |
+| `apps/photocraft/src/main.rs` | DTF Craft name, version and startup (`dtf_panel::dtf_craft_startup`) |
+| `apps/photocraft/src/services.rs` | HTTPS GET service (start-screen illustration) |
+| `assets/app-icon/README.md` | DTF Craft icon |
+| `assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/16x16/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/24x24/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/256x256/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/32x32/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/48x48/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/512x512/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/64x64/apps/ai.storyteller.photocraft.png` | DTF Craft icon |
+| `assets/app-icon/hicolor/scalable/apps/ai.storyteller.photocraft.svg` | DTF Craft icon |
+| `assets/app-icon/photocraft-1024.png` | DTF Craft icon |
+| `assets/app-icon/photocraft.icns` | DTF Craft icon |
+| `assets/app-icon/photocraft.ico` | DTF Craft icon |
+| `crates/algo/Cargo.toml` | tracers of the Vectorisation module |
+| `crates/algo/src/lib.rs` | declares the DTF modules |
+| `crates/algo/src/quantize.rs` | `spot` made `pub(crate)` (DTF Halftone) |
+| `crates/engine/src/build_info.rs` | DTF Craft's version (the subscription follows it), then the base's |
+| `crates/engine/src/commands.rs` | registers the DTF commands |
+| `crates/engine/src/filters.rs` | DTF filter params |
+| `crates/engine/src/image_cmds.rs` | `resample_doc` made `pub(crate)` (Print Conformity) |
+| `crates/engine/src/jobs.rs` | AI Upscale as a background job |
+| `crates/engine/src/lib.rs` | declares the DTF command modules |
+| `crates/io/src/svg.rs` | declares `svg/dtf.rs` (gang sheet SVG helpers) |
+| `crates/ui-egui/build.rs` | appends `i18n/dtf/<code>.tsv` to each catalog |
+| `crates/ui-egui/src/brand.rs` | product name, version, links, `rebrand` |
+| `crates/ui-egui/src/canvas.rs` | DTF preview source, cut-out clicks (holes, eyedropper), hands the start screen to `dtf_home.rs`; `paint_dots` and `start_screen_drop_hint` made `pub(crate)` |
+| `crates/ui-egui/src/credits_tests.rs` | About test with the DTF Craft name |
+| `crates/ui-egui/src/dialogs.rs` | About: DTF Craft, then its base |
+| `crates/ui-egui/src/dock.rs` | DTF tools dock group |
+| `crates/ui-egui/src/dock_tests.rs` | dock tests with the DTF group |
+| `crates/ui-egui/src/file_ui.rs` | rebranded label |
+| `crates/ui-egui/src/filter_dialog.rs` | DTF dialogs: param spec extras (cm, text defaults, descriptions), DTF Halftone tabs and lock, help sheet and tooltips |
+| `crates/ui-egui/src/filter_preview_worker.rs` | previews driven by the DTF panel |
+| `crates/ui-egui/src/gpu_status.rs` | rebranded label |
+| `crates/ui-egui/src/i18n/live_tests.rs` | menu test with the DTF Craft name |
+| `crates/ui-egui/src/i18n/mod.rs` | catalog test reads `i18n/dtf/<code>.tsv` too |
+| `crates/ui-egui/src/icon_data.rs` | DTF icons |
+| `crates/ui-egui/src/kys_import.rs` | rebranded message |
+| `crates/ui-egui/src/kys_import_tests.rs` | test of that message |
+| `crates/ui-egui/src/lib.rs` | declares the DTF modules, their state and hooks (save hint, drops on the Gang Sheet, HTTPS service) |
+| `crates/ui-egui/src/links.rs` | DTF Craft links, Stéphane Glacet's sites |
+| `crates/ui-egui/src/menu_catalog.rs` | DTF menu |
+| `crates/ui-egui/src/menus.rs` | DTF menu commands, modal DTF windows |
+| `crates/ui-egui/src/native_menu.rs` | macOS app menu name |
+| `crates/ui-egui/src/panel_docking.rs` | DTF dock group |
+| `crates/ui-egui/src/panels.rs` | DTF workspace first in the list, DTF Craft window title |
+| `crates/ui-egui/src/prefs_ui.rs` | rebranded labels |
+| `crates/ui-egui/src/screen_picker.rs` | rebranded window title |
+| `crates/ui-egui/src/shortcuts.rs` | Gang Sheet handles its own keys |
+| `crates/ui-egui/src/state.rs` | DTF panel state |
+| `crates/ui-egui/src/theme.rs` | light theme of the Gang Sheet window |
+| `crates/ui-egui/src/titlebar.rs` | no Discord button in the title bar |
+| `crates/ui-egui/src/view_cmds.rs` | DTF window commands |
+| `crates/ui-egui/src/widgets.rs` | typed-only number fields (Gang Sheet) |
+| `crates/ui-egui/src/workspace_ui.rs` | DTF workspace |
+| `xtask/src/i18n_coverage.rs` | reads `i18n/dtf/<code>.tsv` too |
+
+## Added (40)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -133,6 +121,11 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/offers.rs`
 - `crates/vectorcraft-geom/` (copied unchanged from VectorCraft, see below)
 - `crates/vectorcraft-trace/` (copied unchanged from VectorCraft, see below)
+- `PHOTOCRAFT-BASE.toml`
+- `scripts/dtf-sync-photocraft.sh`
+- `crates/io/src/svg/dtf.rs`
+- `crates/ui-egui/src/dtf_home.rs`
+- `crates/ui-egui/src/i18n/dtf/*.tsv` (the DTF strings of each catalog)
 
 ## Removed (7)
 

@@ -1,0 +1,417 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	Растр DTF…
+	Remove Semi-Transparent Pixels…	Видалити напівпрозорі пікселі…
+	Gang Sheet…	Монтажний аркуш…
+	AI Upscale…	Збільшення ШІ…
+	Print Conformity…	Підготовка до друку…
+	Control Background…	Контрольний фон…
+	Remove Control Background	Видалити контрольний фон
+	Saturation…	Насиченість…
+	Target	Ціль
+	Dark Garment	Темна тканина
+	Light Garment	Світла тканина
+	Min Dot	Мін. точка
+	Max Dot	Макс. точка
+	Ellipse	Еліпс
+	About DTF Craft	Про DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — на основі PhotoCraft
+	based on PhotoCraft · open source	на основі PhotoCraft · відкритий код
+	Website	Вебсайт
+	Contact	Контакти
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — інструменти DTF від Stéphane GLACET, на основі:
+	DTF Settings	Налаштування DTF
+	Open a document to use the DTF settings.	Відкрийте документ, щоб скористатися налаштуваннями DTF.
+	Semi-Transparent Pixels Only	Лише напівпрозорі пікселі
+	Whole Visual — Dark Garment	Увесь макет — темна тканина
+	Whole Visual — Light Garment	Увесь макет — світла тканина
+# DTF Craft (3)
+	Print Conformity	Підготовка до друку
+	Control Background	Контрольний фон
+	Remove Semi-Transparent Pixels	Видалити напівпрозорі пікселі
+	Current size: {width} × {height} cm at {resolution} ppi	Поточний розмір: {width} × {height} см при {resolution} ppi
+	Width (cm, 0 = proportional)	Ширина (см, 0 = пропорційно)
+	Height (cm, 0 = proportional)	Висота (см, 0 = пропорційно)
+	Conformity	Підготовка
+	No Background	Без фону
+	Fringe	Облямівка
+# DTF Craft (4)
+	Remove White Background…	Видалити білий фон…
+	Remove White Background	Видалити білий фон
+	Detect Color	Визначити колір фону
+	Remove Halo	Прибрати ореол
+	Interior Holes	Внутрішні отвори
+	Min Hole Size	Мін. розмір отвору (пікс.)
+# DTF Craft (5)
+	Transparent Pixels	Прозорі пікселі
+	Remove Fringe	Видалити облямівку
+	Show Background	Показати фон
+	Delete Background	Видалити фон
+# DTF Craft (6)
+	Layer Name	Назва шару
+	Preview Background	Тло попереднього перегляду
+	Add Holes (Magic Wand)	Додати отвори (чарівна паличка)
+	Show Before	Показати до
+	Click an enclosed area to make it transparent.	Клацніть замкнену область, щоб зробити її прозорою.
+	Interior Hole	Внутрішній отвір
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — бета-версія
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Це бета-версія DTF Craft для тестування: деякі інструменти ще можуть змінитися або містити помилки.
+	Release planned for November 2, 2026.	Випуск заплановано на 2 листопада 2026 р.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} см ({pxw} × {pxh} пікс.) при {resolution} ppi
+	AI Upscale	Збільшення ШІ
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Додати отвори (чарівна гумка)
+	Eraser Tolerance	Допуск гумки
+# DTF Craft (11)
+	Color Analyzer…	Аналізатор кольору…
+	Color Analyzer	Аналізатор кольору
+	Replace Colors with Swatches	Замінити кольори зразками
+	the document is not modified	документ не змінюється
+	Original Colors	Вихідні кольори
+	Replaced Colors	Замінені кольори
+	With Patches	З плашками
+	Add a color with the eyedropper: click the visual.	Додати колір піпеткою: клацніть на зображенні.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Копія, де позначені кольори замінено зразками, зберігається у PNG і відкривається в новій вкладці.
+	PDF Sheet…	PDF-картка…
+	An A4 sheet with the visual, its colors and their references.	Аркуш A4 із зображенням, його кольорами та зразками.
+	Export PNG…	Експорт PNG…
+	Analyzed Pixels	Проаналізовані пікселі
+	Visible, transparency ignored	Видимі, прозорість не враховується
+	RGB {bits} bits	RGB {bits} біт
+	Maximum Colors	Максимум кольорів
+	Grouping (ΔE)	Групування (ΔE)
+	Colors closer than this difference are counted as one.	Кольори, ближчі за цю різницю, вважаються одним.
+	Ignore colors under 0.5 % of the area	Ігнорувати кольори менше 0,5 % площі
+	Reference Swatch Book	Еталонний каталог кольорів
+	None loaded	Не завантажено
+	{name} · {n} colors	{name} · кольорів: {n}
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Формати: .ase, .aco, .csv (ref; R; G; B або L*a*b*). Різниця в ΔE 2000.
+	Detected Colors: {n}	Знайдено кольорів: {n}
+	Patches · on-screen check and PDF sheet	Плашки · контроль на екрані та PDF-картка
+	Below	Знизу
+	Reference	Зразок
+	Hex	Hex
+	Client	Клієнт
+	On the PDF sheet	На PDF-картці
+	Replaced in the PNG export	Замінюється під час експорту PNG
+	Visual	Зображення
+	Match	Відповідність
+	Remove this color	Видалити цей колір
+	Change…	Змінити…
+	Load a swatch book to find the references.	Завантажте каталог кольорів, щоб знайти зразки.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Позначено: колір зображення замінюється зразком під час експорту PNG. ΔE: до 2 = непомітно · 2–5 = видно зблизька · вище = інший відтінок
+	Reference for {hex}	Зразок для {hex}
+	Nearest (automatic)	Найближчий (автоматично)
+	No visible pixels to analyze.	Немає видимих пікселів для аналізу.
+	Swatch book loaded: {name}, {n} colors	Каталог завантажено: {name}, кольорів: {n}
+	{name} color sheet	{name} картка кольорів
+	Color sheet saved: {path}	Картку кольорів збережено: {path}
+	Color Sheet	Картка кольорів
+	Date	Дата
+	Swatch Book	Каталог кольорів
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Знайдено кольорів: {n}
+	No swatch book loaded: the colors have no reference.	Каталог не завантажено: кольори не мають зразків.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Відповідностей при ΔE 2 і менше: {good}; перевірити (ΔE 2–5): {check}; понад 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Розмір зображення: {w} × {h} пкс, {wcm} × {hcm} см при {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: до 2 = непомітна різниця · 2–5 = видно зблизька · понад 5 = інший відтінок.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Кольори показано в sRGB: результат друку залежить від принтера, чорнил і матеріалу.
+	Sheet made with DTF Craft	Картку створено в DTF Craft
+# DTF Craft (12)
+	Add Holes	Додати отвори
+	Add Hole	Додати отвір
+# DTF Craft (13)
+	Pick the Background Colour	Колір тла піпеткою
+	Click the background colour to remove.	Клацніть колір тла, який треба видалити.
+	Click a visible pixel of the background.	Клацніть видимий піксель тла.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Однотонне тло не знайдено: тло вже прозоре, або виберіть його колір піпеткою.
+	Holes: {n}	Отвори: {n}
+	Remove Last Hole	Прибрати останній отвір
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Монтажний аркуш
+	Visuals	Макети
+	Add PNG Files…	Додати файли PNG…
+	Add Open Document	Додати відкритий документ
+	Add PNG files or the open document.	Додайте файли PNG або відкритий документ.
+	Sheet	Аркуш
+	Film Width	Ширина плівки
+	Max Length	Макс. довжина
+	Allow Rotation	Дозволити поворот
+	Auto Build	Авторозкладка
+	Selected Visual	Вибраний макет
+	Rotate 90°	Повернути на 90°
+	Length used: {length} cm	Використана довжина: {length} см
+	{n} not placed	Не розміщено: {n}
+	{n} too close or overlapping	Занадто близько або перекриваються: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Перетягніть макет, щоб перемістити його. Стрілки: 1 мм (Shift: 1 см). Delete прибирає його з аркуша.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Макети ближче за поле до іншого макета або краю: {n}. Все одно експортувати?
+	Too close to another visual	Занадто близько до іншого макета
+	No room to turn this visual	Немає місця, щоб повернути цей макет
+	Open a document first	Спершу відкрийте документ
+	the document was closed	документ було закрито
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Активні аркуші
+	Add a New Sheet	Додати новий аркуш
+	Add a copy to the sheet	Додати копію на аркуш
+	Along the edges	Уздовж країв
+	Auto Build May Rotate	Дозволити поворот (авто)
+	Auto Build — every image at once	Авторозкладка — усі зображення одразу
+	Auto Fill	Автозаповнення
+	Background Warning:	Попередження про тло:
+	Background not removed (opaque corners)	Тло не видалено (непрозорі кути)
+	Between images	Між зображеннями
+	Center Horizontally	Центрувати по горизонталі
+	Center Vertically	Центрувати по вертикалі
+	Center on the Sheet	Центрувати на аркуші
+	Copies of this sheet to print	Копій цього аркуша для друку
+	Custom Color	Власний колір
+	Delete (Del)	Видалити (Del)
+	Delete the Sheet	Видалити аркуш
+	Drag and drop a file here or click to	Перетягніть файл сюди або натисніть, щоб
+	Duplicate Image	Дублювати зображення
+	Export Sheets (PNG)…	Експорт аркушів (PNG)…
+	Fill the room left on the sheet with this visual	Заповнити вільне місце аркуша цим макетом
+	Flip Horizontally	Віддзеркалити по горизонталі
+	Flip Vertically	Віддзеркалити по вертикалі
+	Good resolution >= 250 dpi	Добра роздільність >= 250 dpi
+	Grid (1 cm)	Сітка (1 см)
+	Image Margin	Відступ зображення
+	Import Images	Імпортувати зображення
+	Lock Proportions	Зберігати пропорції
+	Margin (cm)	Відступ (см)
+	No image yet: import PNG files or add the open document.	Зображень немає: імпортуйте PNG або додайте відкритий документ.
+	No room left on the sheet	На аркуші немає місця
+	Number of Images:	Кількість зображень:
+	One copy less	На одну копію менше
+	One copy more	На одну копію більше
+	Optimal	Оптимальна
+	Optimal resolution >= 300 dpi	Оптимальна роздільність >= 300 dpi
+	Overlap Lines	Лінії накладання
+	Overlapping or too close	Накладання або надто близько
+	Poor	Погана
+	Poor resolution >= 200 dpi	Погана роздільність >= 200 dpi
+	Proportions:	Пропорції:
+	Push Down	Посунути вниз
+	Push Left	Посунути ліворуч
+	Push Right	Посунути праворуч
+	Push Up	Посунути вгору
+	Qty:	К-сть:
+	Redo (Ctrl+Y)	Повторити (Ctrl+Y)
+	Rotate 90° Counterclockwise	Повернути на 90° проти годинникової
+	Same image, another size	Те саме зображення, інший розмір
+	Select an object to edit.	Виберіть об'єкт для зміни.
+	Semi-transparent pixels: {p} %	Напівпрозорі пікселі: {p} %
+	Sheet Background	Тло аркуша
+	Sheet Margin	Поле аркуша
+	Show Overlap Lines	Показувати лінії накладання
+	Show Resolution Lines	Показувати лінії роздільності
+	Snap While Moving	Вирівнювати під час переміщення
+	Start Over	Почати заново
+	Stretch to the Film Width	Розтягнути на ширину плівки
+	Stretch to the Sheet Length	Розтягнути на довжину аркуша
+	Supported format: PNG (cropped to its visible pixels)	Підтримуваний формат: PNG (обрізаний по видимих пікселях)
+	Transparency Warning:	Попередження про прозорість:
+	Undo (Ctrl+Z)	Скасувати (Ctrl+Z)
+	Very Poor	Дуже погана
+	Very poor resolution < 200 dpi	Дуже погана роздільність < 200 dpi
+	With the image margin	З відступом зображення
+	With the sheet margin	З полем аркуша
+	copy	копія
+	{n} images	Зображень: {n}
+# DTF Craft (14)
+	Vectorization…	Векторизація…
+	Vectorization	Векторизація
+	Vectorized	Векторизовано
+	Side by Side	Поруч
+	Show Contours	Показати контури
+	Checkerboard under Transparency	Шахівниця під прозорістю
+	{colors} colors · {shapes} shapes · {points} points	Кольори: {colors} · фігури: {shapes} · точки: {points}
+	Cut-out shapes, no overlap	Вирізані фігури без накладання
+	Open document, flattened	Відкритий документ, зведений
+	{w} × {h} mm at {dpi} ppi	{w} × {h} мм при {dpi} ppi
+	Type of Visual	Тип зображення
+	Logo · flat colors	Логотип · плоскі кольори
+	Illustration · shades	Ілюстрація · відтінки
+	Number of Colors	Кількість кольорів
+	Detail Level	Рівень деталізації
+	Sharp Corners	Гострі кути
+	Remove the Background	Видалити фон
+	read on the visual's edge	визначено за краєм зображення
+	No background found: the visual is already cut out.	Фон не знайдено: зображення вже вирізане.
+	Palette	Палітра
+	{n} colors · {k} in the SVG	Кольори: {n} · у SVG: {k}
+	Edge Background	Фон
+	Keep {hex} in the SVG	Залишити {hex} у SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Не позначено: колір вилучається з SVG; його фігури видаляються, а не об’єднуються.
+	SVG · cut-out shapes	SVG · вирізані фігури
+	{w} × {h} mm (document size)	{w} × {h} мм (розмір документа)
+	Open the SVG in DTF Craft after the export	Відкрити SVG у DTF Craft після експорту
+	Export SVG…	Експорт SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Вирізані фігури в друкованому розмірі документа, збережені як SVG.
+	SVG saved: {path}	SVG збережено: {path}
+	No visible pixels to vectorize.	Немає видимих пікселів для векторизації.
+	Nothing to export: every color is left out.	Нічого експортувати: усі кольори вилучено.
+	Low Detail	Низький
+	Medium Detail	Середній
+	High Detail	Високий
+	Close the Seams between Colors	Закрити стики між кольорами
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Кожна фігура заходить на сусідні на пів пікселя, щоб під час друку між двома кольорами не з’являлася прозора лінія. Зніміть позначку для строго вирізаних фігур (ріжучий плотер).
+# DTF Craft (14)
+	Conformity…	Підготовка…
+	Cutout…	Аплікація…
+	Transparent Pixels…	Прозорі пікселі…
+	Remove Fringe…	Видалити облямівку…
+	Sharpness…	Різкість…
+# DTF Craft (15)
+	Group the Selection	Згрупувати
+	Ungroup	Розгрупувати
+	Group (Ctrl+G)	Згрупувати (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Розгрупувати (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Дублювати (Ctrl+D)
+	{n} visuals selected	Вибрано зображень: {n}
+	Colors kept: {n}	Збережені кольори: {n}
+# DTF Craft (16)
+	Applied Ranges	Застосовані діапазони
+	Click: a color · Shift+click: add · Alt+click: remove	Клацання: колір · Shift+клацання: додати · Alt+клацання: прибрати
+	Contiguous Pixels	Суміжні пікселі
+	Pick a color on the visual.	Виберіть колір на зображенні.
+	Remove this range	Прибрати цей діапазон
+	Replacement Color	Колір заміни
+	Turn on Color Range above the visual, then click a color.	Увімкніть «Колірний діапазон» над зображенням і клацніть колір.
+	{p} % of the visible pixels	{p} % видимих пікселів
+# DTF Craft (17)
+	Hide the image	Сховати зображення
+	Illustration: {user} on Pixabay	Ілюстрація: {user}, Pixabay
+	Show an illustration	Показати ілюстрацію
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Аркуш A4 із зображенням, результатом векторизації, його кольорами та їхніми еталонами.
+	Detected Colors	Виявлені кольори
+	Replaced by the reference in the SVG	Замінюється еталоном у SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG знято: колір виключається з SVG; його фігури видаляються, а не об'єднуються.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Спільний з Аналізатором кольору. Формати: .ase, .aco, .csv; різниця в ΔE 2000.
+	{name} vectorized color sheet	{name} кольоровий аркуш векторизації
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ позначено: фігури набувають кольору еталона й у SVG мають його назву. ΔE: до 2 = непомітно · від 2 до 5 = помітно зблизька · більше = інший відтінок
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	«{color}» — не колір: запишіть його як #rrggbb.
+	16 Colors	16 кольорів
+	3 Colors	3 кольори
+	6 Colors	6 кольорів
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Коло, еліпс, прямокутник або правильний многокутник виходить саме такою фігурою.
+	Abutting	Суміжні
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Суміжні: кожен колір має власну область, фігури мають спільні краї. Накладені: кожен шар заходить під шари вище, без проміжків між кольорами.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Область, колір якої рівномірно змінюється в одному напрямку, стає однією фігурою з лінійним градієнтом.
+	Areas smaller than this many pixels are ignored.	Області, менші за цю кількість пікселів, ігноруються.
+	Black and White	Чорно-білий
+	Black and White Logo	Чорно-білий логотип
+	Cut-out shapes, contours cleaned for DTF printing.	Вирізані фігури, контури очищено для друку DTF.
+	Engine	Рушій
+	Exact Shapes	Точні фігури
+	Fills	Заливки
+	Flat Logo	Плаский логотип
+	Full Tone	Безперервний тон
+	Grays	Відтінки
+	High Fidelity Photo	Фото високої точності
+	Higher keeps more sharp corners.	Що вище, то більше гострих кутів зберігається.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Наскільки точно криві йдуть за пікселями: вище — точніше, з більшою кількістю точок.
+	Ignore Color	Ігнорувати колір
+	Limited	Обмежена
+	Line Art	Штриховий малюнок
+	Lines as Strokes	Лінії як обведення
+	Lines no wider than the stroke width are traced as stroked center lines.	Лінії, не ширші за товщину обведення, трасуються як осьові лінії з обведенням.
+	Load a swatch book to use it as the palette.	Завантажте каталог зразків, щоб використати його як палітру.
+	Logo Colors	Кольори логотипа
+	Low Fidelity Photo	Фото низької точності
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Майже прямі криві стають прямими лініями; у Пласкому логотипі частини кіл стають справжніми дугами.
+	Nothing to trace: everything is ignored or transparent.	Нічого трасувати: усе ігнорується або прозоре.
+	Outline	Контур
+	Overlapping	Накладені
+	Pixels darker than this are black.	Пікселі, темніші за це значення, стають чорними.
+	Shades of Gray	Відтінки сірого
+	Silhouettes	Силуети
+	Sketched Art	Ескіз
+	Snap Curves to Lines	Прив'язати криві до ліній
+	Technical Drawing	Технічне креслення
+	The areas of this color are left out (white when the field is empty).	Області цього кольору виключаються (білий, якщо поле порожнє).
+	The colors of the reference swatch book below, at most this many.	Кольори еталонного каталогу зразків нижче, не більше цієї кількості.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Це зображення не пласкокольоровий логотип ({p} % суцільних областей однотонні): виберіть режим «Колір».
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Забагато точок: збільште Шум або зменште Контури чи Кольори.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Трасування зображення VectorCraft: його стилі та всі його налаштування, для DTF та інших технологій.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Векторизація: трасування зображення VectorCraft (ArtCraft Team і учасники VectorCraft, MIT OR Apache-2.0) та visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	автоматично або #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Комірки {size} × {size} см · рядів: {rows}
+	Cells touch: no spacing between images.	Комірки прилягають: без інтервалу між зображеннями.
+	No Cells	Без комірок
+	Organize Automatically on Import	Автоматично розкладати під час імпорту
+	Printed width: {width} cm	Ширина друку: {width} см
+	Reserve up to {max} cm · not exported	Резерв до {max} см · не експортується
+	Snap to the Cells	Прив'язка до комірок
+	Split the Width into Cells	Розділити ширину на комірки
+	{width} × {length} cm (max {max})	{width} × {length} см (макс. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	У файлі немає розміру: запропоновано {width} см.
+	Place	Розмістити
+	SVG Print Size	Розмір друку SVG
+	Size given in the file.	Розмір із файлу.
+	Skip	Пропустити
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Підтримувані формати: PNG (обрізається за видимими пікселями) і SVG (відтворюється в розмірі друку)
+	Width in cells:	Ширина в комірках:
+	SVG files still waiting: {n}	Ще файлів SVG у черзі: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	ШІ ×{scale}: {from} → {to} px
+	Background {color} made transparent	Тло {color} зроблено прозорим
+	Copy for Vectorization	Копія для векторизації
+	Fringes removed, 2 px margin	Ореоли видалено, поле 2 px
+	JPEG: light median against the artefacts	JPEG: легка медіана проти артефактів
+	Optimize for Vectorization	Оптимізувати для векторизації
+	RGB 8 bits, sRGB	RGB 8 біт, sRGB
+	Reduced: {from} → {to} px	Зменшено: {from} → {to} px
+	Size kept: {size} px	Розмір збережено: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Забагато кольорів ({n}): фото чи градієнт погано підходять для векторизації.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Сайт ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Аналіз кольорів…
+	Background kept	Тло збережено
+	Sheets used: {sheets}	Використано аркушів: {sheets}
+	The vectorization stopped unexpectedly.	Векторизація неочікувано зупинилася.
+	Tracing the shapes…	Трасування фігур…
+	Tracing with VectorCraft…	Трасування у VectorCraft…
+	{n} new sheets added	Додано нових аркушів: {n}
+# DTF Craft (26)
+	AI upscale…	Збільшення ШІ…
+	Not Suited to Vectorization	Погано підходить для векторизації
+	On white	На білому
+	Preparation cancelled	Підготовку скасовано
+	Prepared for vectorization: {steps}	Підготовлено до векторизації: {steps}
+	Preparing for Vectorization	Підготовка до векторизації
+	Preparing the visual…	Підготовка зображення…
+	The document changed during the preparation.	Документ змінився під час підготовки.
+	The preparation stopped unexpectedly.	Підготовка неочікувано зупинилася.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Клацання: його налаштування · Подвійне клацання: додати копію на аркуш
+# DTF Craft (28)
+	Locked	Заблоковано
+	Unlocked	Розблоковано
+# DTF Craft (29)
+	Manual	Вручну
+	Black T-Shirt	Чорна футболка
+	Soft Black T-Shirt	Чорна футболка — м’яко
+	White T-Shirt	Біла футболка
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Шари ретуші (яскравість +32, насиченість +16), приховані
+# DTF Craft (30)
+	Cells	Комірки
+	Click: show the sheet · Double-click: rename it	Клацання: показати аркуш · Подвійне клацання: перейменувати
+	Copies to Print	Копій для друку
+	Custom Width	Власна ширина
+	Display	Відображення
+	Drop PNG or SVG files here	Перетягніть сюди файли PNG або SVG
+	Duplicate the Sheet	Дублювати аркуш
+	Every sheet emptied, the visuals kept	Усі аркуші очищено, зображення збережено
+	Every visual's size and copies, then lay the sheets out	Розмір і кількість кожного зображення, потім розкладка аркушів
+	Film	Плівка
+	Total: {sheets} sheets · {visuals} visuals	Усього: аркушів {sheets} · зображень {visuals}

@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -25,7 +27,9 @@ pub fn run(root: &Path) -> Result<(), String> {
     for language in &languages {
         if let Some(path) = &language.catalog {
             let full_path = i18n_dir.join(path);
-            let text = fs::read_to_string(&full_path).map_err(|e| format!("{}: {e}", full_path.display()))?;
+            let mut text = fs::read_to_string(&full_path).map_err(|e| format!("{}: {e}", full_path.display()))?;
+            // DTF Craft: `dtf/<code>.tsv` follows the PhotoCraft catalog (ui-egui's build.rs).
+            text.push_str(&fs::read_to_string(i18n_dir.join("dtf").join(path)).unwrap_or_default());
             catalog_texts.insert(language.code.clone(), (full_path, text));
         }
     }
@@ -585,7 +589,8 @@ mod tests {
             ("sr", "sr.tsv"),
         ] {
             let catalog_path = root.join("crates/ui-egui/src/i18n").join(path);
-            let text = fs::read_to_string(&catalog_path).unwrap_or_default();
+            let mut text = fs::read_to_string(&catalog_path).unwrap_or_default();
+            text.push_str(&fs::read_to_string(root.join("crates/ui-egui/src/i18n/dtf").join(path)).unwrap_or_default());
             let translations = parse_catalog(&catalog_path, &text).unwrap_or_default();
             let missing: Vec<_> = keys.difference(&translations).collect();
             assert!(missing.is_empty(), "{code}: missing source keys: {missing:#?}");

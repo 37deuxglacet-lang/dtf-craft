@@ -215,6 +215,8 @@ mod tile_overlay;
 mod timeline_ui;
 pub mod dtf_halftone_ui;
 pub mod dtf_help;
+/// DTF Craft: its start screen (PhotoCraft's `canvas::start_screen` hands over to it).
+pub(crate) mod dtf_home;
 pub mod dtf_panel;
 mod titlebar;
 pub use titlebar::{Caption, CaptionFamily, CaptionIcon, CaptionIcons, CaptionStyle, RenderIconFn};

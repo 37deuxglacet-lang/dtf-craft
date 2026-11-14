@@ -1,0 +1,425 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	Halftone DTF…
+	Remove Semi-Transparent Pixels…	Hapus piksel semi-transparan…
+	Gang Sheet…	Lembar gabungan…
+	AI Upscale…	Perbesar dengan AI…
+	Print Conformity…	Kesesuaian cetak…
+	Control Background…	Latar kontrol…
+	Remove Control Background	Hapus latar kontrol
+	Saturation…	Saturasi…
+	Target	Target
+	Dark Garment	Kain gelap
+	Light Garment	Kain terang
+	Min Dot	Titik min.
+	Max Dot	Titik maks.
+	Ellipse	Elips
+	About DTF Craft	Tentang DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — berbasis PhotoCraft
+	based on PhotoCraft · open source	berbasis PhotoCraft · sumber terbuka
+	Website	Situs web
+	Contact	Kontak
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — alat DTF oleh Stéphane GLACET, berbasis:
+	DTF Settings	Pengaturan DTF
+	Open a document to use the DTF settings.	Buka dokumen untuk menggunakan pengaturan DTF.
+	Semi-Transparent Pixels Only	Hanya piksel semi-transparan
+	Whole Visual — Dark Garment	Seluruh desain — kain gelap
+	Whole Visual — Light Garment	Seluruh desain — kain terang
+# DTF Craft (3)
+	Print Conformity	Kesesuaian cetak
+	Control Background	Latar kontrol
+	Remove Semi-Transparent Pixels	Hapus piksel semi-transparan
+	Defringe	Defringe
+	Smart Sharpen	Smart Sharpen
+	Current size: {width} × {height} cm at {resolution} ppi	Ukuran saat ini: {width} × {height} cm pada {resolution} ppi
+	Width (cm, 0 = proportional)	Lebar (cm, 0 = proporsional)
+	Height (cm, 0 = proportional)	Tinggi (cm, 0 = proporsional)
+	Conformity	Kesesuaian
+	No Background	Tanpa latar
+	Fringe	Tepi
+# DTF Craft (4)
+	Remove White Background…	Hapus latar putih…
+	Remove White Background	Hapus latar putih
+	Cutout	Potongan
+	Detect Color	Deteksi warna latar
+	Remove Halo	Hapus halo
+	Interior Holes	Lubang dalam
+	Min Hole Size	Ukuran lubang min. (px)
+# DTF Craft (5)
+	Transparent Pixels	Piksel transparan
+	Remove Fringe	Hapus pinggiran
+	Show Background	Tampilkan latar
+	Delete Background	Hapus latar
+# DTF Craft (6)
+	Layer Name	Nama layer
+	Preview Background	Latar pratinjau
+	Add Holes (Magic Wand)	Tambah lubang (tongkat ajaib)
+	Show Before	Tampilkan sebelum
+	Click an enclosed area to make it transparent.	Klik area tertutup untuk membuatnya transparan.
+	Interior Hole	Lubang dalam
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — versi beta
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Ini adalah versi beta DTF Craft untuk pengujian: beberapa alat masih dapat berubah atau mengandung bug.
+	Release planned for November 2, 2026.	Rilis direncanakan pada 2 November 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) pada {resolution} ppi
+	AI Upscale	Perbesar dengan AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Tambah lubang (penghapus ajaib)
+	Eraser Tolerance	Toleransi penghapus
+# DTF Craft (11)
+	Color Analyzer…	Penganalisis Warna…
+	Color Analyzer	Penganalisis Warna
+	Replace Colors with Swatches	Ganti warna dengan swatch
+	the document is not modified	dokumen tidak diubah
+	Original Colors	Warna asli
+	Replaced Colors	Warna pengganti
+	With Patches	Dengan patch
+	Add a color with the eyedropper: click the visual.	Tambah warna dengan pipet: klik pada visual.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Salinan dengan warna yang dicentang diganti referensinya, disimpan sebagai PNG dan dibuka di tab baru.
+	PDF Sheet…	Lembar PDF…
+	An A4 sheet with the visual, its colors and their references.	Lembar A4 berisi visual, warnanya, dan referensinya.
+	Export PNG…	Ekspor PNG…
+	Analyzed Pixels	Piksel yang dianalisis
+	Visible, transparency ignored	Terlihat, transparansi diabaikan
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Warna maksimum
+	Grouping (ΔE)	Pengelompokan (ΔE)
+	Colors closer than this difference are counted as one.	Warna yang lebih dekat dari selisih ini dihitung sebagai satu.
+	Ignore colors under 0.5 % of the area	Abaikan warna di bawah 0,5 % luas
+	Reference Swatch Book	Buku swatch referensi
+	None loaded	Belum dimuat
+	{name} · {n} colors	{name} · {n} warna
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Format: .ase, .aco, .csv (ref; R; G; B atau L*a*b*). Selisih diukur dalam ΔE 2000.
+	Detected Colors: {n}	Warna terdeteksi: {n}
+	Patches · on-screen check and PDF sheet	Patch · pemeriksaan di layar dan lembar PDF
+	Below	Di bawah
+	Reference	Referensi
+	Hex	Hex
+	Client	Klien
+	On the PDF sheet	Di lembar PDF
+	Replaced in the PNG export	Diganti saat ekspor PNG
+	Visual	Visual
+	Area	Luas
+	Match	Kecocokan
+	Remove this color	Hapus warna ini
+	Change…	Ubah…
+	Load a swatch book to find the references.	Muat buku swatch untuk menemukan referensi.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Dicentang: warna visual diganti referensi saat ekspor PNG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain
+	Reference for {hex}	Referensi untuk {hex}
+	Nearest (automatic)	Terdekat (otomatis)
+	No visible pixels to analyze.	Tidak ada piksel terlihat untuk dianalisis.
+	Swatch book loaded: {name}, {n} colors	Buku swatch dimuat: {name}, {n} warna
+	{name} color sheet	{name} lembar warna
+	Color sheet saved: {path}	Lembar warna disimpan: {path}
+	Color Sheet	Lembar Warna
+	Date	Tanggal
+	Profile	Profil
+	Swatch Book	Buku swatch
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Warna terdeteksi: {n}
+	No swatch book loaded: the colors have no reference.	Belum ada buku swatch: warna tidak memiliki referensi.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Cocok pada ΔE 2 atau kurang: {good}; perlu diperiksa (ΔE 2 sampai 5): {check}; di atas 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Ukuran visual: {w} × {h} px, {wcm} × {hcm} cm pada {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: hingga 2 = selisih tak terlihat · 2 sampai 5 = terlihat dari dekat · di atas 5 = rona lain.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Warna ditampilkan dalam sRGB: hasil cetak bergantung pada printer, tinta, dan media.
+	Sheet made with DTF Craft	Lembar dibuat dengan DTF Craft
+# DTF Craft (12)
+	Add Holes	Tambah lubang
+	Add Hole	Tambah lubang
+# DTF Craft (13)
+	Pick the Background Colour	Warna latar dengan pipet
+	Click the background colour to remove.	Klik warna latar yang akan dihapus.
+	Click a visible pixel of the background.	Klik piksel latar yang terlihat.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Tidak ada latar polos terdeteksi: latar sudah transparan, atau pilih warnanya dengan pipet.
+	Holes: {n}	Lubang: {n}
+	Remove Last Hole	Hapus lubang terakhir
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Lembar gabungan
+	Visuals	Desain
+	Add PNG Files…	Tambah file PNG…
+	Add Open Document	Tambah dokumen yang terbuka
+	Add PNG files or the open document.	Tambahkan file PNG atau dokumen yang terbuka.
+	Sheet	Lembar
+	Film Width	Lebar film
+	Max Length	Panjang maks.
+	Allow Rotation	Izinkan rotasi
+	Auto Build	Susun otomatis
+	Selected Visual	Desain terpilih
+	Rotate 90°	Putar 90°
+	Length used: {length} cm	Panjang terpakai: {length} cm
+	{n} not placed	Belum ditempatkan: {n}
+	{n} too close or overlapping	Terlalu dekat atau bertumpuk: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Seret desain untuk memindahkannya. Panah: 1 mm (Shift: 1 cm). Delete melepasnya dari lembar.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Desain yang lebih dekat dari margin ke desain lain atau ke tepi: {n}. Tetap ekspor?
+	Too close to another visual	Terlalu dekat dengan desain lain
+	No room to turn this visual	Tidak ada ruang untuk memutar desain ini
+	Open a document first	Buka dokumen terlebih dahulu
+	the document was closed	dokumen telah ditutup
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Lembar aktif
+	Add a New Sheet	Tambah lembar baru
+	Add a copy to the sheet	Tambah satu salinan ke lembar
+	Along the edges	Di sepanjang tepi
+	Auto Build May Rotate	Izinkan rotasi (otomatis)
+	Auto Build — every image at once	Susun otomatis — semua gambar sekaligus
+	Auto Fill	Isi otomatis
+	Background Warning:	Peringatan latar:
+	Background not removed (opaque corners)	Latar belum dihapus (sudut buram)
+	Between images	Antar gambar
+	Center Horizontally	Tengahkan horizontal
+	Center Vertically	Tengahkan vertikal
+	Center on the Sheet	Tengahkan di lembar
+	Copies of this sheet to print	Salinan lembar ini yang dicetak
+	Custom Color	Warna khusus
+	Delete (Del)	Hapus (Del)
+	Delete the Sheet	Hapus lembar
+	Drag and drop a file here or click to	Seret file ke sini atau klik untuk
+	Duplicate Image	Duplikat gambar
+	Export Sheets (PNG)…	Ekspor lembar (PNG)…
+	Fill the room left on the sheet with this visual	Isi ruang kosong lembar dengan desain ini
+	Flip Horizontally	Balik horizontal
+	Flip Vertically	Balik vertikal
+	Good	Baik
+	Good resolution >= 250 dpi	Resolusi baik >= 250 dpi
+	Grid (1 cm)	Kisi (1 cm)
+	Image Margin	Margin gambar
+	Import Images	Impor gambar
+	Lock Proportions	Kunci proporsi
+	Margin (cm)	Margin (cm)
+	No image yet: import PNG files or add the open document.	Belum ada gambar: impor file PNG atau tambahkan dokumen yang terbuka.
+	No room left on the sheet	Tidak ada ruang di lembar
+	Number of Images:	Jumlah gambar:
+	One copy less	Kurangi satu salinan
+	One copy more	Tambah satu salinan
+	Optimal	Optimal
+	Optimal resolution >= 300 dpi	Resolusi optimal >= 300 dpi
+	Overlap Lines	Garis tumpang tindih
+	Overlapping or too close	Tumpang tindih atau terlalu dekat
+	Poor	Buruk
+	Poor resolution >= 200 dpi	Resolusi buruk >= 200 dpi
+	Proportions:	Proporsi:
+	Push Down	Dorong ke bawah
+	Push Left	Dorong ke kiri
+	Push Right	Dorong ke kanan
+	Push Up	Dorong ke atas
+	Qty:	Jml:
+	Redo (Ctrl+Y)	Ulangi (Ctrl+Y)
+	Rotate 90° Counterclockwise	Putar 90° berlawanan arah jarum jam
+	Same image, another size	Gambar sama, ukuran lain
+	Select an object to edit.	Pilih objek untuk diedit.
+	Semi-transparent pixels: {p} %	Piksel semi-transparan: {p} %
+	Sheet Background	Latar lembar
+	Sheet Margin	Margin lembar
+	Show Overlap Lines	Tampilkan garis tumpang tindih
+	Show Resolution Lines	Tampilkan garis resolusi
+	Snap While Moving	Rapatkan saat memindah
+	Start Over	Mulai ulang
+	Stretch to the Film Width	Regangkan ke lebar film
+	Stretch to the Sheet Length	Regangkan ke panjang lembar
+	Supported format: PNG (cropped to its visible pixels)	Format didukung: PNG (dipangkas ke piksel yang terlihat)
+	Transparency Warning:	Peringatan transparansi:
+	Undo (Ctrl+Z)	Urungkan (Ctrl+Z)
+	Very Poor	Sangat buruk
+	Very poor resolution < 200 dpi	Resolusi sangat buruk < 200 dpi
+	With the image margin	Dengan margin gambar
+	With the sheet margin	Dengan margin lembar
+	copy	salinan
+	{n} images	{n} gambar
+# DTF Craft (14)
+	Vectorization…	Vektorisasi…
+	Vectorization	Vektorisasi
+	Vectorized	Hasil vektor
+	Side by Side	Berdampingan
+	Show Contours	Tampilkan Kontur
+	Checkerboard under Transparency	Papan Catur di Bawah Transparansi
+	{colors} colors · {shapes} shapes · {points} points	{colors} warna · {shapes} bentuk · {points} titik
+	Cut-out shapes, no overlap	Bentuk terpotong, tanpa tumpang tindih
+	Open document, flattened	Dokumen terbuka, diratakan
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm pada {dpi} ppi
+	Type of Visual	Jenis Visual
+	Logo · flat colors	Logo · warna datar
+	Illustration · shades	Ilustrasi · gradasi
+	Number of Colors	Jumlah Warna
+	Detail Level	Tingkat Detail
+	Sharp Corners	Sudut Tajam
+	Remove the Background	Hapus Latar Belakang
+	read on the visual's edge	dibaca di tepi visual
+	No background found: the visual is already cut out.	Latar belakang tidak ditemukan: visual sudah terpotong.
+	Palette	Palet
+	{n} colors · {k} in the SVG	{n} warna · {k} di SVG
+	Edge Background	Latar
+	Keep {hex} in the SVG	Pertahankan {hex} di SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Tidak dicentang: warna dikeluarkan dari SVG; bentuknya dihapus, tidak digabung.
+	SVG · cut-out shapes	SVG · bentuk terpotong
+	{w} × {h} mm (document size)	{w} × {h} mm (ukuran dokumen)
+	Open the SVG in DTF Craft after the export	Buka SVG di DTF Craft setelah ekspor
+	Export SVG…	Ekspor SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Bentuk terpotong pada ukuran cetak dokumen, disimpan sebagai SVG.
+	SVG saved: {path}	SVG disimpan: {path}
+	No visible pixels to vectorize.	Tidak ada piksel terlihat untuk divektorisasi.
+	Nothing to export: every color is left out.	Tidak ada yang diekspor: semua warna dikeluarkan.
+	Low Detail	Rendah
+	Medium Detail	Sedang
+	High Detail	Tinggi
+	Close the Seams between Colors	Tutup Sambungan antar Warna
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Setiap bentuk menumpuk setengah piksel pada tetangganya, sehingga tidak ada garis tipis transparan di antara dua warna saat dicetak. Hapus centang untuk bentuk yang terpotong persis (plotter pemotong).
+# DTF Craft (14)
+	Conformity…	Kesesuaian…
+	Cutout…	Potongan…
+	Transparent Pixels…	Piksel transparan…
+	Remove Fringe…	Hapus pinggiran…
+	Sharpness…	Ketajaman…
+# DTF Craft (15)
+	Group the Selection	Kelompokkan
+	Ungroup	Pisahkan Grup
+	Group (Ctrl+G)	Kelompokkan (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Pisahkan Grup (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Duplikat (Ctrl+D)
+	{n} visuals selected	{n} visual dipilih
+	Colors kept: {n}	Warna yang dipertahankan: {n}
+# DTF Craft (16)
+	Applied Ranges	Rentang diterapkan
+	Click: a color · Shift+click: add · Alt+click: remove	Klik: satu warna · Shift+klik: tambah · Alt+klik: hapus
+	Contiguous Pixels	Piksel berdekatan
+	Pick a color on the visual.	Pilih warna pada visual.
+	Remove this range	Hapus rentang ini
+	Replacement Color	Warna pengganti
+	Turn on Color Range above the visual, then click a color.	Aktifkan Rentang Warna di atas visual, lalu klik satu warna.
+	{p} % of the visible pixels	{p} % dari piksel terlihat
+# DTF Craft (17)
+	Hide the image	Sembunyikan gambar
+	Illustration: {user} on Pixabay	Ilustrasi: {user} di Pixabay
+	Show an illustration	Tampilkan ilustrasi
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Lembar A4 berisi visual, hasil vektorisasi, warnanya, dan referensinya.
+	Detected Colors	Warna terdeteksi
+	Replaced by the reference in the SVG	Diganti dengan referensi di SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG tidak dicentang: warna dikeluarkan dari SVG; bentuknya dihapus, tidak digabung.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dipakai bersama Penganalisis Warna. Format: .ase, .aco, .csv; selisih dalam ΔE 2000.
+	{name} vectorized color sheet	{name} lembar warna vektorisasi
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ dicentang: bentuk mengambil warna referensi dan diberi namanya di SVG. ΔE: hingga 2 = tak terlihat · 2 sampai 5 = terlihat dari dekat · di atasnya = rona lain
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}" bukan warna: tulis sebagai #rrggbb.
+	16 Colors	16 warna
+	3 Colors	3 warna
+	6 Colors	6 warna
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Lingkaran, elips, persegi panjang, atau poligon beraturan keluar persis sebagai bentuk itu.
+	Abutting	Bersebelahan
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Bersebelahan: tiap warna punya area sendiri, bentuk berbagi tepi. Bertumpuk: tiap lapisan memanjang di bawah lapisan di atasnya, tanpa celah antarwarna.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Area yang warnanya berubah merata ke satu arah menjadi satu bentuk berisi gradien linear.
+	Areas smaller than this many pixels are ignored.	Area yang lebih kecil dari jumlah piksel ini diabaikan.
+	Black and White	Hitam putih
+	Black and White Logo	Logo hitam putih
+	Cut-out shapes, contours cleaned for DTF printing.	Bentuk terpotong, kontur dibersihkan untuk cetak DTF.
+	Engine	Mesin
+	Exact Shapes	Bentuk tepat
+	Fills	Isian
+	Flat Logo	Logo warna datar
+	Full Tone	Nada kontinu
+	Grays	Abu-abu
+	High Fidelity Photo	Foto fidelitas tinggi
+	Higher keeps more sharp corners.	Lebih tinggi mempertahankan lebih banyak sudut tajam.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Seberapa dekat kurva mengikuti piksel: lebih tinggi lebih setia, dengan lebih banyak titik.
+	Ignore Color	Abaikan warna
+	Limited	Terbatas
+	Line Art	Gambar garis
+	Lines as Strokes	Garis sebagai goresan
+	Lines no wider than the stroke width are traced as stroked center lines.	Garis yang tidak lebih lebar dari tebal goresan dijiplak sebagai garis tengah dengan goresan.
+	Load a swatch book to use it as the palette.	Muat buku swatch untuk memakainya sebagai palet.
+	Logo Colors	Warna logo
+	Low Fidelity Photo	Foto fidelitas rendah
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Kurva yang hampir lurus menjadi garis lurus; pada Logo warna datar, bagian lingkaran menjadi busur sejati.
+	Nothing to trace: everything is ignored or transparent.	Tidak ada yang dijiplak: semuanya diabaikan atau transparan.
+	Outline	Garis luar
+	Overlapping	Bertumpuk
+	Pixels darker than this are black.	Piksel yang lebih gelap dari nilai ini menjadi hitam.
+	Shades of Gray	Gradasi abu-abu
+	Silhouettes	Siluet
+	Sketched Art	Sketsa
+	Snap Curves to Lines	Tempelkan kurva ke garis
+	Technical Drawing	Gambar teknik
+	The areas of this color are left out (white when the field is empty).	Area warna ini dihilangkan (putih jika kolom kosong).
+	The colors of the reference swatch book below, at most this many.	Warna buku swatch acuan di bawah, paling banyak sejumlah ini.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Visual ini bukan logo warna datar ({p} % area padatnya rata): pilih mode Warna.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Terlalu banyak titik: naikkan Derau, atau turunkan Jalur atau Warna.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Jiplak Gambar VectorCraft: preset dan semua pengaturannya, untuk DTF dan teknik lain.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorisasi: Jiplak Gambar VectorCraft (ArtCraft Team dan kontributor VectorCraft, MIT OR Apache-2.0) dan visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	otomatis, atau #rrggbb #rrggbb…
+	Stroke Width	Tebal goresan
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Sel {size} × {size} cm · {rows} baris
+	Cells touch: no spacing between images.	Sel saling bersentuhan: tanpa jarak antargambar.
+	No Cells	Tanpa sel
+	Organize Automatically on Import	Atur otomatis saat impor
+	Printed width: {width} cm	Lebar cetak: {width} cm
+	Reserve up to {max} cm · not exported	Cadangan hingga {max} cm · tidak diekspor
+	Snap to the Cells	Rapatkan ke sel
+	Split the Width into Cells	Bagi lebar menjadi sel
+	{width} × {length} cm (max {max})	{width} × {length} cm (maks. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Tidak ada ukuran di berkas: diusulkan {width} cm.
+	Place	Tempatkan
+	SVG Print Size	Ukuran cetak SVG
+	Size given in the file.	Ukuran dari berkas.
+	Skip	Lewati
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Format yang didukung: PNG (dipangkas ke piksel yang terlihat) dan SVG (dirender pada ukuran cetak)
+	Width in cells:	Lebar dalam sel:
+	SVG files still waiting: {n}	Berkas SVG yang masih menunggu: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Latar {color} dibuat transparan
+	Copy for Vectorization	Salinan untuk vektorisasi
+	Fringes removed, 2 px margin	Pinggiran dihapus, margin 2 px
+	JPEG: light median against the artefacts	JPEG: median ringan terhadap artefak
+	Optimize for Vectorization	Optimalkan untuk vektorisasi
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Diperkecil: {from} → {to} px
+	Size kept: {size} px	Ukuran dipertahankan: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Terlalu banyak warna ({n}): foto atau gradien kurang cocok untuk vektorisasi.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Situs ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Menganalisis warna…
+	Background kept	Latar dipertahankan
+	Sheets used: {sheets}	Lembar terpakai: {sheets}
+	The vectorization stopped unexpectedly.	Vektorisasi berhenti secara tak terduga.
+	Tracing the shapes…	Menjiplak bentuk…
+	Tracing with VectorCraft…	Menjiplak dengan VectorCraft…
+	{n} new sheets added	{n} lembar baru ditambahkan
+# DTF Craft (26)
+	AI upscale…	Perbesaran AI…
+	Not Suited to Vectorization	Kurang cocok untuk vektorisasi
+	On white	Di atas putih
+	Preparation cancelled	Persiapan dibatalkan
+	Prepared for vectorization: {steps}	Disiapkan untuk vektorisasi: {steps}
+	Preparing for Vectorization	Persiapan vektorisasi
+	Preparing the visual…	Menyiapkan gambar…
+	The document changed during the preparation.	Dokumen berubah selama persiapan.
+	The preparation stopped unexpectedly.	Persiapan berhenti secara tak terduga.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Klik: pengaturannya · Klik ganda: tambah salinan ke lembar
+# DTF Craft (28)
+	Locked	Terkunci
+	Unlocked	Tidak terkunci
+# DTF Craft (29)
+	Manual	Manual
+	Uniform	Seragam
+	Black T-Shirt	Kaus hitam
+	Soft Black T-Shirt	Kaus hitam lembut
+	White T-Shirt	Kaus putih
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Layer retus (kecerahan +32, saturasi +16), tersembunyi
+# DTF Craft (30)
+	Cells	Sel
+	Click: show the sheet · Double-click: rename it	Klik: tampilkan lembar · Klik ganda: ganti nama
+	Copies to Print	Salinan untuk dicetak
+	Custom Width	Lebar khusus
+	Display	Tampilan
+	Drop PNG or SVG files here	Letakkan file PNG atau SVG di sini
+	Duplicate the Sheet	Duplikat lembar
+	Every sheet emptied, the visuals kept	Semua lembar dikosongkan, visual tetap ada
+	Every visual's size and copies, then lay the sheets out	Ukuran dan jumlah tiap visual, lalu tata lembar
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Total: {sheets} lembar · {visuals} visual
