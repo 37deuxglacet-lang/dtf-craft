@@ -1,0 +1,407 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	DTF raszter…
+	Remove Semi-Transparent Pixels…	Félig átlátszó képpontok eltávolítása…
+	Gang Sheet…	Gyűjtőlap…
+	AI Upscale…	MI-nagyítás…
+	Print Conformity…	Nyomdai előkészítés…
+	Control Background…	Ellenőrző háttér…
+	Remove Control Background	Ellenőrző háttér eltávolítása
+	Saturation…	Telítettség…
+	Dark Garment	Sötét anyag
+	Light Garment	Világos anyag
+	Min Dot	Min. pont
+	Max Dot	Max. pont
+	Ellipse	Ellipszis
+	About DTF Craft	A DTF Craft névjegye
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — a PhotoCraft alapján
+	based on PhotoCraft · open source	a PhotoCraft alapján · nyílt forráskódú
+	Website	Weboldal
+	Contact	Kapcsolat
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — Stéphane GLACET DTF-eszközei, alapja:
+	DTF Settings	DTF-beállítások
+	Open a document to use the DTF settings.	Nyisson meg egy dokumentumot a DTF-beállítások használatához.
+	Semi-Transparent Pixels Only	Csak félig átlátszó képpontok
+	Whole Visual — Dark Garment	Teljes minta — sötét textil
+	Whole Visual — Light Garment	Teljes minta — világos textil
+# DTF Craft (3)
+	Print Conformity	Nyomdai előkészítés
+	Control Background	Ellenőrző háttér
+	Remove Semi-Transparent Pixels	Félig átlátszó képpontok eltávolítása
+	Current size: {width} × {height} cm at {resolution} ppi	Jelenlegi méret: {width} × {height} cm, {resolution} ppi
+	Width (cm, 0 = proportional)	Szélesség (cm, 0 = arányos)
+	Height (cm, 0 = proportional)	Magasság (cm, 0 = arányos)
+	Conformity	Előkészítés
+	No Background	Háttér nélkül
+	Fringe	Szegély
+# DTF Craft (4)
+	Remove White Background…	Fehér háttér eltávolítása…
+	Remove White Background	Fehér háttér eltávolítása
+	Detect Color	Háttérszín felismerése
+	Remove Halo	Fényudvar eltávolítása
+	Interior Holes	Belső lyukak
+	Min Hole Size	Min. lyukméret (px)
+# DTF Craft (5)
+	Transparent Pixels	Átlátszó képpontok
+	Remove Fringe	Szegély eltávolítása
+	Show Background	Háttér megjelenítése
+	Delete Background	Háttér törlése
+# DTF Craft (6)
+	Layer Name	Réteg neve
+	Preview Background	Előnézet háttere
+	Add Holes (Magic Wand)	Lyukak hozzáadása (varázspálca)
+	Show Before	Előtte nézet
+	Click an enclosed area to make it transparent.	Kattintson egy zárt területre, hogy átlátszó legyen.
+	Interior Hole	Belső lyuk
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — béta verzió
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Ez a DTF Craft tesztelésre szánt béta verziója: egyes eszközök még változhatnak vagy hibákat tartalmazhatnak.
+	Release planned for November 2, 2026.	Megjelenés tervezett időpontja: 2026. november 2.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px), {resolution} ppi
+	AI Upscale	MI-nagyítás
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Lyukak hozzáadása (varázsradír)
+	Eraser Tolerance	Radír tűrése
+# DTF Craft (11)
+	Color Analyzer…	Színelemző…
+	Color Analyzer	Színelemző
+	Replace Colors with Swatches	Színek cseréje színmintákra
+	the document is not modified	a dokumentum nem változik
+	Original Colors	Eredeti színek
+	Replaced Colors	Lecserélt színek
+	With Patches	Színfoltokkal
+	Add a color with the eyedropper: click the visual.	Szín hozzáadása pipettával: kattintson a motívumra.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Másolat, amelyben a bejelölt színeket a referenciáik váltják fel, PNG-ként mentve és új lapon megnyitva.
+	PDF Sheet…	PDF-adatlap…
+	An A4 sheet with the visual, its colors and their references.	A4-es adatlap a motívummal, a színeivel és a referenciáikkal.
+	Export PNG…	PNG exportálása…
+	Analyzed Pixels	Elemzett képpontok
+	Visible, transparency ignored	Látható, átlátszóság figyelmen kívül
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Színek legfeljebb
+	Grouping (ΔE)	Csoportosítás (ΔE)
+	Colors closer than this difference are counted as one.	Az ennél kisebb eltérésű színek egynek számítanak.
+	Ignore colors under 0.5 % of the area	A terület 0,5 %-a alatti színek kihagyása
+	Reference Swatch Book	Referencia-színminta
+	None loaded	Nincs betöltve
+	{name} · {n} colors	{name} · {n} szín
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Formátumok: .ase, .aco, .csv (ref; R; G; B vagy L*a*b*). Eltérés ΔE 2000-ben mérve.
+	Detected Colors: {n}	Észlelt színek: {n}
+	Patches · on-screen check and PDF sheet	Színfoltok · ellenőrzés a képernyőn és PDF-adatlap
+	Below	Alul
+	Reference	Referencia
+	Hex	Hex
+	Client	Ügyfél
+	On the PDF sheet	A PDF-adatlapon
+	Replaced in the PNG export	Lecserélve a PNG-exportban
+	Visual	Motívum
+	Match	Megfelelés
+	Remove this color	Szín eltávolítása
+	Load a swatch book to find the references.	Töltsön be egy színmintát a referenciák kereséséhez.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Bejelölve: a motívum színét a PNG-exportban a referencia váltja fel. ΔE: 2-ig = észrevehetetlen · 2–5 = közelről látható · felette = más árnyalat
+	Reference for {hex}	Referencia ehhez: {hex}
+	Nearest (automatic)	Legközelebbi (automatikus)
+	No visible pixels to analyze.	Nincs elemezhető látható képpont.
+	Swatch book loaded: {name}, {n} colors	Színminta betöltve: {name}, {n} szín
+	{name} color sheet	{name} színadatlap
+	Color sheet saved: {path}	Színadatlap mentve: {path}
+	Color Sheet	Színadatlap
+	Swatch Book	Színminta
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Észlelt színek: {n}
+	No swatch book loaded: the colors have no reference.	Nincs betöltött színminta: a színeknek nincs referenciájuk.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Egyezések ΔE 2 vagy kevesebb: {good}; ellenőrizendő (ΔE 2–5): {check}; 5 felett: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Motívum mérete: {w} × {h} px, {wcm} × {hcm} cm {dpi} ppi mellett.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: 2-ig = észrevehetetlen eltérés · 2–5 = közelről látható · 5 felett = más árnyalat.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	sRGB-ben megjelenített színek: a nyomat a nyomtatótól, a tintáktól és a hordozótól függ.
+	Sheet made with DTF Craft	Az adatlap a DTF Crafttal készült
+# DTF Craft (12)
+	Add Holes	Lyukak hozzáadása
+	Add Hole	Lyuk hozzáadása
+# DTF Craft (13)
+	Pick the Background Colour	Háttérszín pipettával
+	Click the background colour to remove.	Kattintson az eltávolítandó háttérszínre.
+	Click a visible pixel of the background.	Kattintson a háttér egy látható képpontjára.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Nem észlelhető egyszínű háttér: a háttér már átlátszó, vagy válassza ki a színét pipettával.
+	Holes: {n}	Lyukak: {n}
+	Remove Last Hole	Utolsó lyuk eltávolítása
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Gyűjtőlap
+	Visuals	Motívumok
+	Add PNG Files…	PNG-fájlok hozzáadása…
+	Add Open Document	Megnyitott dokumentum hozzáadása
+	Add PNG files or the open document.	Adjon hozzá PNG-fájlokat vagy a megnyitott dokumentumot.
+	Sheet	Lap
+	Film Width	Fóliaszélesség
+	Max Length	Max. hossz
+	Allow Rotation	Forgatás engedélyezése
+	Auto Build	Automatikus elrendezés
+	Selected Visual	Kijelölt motívum
+	Rotate 90°	Forgatás 90°-kal
+	Length used: {length} cm	Felhasznált hossz: {length} cm
+	{n} not placed	Nincs elhelyezve: {n}
+	{n} too close or overlapping	Túl közel vagy átfedésben: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Húzzon egy motívumot az áthelyezéséhez. Nyilak: 1 mm (Shift: 1 cm). A Delete leveszi a lapról.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	A margónál közelebb egy másik motívumhoz vagy szélhez: {n}. Exportálja mégis?
+	Too close to another visual	Túl közel egy másik motívumhoz
+	No room to turn this visual	Nincs hely a motívum elforgatásához
+	Open a document first	Először nyisson meg egy dokumentumot
+	the document was closed	a dokumentumot bezárták
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Aktív gyűjtőlapok
+	Add a New Sheet	Új lap hozzáadása
+	Add a copy to the sheet	Egy példány hozzáadása a laphoz
+	Along the edges	A szélek mentén
+	Auto Build May Rotate	Forgatás engedélyezése (automatikus)
+	Auto Build — every image at once	Automatikus elrendezés — minden kép egyszerre
+	Auto Fill	Automatikus kitöltés
+	Background Warning:	Háttér figyelmeztetés:
+	Background not removed (opaque corners)	A háttér nincs eltávolítva (átlátszatlan sarkok)
+	Between images	A képek között
+	Center Horizontally	Vízszintes középre igazítás
+	Center Vertically	Függőleges középre igazítás
+	Center on the Sheet	Középre a lapon
+	Copies of this sheet to print	A lap nyomtatandó példányai
+	Custom Color	Egyéni szín
+	Delete (Del)	Törlés (Del)
+	Delete the Sheet	Lap törlése
+	Drag and drop a file here or click to	Húzzon ide egy fájlt, vagy kattintson a
+	Duplicate Image	Kép kettőzése
+	Export Sheets (PNG)…	Lapok exportálása (PNG)…
+	Fill the room left on the sheet with this visual	A lap szabad helyének kitöltése ezzel a motívummal
+	Flip Horizontally	Vízszintes tükrözés
+	Flip Vertically	Függőleges tükrözés
+	Good resolution >= 250 dpi	Jó felbontás >= 250 dpi
+	Grid (1 cm)	Rács (1 cm)
+	Image Margin	Képmargó
+	Import Images	Képek importálása
+	Lock Proportions	Arányok zárolása
+	Margin (cm)	Margó (cm)
+	No image yet: import PNG files or add the open document.	Még nincs kép: importáljon PNG-fájlokat, vagy adja hozzá a megnyitott dokumentumot.
+	No room left on the sheet	Nincs több hely a lapon
+	Number of Images:	Képek száma:
+	One copy less	Eggyel kevesebb példány
+	One copy more	Eggyel több példány
+	Optimal	Optimális
+	Optimal resolution >= 300 dpi	Optimális felbontás >= 300 dpi
+	Overlap Lines	Átfedési vonalak
+	Overlapping or too close	Átfedésben vagy túl közel
+	Poor	Gyenge
+	Poor resolution >= 200 dpi	Gyenge felbontás >= 200 dpi
+	Proportions:	Arányok:
+	Push Down	Tolás le
+	Push Left	Tolás balra
+	Push Right	Tolás jobbra
+	Push Up	Tolás fel
+	Qty:	Db:
+	Redo (Ctrl+Y)	Ismét (Ctrl+Y)
+	Rotate 90° Counterclockwise	Forgatás 90°-kal balra
+	Same image, another size	Ugyanaz a kép, más méret
+	Select an object to edit.	Válasszon ki egy objektumot a szerkesztéshez.
+	Semi-transparent pixels: {p} %	Félig átlátszó képpontok: {p} %
+	Sheet Background	Lap háttere
+	Sheet Margin	Lapmargó
+	Show Overlap Lines	Átfedési vonalak megjelenítése
+	Show Resolution Lines	Felbontásvonalak megjelenítése
+	Snap While Moving	Igazítás mozgatás közben
+	Start Over	Újrakezdés
+	Stretch to the Film Width	Nyújtás a fólia szélességére
+	Stretch to the Sheet Length	Nyújtás a lap hosszára
+	Supported format: PNG (cropped to its visible pixels)	Támogatott formátum: PNG (a látható képpontokra vágva)
+	Transparency Warning:	Átlátszóság figyelmeztetés:
+	Undo (Ctrl+Z)	Visszavonás (Ctrl+Z)
+	Very Poor	Nagyon gyenge
+	Very poor resolution < 200 dpi	Nagyon gyenge felbontás < 200 dpi
+	With the image margin	A képmargóval
+	With the sheet margin	A lapmargóval
+	copy	másolat
+	{n} images	Képek: {n}
+# DTF Craft (14)
+	Vectorization…	Vektorizálás…
+	Vectorization	Vektorizálás
+	Vectorized	Vektorizált
+	Side by Side	Egymás mellett
+	Show Contours	Körvonalak megjelenítése
+	Checkerboard under Transparency	Sakktábla az átlátszóság alatt
+	{colors} colors · {shapes} shapes · {points} points	Színek: {colors} · alakzatok: {shapes} · pontok: {points}
+	Cut-out shapes, no overlap	Kivágott alakzatok, átfedés nélkül
+	Open document, flattened	Megnyitott dokumentum, egyesítve
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm, {dpi} ppi
+	Type of Visual	Kép típusa
+	Logo · flat colors	Logó · egyszínű felületek
+	Illustration · shades	Illusztráció · árnyalatok
+	Number of Colors	Színek száma
+	Detail Level	Részletesség
+	Sharp Corners	Éles sarkok
+	Remove the Background	Háttér eltávolítása
+	read on the visual's edge	a kép szélén leolvasva
+	No background found: the visual is already cut out.	Nem található háttér: a kép már ki van vágva.
+	Palette	Paletta
+	{n} colors · {k} in the SVG	Színek: {n} · az SVG-ben: {k}
+	Edge Background	Háttér
+	Keep {hex} in the SVG	{hex} megtartása az SVG-ben
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Nincs bejelölve: a szín kimarad az SVG-ből; alakzatai törlődnek, nem olvadnak össze.
+	SVG · cut-out shapes	SVG · kivágott alakzatok
+	{w} × {h} mm (document size)	{w} × {h} mm (dokumentumméret)
+	Open the SVG in DTF Craft after the export	Az SVG megnyitása a DTF Craftban az exportálás után
+	Export SVG…	SVG exportálása…
+	Cut-out shapes at the document's print size, saved as SVG.	Kivágott alakzatok a dokumentum nyomtatási méretében, SVG-ként mentve.
+	SVG saved: {path}	SVG mentve: {path}
+	No visible pixels to vectorize.	Nincs vektorizálható látható képpont.
+	Nothing to export: every color is left out.	Nincs mit exportálni: minden szín ki van hagyva.
+	Low Detail	Alacsony
+	Medium Detail	Közepes
+	High Detail	Magas
+	Close the Seams between Colors	Színek közötti illesztések lezárása
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Minden alakzat fél képponttal átfedi a szomszédait, így nyomtatáskor nem jelenik meg átlátszó hajszálvonal két szín között. Kapcsolja ki a pontosan kivágott alakzatokhoz (vágóplotter).
+# DTF Craft (14)
+	Conformity…	Előkészítés…
+	Cutout…	Papírkivágás…
+	Transparent Pixels…	Átlátszó képpontok…
+	Remove Fringe…	Szegély eltávolítása…
+	Sharpness…	Élesség…
+# DTF Craft (15)
+	Group the Selection	Csoportosítás
+	Group (Ctrl+G)	Csoportosítás (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Csoport bontása (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Kettőzés (Ctrl+D)
+	{n} visuals selected	{n} kijelölt kép
+	Colors kept: {n}	Megtartott színek: {n}
+# DTF Craft (16)
+	Applied Ranges	Alkalmazott tartományok
+	Click: a color · Shift+click: add · Alt+click: remove	Kattintás: egy szín · Shift+kattintás: hozzáadás · Alt+kattintás: eltávolítás
+	Contiguous Pixels	Összefüggő képpontok
+	Pick a color on the visual.	Válasszon egy színt a képen.
+	Remove this range	Tartomány eltávolítása
+	Replacement Color	Csereszín
+	Turn on Color Range above the visual, then click a color.	Kapcsolja be a Színtartományt a kép felett, majd kattintson egy színre.
+	{p} % of the visible pixels	A látható képpontok {p} %-a
+# DTF Craft (17)
+	Hide the image	Kép elrejtése
+	Illustration: {user} on Pixabay	Illusztráció: {user}, Pixabay
+	Show an illustration	Illusztráció megjelenítése
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	A4-es lap a grafikával, a vektorizált eredménnyel, a színeivel és azok referenciáival.
+	Detected Colors	Észlelt színek
+	Replaced by the reference in the SVG	Az SVG-ben a referencia váltja fel
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG bejelöletlen: a szín kimarad az SVG-ből; alakzatai törlődnek, nem olvadnak össze.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Közös a Színelemzővel. Formátumok: .ase, .aco, .csv; eltérés ΔE 2000-ben.
+	{name} vectorized color sheet	{name} vektorizált színlap
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ bejelölve: az alakzatok a referencia színét veszik fel, és az SVG-ben annak nevét viselik. ΔE: 2-ig = észrevehetetlen · 2–5 = közelről látható · felette = más árnyalat
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	„{color}” nem szín: #rrggbb formában írja.
+	16 Colors	16 szín
+	3 Colors	3 szín
+	6 Colors	6 szín
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	A kör, ellipszis, téglalap vagy szabályos sokszög pontosan ilyen alakzatként jön ki.
+	Abutting	Szomszédos
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Szomszédos: minden színnek saját területe van, az alakzatok közös élen találkoznak. Átfedő: minden réteg a fölötte lévők alá is kiterjed, így nincs rés a színek között.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Az a terület, amelynek színe egy irányban egyenletesen változik, egyetlen lineáris színátmenettel kitöltött alakzat lesz.
+	Areas smaller than this many pixels are ignored.	Az ennél kevesebb képpontú területeket figyelmen kívül hagyja.
+	Black and White	Fekete-fehér
+	Black and White Logo	Fekete-fehér logó
+	Cut-out shapes, contours cleaned for DTF printing.	Kivágott alakzatok, DTF-nyomtatáshoz tisztított kontúrok.
+	Engine	Motor
+	Exact Shapes	Pontos alakzatok
+	Fills	Kitöltések
+	Flat Logo	Sík logó
+	Full Tone	Folyamatos tónus
+	Grays	Szürkék
+	High Fidelity Photo	Nagy hűségű fotó
+	Higher keeps more sharp corners.	A magasabb érték több éles sarkot tart meg.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Mennyire követik a görbék a képpontokat: a magasabb hűbb, több ponttal.
+	Ignore Color	Szín figyelmen kívül hagyása
+	Limited	Korlátozott
+	Line Art	Vonalrajz
+	Lines as Strokes	Vonalak körvonalként
+	Lines no wider than the stroke width are traced as stroked center lines.	A körvonal-vastagságnál nem szélesebb vonalak középvonalként, körvonallal lesznek átrajzolva.
+	Load a swatch book to use it as the palette.	Töltsön be egy színmintakönyvet, hogy palettaként használja.
+	Logo Colors	Logó színei
+	Low Fidelity Photo	Kis hűségű fotó
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	A majdnem egyenes görbék egyenesek lesznek; a Sík logóban a körrészek valódi ívek lesznek.
+	Nothing to trace: everything is ignored or transparent.	Nincs mit átrajzolni: minden figyelmen kívül hagyva vagy átlátszó.
+	Outline	Körvonal
+	Overlapping	Átfedő
+	Pixels darker than this are black.	Az ennél sötétebb képpontok feketék.
+	Shades of Gray	Szürkeárnyalatok
+	Silhouettes	Sziluettek
+	Sketched Art	Vázlat
+	Snap Curves to Lines	Görbék illesztése vonalakhoz
+	Technical Drawing	Műszaki rajz
+	The areas of this color are left out (white when the field is empty).	Ennek a színnek a területei kimaradnak (fehér, ha a mező üres).
+	The colors of the reference swatch book below, at most this many.	Az alábbi referencia-színmintakönyv színei, legfeljebb ennyi.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Ez a grafika nem sík színű logó (tömör területeinek {p} %-a egyszínű): válassza a Szín módot.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Túl sok pont: növelje a Zajt, vagy csökkentse az Útvonalakat vagy a Színeket.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	A VectorCraft Képátrajzolója: előbeállításai és minden beállítása, DTF-hez és más technikákhoz.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vektorizálás: a VectorCraft Képátrajzolója (ArtCraft Team és a VectorCraft közreműködői, MIT OR Apache-2.0) és a visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	automatikus, vagy #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm-es cellák · {rows} sor
+	Cells touch: no spacing between images.	A cellák érintkeznek: nincs térköz a képek között.
+	No Cells	Nincs cellafelosztás
+	Organize Automatically on Import	Automatikus elrendezés importáláskor
+	Printed width: {width} cm	Nyomtatási szélesség: {width} cm
+	Reserve up to {max} cm · not exported	Tartalék {max} cm-ig · nem kerül exportálásra
+	Snap to the Cells	Igazítás a cellákhoz
+	Split the Width into Cells	A szélesség felosztása cellákra
+	{width} × {length} cm (max {max})	{width} × {length} cm (max. {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	A fájl nem ad meg méretet: {width} cm javasolt.
+	Place	Elhelyezés
+	SVG Print Size	Az SVG nyomtatási mérete
+	Size given in the file.	A fájlban megadott méret.
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Támogatott formátumok: PNG (a látható képpontokra vágva) és SVG (nyomtatási méretben renderelve)
+	Width in cells:	Szélesség cellákban:
+	SVG files still waiting: {n}	Még várakozó SVG-fájlok: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	MI ×{scale}: {from} → {to} px
+	Background {color} made transparent	A(z) {color} háttér átlátszó lett
+	Copy for Vectorization	Másolat vektorizáláshoz
+	Fringes removed, 2 px margin	Szegélyek eltávolítva, 2 px margó
+	JPEG: light median against the artefacts	JPEG: enyhe medián a műtermékek ellen
+	Optimize for Vectorization	Optimalizálás vektorizáláshoz
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Kicsinyítve: {from} → {to} px
+	Size kept: {size} px	Méret megtartva: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Túl sok szín ({n}): fénykép vagy színátmenet rosszul vektorizálható.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft webhely
+# DTF Craft (25)
+	Analyzing the colors…	Színek elemzése…
+	Background kept	Háttér megtartva
+	Sheets used: {sheets}	Felhasznált ívek: {sheets}
+	The vectorization stopped unexpectedly.	A vektorizálás váratlanul leállt.
+	Tracing the shapes…	Alakzatok körvonalazása…
+	Tracing with VectorCraft…	Körvonalazás a VectorCrafttal…
+	{n} new sheets added	{n} új ív hozzáadva
+# DTF Craft (26)
+	AI upscale…	MI-nagyítás…
+	Not Suited to Vectorization	Kevéssé alkalmas vektorizálásra
+	On white	Fehér alapon
+	Preparation cancelled	Előkészítés megszakítva
+	Prepared for vectorization: {steps}	Vektorizálásra előkészítve: {steps}
+	Preparing for Vectorization	Előkészítés vektorizáláshoz
+	Preparing the visual…	A kép előkészítése…
+	The document changed during the preparation.	A dokumentum megváltozott az előkészítés közben.
+	The preparation stopped unexpectedly.	Az előkészítés váratlanul leállt.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Kattintás: a beállításai · Dupla kattintás: másolat hozzáadása az ívhez
+# DTF Craft (29)
+	Black T-Shirt	Fekete póló
+	Soft Black T-Shirt	Fekete póló – lágy
+	White T-Shirt	Fehér póló
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Retusáló rétegek (fényerő +32, telítettség +16), rejtve
+# DTF Craft (30)
+	Cells	Cellák
+	Click: show the sheet · Double-click: rename it	Kattintás: ív megjelenítése · Dupla kattintás: átnevezés
+	Copies to Print	Nyomtatandó példányok
+	Custom Width	Egyéni szélesség
+	Drop PNG or SVG files here	Ide húzza a PNG- vagy SVG-fájlokat
+	Duplicate the Sheet	Ív kettőzése
+	Every sheet emptied, the visuals kept	Minden ív kiürítve, a képek megmaradnak
+	Every visual's size and copies, then lay the sheets out	Minden kép mérete és példányszáma, majd az ívek elrendezése
+	Film	Fólia
+	Total: {sheets} sheets · {visuals} visuals	Összesen: {sheets} ív · {visuals} kép

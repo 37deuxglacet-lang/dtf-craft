@@ -34,6 +34,15 @@ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
     json!({"url": url})
 }
 
+/// The prominent "Join us on Discord" button.
+pub fn discord_button(app: &mut PhotocraftApp, ui: &mut egui::Ui, min_width: f32) -> egui::Response {
+    let r = crate::widgets::primary_button(ui, tl!("Join us on Discord"), min_width).on_hover_text(DISCORD);
+    if r.clicked() {
+        open(app, ui.ctx(), DISCORD);
+    }
+    r
+}
+
 /// "Website · Contact · GitHub · PhotoCraft website" as links, centred: DTF Craft's own site,
 /// contact and GitHub project first, then PhotoCraft's site, which DTF Craft is based on. Clicks route through [`open`]
 /// (the platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable

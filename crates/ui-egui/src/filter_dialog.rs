@@ -705,203 +705,208 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
     // DTF Craft: the tool's help sheet ("?"), and a tooltip over each setting's rows.
     crate::dtf_help::sheet_ui(ui, f, &cmd);
     let mut tip_from: Option<(String, f32)> = None;
-    ui.scope(|ui| {
-        if locked {
-            ui.disable();
+    // DTF Craft: the rows go in a child Ui (as `ui.scope` would), disabled while DTF Halftone's
+    // settings are locked; written this way so PhotoCraft's loop keeps its indentation.
+    let outer = ui;
+    let mut rows = outer.new_child(egui::UiBuilder::new());
+    if locked {
+        rows.disable();
+    }
+    let ui = &mut rows;
+    for p in parse_spec(&spec) {
+        if halftone && (auto || !crate::dtf_halftone_ui::manual_row(&p.key)) {
+            continue;
         }
-        for p in parse_spec(&spec) {
-            if halftone && (auto || !crate::dtf_halftone_ui::manual_row(&p.key)) {
-                continue;
-            }
-            // DTF Craft: Remove White Background's colour only shows once detection on the edges is
-            // off, and the minimum hole size once interior holes are on.
-            if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE
-                && ((p.key == "color" && f.get("detectColor").and_then(Value::as_bool) != Some(false))
-                    || (p.key == "minHoleSize" && f.get("interiorHoles").and_then(Value::as_bool) != Some(true)))
-            {
-                continue;
-            }
-            if let Some((key, top)) = tip_from.take() {
-                crate::dtf_help::tip_over(ui, &cmd, &key, top);
-            }
-            tip_from = Some((p.key.clone(), ui.cursor().top()));
-            match p.kind {
-                Kind::Range { min, max, default } => {
-                    let mut v = f.get(&p.key).and_then(Value::as_f64).unwrap_or(default as f64) as f32;
-                    if cmd == "image.mode.indexedColor" && p.key == "colors" {
-                        let mut count = v.round().clamp(2.0, 256.0) as u32;
-                        crate::widgets::color_count_row(ui, &label(&p.key), &mut count);
-                        f.insert(p.key, json!(count));
-                        continue;
+        // DTF Craft: Remove White Background's colour only shows once detection on the edges is
+        // off, and the minimum hole size once interior holes are on.
+        if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE
+            && ((p.key == "color" && f.get("detectColor").and_then(Value::as_bool) != Some(false))
+                || (p.key == "minHoleSize" && f.get("interiorHoles").and_then(Value::as_bool) != Some(true)))
+        {
+            continue;
+        }
+        if let Some((key, top)) = tip_from.take() {
+            crate::dtf_help::tip_over(ui, &cmd, &key, top);
+        }
+        tip_from = Some((p.key.clone(), ui.cursor().top()));
+        match p.kind {
+            Kind::Range { min, max, default } => {
+                let mut v = f.get(&p.key).and_then(Value::as_f64).unwrap_or(default as f64) as f32;
+                if cmd == "image.mode.indexedColor" && p.key == "colors" {
+                    let mut count = v.round().clamp(2.0, 256.0) as u32;
+                    crate::widgets::color_count_row(ui, &label(&p.key), &mut count);
+                    f.insert(p.key, json!(count));
+                    continue;
+                }
+                // Replace Color's Range only applies with Localized Color Clusters on, as in Photoshop.
+                let enabled = !(cmd == REPLACE_COLOR && p.key == "range") || f.get("localized").and_then(Value::as_bool) == Some(true);
+                let unit = if is_cm_param(&cmd, &p.key) {
+                    "cm"
+                } else if is_pixel_param_of(&cmd, &p.key) {
+                    "px"
+                } else if p.key == "angle" {
+                    "°"
+                } else if p.key == "amount" && max <= 500.0 {
+                    "%"
+                } else {
+                    ""
+                };
+                ui.scope(|ui| {
+                    if !enabled {
+                        ui.disable();
                     }
-                    // Replace Color's Range only applies with Localized Color Clusters on, as in Photoshop.
-                    let enabled = !(cmd == REPLACE_COLOR && p.key == "range") || f.get("localized").and_then(Value::as_bool) == Some(true);
-                    let unit = if is_cm_param(&cmd, &p.key) {
-                        "cm"
-                    } else if is_pixel_param_of(&cmd, &p.key) {
-                        "px"
-                    } else if p.key == "angle" {
-                        "°"
-                    } else if p.key == "amount" && max <= 500.0 {
-                        "%"
-                    } else {
-                        ""
-                    };
-                    ui.scope(|ui| {
-                        if !enabled {
-                            ui.disable();
-                        }
-                        if uses_angle_dial(&cmd, &p.key) {
-                            crate::widgets::angle_dial_row(ui, &label(&p.key), &mut v, min..=max);
-                            ui.add_space(4.0);
-                        } else if uses_logarithmic_slider(min, max) {
-                            // Keep one numeric field for direct entry and one log-scaled slider for
-                            // wide ranges. slider_row would add a second, linear slider (#146).
-                            ui.horizontal(|ui| {
-                                ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
-                                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                    crate::widgets::value_field(ui, &mut v, min..=max, unit, 74.0);
-                                });
+                    if uses_angle_dial(&cmd, &p.key) {
+                        crate::widgets::angle_dial_row(ui, &label(&p.key), &mut v, min..=max);
+                        ui.add_space(4.0);
+                    } else if uses_logarithmic_slider(min, max) {
+                        // Keep one numeric field for direct entry and one log-scaled slider for
+                        // wide ranges. slider_row would add a second, linear slider (#146).
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                crate::widgets::value_field(ui, &mut v, min..=max, unit, 74.0);
                             });
-                            let mut lv = v.clamp(min, max).ln();
-                            if crate::widgets::slider(ui, &mut lv, min.ln()..=max.ln(), None).changed() {
-                                v = lv.exp();
-                            }
-                            ui.add_space(4.0);
-                        } else {
-                            // A double-click on the slider puts it back to the filter's default.
-                            let gestures = crate::widgets::RowGestures { reset: Some(default), wheel_step: None };
-                            crate::widgets::slider_row_with(ui, &label(&p.key), &mut v, min..=max, unit, None, gestures);
-                        }
-                    });
-                    // Small ranges (0–1 thresholds and centres) keep the two decimals their field shows.
-                    let scale = if max - min <= 10.0 { 100.0 } else { 10.0 };
-                    f.insert(p.key, json!((v * scale).round() / scale));
-                }
-                Kind::Choice { options, default } => {
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
-                        let initial = default.as_deref().or_else(|| options.first().map(String::as_str)).unwrap_or("");
-                        let mut cur = f.get(&p.key).and_then(Value::as_str).unwrap_or(initial).to_string();
-                        let labels: Vec<String> = options.iter().map(|o| choice_label(o)).collect();
-                        let mut opts: Vec<(String, &str)> = options.iter().cloned().zip(labels.iter().map(String::as_str)).collect();
-                        // Like Photoshop, the profile menus also list every profile installed in
-                        // the system (printer and paper profiles), by description.
-                        let installed = if p.key == "profile" && PROFILE_DIALOGS.contains(&cmd.as_str()) {
-                            photocraft_engine::installed_profiles::installed().into_iter().filter(|i| i.is_destination()).collect()
-                        } else {
-                            Vec::new()
-                        };
-                        opts.extend(installed.iter().map(|i| (i.path.clone(), i.description.as_str())));
-                        // Assign Profile: only what the document's colour mode can take (#4951).
-                        if p.key == "profile"
-                            && let Some(allowed) = f.get("__profiles").and_then(Value::as_array)
-                        {
-                            opts.retain(|(v, _)| allowed.iter().any(|a| a.as_str() == Some(v.as_str())));
-                        }
-                        // A profile given by path that isn't listed (typed by an agent, or spelled with
-                        // different case) still shows, by its file name, instead of a blank menu.
-                        let stem = std::path::Path::new(&cur).file_stem().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
-                        if p.key == "profile" && PROFILE_DIALOGS.contains(&cmd.as_str()) && !opts.iter().any(|(v, _)| *v == cur) {
-                            opts.push((cur.clone(), stem.as_str()));
-                        }
-                        crate::widgets::dropdown(ui, &format!("flt-{cmd}-{}", p.key), &mut cur, &opts, 170.0);
-                        f.insert(p.key.clone(), json!(cur));
-                    });
-                }
-                Kind::Bool(default) => {
-                    let mut b = f.get(&p.key).and_then(Value::as_bool).unwrap_or(default);
-                    crate::widgets::checkbox(ui, &mut b, &label(&p.key));
-                    f.insert(p.key, json!(b));
-                }
-                Kind::Text => {
-                    let mut v = f.get(&p.key).and_then(Value::as_str).unwrap_or_default().to_string();
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
-                        ui.add(egui::TextEdit::singleline(&mut v).desired_width(200.0));
-                    });
-                    if v.is_empty() {
-                        f.remove(&p.key);
-                    } else {
-                        f.insert(p.key, json!(v));
-                    }
-                }
-                Kind::Document => {
-                    let names: Vec<String> =
-                        f.get("__docs").and_then(Value::as_array).map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_string)).collect()).unwrap_or_default();
-                    let cur = f.get(&p.key).and_then(Value::as_i64).unwrap_or(-1);
-                    let mut sel = cur.to_string();
-                    let mut opts: Vec<(String, &str)> = vec![("-1".to_string(), tl!("None"))];
-                    opts.extend(names.iter().enumerate().map(|(i, n)| (i.to_string(), n.as_str())));
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
-                        crate::widgets::dropdown(ui, &format!("flt-{cmd}-{}", p.key), &mut sel, &opts, 170.0);
-                    });
-                    match sel.parse::<i64>() {
-                        Ok(i) if i >= 0 => f.insert(p.key, json!(i)),
-                        _ => f.insert(p.key, json!(-1)),
-                    };
-                }
-                Kind::Grid(n) => {
-                    let side = (n as f32).sqrt().round().max(1.0) as usize;
-                    let mut vals: Vec<f32> =
-                        f.get(&p.key).and_then(Value::as_array).map(|a| a.iter().map(|v| v.as_f64().unwrap_or(0.0) as f32).collect()).unwrap_or_default();
-                    vals.resize(n, 0.0);
-                    ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
-                    egui::Grid::new(format!("flt-grid-{cmd}-{}", p.key)).spacing([4.0, 4.0]).show(ui, |ui| {
-                        for (i, v) in vals.iter_mut().enumerate() {
-                            crate::widgets::value_field(ui, v, -999.0..=999.0, "", 44.0);
-                            if (i + 1) % side == 0 {
-                                ui.end_row();
-                            }
-                        }
-                    });
-                    f.insert(p.key, json!(vals.iter().map(|v| v.round() as i64).collect::<Vec<_>>()));
-                }
-                Kind::Json => {}
-                Kind::Color(default) => {
-                    let set = f.get(&p.key).and_then(Value::as_str).and_then(crate::color_picker_ui::parse_hex);
-                    let rgb = set.or(default).unwrap_or([0.0; 3]);
-                    let q = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
-                    let bytes = rgb.map(q);
-                    let name = label(&p.key);
-                    let mut clicked = false;
-                    let eyedropper = cmd == REPLACE_COLOR && p.key == "color";
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(&name).color(t.text_dim));
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            // PhotoCraft's Color Picker, as everywhere else (#2144).
-                            clicked = crate::widgets::color_swatch_button(ui, egui::Color32::from_rgb(bytes[0], bytes[1], bytes[2]), &name).clicked();
-                            if eyedropper {
-                                let armed = f.get(COLOR_EYEDROPPER).and_then(Value::as_bool).unwrap_or(false);
-                                if crate::icons::button(ui, "pipette", 24.0, armed, "Pick Color From Image").clicked() {
-                                    f.insert(COLOR_EYEDROPPER.into(), json!(!armed));
-                                }
-                            }
-                            ui.label(egui::RichText::new(crate::color_picker_ui::hex(rgb)).color(t.text_dim).monospace());
                         });
+                        let mut lv = v.clamp(min, max).ln();
+                        if crate::widgets::slider(ui, &mut lv, min.ln()..=max.ln(), None).changed() {
+                            v = lv.exp();
+                        }
+                        ui.add_space(4.0);
+                    } else {
+                        // A double-click on the slider puts it back to the filter's default.
+                        let gestures = crate::widgets::RowGestures { reset: Some(default), wheel_step: None };
+                        crate::widgets::slider_row_with(ui, &label(&p.key), &mut v, min..=max, unit, None, gestures);
+                    }
+                });
+                // Small ranges (0–1 thresholds and centres) keep the two decimals their field shows.
+                let scale = if max - min <= 10.0 { 100.0 } else { 10.0 };
+                f.insert(p.key, json!((v * scale).round() / scale));
+            }
+            Kind::Choice { options, default } => {
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
+                    let initial = default.as_deref().or_else(|| options.first().map(String::as_str)).unwrap_or("");
+                    let mut cur = f.get(&p.key).and_then(Value::as_str).unwrap_or(initial).to_string();
+                    let labels: Vec<String> = options.iter().map(|o| choice_label(o)).collect();
+                    let mut opts: Vec<(String, &str)> = options.iter().cloned().zip(labels.iter().map(String::as_str)).collect();
+                    // Like Photoshop, the profile menus also list every profile installed in
+                    // the system (printer and paper profiles), by description.
+                    let installed = if p.key == "profile" && PROFILE_DIALOGS.contains(&cmd.as_str()) {
+                        photocraft_engine::installed_profiles::installed().into_iter().filter(|i| i.is_destination()).collect()
+                    } else {
+                        Vec::new()
+                    };
+                    opts.extend(installed.iter().map(|i| (i.path.clone(), i.description.as_str())));
+                    // Assign Profile: only what the document's colour mode can take (#4951).
+                    if p.key == "profile"
+                        && let Some(allowed) = f.get("__profiles").and_then(Value::as_array)
+                    {
+                        opts.retain(|(v, _)| allowed.iter().any(|a| a.as_str() == Some(v.as_str())));
+                    }
+                    // A profile given by path that isn't listed (typed by an agent, or spelled with
+                    // different case) still shows, by its file name, instead of a blank menu.
+                    let stem = std::path::Path::new(&cur).file_stem().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+                    if p.key == "profile" && PROFILE_DIALOGS.contains(&cmd.as_str()) && !opts.iter().any(|(v, _)| *v == cur) {
+                        opts.push((cur.clone(), stem.as_str()));
+                    }
+                    crate::widgets::dropdown(ui, &format!("flt-{cmd}-{}", p.key), &mut cur, &opts, 170.0);
+                    f.insert(p.key.clone(), json!(cur));
+                });
+            }
+            Kind::Bool(default) => {
+                let mut b = f.get(&p.key).and_then(Value::as_bool).unwrap_or(default);
+                crate::widgets::checkbox(ui, &mut b, &label(&p.key));
+                f.insert(p.key, json!(b));
+            }
+            Kind::Text => {
+                let mut v = f.get(&p.key).and_then(Value::as_str).unwrap_or_default().to_string();
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
+                    ui.add(egui::TextEdit::singleline(&mut v).desired_width(200.0));
+                });
+                if v.is_empty() {
+                    f.remove(&p.key);
+                } else {
+                    f.insert(p.key, json!(v));
+                }
+            }
+            Kind::Document => {
+                let names: Vec<String> =
+                    f.get("__docs").and_then(Value::as_array).map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_string)).collect()).unwrap_or_default();
+                let cur = f.get(&p.key).and_then(Value::as_i64).unwrap_or(-1);
+                let mut sel = cur.to_string();
+                let mut opts: Vec<(String, &str)> = vec![("-1".to_string(), tl!("None"))];
+                opts.extend(names.iter().enumerate().map(|(i, n)| (i.to_string(), n.as_str())));
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
+                    crate::widgets::dropdown(ui, &format!("flt-{cmd}-{}", p.key), &mut sel, &opts, 170.0);
+                });
+                match sel.parse::<i64>() {
+                    Ok(i) if i >= 0 => f.insert(p.key, json!(i)),
+                    _ => f.insert(p.key, json!(-1)),
+                };
+            }
+            Kind::Grid(n) => {
+                let side = (n as f32).sqrt().round().max(1.0) as usize;
+                let mut vals: Vec<f32> =
+                    f.get(&p.key).and_then(Value::as_array).map(|a| a.iter().map(|v| v.as_f64().unwrap_or(0.0) as f32).collect()).unwrap_or_default();
+                vals.resize(n, 0.0);
+                ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
+                egui::Grid::new(format!("flt-grid-{cmd}-{}", p.key)).spacing([4.0, 4.0]).show(ui, |ui| {
+                    for (i, v) in vals.iter_mut().enumerate() {
+                        crate::widgets::value_field(ui, v, -999.0..=999.0, "", 44.0);
+                        if (i + 1) % side == 0 {
+                            ui.end_row();
+                        }
+                    }
+                });
+                f.insert(p.key, json!(vals.iter().map(|v| v.round() as i64).collect::<Vec<_>>()));
+            }
+            Kind::Json => {}
+            Kind::Color(default) => {
+                let set = f.get(&p.key).and_then(Value::as_str).and_then(crate::color_picker_ui::parse_hex);
+                let rgb = set.or(default).unwrap_or([0.0; 3]);
+                let q = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
+                let bytes = rgb.map(q);
+                let name = label(&p.key);
+                let mut clicked = false;
+                let eyedropper = cmd == REPLACE_COLOR && p.key == "color";
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new(&name).color(t.text_dim));
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        // PhotoCraft's Color Picker, as everywhere else (#2144).
+                        clicked = crate::widgets::color_swatch_button(ui, egui::Color32::from_rgb(bytes[0], bytes[1], bytes[2]), &name).clicked();
+                        if eyedropper {
+                            let armed = f.get(COLOR_EYEDROPPER).and_then(Value::as_bool).unwrap_or(false);
+                            if crate::icons::button(ui, "pipette", 24.0, armed, "Pick Color From Image").clicked() {
+                                f.insert(COLOR_EYEDROPPER.into(), json!(!armed));
+                            }
+                        }
+                        ui.label(egui::RichText::new(crate::color_picker_ui::hex(rgb)).color(t.text_dim).monospace());
                     });
-                    if set.is_none() && default.is_some() {
+                });
+                if set.is_none() && default.is_some() {
+                    f.insert(p.key.clone(), json!(crate::color_picker_ui::hex(rgb)));
+                }
+                if clicked {
+                    if !f.contains_key(&p.key) {
                         f.insert(p.key.clone(), json!(crate::color_picker_ui::hex(rgb)));
                     }
-                    if clicked {
-                        if !f.contains_key(&p.key) {
-                            f.insert(p.key.clone(), json!(crate::color_picker_ui::hex(rgb)));
-                        }
-                        crate::color_picker_ui::request_field(f, &p.key, &crate::color_picker_ui::title_for(&name));
-                    }
-                }
-                Kind::Int { default } => {
-                    let mut v = f.get(&p.key).and_then(Value::as_f64).unwrap_or(default as f64) as f32;
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
-                        crate::widgets::value_field(ui, &mut v, -30000.0..=30000.0, "", 80.0);
-                    });
-                    f.insert(p.key, json!(v.round() as i64));
+                    crate::color_picker_ui::request_field(f, &p.key, &crate::color_picker_ui::title_for(&name));
                 }
             }
+            Kind::Int { default } => {
+                let mut v = f.get(&p.key).and_then(Value::as_f64).unwrap_or(default as f64) as f32;
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new(label(&p.key)).color(t.text_dim));
+                    crate::widgets::value_field(ui, &mut v, -30000.0..=30000.0, "", 80.0);
+                });
+                f.insert(p.key, json!(v.round() as i64));
+            }
         }
-    });
+    }
+    outer.advance_cursor_after_rect(rows.min_rect());
+    let ui = outer;
     if let Some((key, top)) = tip_from.take() {
         crate::dtf_help::tip_over(ui, &cmd, &key, top);
     }

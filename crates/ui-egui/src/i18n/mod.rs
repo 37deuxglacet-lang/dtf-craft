@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! UI localisation. Strings in code stay English and are the default lookup keys; a per-language
 //! catalog (`*.tsv`, see `ja.tsv` for the format) maps them to display text at render time. Command
 //! ids, menu paths used for logic, the control channel, the CLI and MCP never see translated text,
@@ -900,12 +902,14 @@ mod tests {
         assert_eq!(tr(CS(), "All"), "Vše");
     }
 
-    /// The packed catalogs in the binary unpack to exactly the `.tsv` files.
+    /// The packed catalogs in the binary unpack to exactly the `.tsv` files (DTF Craft: followed by
+    /// `dtf/<code>.tsv`, see build.rs).
     #[test]
     fn packed_catalogs_match_their_files() {
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/i18n");
         for l in LANGUAGES.iter().skip(1) {
-            let file = std::fs::read_to_string(dir.join(format!("{}.tsv", l.code))).unwrap();
+            let mut file = std::fs::read_to_string(dir.join(format!("{}.tsv", l.code))).unwrap();
+            file.push_str(&std::fs::read_to_string(dir.join("dtf").join(format!("{}.tsv", l.code))).unwrap_or_default());
             assert_eq!(unpack(l.source).unwrap(), file, "{}", l.code);
             assert!(l.source.len() < file.len() / 2, "{}: stored deflated", l.code);
         }

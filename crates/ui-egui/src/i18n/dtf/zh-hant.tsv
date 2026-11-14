@@ -1,0 +1,434 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	DTF 半色調…
+	Remove Semi-Transparent Pixels…	移除半透明像素…
+	Gang Sheet…	拼版…
+	AI Upscale…	AI 放大…
+	Print Conformity…	印刷規範化…
+	Control Background…	檢查背景…
+	Remove Control Background	移除檢查背景
+	Saturation…	飽和度…
+	Target	目標
+	Dark Garment	深色布料
+	Light Garment	淺色布料
+	Min Dot	最小網點
+	Max Dot	最大網點
+	Ellipse	橢圓
+	About DTF Craft	關於 DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — 以 PhotoCraft 為基礎
+	based on PhotoCraft · open source	以 PhotoCraft 為基礎 · 開放原始碼
+	Website	網站
+	Contact	聯絡
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — Stéphane GLACET 的 DTF 工具，以此為基礎：
+	DTF Settings	DTF 設定
+	Open a document to use the DTF settings.	開啟文件以使用 DTF 設定。
+	Semi-Transparent Pixels Only	僅半透明像素
+	Whole Visual — Dark Garment	整個圖案 — 深色布料
+	Whole Visual — Light Garment	整個圖案 — 淺色布料
+# DTF Craft (3)
+	Print Conformity	印刷規範化
+	Control Background	檢查背景
+	Remove Semi-Transparent Pixels	移除半透明像素
+	Defringe	去除邊緣綴邊
+	Smart Sharpen	智慧型銳利化
+	Current size: {width} × {height} cm at {resolution} ppi	目前尺寸：{width} × {height} 公分，{resolution} ppi
+	Width (cm, 0 = proportional)	寬度（公分，0 = 依比例）
+	Height (cm, 0 = proportional)	高度（公分，0 = 依比例）
+	Conformity	規範化
+	No Background	無背景
+	Fringe	邊緣
+	Sharpness	銳利化
+# DTF Craft (4)
+	Remove White Background…	移除白色背景…
+	Remove White Background	移除白色背景
+	Cutout	去背
+	Detect Color	偵測背景色
+	Remove Halo	去除光暈
+	Interior Holes	內部孔洞
+	Min Hole Size	最小孔洞尺寸 (像素)
+# DTF Craft (5)
+	Transparent Pixels	透明像素
+	Remove Fringe	去除邊緣
+	Show Background	顯示背景
+	Delete Background	刪除背景
+# DTF Craft (6)
+	Layer Name	圖層名稱
+	Preview Background	預覽背景
+	Add Holes (Magic Wand)	新增孔洞（魔術棒）
+	Show Before	顯示之前
+	Click an enclosed area to make it transparent.	按一下封閉區域使其透明。
+	Interior Hole	內部孔洞
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — 測試版
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	這是用於測試的 DTF Craft 測試版：部分工具仍可能變更或存在錯誤。
+	Release planned for November 2, 2026.	預計於 2026 年 11 月 2 日發布。
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}：{width} × {height} 公分（{pxw} × {pxh} 像素），{resolution} ppi
+	AI Upscale	AI 放大
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	新增孔洞（魔術橡皮擦）
+	Eraser Tolerance	橡皮擦容許度
+# DTF Craft (11)
+	Color Analyzer…	顏色分析器…
+	Color Analyzer	顏色分析器
+	Replace Colors with Swatches	用色票取代顏色
+	the document is not modified	文件不會被修改
+	Original Colors	原始顏色
+	Replaced Colors	取代後的顏色
+	With Patches	附色塊
+	Add a color with the eyedropper: click the visual.	用滴管新增顏色：按一下圖像。
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	將勾選的顏色取代為參考色的副本，儲存為 PNG 並在新分頁中開啟。
+	PDF Sheet…	PDF 說明單…
+	An A4 sheet with the visual, its colors and their references.	包含圖像、其顏色及參考色的 A4 說明單。
+	Export PNG…	轉存 PNG…
+	Analyzed Pixels	分析的像素
+	Visible, transparency ignored	可見像素，忽略透明
+	RGB {bits} bits	RGB {bits} 位元
+	Maximum Colors	最多顏色數
+	Grouping (ΔE)	合併 (ΔE)
+	Colors closer than this difference are counted as one.	差異小於此值的顏色計為一種。
+	Ignore colors under 0.5 % of the area	忽略面積低於 0.5 % 的顏色
+	Reference Swatch Book	參考色票
+	None loaded	未載入
+	{name} · {n} colors	{name} · {n} 種顏色
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	格式：.ase、.aco、.csv（ref; R; G; B 或 L*a*b*）。差異以 ΔE 2000 衡量。
+	Detected Colors: {n}	偵測到的顏色：{n}
+	Patches · on-screen check and PDF sheet	色塊 · 螢幕檢查與 PDF 說明單
+	Below	下方
+	Reference	參考
+	Hex	十六進位
+	Client	客戶
+	On the PDF sheet	顯示在 PDF 說明單上
+	Replaced in the PNG export	轉存 PNG 時取代
+	Visual	圖像
+	Area	面積
+	Match	對應色
+	Remove this color	移除此顏色
+	Change…	變更…
+	Load a swatch book to find the references.	載入色票以尋找參考色。
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	勾選：轉存 PNG 時圖像顏色取代為參考色。ΔE：≤2 = 無法察覺 · 2 至 5 = 近看可見 · 以上 = 另一色調
+	Reference for {hex}	{hex} 的參考色
+	Nearest (automatic)	最接近（自動）
+	No visible pixels to analyze.	沒有可分析的可見像素。
+	Swatch book loaded: {name}, {n} colors	已載入色票：{name}，{n} 種顏色
+	{name} color sheet	{name} 顏色說明單
+	Color sheet saved: {path}	已儲存顏色說明單：{path}
+	Color Sheet	顏色說明單
+	Date	日期
+	Profile	描述檔
+	Swatch Book	色票
+	Hex · RGB	十六進位 · RGB
+	Colors detected: {n}	偵測到的顏色：{n}
+	No swatch book loaded: the colors have no reference.	未載入色票：顏色沒有參考色。
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	ΔE ≤ 2 的相符：{good}；待檢查（ΔE 2 至 5）：{check}；大於 5：{far}。
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	圖像尺寸：{w} × {h} 像素，{dpi} ppi 時為 {wcm} × {hcm} 公分。
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000：≤2 = 無法察覺的差異 · 2 至 5 = 近看可見 · 大於 5 = 另一色調。
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	顏色以 sRGB 顯示：列印效果取決於印表機、墨水和承印物。
+	Sheet made with DTF Craft	由 DTF Craft 產生的說明單
+	RGB	RGB
+	Color Profile	色彩描述檔
+# DTF Craft (12)
+	Add Holes	新增孔洞
+	Add Hole	新增孔洞
+# DTF Craft (13)
+	Pick the Background Colour	用滴管取背景色
+	Click the background colour to remove.	按一下要移除的背景顏色。
+	Click a visible pixel of the background.	按一下背景中可見的像素。
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	未偵測到純色背景：背景已透明，或用滴管選擇其顏色。
+	Holes: {n}	孔洞：{n}
+	Remove Last Hole	移除最後一個孔洞
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	拼版
+	Visuals	圖案
+	Add PNG Files…	加入 PNG 檔案…
+	Add Open Document	加入開啟的文件
+	Add PNG files or the open document.	加入 PNG 檔案或開啟的文件。
+	Sheet	版面
+	Film Width	膜寬
+	Max Length	最大長度
+	Allow Rotation	允許旋轉
+	Auto Build	自動排版
+	Selected Visual	所選圖案
+	Rotate 90°	旋轉 90°
+	Length used: {length} cm	已用長度：{length} cm
+	{n} not placed	未放置：{n}
+	{n} too close or overlapping	過近或重疊：{n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	拖曳圖案即可移動。方向鍵：1 mm（Shift：1 cm）。Delete 會將其從版面移除。
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	與其他圖案或邊緣的距離小於邊界的圖案：{n}。仍要匯出嗎？
+	Too close to another visual	與其他圖案距離過近
+	No room to turn this visual	沒有空間旋轉此圖案
+	Open a document first	請先開啟文件
+	the document was closed	文件已關閉
+	Duplicate	複製
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	目前拼版
+	Add a New Sheet	加入新版面
+	Add a copy to the sheet	在版面加入一份
+	Along the edges	沿邊緣
+	Auto Build May Rotate	允許旋轉（自動）
+	Auto Build — every image at once	自動排版 — 一次處理所有圖片
+	Auto Fill	自動填滿
+	Background Warning:	背景警告：
+	Background not removed (opaque corners)	背景未去除（四角不透明）
+	Between images	圖片之間
+	Center Horizontally	水平置中
+	Center Vertically	垂直置中
+	Center on the Sheet	在版面置中
+	Copies of this sheet to print	此版面的列印份數
+	Custom Color	自訂顏色
+	Delete (Del)	刪除（Del）
+	Delete the Sheet	刪除版面
+	Drag and drop a file here or click to	將檔案拖放到此處，或按一下
+	Duplicate Image	複製圖片
+	Export Sheets (PNG)…	匯出版面（PNG）…
+	Fill the room left on the sheet with this visual	以此圖案填滿版面剩餘空間
+	Flip Horizontally	水平翻轉
+	Flip Vertically	垂直翻轉
+	Good	良好
+	Good resolution >= 250 dpi	良好解析度 >= 250 dpi
+	Grid (1 cm)	格線（1 cm）
+	Image Margin	圖片邊界
+	Import Images	匯入圖片
+	Lock Proportions	鎖定比例
+	Margin (cm)	邊界（cm）
+	No image yet: import PNG files or add the open document.	尚無圖片：請匯入 PNG 檔案或加入開啟的文件。
+	No room left on the sheet	版面已無空間
+	Number of Images:	圖片數量：
+	One copy less	減少一份
+	One copy more	增加一份
+	Optimal	最佳
+	Optimal resolution >= 300 dpi	最佳解析度 >= 300 dpi
+	Overlap Lines	重疊線
+	Overlapping or too close	重疊或過近
+	Poor	較差
+	Poor resolution >= 200 dpi	較差解析度 >= 200 dpi
+	Proportions:	比例：
+	Push Down	推到底部
+	Push Left	推到左側
+	Push Right	推到右側
+	Push Up	推到頂部
+	Qty:	數量：
+	Redo (Ctrl+Y)	重做（Ctrl+Y）
+	Rotate 90° Counterclockwise	逆時針旋轉 90°
+	Same image, another size	同一圖片，其他尺寸
+	Select an object to edit.	請選取要編輯的物件。
+	Semi-transparent pixels: {p} %	半透明像素：{p} %
+	Settings	設定
+	Sheet Background	版面背景
+	Sheet Margin	版面邊界
+	Show Overlap Lines	顯示重疊線
+	Show Resolution Lines	顯示解析度線
+	Snap While Moving	移動時自動對齊
+	Start Over	重新開始
+	Stretch to the Film Width	拉伸到膜寬
+	Stretch to the Sheet Length	拉伸到版面長度
+	Supported format: PNG (cropped to its visible pixels)	支援格式：PNG（裁切到可見像素）
+	Transparency Warning:	透明度警告：
+	Undo (Ctrl+Z)	復原（Ctrl+Z）
+	Very Poor	很差
+	Very poor resolution < 200 dpi	很差解析度 < 200 dpi
+	With the image margin	使用圖片邊界
+	With the sheet margin	使用版面邊界
+	copy	副本
+	{n} images	{n} 張圖片
+# DTF Craft (14)
+	Vectorization…	向量化…
+	Vectorization	向量化
+	Vectorized	向量化結果
+	Side by Side	並排
+	Show Contours	顯示輪廓
+	Checkerboard under Transparency	透明區域顯示棋盤格
+	{colors} colors · {shapes} shapes · {points} points	{colors} 種顏色 · {shapes} 個形狀 · {points} 個點
+	Cut-out shapes, no overlap	切割形狀，無重疊
+	Open document, flattened	開啟的文件，已平面化
+	{w} × {h} mm at {dpi} ppi	{w} × {h} 公釐，{dpi} ppi
+	Type of Visual	影像類型
+	Logo · flat colors	標誌 · 平塗色
+	Illustration · shades	插圖 · 色調層次
+	Number of Colors	顏色數量
+	Detail Level	細節層級
+	Sharp Corners	尖角
+	Remove the Background	移除背景
+	read on the visual's edge	從影像邊緣讀取
+	No background found: the visual is already cut out.	找不到背景：影像已去背。
+	Palette	調色盤
+	{n} colors · {k} in the SVG	{n} 種顏色 · SVG 中 {k} 種
+	Edge Background	背景
+	Keep {hex} in the SVG	在 SVG 中保留 {hex}
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	未勾選：該顏色從 SVG 中排除；其形狀會被刪除，而非合併。
+	SVG · cut-out shapes	SVG · 切割形狀
+	{w} × {h} mm (document size)	{w} × {h} 公釐（文件尺寸）
+	Open the SVG in DTF Craft after the export	轉存後在 DTF Craft 中開啟 SVG
+	Export SVG…	轉存 SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	依文件列印尺寸的切割形狀，儲存為 SVG。
+	SVG saved: {path}	SVG 已儲存：{path}
+	No visible pixels to vectorize.	沒有可向量化的可見像素。
+	Nothing to export: every color is left out.	沒有可轉存的內容：所有顏色皆已排除。
+	High	高
+	Low	低
+	Low Detail	低
+	Medium Detail	中
+	High Detail	高
+	Close the Seams between Colors	閉合顏色間的接縫
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	每個形狀與相鄰形狀重疊半個像素，列印時兩種顏色之間不會出現透明細線。取消勾選可得到嚴格切割的形狀（割字機）。
+# DTF Craft (14)
+	Conformity…	規範化…
+	Cutout…	去背…
+	Transparent Pixels…	透明像素…
+	Remove Fringe…	去除邊緣…
+	Sharpness…	銳利化…
+# DTF Craft (15)
+	Group the Selection	群組
+	Ungroup	解散群組
+	Group (Ctrl+G)	群組（Ctrl+G）
+	Ungroup (Ctrl+Shift+G)	解散群組（Ctrl+Shift+G）
+	Duplicate (Ctrl+D)	複製（Ctrl+D）
+	{n} visuals selected	已選取 {n} 個圖案
+	Colors kept: {n}	保留的顏色：{n}
+# DTF Craft (16)
+	Applied Ranges	已套用的範圍
+	Click: a color · Shift+click: add · Alt+click: remove	按一下：一種顏色 · Shift+按一下：加入 · Alt+按一下：移除
+	Contiguous Pixels	連續像素
+	Pick a color on the visual.	在圖案上選取一種顏色。
+	Remove this range	移除此範圍
+	Replacement Color	取代顏色
+	Turn on Color Range above the visual, then click a color.	開啟圖案上方的「顏色範圍」，然後按一下一種顏色。
+	{p} % of the visible pixels	可見像素的 {p} %
+	Color Range	顏色範圍
+# DTF Craft (17)
+	Hide the image	隱藏圖片
+	Illustration: {user} on Pixabay	插圖：{user}，來自 Pixabay
+	Show an illustration	顯示插圖
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	一張 A4 色卡，含圖像、向量化結果、其顏色及參考色。
+	Detected Colors	偵測到的顏色
+	Replaced by the reference in the SVG	在 SVG 中替換為參考色
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG 未勾選：該顏色不進入 SVG；其形狀被刪除，而不是合併。
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	與顏色分析器共用。格式：.ase、.aco、.csv；差異以 ΔE 2000 計。
+	{name} vectorized color sheet	{name} 向量化色卡
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ 勾選：形狀採用參考色，並在 SVG 中以其命名。ΔE：2 以內 = 難以察覺 · 2 到 5 = 近看可見 · 以上 = 另一色相
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	「{color}」不是顏色：請寫成 #rrggbb。
+	16 Colors	16 色
+	3 Colors	3 色
+	6 Colors	6 色
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	圓形、橢圓、矩形或正多邊形會準確輸出為該形狀。
+	Abutting	鄰接
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	鄰接：每種顏色有自己的區域，形狀共用邊緣。疊加：每個圖層延伸到上方圖層之下，顏色之間沒有縫隙。
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	顏色沿一個方向均勻變化的區域成為一個以線性漸層填滿的形狀。
+	Areas smaller than this many pixels are ignored.	小於此像素數的區域會被忽略。
+	Black and White	黑白
+	Black and White Logo	黑白標誌
+	Cut-out shapes, contours cleaned for DTF printing.	剪切形狀，輪廓已為 DTF 列印整理。
+	Engine	引擎
+	Exact Shapes	精確形狀
+	Fills	填色
+	Flat Logo	平面標誌
+	Full Tone	連續色調
+	Grays	灰階級
+	High Fidelity Photo	高傳真相片
+	Higher keeps more sharp corners.	越高保留的尖角越多。
+	How closely the curves follow the pixels: higher is more faithful, with more points.	曲線貼合像素的程度：越高越忠實，點也越多。
+	Ignore Color	忽略顏色
+	Limited	有限
+	Line Art	線稿
+	Lines as Strokes	線條作為筆畫
+	Lines no wider than the stroke width are traced as stroked center lines.	不寬於筆畫寬度的線條會描圖為帶筆畫的中心線。
+	Load a swatch book to use it as the palette.	請載入色票庫以將其作為調色盤。
+	Logo Colors	標誌顏色
+	Low Fidelity Photo	低傳真相片
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	近乎筆直的曲線變為直線；在平面標誌中，圓的部分變為真正的圓弧。
+	Nothing to trace: everything is ignored or transparent.	沒有可描圖的內容：全部被忽略或透明。
+	Outline	外框
+	Overlapping	疊加
+	Pixels darker than this are black.	比此值暗的像素變為黑色。
+	Shades of Gray	灰色陰影
+	Silhouettes	剪影
+	Sketched Art	素描圖稿
+	Snap Curves to Lines	將曲線對齊線條
+	Technical Drawing	技術圖面
+	The areas of this color are left out (white when the field is empty).	移除此顏色的區域（欄位空白時為白色）。
+	The colors of the reference swatch book below, at most this many.	下方參考色票庫的顏色，最多此數量。
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	此圖像不是平面色標誌（{p} % 的實色區域為純色）：請選擇顏色模式。
+	Too many points to trace: raise Noise, or lower Paths or Colors.	點數過多：請提高雜訊，或降低路徑或顏色。
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	VectorCraft 的影像描圖：其預設集和全部設定，適用於 DTF 和其他工藝。
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	向量化：VectorCraft 的影像描圖（ArtCraft Team 與 VectorCraft 貢獻者，MIT OR Apache-2.0）和 visioncortex（MIT OR Apache-2.0）。
+	automatic, or #rrggbb #rrggbb…	自動，或 #rrggbb #rrggbb…
+	Method	方法
+	Stroke Width	筆畫寬度
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	{size} × {size} cm 格 · {rows} 列
+	Cells touch: no spacing between images.	格子相接：圖片之間無間距。
+	No Cells	不分格
+	Organize Automatically on Import	匯入時自動排列
+	Printed width: {width} cm	列印寬度：{width} cm
+	Reserve up to {max} cm · not exported	預留至 {max} cm · 不匯出
+	Snap to the Cells	吸附至格子
+	Split the Width into Cells	將寬度分成格子
+	{width} × {length} cm (max {max})	{width} × {length} cm（最大 {max}）
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	檔案中沒有尺寸：建議 {width} cm。
+	Place	放置
+	SVG Print Size	SVG 列印尺寸
+	Size given in the file.	檔案中提供的尺寸。
+	Skip	略過
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	支援的格式：PNG（裁切至可見像素）與 SVG（依列印尺寸算繪）
+	Width in cells:	以格計的寬度：
+	SVG files still waiting: {n}	仍在等待的 SVG 檔案：{n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}：{from} → {to} px
+	Background {color} made transparent	背景 {color} 已設為透明
+	Copy for Vectorization	用於向量化的副本
+	Fringes removed, 2 px margin	已去除毛邊，邊距 2 px
+	JPEG: light median against the artefacts	JPEG：輕度中值濾鏡去除雜訊
+	Optimize for Vectorization	為向量化最佳化
+	RGB 8 bits, sRGB	RGB 8 位元，sRGB
+	Reduced: {from} → {to} px	縮小：{from} → {to} px
+	Size kept: {size} px	保持尺寸：{size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	顏色過多（{n}）：照片或漸層不適合向量化。
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	ArtCraft / PhotoCraft 網站
+# DTF Craft (25)
+	Analyzing the colors…	正在分析顏色…
+	Background kept	保留背景
+	Sheets used: {sheets}	已用版面：{sheets}
+	The vectorization stopped unexpectedly.	向量化意外停止。
+	Tracing the shapes…	正在描摹形狀…
+	Tracing with VectorCraft…	正在用 VectorCraft 描摹…
+	{n} new sheets added	已新增 {n} 張新版面
+# DTF Craft (26)
+	AI upscale…	AI 放大中…
+	Not Suited to Vectorization	不適合向量化
+	On white	白色背景上
+	Preparation cancelled	已取消準備
+	Prepared for vectorization: {steps}	已為向量化準備：{steps}
+	Preparing for Vectorization	為向量化做準備
+	Preparing the visual…	正在準備圖像…
+	The document changed during the preparation.	準備期間文件已變更。
+	The preparation stopped unexpectedly.	準備意外停止。
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	按一下：查看設定 · 按兩下：在版面上新增一份
+# DTF Craft (28)
+	Locked	已鎖定
+	Unlocked	已解鎖
+# DTF Craft (29)
+	Manual	手動
+	Uniform	均勻
+	Black T-Shirt	黑色T恤
+	Soft Black T-Shirt	黑色T恤（柔和）
+	White T-Shirt	白色T恤
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	修飾圖層（亮度 +32，飽和度 +16），隱藏
+# DTF Craft (30)
+	Cells	儲存格
+	Click: show the sheet · Double-click: rename it	按一下：顯示該頁 · 按兩下：重新命名
+	Copies to Print	列印份數
+	Custom Width	自訂寬度
+	Display	顯示
+	Drop PNG or SVG files here	將 PNG 或 SVG 檔案拖放到此處
+	Duplicate the Sheet	複製該頁
+	Every sheet emptied, the visuals kept	清空所有頁，保留圖案
+	Every visual's size and copies, then lay the sheets out	設定每個圖案的尺寸和份數，然後排版
+	Film	膜
+	Total: {sheets} sheets · {visuals} visuals	合計：{sheets} 頁 · {visuals} 個圖案

@@ -1,0 +1,415 @@
+# DTF Craft
+	DTF	DTF
+	DTF Halftone…	Bán sắc DTF…
+	Remove Semi-Transparent Pixels…	Xóa điểm ảnh bán trong suốt…
+	Gang Sheet…	Trang ghép in…
+	AI Upscale…	Phóng to bằng AI…
+	Print Conformity…	Chuẩn hóa in…
+	Control Background…	Nền kiểm tra…
+	Remove Control Background	Xóa nền kiểm tra
+	Saturation…	Độ bão hòa…
+	Dark Garment	Vải tối màu
+	Light Garment	Vải sáng màu
+	Min Dot	Điểm tối thiểu
+	Max Dot	Điểm tối đa
+	Ellipse	Hình elip
+	About DTF Craft	Giới thiệu DTF Craft
+# DTF Craft (2)
+	DTF Craft — based on PhotoCraft	DTF Craft — dựa trên PhotoCraft
+	based on PhotoCraft · open source	dựa trên PhotoCraft · mã nguồn mở
+	Website	Trang web
+	Contact	Liên hệ
+	DTF Craft — DTF tools by Stéphane GLACET, based on:	DTF Craft — công cụ DTF của Stéphane GLACET, dựa trên:
+	DTF Settings	Cài đặt DTF
+	Open a document to use the DTF settings.	Mở một tài liệu để dùng cài đặt DTF.
+	Semi-Transparent Pixels Only	Chỉ điểm ảnh bán trong suốt
+	Whole Visual — Dark Garment	Toàn bộ hình — vải tối màu
+	Whole Visual — Light Garment	Toàn bộ hình — vải sáng màu
+# DTF Craft (3)
+	Print Conformity	Chuẩn hóa in
+	Control Background	Nền kiểm tra
+	Remove Semi-Transparent Pixels	Xóa điểm ảnh bán trong suốt
+	Current size: {width} × {height} cm at {resolution} ppi	Kích thước hiện tại: {width} × {height} cm ở {resolution} ppi
+	Width (cm, 0 = proportional)	Chiều rộng (cm, 0 = theo tỉ lệ)
+	Height (cm, 0 = proportional)	Chiều cao (cm, 0 = theo tỉ lệ)
+	Conformity	Chuẩn hóa
+	No Background	Không nền
+	Fringe	Viền
+# DTF Craft (4)
+	Remove White Background…	Xóa nền trắng…
+	Remove White Background	Xóa nền trắng
+	Detect Color	Nhận diện màu nền
+	Remove Halo	Xóa viền sáng
+	Interior Holes	Lỗ bên trong
+	Min Hole Size	Kích thước lỗ tối thiểu (px)
+# DTF Craft (5)
+	Transparent Pixels	Điểm ảnh trong suốt
+	Remove Fringe	Xóa viền
+	Show Background	Hiện nền
+	Delete Background	Xóa nền
+# DTF Craft (6)
+	Layer Name	Tên lớp
+	Preview Background	Nền xem trước
+	Add Holes (Magic Wand)	Thêm lỗ (đũa thần)
+	Show Before	Hiện trước
+	Click an enclosed area to make it transparent.	Nhấp vào vùng kín để làm nó trong suốt.
+	Interior Hole	Lỗ bên trong
+# DTF Craft (7)
+	DTF Craft — Beta Version	DTF Craft — phiên bản beta
+	This is a beta version of DTF Craft, for testing: some tools may still change or contain bugs.	Đây là phiên bản beta của DTF Craft để thử nghiệm: một số công cụ vẫn có thể thay đổi hoặc có lỗi.
+	Release planned for November 2, 2026.	Dự kiến phát hành ngày 2 tháng 11 năm 2026.
+# DTF Craft (8)
+	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) at {resolution} ppi	×{scale}: {width} × {height} cm ({pxw} × {pxh} px) ở {resolution} ppi
+	AI Upscale	Phóng to bằng AI
+# DTF Craft (10)
+	Add Holes (Magic Eraser)	Thêm lỗ (tẩy thần)
+	Eraser Tolerance	Dung sai của tẩy
+# DTF Craft (11)
+	Color Analyzer…	Trình phân tích màu…
+	Color Analyzer	Trình phân tích màu
+	Replace Colors with Swatches	Thay màu bằng mẫu màu
+	the document is not modified	tài liệu không bị thay đổi
+	Original Colors	Màu gốc
+	Replaced Colors	Màu đã thay
+	With Patches	Kèm ô màu
+	Add a color with the eyedropper: click the visual.	Thêm màu bằng ống hút: nhấp vào hình.
+	A copy with the checked colors replaced by their references, saved as PNG and opened in a new tab.	Bản sao với các màu đã chọn được thay bằng màu tham chiếu, lưu dạng PNG và mở trong thẻ mới.
+	PDF Sheet…	Phiếu PDF…
+	An A4 sheet with the visual, its colors and their references.	Phiếu A4 gồm hình, các màu và màu tham chiếu.
+	Export PNG…	Xuất PNG…
+	Analyzed Pixels	Điểm ảnh được phân tích
+	Visible, transparency ignored	Hiển thị, bỏ qua độ trong suốt
+	RGB {bits} bits	RGB {bits} bit
+	Maximum Colors	Số màu tối đa
+	Grouping (ΔE)	Gộp nhóm (ΔE)
+	Colors closer than this difference are counted as one.	Các màu gần nhau hơn mức chênh lệch này được tính là một.
+	Ignore colors under 0.5 % of the area	Bỏ qua màu dưới 0,5 % diện tích
+	Reference Swatch Book	Bảng màu tham chiếu
+	None loaded	Chưa tải
+	{name} · {n} colors	{name} · {n} màu
+	Formats: .ase, .aco, .csv (ref; R; G; B or L*a*b*). Difference measured in ΔE 2000.	Định dạng: .ase, .aco, .csv (ref; R; G; B hoặc L*a*b*). Chênh lệch đo bằng ΔE 2000.
+	Detected Colors: {n}	Màu phát hiện: {n}
+	Patches · on-screen check and PDF sheet	Ô màu · kiểm tra trên màn hình và phiếu PDF
+	Below	Bên dưới
+	Reference	Tham chiếu
+	Hex	Hex
+	Client	Khách hàng
+	On the PDF sheet	Trên phiếu PDF
+	Replaced in the PNG export	Được thay khi xuất PNG
+	Visual	Hình
+	Match	Màu tương ứng
+	Remove this color	Xóa màu này
+	Change…	Đổi…
+	Load a swatch book to find the references.	Tải bảng màu để tìm màu tham chiếu.
+	Checked: the visual's color is replaced by the reference in the PNG export. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	Đã chọn: màu của hình được thay bằng màu tham chiếu khi xuất PNG. ΔE: đến 2 = không nhận thấy · 2 đến 5 = thấy khi nhìn gần · trên = sắc khác
+	Reference for {hex}	Tham chiếu cho {hex}
+	Nearest (automatic)	Gần nhất (tự động)
+	No visible pixels to analyze.	Không có điểm ảnh hiển thị để phân tích.
+	Swatch book loaded: {name}, {n} colors	Đã tải bảng màu: {name}, {n} màu
+	{name} color sheet	{name} phiếu màu
+	Color sheet saved: {path}	Đã lưu phiếu màu: {path}
+	Color Sheet	Phiếu màu
+	Date	Ngày
+	Swatch Book	Bảng màu
+	Hex · RGB	Hex · RGB
+	Colors detected: {n}	Màu phát hiện: {n}
+	No swatch book loaded: the colors have no reference.	Chưa tải bảng màu: các màu không có tham chiếu.
+	Matches at ΔE 2 or less: {good}; to check (ΔE 2 to 5): {check}; above 5: {far}.	Khớp ở ΔE 2 trở xuống: {good}; cần kiểm tra (ΔE 2 đến 5): {check}; trên 5: {far}.
+	Visual size: {w} × {h} px, {wcm} × {hcm} cm at {dpi} ppi.	Kích thước hình: {w} × {h} px, {wcm} × {hcm} cm ở {dpi} ppi.
+	ΔE 2000: up to 2 = imperceptible difference · 2 to 5 = visible up close · above 5 = another hue.	ΔE 2000: đến 2 = khác biệt không nhận thấy · 2 đến 5 = thấy khi nhìn gần · trên 5 = sắc khác.
+	Colors shown in sRGB: the printed result depends on the printer, the inks and the substrate.	Màu hiển thị theo sRGB: kết quả in phụ thuộc vào máy in, mực và vật liệu.
+	Sheet made with DTF Craft	Phiếu tạo bằng DTF Craft
+# DTF Craft (12)
+	Add Holes	Thêm lỗ
+	Add Hole	Thêm lỗ
+# DTF Craft (13)
+	Pick the Background Colour	Màu nền bằng ống hút
+	Click the background colour to remove.	Nhấp vào màu nền cần xóa.
+	Click a visible pixel of the background.	Nhấp vào một điểm ảnh nhìn thấy của nền.
+	No plain background detected: the background is already transparent, or pick its colour with the eyedropper.	Không phát hiện nền trơn: nền đã trong suốt, hoặc chọn màu nền bằng ống hút.
+	Holes: {n}	Lỗ: {n}
+	Remove Last Hole	Bỏ lỗ cuối
+# DTF Craft (6) — Gang Sheet
+	Gang Sheet	Trang ghép in
+	Visuals	Hình in
+	Add PNG Files…	Thêm tệp PNG…
+	Add Open Document	Thêm tài liệu đang mở
+	Add PNG files or the open document.	Thêm tệp PNG hoặc tài liệu đang mở.
+	Sheet	Trang
+	Film Width	Khổ phim
+	Max Length	Chiều dài tối đa
+	Allow Rotation	Cho phép xoay
+	Auto Build	Xếp tự động
+	Selected Visual	Hình đang chọn
+	Rotate 90°	Xoay 90°
+	Length used: {length} cm	Chiều dài đã dùng: {length} cm
+	{n} not placed	Chưa đặt được: {n}
+	{n} too close or overlapping	Quá gần hoặc chồng lên nhau: {n}
+	Drag a visual to move it. Arrows: 1 mm (Shift: 1 cm). Delete takes it off the sheet.	Kéo một hình để di chuyển. Phím mũi tên: 1 mm (Shift: 1 cm). Delete gỡ hình khỏi trang.
+	{n} visuals are closer than the margin to another visual or to an edge. Export anyway?	Hình gần hình khác hoặc mép hơn lề cho phép: {n}. Vẫn xuất?
+	Too close to another visual	Quá gần một hình khác
+	No room to turn this visual	Không đủ chỗ để xoay hình này
+	Open a document first	Hãy mở một tài liệu trước
+	the document was closed	tài liệu đã bị đóng
+	{dpi} ppi	{dpi} ppi
+# DTF Craft (7) — Gang Sheet window
+	Active Gang Sheets	Các trang đang dùng
+	Add a New Sheet	Thêm trang mới
+	Add a copy to the sheet	Thêm một bản vào trang
+	Along the edges	Dọc theo mép
+	Auto Build May Rotate	Cho phép xoay (tự động)
+	Auto Build — every image at once	Xếp tự động — tất cả hình cùng lúc
+	Auto Fill	Lấp đầy tự động
+	Background Warning:	Cảnh báo nền:
+	Background not removed (opaque corners)	Chưa xóa nền (góc không trong suốt)
+	Between images	Giữa các hình
+	Center Horizontally	Căn giữa theo chiều ngang
+	Center Vertically	Căn giữa theo chiều dọc
+	Center on the Sheet	Căn giữa trang
+	Copies of this sheet to print	Số bản in của trang này
+	Custom Color	Màu tùy chọn
+	Delete (Del)	Xóa (Del)
+	Delete the Sheet	Xóa trang
+	Drag and drop a file here or click to	Kéo thả tệp vào đây hoặc bấm để
+	Duplicate Image	Nhân bản hình
+	Export Sheets (PNG)…	Xuất các trang (PNG)…
+	Fill the room left on the sheet with this visual	Lấp chỗ trống của trang bằng hình này
+	Flip Horizontally	Lật ngang
+	Flip Vertically	Lật dọc
+	Good resolution >= 250 dpi	Độ phân giải tốt >= 250 dpi
+	Grid (1 cm)	Lưới (1 cm)
+	Image Margin	Lề hình
+	Import Images	Nhập hình
+	Lock Proportions	Khóa tỉ lệ
+	Margin (cm)	Lề (cm)
+	No image yet: import PNG files or add the open document.	Chưa có hình: hãy nhập tệp PNG hoặc thêm tài liệu đang mở.
+	No room left on the sheet	Hết chỗ trên trang
+	Number of Images:	Số lượng hình:
+	One copy less	Bớt một bản
+	One copy more	Thêm một bản
+	Optimal	Tối ưu
+	Optimal resolution >= 300 dpi	Độ phân giải tối ưu >= 300 dpi
+	Overlap Lines	Đường chồng lấn
+	Overlapping or too close	Chồng lấn hoặc quá gần
+	Poor	Kém
+	Poor resolution >= 200 dpi	Độ phân giải kém >= 200 dpi
+	Proportions:	Tỉ lệ:
+	Push Down	Đẩy xuống
+	Push Right	Đẩy sang phải
+	Push Up	Đẩy lên
+	Qty:	SL:
+	Redo (Ctrl+Y)	Làm lại (Ctrl+Y)
+	Rotate 90° Counterclockwise	Xoay 90° ngược chiều kim đồng hồ
+	Same image, another size	Cùng hình, kích thước khác
+	Select an object to edit.	Chọn một đối tượng để chỉnh.
+	Semi-transparent pixels: {p} %	Điểm ảnh bán trong suốt: {p} %
+	Sheet Background	Nền trang
+	Sheet Margin	Lề trang
+	Show Overlap Lines	Hiện đường chồng lấn
+	Show Resolution Lines	Hiện đường độ phân giải
+	Snap While Moving	Căn khi di chuyển
+	Start Over	Làm lại từ đầu
+	Stretch to the Film Width	Kéo giãn theo khổ phim
+	Stretch to the Sheet Length	Kéo giãn theo chiều dài trang
+	Supported format: PNG (cropped to its visible pixels)	Định dạng hỗ trợ: PNG (cắt theo điểm ảnh hiển thị)
+	Transparency Warning:	Cảnh báo trong suốt:
+	Undo (Ctrl+Z)	Hoàn tác (Ctrl+Z)
+	Very Poor	Rất kém
+	Very poor resolution < 200 dpi	Độ phân giải rất kém < 200 dpi
+	With the image margin	Có lề hình
+	With the sheet margin	Có lề trang
+	copy	bản sao
+	{n} images	{n} hình
+# DTF Craft (14)
+	Vectorization…	Vector hóa…
+	Vectorization	Vector hóa
+	Vectorized	Đã vector hóa
+	Side by Side	Cạnh nhau
+	Show Contours	Hiện đường viền
+	Checkerboard under Transparency	Ô bàn cờ dưới vùng trong suốt
+	{colors} colors · {shapes} shapes · {points} points	{colors} màu · {shapes} hình · {points} điểm
+	Cut-out shapes, no overlap	Hình cắt rời, không chồng lên nhau
+	Open document, flattened	Tài liệu đang mở, đã gộp lớp
+	{w} × {h} mm at {dpi} ppi	{w} × {h} mm ở {dpi} ppi
+	Type of Visual	Loại hình ảnh
+	Logo · flat colors	Logo · màu phẳng
+	Illustration · shades	Minh họa · sắc độ
+	Number of Colors	Số màu
+	Detail Level	Mức chi tiết
+	Sharp Corners	Góc sắc
+	Remove the Background	Xóa nền
+	read on the visual's edge	đọc ở mép hình ảnh
+	No background found: the visual is already cut out.	Không tìm thấy nền: hình ảnh đã được tách nền.
+	Palette	Bảng màu
+	{n} colors · {k} in the SVG	{n} màu · {k} trong SVG
+	Edge Background	Nền
+	Keep {hex} in the SVG	Giữ {hex} trong SVG
+	Unchecked: the color is left out of the SVG; its shapes are removed, not merged.	Bỏ chọn: màu bị loại khỏi SVG; các hình của nó bị xóa, không gộp.
+	SVG · cut-out shapes	SVG · hình cắt rời
+	{w} × {h} mm (document size)	{w} × {h} mm (kích thước tài liệu)
+	Open the SVG in DTF Craft after the export	Mở SVG trong DTF Craft sau khi xuất
+	Export SVG…	Xuất SVG…
+	Cut-out shapes at the document's print size, saved as SVG.	Hình cắt rời theo kích thước in của tài liệu, lưu dưới dạng SVG.
+	SVG saved: {path}	Đã lưu SVG: {path}
+	No visible pixels to vectorize.	Không có điểm ảnh hiển thị để vector hóa.
+	Nothing to export: every color is left out.	Không có gì để xuất: mọi màu đều bị loại.
+	Low Detail	Thấp
+	Medium Detail	Trung bình
+	High Detail	Cao
+	Close the Seams between Colors	Khép kín mối nối giữa các màu
+	Each shape overlaps its neighbors by half a pixel, so no transparent hairline shows between two colors in print. Uncheck for strictly cut-out shapes (cutting plotter).	Mỗi hình chồng lên hình kế bên nửa điểm ảnh, để khi in không xuất hiện đường mảnh trong suốt giữa hai màu. Bỏ chọn để có hình cắt rời chính xác (máy cắt decal).
+# DTF Craft (14)
+	Conformity…	Chuẩn hóa…
+	Cutout…	Cắt ra…
+	Transparent Pixels…	Điểm ảnh trong suốt…
+	Remove Fringe…	Xóa viền…
+	Sharpness…	Độ nét…
+# DTF Craft (15)
+	Group the Selection	Nhóm
+	Ungroup	Bỏ nhóm
+	Group (Ctrl+G)	Nhóm (Ctrl+G)
+	Ungroup (Ctrl+Shift+G)	Bỏ nhóm (Ctrl+Shift+G)
+	Duplicate (Ctrl+D)	Nhân bản (Ctrl+D)
+	{n} visuals selected	Đã chọn {n} hình
+	Colors kept: {n}	Màu được giữ: {n}
+# DTF Craft (16)
+	Applied Ranges	Phạm vi đã áp dụng
+	Click: a color · Shift+click: add · Alt+click: remove	Nhấp: một màu · Shift+nhấp: thêm · Alt+nhấp: bớt
+	Contiguous Pixels	Điểm ảnh liền kề
+	Pick a color on the visual.	Chọn một màu trên hình.
+	Remove this range	Bỏ phạm vi này
+	Replacement Color	Màu thay thế
+	Turn on Color Range above the visual, then click a color.	Bật Phạm vi màu phía trên hình, rồi nhấp vào một màu.
+	{p} % of the visible pixels	{p} % điểm ảnh hiển thị
+# DTF Craft (17)
+	Hide the image	Ẩn hình ảnh
+	Illustration: {user} on Pixabay	Minh họa: {user} trên Pixabay
+	Show an illustration	Hiện minh họa
+# DTF Craft (18)
+	An A4 sheet with the visual, the vectorized result, its colors and their references.	Một trang A4 gồm hình, kết quả vector hóa, các màu và tham chiếu của chúng.
+	Detected Colors	Màu phát hiện được
+	Replaced by the reference in the SVG	Được thay bằng tham chiếu trong SVG
+	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG bỏ chọn: màu bị loại khỏi SVG; các hình của nó bị xóa, không gộp.
+	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Dùng chung với Trình phân tích màu. Định dạng: .ase, .aco, .csv; chênh lệch theo ΔE 2000.
+	{name} vectorized color sheet	{name} bảng màu vector hóa
+	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ được chọn: các hình lấy màu của tham chiếu và mang tên của nó trong SVG. ΔE: đến 2 = không nhận ra · 2 đến 5 = thấy khi nhìn gần · cao hơn = sắc độ khác
+# DTF Craft (19)
+	"{color}" is not a color: write it as #rrggbb.	"{color}" không phải là màu: hãy viết dạng #rrggbb.
+	16 Colors	16 màu
+	3 Colors	3 màu
+	6 Colors	6 màu
+	A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape.	Hình tròn, elip, hình chữ nhật hay đa giác đều sẽ ra đúng hình đó.
+	Abutting	Liền kề
+	Abutting: each color has its own area, the shapes share their edges. Overlapping: each layer extends under the ones above it, so no gap shows between colors.	Liền kề: mỗi màu có vùng riêng, các hình chung cạnh. Chồng lớp: mỗi lớp kéo xuống dưới các lớp phía trên, không có khe hở giữa các màu.
+	An area whose color changes evenly in one direction is one shape filled with a linear gradient.	Vùng có màu thay đổi đều theo một hướng thành một hình tô dải chuyển tuyến tính.
+	Areas smaller than this many pixels are ignored.	Các vùng nhỏ hơn số điểm ảnh này bị bỏ qua.
+	Black and White	Đen trắng
+	Black and White Logo	Logo đen trắng
+	Cut-out shapes, contours cleaned for DTF printing.	Hình cắt rời, đường viền được làm sạch để in DTF.
+	Engine	Bộ máy
+	Exact Shapes	Hình chính xác
+	Fills	Tô
+	Flat Logo	Logo màu phẳng
+	Full Tone	Tông liên tục
+	Grays	Mức xám
+	High Fidelity Photo	Ảnh độ trung thực cao
+	Higher keeps more sharp corners.	Cao hơn giữ nhiều góc sắc hơn.
+	How closely the curves follow the pixels: higher is more faithful, with more points.	Mức đường cong bám theo điểm ảnh: cao hơn trung thực hơn, nhiều điểm hơn.
+	Ignore Color	Bỏ qua màu
+	Limited	Giới hạn
+	Line Art	Nét vẽ
+	Lines as Strokes	Đường thành nét
+	Lines no wider than the stroke width are traced as stroked center lines.	Các đường không rộng hơn độ dày nét được đồ thành đường tâm có nét.
+	Load a swatch book to use it as the palette.	Hãy tải một bộ màu mẫu để dùng làm bảng màu.
+	Logo Colors	Màu logo
+	Low Fidelity Photo	Ảnh độ trung thực thấp
+	Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs.	Đường cong gần thẳng thành đường thẳng; ở Logo màu phẳng, phần đường tròn thành cung thật.
+	Nothing to trace: everything is ignored or transparent.	Không có gì để đồ: mọi thứ đều bị bỏ qua hoặc trong suốt.
+	Outline	Đường bao
+	Overlapping	Chồng lớp
+	Pixels darker than this are black.	Điểm ảnh tối hơn giá trị này thành màu đen.
+	Shades of Gray	Sắc độ xám
+	Silhouettes	Hình bóng
+	Sketched Art	Phác thảo
+	Snap Curves to Lines	Bắt đường cong theo đường thẳng
+	Technical Drawing	Bản vẽ kỹ thuật
+	The areas of this color are left out (white when the field is empty).	Các vùng màu này bị loại bỏ (màu trắng nếu ô trống).
+	The colors of the reference swatch book below, at most this many.	Các màu của bộ màu mẫu tham chiếu bên dưới, tối đa bấy nhiêu.
+	This visual is not a flat-color logo ({p} % of its solid areas are flat): choose the Color mode.	Hình này không phải logo màu phẳng ({p} % vùng đặc là màu trơn): hãy chọn chế độ Màu.
+	Too many points to trace: raise Noise, or lower Paths or Colors.	Quá nhiều điểm: tăng Nhiễu, hoặc giảm Đường dẫn hay Màu.
+	VectorCraft's Image Trace: its presets and all its settings, for DTF and other techniques.	Đồ hình ảnh của VectorCraft: các thiết lập sẵn và mọi thiết lập, cho DTF và các kỹ thuật khác.
+	Vectorization: VectorCraft's Image Trace (ArtCraft Team and the VectorCraft contributors, MIT OR Apache-2.0) and visioncortex (MIT OR Apache-2.0).	Vector hóa: Đồ hình ảnh của VectorCraft (ArtCraft Team và những người đóng góp VectorCraft, MIT OR Apache-2.0) và visioncortex (MIT OR Apache-2.0).
+	automatic, or #rrggbb #rrggbb…	tự động, hoặc #rrggbb #rrggbb…
+# DTF Craft (21)
+	Cells of {size} × {size} cm · {rows} rows	Ô {size} × {size} cm · {rows} hàng
+	Cells touch: no spacing between images.	Các ô liền nhau: không có khoảng cách giữa các hình.
+	No Cells	Không chia ô
+	Organize Automatically on Import	Tự động sắp xếp khi nhập
+	Printed width: {width} cm	Chiều rộng in: {width} cm
+	Reserve up to {max} cm · not exported	Phần dự trữ đến {max} cm · không xuất
+	Snap to the Cells	Bám theo ô
+	Split the Width into Cells	Chia chiều rộng thành ô
+	{width} × {length} cm (max {max})	{width} × {length} cm (tối đa {max})
+# DTF Craft (22)
+	No size in the file: {width} cm proposed.	Tệp không có kích thước: đề xuất {width} cm.
+	Place	Đặt
+	SVG Print Size	Kích thước in SVG
+	Size given in the file.	Kích thước ghi trong tệp.
+	Skip	Bỏ qua
+	Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)	Định dạng hỗ trợ: PNG (cắt theo điểm ảnh hiển thị) và SVG (vẽ theo kích thước in)
+	Width in cells:	Chiều rộng theo ô:
+	SVG files still waiting: {n}	Tệp SVG còn chờ: {n}
+# DTF Craft (23)
+	AI ×{scale}: {from} → {to} px	AI ×{scale}: {from} → {to} px
+	Background {color} made transparent	Nền {color} đã thành trong suốt
+	Copy for Vectorization	Bản sao để vector hóa
+	Fringes removed, 2 px margin	Đã xóa viền, lề 2 px
+	JPEG: light median against the artefacts	JPEG: lọc trung vị nhẹ chống nhiễu
+	Optimize for Vectorization	Tối ưu để vector hóa
+	RGB 8 bits, sRGB	RGB 8 bit, sRGB
+	Reduced: {from} → {to} px	Thu nhỏ: {from} → {to} px
+	Size kept: {size} px	Giữ kích thước: {size} px
+	Too many colours ({n}): a photo or a gradient is poorly suited to vectorization.	Quá nhiều màu ({n}): ảnh chụp hoặc dải chuyển màu khó vector hóa.
+# DTF Craft (24)
+	ArtCraft / PhotoCraft website	Trang web ArtCraft / PhotoCraft
+# DTF Craft (25)
+	Analyzing the colors…	Đang phân tích màu…
+	Background kept	Giữ nguyên nền
+	Sheets used: {sheets}	Số tờ đã dùng: {sheets}
+	The vectorization stopped unexpectedly.	Quá trình vector hóa dừng bất ngờ.
+	Tracing the shapes…	Đang dò hình…
+	Tracing with VectorCraft…	Đang dò bằng VectorCraft…
+	{n} new sheets added	Đã thêm {n} tờ mới
+# DTF Craft (26)
+	AI upscale…	Phóng to bằng AI…
+	Not Suited to Vectorization	Không phù hợp để vector hóa
+	On white	Trên nền trắng
+	Preparation cancelled	Đã hủy chuẩn bị
+	Prepared for vectorization: {steps}	Đã chuẩn bị để vector hóa: {steps}
+	Preparing for Vectorization	Chuẩn bị để vector hóa
+	Preparing the visual…	Đang chuẩn bị hình…
+	The document changed during the preparation.	Tài liệu đã thay đổi trong lúc chuẩn bị.
+	The preparation stopped unexpectedly.	Quá trình chuẩn bị dừng bất ngờ.
+# DTF Craft (27)
+	Click: its settings · Double-click: add a copy to the sheet	Nhấp: cài đặt của nó · Nhấp đúp: thêm một bản vào tờ
+# DTF Craft (28)
+	Locked	Đã khóa
+	Unlocked	Đã mở khóa
+# DTF Craft (29)
+	Manual	Thủ công
+	Black T-Shirt	Áo thun đen
+	Soft Black T-Shirt	Áo thun đen (dịu)
+	White T-Shirt	Áo thun trắng
+	Retouch Layers (Brightness +32, Saturation +16), Hidden	Lớp chỉnh sửa (độ sáng +32, độ bão hòa +16), ẩn
+# DTF Craft (30)
+	Cells	Ô
+	Click: show the sheet · Double-click: rename it	Nhấp: hiện tờ · Nhấp đúp: đổi tên
+	Copies to Print	Số bản in
+	Custom Width	Chiều rộng tùy chỉnh
+	Display	Hiển thị
+	Drop PNG or SVG files here	Thả tệp PNG hoặc SVG vào đây
+	Duplicate the Sheet	Nhân bản tờ
+	Every sheet emptied, the visuals kept	Làm trống mọi tờ, giữ lại hình
+	Every visual's size and copies, then lay the sheets out	Kích thước và số bản mỗi hình, rồi xếp các tờ
+	Film	Phim
+	Total: {sheets} sheets · {visuals} visuals	Tổng: {sheets} tờ · {visuals} hình
