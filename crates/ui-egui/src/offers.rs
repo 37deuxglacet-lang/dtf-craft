@@ -61,6 +61,7 @@ pub fn tool_name(command: &str) -> Option<&'static str> {
         "dtf.colorAnalyzer" => "Analyseur couleur",
         "dtf.gangSheet" => "Gang sheet",
         "dtf.vectorize" => "Vectorisation",
+        "dtf.separations" => "Séparations sérigraphie",
         _ => return None,
     })
 }

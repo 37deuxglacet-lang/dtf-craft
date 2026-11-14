@@ -1,0 +1,13 @@
+[package]
+name = "photocraft-separations"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "DTF Craft: Screen Printing Separations module (public placeholder; the official build ships the subscription module in its place)"
+
+[lints]
+workspace = true
+
+[dependencies]
+egui = { workspace = true }
+serde_json = { workspace = true }

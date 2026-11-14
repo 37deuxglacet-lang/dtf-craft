@@ -4,9 +4,13 @@ name: DTF Craft (Windows)
 # The repository is public: the official zip is NOT attached to GitHub releases. It is kept as a
 # 1-day workflow artifact and, on tags or manual runs, uploaded to the Nuxit hosting (FTPS) when the
 # NUXIT_FTP_* secrets are set.
+# V2.0: the Screen Printing Separations module is sold by subscription and its code is private
+# (37deuxglacet-lang/dtf-craft-pro). With the DTF_PRO_TOKEN secret (read-only access to that
+# repository), the official build replaces the public placeholder crates/separations with it.
+# Without the secret (forks, public builds), the placeholder is built.
 on:
   push:
-    branches: [main, dtf-craft]
+    branches: [main, dtf-craft, v2-separations]
     tags: ["*"]
   workflow_dispatch:
     inputs:
@@ -31,8 +35,26 @@ jobs:
       NUXIT_FTP_DIR: ${{ secrets.NUXIT_FTP_DIR }}
       # The start screen's Pixabay illustration: the API key, built into the app (empty: no illustration).
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      DTF_PRO_TOKEN: ${{ secrets.DTF_PRO_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+      - name: Private module (dtf-craft-pro)
+        if: env.DTF_PRO_TOKEN != ''
+        uses: actions/checkout@v4
+        with:
+          repository: 37deuxglacet-lang/dtf-craft-pro
+          token: ${{ secrets.DTF_PRO_TOKEN }}
+          path: _pro
+          persist-credentials: false
+      - name: Use the private module
+        if: env.DTF_PRO_TOKEN != ''
+        shell: pwsh
+        run: |
+          if (-not (Test-Path _pro/separations/Cargo.toml)) { throw "dtf-craft-pro: separations/Cargo.toml manquant" }
+          Remove-Item -Recurse -Force crates/separations
+          Copy-Item -Recurse _pro/separations crates/separations
+          Remove-Item -Recurse -Force _pro
+          Write-Host "::notice title=Module Séparations::module privé (version officielle)"
       - name: Rust toolchain
         run: rustup toolchain install stable --profile minimal && rustup default stable
       - uses: Swatinem/rust-cache@v2
@@ -40,6 +62,7 @@ jobs:
         run: |
           cargo test --release -p photocraft-algo --lib -- dtf upscale
           cargo test --release -p photocraft-engine --lib dtf_cmds
+          cargo test --release -p photocraft-separations
       - name: Build
         run: cargo build --release -p photocraft -p photocraft-cli
       - name: Package

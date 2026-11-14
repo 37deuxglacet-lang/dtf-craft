@@ -28,6 +28,8 @@ pub const TOP_MENUS: [&str; 11] = ["File", "Edit", "Image", "Layer", "Type", "Se
 /// UI-level commands (handled by the shell rather than the engine): id, label, menu, shortcut.
 pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.symmetryTransform", "Transform Symmetry", &[], None),
+    // DTF Craft: DTF › Screen Printing Separations (listed in the DTF menu by `menu_catalog`).
+    ("dtf.separations", "Screen Printing Separations…", &[], None),
     // Right-click the options bar's tool icon (#2825); `tool.resetAll` asks first.
     ("tool.reset", "Reset Tool", &[], None),
     ("tool.resetAll", "Reset All Tools", &[], None),
@@ -283,6 +285,10 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     }
     // DTF › Gang Sheet dialog (DTF Craft) and its control params.
     if let Some(r) = crate::gang_sheet_ui::menu(app, ctx, id, &params) {
+        return r;
+    }
+    // DTF › Screen Printing Separations (DTF Craft).
+    if let Some(r) = crate::separations_ui::menu(app, id, &params) {
         return r;
     }
     if let Some(profile) = proof_preset(id) {

@@ -124,6 +124,8 @@ pub mod layer_tree_ui;
 mod layout_keys;
 pub mod links;
 pub mod gang_sheet_ui;
+/// DTF Craft: DTF › Screen Printing Separations (the subscription module or its placeholder).
+pub mod separations_ui;
 /// DTF Craft: the start screen's strip of Stéphane Glacet's sites.
 pub mod offers;
 /// DTF Craft: the start screen's background illustration, from Pixabay.
@@ -706,6 +708,8 @@ pub struct PhotocraftApp {
     pub(crate) wide_angle: Option<wide_angle_ui::WideAngleDialog>,
     /// DTF › Gang Sheet dialog (gang_sheet_ui, DTF Craft).
     pub(crate) gang_sheet: Option<gang_sheet_ui::GangSheetDialog>,
+    /// DTF › Screen Printing Separations (separations_ui, DTF Craft), while it is open.
+    pub(crate) separations: Option<photocraft_separations::Separations>,
     /// DTF Craft: the start screen's Pixabay illustration.
     pub(crate) home_image: home_image::HomeImage,
     /// ⌘Z history of each open parameter dialog (edit_history).
@@ -904,6 +908,7 @@ impl PhotocraftApp {
             raw_redevelop: None,
             wide_angle: None,
             gang_sheet: None,
+            separations: None,
             home_image: home_image::HomeImage::default(),
             dialog_edits: Default::default(),
             pending_after_prompt: None,
@@ -1928,6 +1933,7 @@ impl eframe::App for PhotocraftApp {
         dtf_panel::poll_vectorize(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         gang_sheet_ui::show(self, &ctx);
+        separations_ui::show(self, &ctx);
         canvas::extra_windows(self, &ctx);
         notices::show(self, &ctx);
         gpu_status::show_fallback(self, &ctx);

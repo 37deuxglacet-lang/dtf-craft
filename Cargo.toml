@@ -36,6 +36,9 @@ photocraft-engine = { path = "crates/engine" }
 photocraft-ui-egui = { path = "crates/ui-egui" }
 photocraft-testkit = { path = "crates/testkit" }
 photocraft-tablet = { path = "crates/tablet" }
+# DTF Craft: the Screen Printing Separations module (public placeholder; the official build
+# replaces crates/separations with the private subscription module).
+photocraft-separations = { path = "crates/separations" }
 
 # external
 craft-print = { git = "https://github.com/storytold/craft-libs", rev = "3d37da389a3618ab9b76109da11416e9ca4ea719" }

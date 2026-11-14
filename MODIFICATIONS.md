@@ -7,7 +7,7 @@ lists every file changed from that base. Modified Rust source files also carry a
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (86)
+## Modified (88)
 
 - `Cargo.lock`
 - `LICENSE-MIT`
@@ -95,8 +95,10 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `apps/photocraft-cli/tests/cli.rs`
 - `crates/engine/src/build_info.rs`
 - `crates/io/src/svg.rs`
+- `crates/ui-egui/Cargo.toml`
+- `xtask/src/layers.rs`
 
-## Added (34)
+## Added (36)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -130,6 +132,8 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/ui-egui/src/home_image.rs`
 - `crates/algo/src/vectorize_vc.rs`
 - `crates/ui-egui/src/offers.rs`
+- `crates/separations/` (DTF › Screen Printing Separations: public placeholder of the subscription module)
+- `crates/ui-egui/src/separations_ui.rs`
 - `crates/vectorcraft-geom/` (copied unchanged from VectorCraft, see below)
 - `crates/vectorcraft-trace/` (copied unchanged from VectorCraft, see below)
 
