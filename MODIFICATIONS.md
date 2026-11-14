@@ -96,7 +96,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/engine/src/build_info.rs`
 - `crates/io/src/svg.rs`
 
-## Added (34)
+## Added (35)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -114,6 +114,7 @@ All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the or
 - `crates/algo/src/vectorize.rs`
 - `crates/engine/src/dtf_cmds.rs`
 - `crates/engine/src/gang_sheet_cmds.rs`
+- `crates/ui-egui/src/dtf_halftone_ui.rs`
 - `crates/ui-egui/src/dtf_help.rs`
 - `crates/ui-egui/src/dtf_panel.rs`
 - `crates/ui-egui/src/dtf_upscale_gpu_tests.rs`

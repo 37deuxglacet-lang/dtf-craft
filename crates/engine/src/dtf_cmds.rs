@@ -10,7 +10,7 @@
 //! Both run through [`crate::filters::run_filter`], so selections, smart objects (as smart
 //! filters), history and the schema dialog with live preview work as for every other filter.
 
-use photocraft_algo::dtf::{CutoutSpec, HalftoneSpec, HalftoneTarget};
+use photocraft_algo::dtf::{CutoutSpec, HalftoneRecipe, HalftoneSpec, HalftoneTarget};
 use photocraft_algo::FilterParams;
 use photocraft_algo::quantize::HalftoneShape;
 use serde_json::{Value, json};
@@ -60,6 +60,7 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
                 low: (num(p, "inBlack", 0.0).clamp(0.0, 255.0) / 255.0) as f32,
                 high: (num(p, "inWhite", 255.0).clamp(0.0, 255.0) / 255.0) as f32,
                 gamma: num(p, "gamma", 1.0).clamp(0.1, 9.99) as f32,
+                recipe: HalftoneRecipe::from_id(text(p, "preset", "none")),
             };
             Some(FilterParams::DtfHalftone { spec })
         }
@@ -162,6 +163,21 @@ pub fn halftone_background(mode: &str) -> Option<&'static str> {
     }
 }
 
+/// The automatic halftones (`preset`), after the Photoshop actions: (id, lines per inch, angle,
+/// shape, control fill). The dots print from 0 to 100 % (no minimum or maximum dot), as in
+/// Photoshop's Bitmap conversion.
+pub const HALFTONE_PRESETS: [(&str, f64, f64, &str, Option<&str>); 5] = [
+    ("teeBlack", 25.0, 22.0, "round", Some("#000000")),
+    ("teeBlackSoft", 25.0, 22.0, "round", Some("#000000")),
+    ("teeWhite", 25.0, 22.0, "round", Some("#ffffff")),
+    ("blackWhite", 55.0, 22.0, "round", Some("#000000")),
+    ("uniform", 25.0, 22.0, "round", None),
+];
+
+/// The group of retouching layers an automatic halftone can add, hidden, above the screened
+/// copy (as the actions' "RasterFx"): Brightness/Contrast +32, Hue/Saturation +16.
+pub const RASTER_FX_GROUP: &str = "RasterFx";
+
 fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     check_range(HALFTONE, p, "frequency", 1.0, 300.0)?;
     check_range(HALFTONE, p, "angle", -180.0, 180.0)?;
@@ -174,6 +190,19 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     check_choice(HALFTONE, p, "mode", &["semiTransparent", "darkGarment", "lightGarment"])?;
     // `target` is the first version's name for the mode ("alpha" = semi-transparent only).
     check_choice(HALFTONE, p, "target", &["alpha", "semiTransparent", "darkGarment", "lightGarment"])?;
+    check_choice(HALFTONE, p, "preset", &["none", "teeBlack", "teeBlackSoft", "teeWhite", "blackWhite", "uniform"])?;
+    let preset = HALFTONE_PRESETS.iter().find(|r| Some(r.0) == p.get("preset").and_then(Value::as_str)).copied();
+    // An automatic halftone brings its own screen.
+    let mut p = if p.is_object() { p.clone() } else { json!({}) };
+    if let (Some((_, lpi, angle, shape, _)), Value::Object(m)) = (preset, &mut p) {
+        m.insert("frequency".into(), json!(lpi));
+        m.insert("angle".into(), json!(angle));
+        m.insert("shape".into(), json!(shape));
+        m.insert("minDot".into(), json!(0));
+        m.insert("maxDot".into(), json!(100));
+    }
+    let raster_fx = preset.is_some() && p.get("rasterFx").and_then(Value::as_bool) == Some(true);
+    let p = &p;
     let st = s.active().ok_or(EngineError::NoDocument)?;
     let dpi = f64::from(st.doc.resolution_dpi).max(1.0);
     let source = st.active_layer.ok_or_else(|| EngineError::Other("select the layer to screen".into()))?;
@@ -192,7 +221,10 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
         m.insert("mode".into(), json!(mode));
         m.insert("__cellPx".into(), json!(dpi / lpi));
     }
-    let background = halftone_background(p2.get("mode").and_then(Value::as_str).unwrap_or("semiTransparent"));
+    let background = match preset {
+        Some((.., fill)) => fill,
+        None => halftone_background(p2.get("mode").and_then(Value::as_str).unwrap_or("semiTransparent")),
+    };
     // The layers first, as one step: a copy of the visual named "Halftone" (over a control fill
     // for a garment), in the "Halftone DTF" group above the source, hidden but left untouched.
     let screened = s.keeping_background(|s| crate::analysis_cmds::compound(s, HALFTONE_GROUP, |s| {
@@ -215,6 +247,10 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
         s.execute("layer.groupLayers", json!({"name": HALFTONE_GROUP}))?;
         s.execute("layer.setProps", json!({"layer": source.0, "visible": false}))?;
         s.execute("layer.select", json!({"layer": copy.0}))?;
+        if raster_fx {
+            raster_fx_group(s)?;
+            s.execute("layer.select", json!({"layer": copy.0}))?;
+        }
         Ok(copy)
     }))?;
     // Then the screen on the copy (a background job in the app, like every filter).
@@ -222,6 +258,29 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
         m.insert("layer".into(), json!(screened.0));
     }
     crate::filters::run_filter(s, HALFTONE, &p2)
+}
+
+/// The hidden "RasterFx" group above the active (screened) layer: Brightness/Contrast +32 and
+/// Hue/Saturation +16, covering the canvas (no mask from a selection).
+fn raster_fx_group(s: &mut Session) -> Result<()> {
+    let mut made = Vec::new();
+    for (cmd, params) in [
+        ("layer.newAdjustmentLayer.brightnessContrast", json!({"brightness": 32, "contrast": 0, "legacy": false})),
+        ("layer.newAdjustmentLayer.hueSaturation", json!({"hue": 0, "saturation": 16, "lightness": 0})),
+    ] {
+        s.execute(cmd, params)?;
+        let id = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+        if s.active().and_then(|d| d.doc.layer(id)).is_some_and(|l| l.mask.is_some()) {
+            s.execute("layer.layerMask.delete", json!({}))?;
+        }
+        made.push(id);
+    }
+    s.execute("layer.select", json!({"layer": made[0].0}))?;
+    s.execute("layer.select", json!({"layer": made[1].0, "mode": "add"}))?;
+    s.execute("layer.groupLayers", json!({"name": RASTER_FX_GROUP}))?;
+    let group = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+    s.execute("layer.setProps", json!({"layer": group.0, "visible": false}))?;
+    Ok(())
 }
 
 fn remove_semi(s: &mut Session, p: &Value) -> Result<Value> {
@@ -819,7 +878,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "DTF Halftone…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone", over a "Fond de contrôle" fill for a garment (#231c1c dark, #ffffff light; none for the semi-transparent pixels); the source layer is hidden, unchanged"##,
+            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1,"preset":"none|teeBlack|teeBlackSoft|teeWhite|blackWhite|uniform"="none" (an automatic halftone after the Photoshop actions, replacing the settings above: black tee (Levels twice), soft black tee (once), white tee, black and white (55 lpi, white dots), uniform screen),"rasterFx":bool=false (with a preset: a hidden "RasterFx" group of Brightness/Contrast +32 and Hue/Saturation +16 above the screened copy)} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone", over a "Fond de contrôle" fill for a garment (#231c1c dark, #ffffff light; none for the semi-transparent pixels); the source layer is hidden, unchanged"##,
             enabled: crate::filters::has_filterable_layer,
             run: halftone,
             journal: true,
@@ -947,6 +1006,46 @@ mod tests {
                 assert_eq!(format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2]), hex, "{mode}");
             }
         }
+    }
+
+    /// An automatic halftone: its own screen (whatever the settings given), its control fill,
+    /// and on request the hidden "RasterFx" group of retouching layers above the screened copy.
+    #[test]
+    fn halftone_presets_bring_their_screen_fill_and_retouch_layers() {
+        for (preset, fill) in [("teeBlack", Some("#000000")), ("teeBlackSoft", Some("#000000")), ("teeWhite", Some("#ffffff")), ("blackWhite", Some("#000000")), ("uniform", None)] {
+            let mut s = session_with_ramp();
+            // The manual settings given alongside are ignored.
+            s.execute(HALFTONE, json!({"preset": preset, "frequency": 300, "minDot": 50, "rasterFx": true})).unwrap();
+            let d = s.active().unwrap();
+            let layers = d.doc.walk();
+            let found = layers.iter().find(|(_, _, l)| l.name == HALFTONE_BACKGROUND).map(|(_, _, l)| (*l).clone());
+            assert_eq!(found.is_some(), fill.is_some(), "{preset}");
+            if let (Some(l), Some(hex)) = (found, fill) {
+                let photocraft_doc::LayerContent::Fill(photocraft_doc::Fill::Solid(c)) = &l.content else { panic!("{preset}: not a solid fill") };
+                let rgb = [0, 1, 2].map(|i| (c.c[i] * 255.0).round() as u8);
+                assert_eq!(format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2]), hex, "{preset}");
+            }
+            // RasterFx: hidden, holding Brightness/Contrast +32 and Hue/Saturation +16.
+            let (_, _, fx) = layers.iter().find(|(_, _, l)| l.name == RASTER_FX_GROUP).unwrap_or_else(|| panic!("{preset}: no RasterFx"));
+            assert!(!fx.visible, "{preset}: RasterFx hidden");
+            let adjustments: Vec<_> = layers.iter().filter_map(|(_, _, l)| match &l.content {
+                photocraft_doc::LayerContent::Adjustment(a) => Some(a.clone()),
+                _ => None,
+            }).collect();
+            assert!(adjustments.iter().any(|a| matches!(a, photocraft_doc::Adjustment::BrightnessContrast { brightness, contrast, .. } if (*brightness - 32.0).abs() < 1e-6 && contrast.abs() < 1e-6)), "{preset}: {adjustments:?}");
+            assert!(format!("{adjustments:?}").contains("16"), "{preset}: saturation +16 in {adjustments:?}");
+            // The screened copy is the active layer, binary; at 25 lpi (12 px cells at 300 ppi)
+            // some pixels print, at 300 lpi (1 px) the screen would be gone.
+            assert_eq!(d.doc.layer(d.active_layer.unwrap()).unwrap().name, HALFTONE_LAYER, "{preset}");
+            let a = alphas(&s);
+            assert!(a.iter().all(|v| *v == 0.0 || *v == 1.0), "{preset}");
+            assert!(a.contains(&1.0), "{preset}: something prints");
+        }
+        // Without a preset, rasterFx adds nothing.
+        let mut s = session_with_ramp();
+        s.execute(HALFTONE, json!({"mode": "darkGarment", "rasterFx": true})).unwrap();
+        assert!(!s.active().unwrap().doc.walk().iter().any(|(_, _, l)| l.name == RASTER_FX_GROUP));
+        assert!(s.execute(HALFTONE, json!({"preset": "nope"})).is_err());
     }
 
     /// A white 30 × 20 picture (as a JPEG opens: a Background layer) with a black square.

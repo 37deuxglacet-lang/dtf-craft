@@ -44,6 +44,66 @@ impl HalftoneTarget {
     }
 }
 
+/// The automatic halftones, after Stéphane Glacet's Photoshop actions (RasterMe series). Each
+/// builds a grey image from the visual (Photoshop's Desaturate lightness, `(max + min) / 2`),
+/// optionally negated and put through Levels, screened in Bitmap mode (black dots on white);
+/// the black dots are where the visual prints:
+///
+/// * `TeeBlack` (tee black 1): negative, Levels 50–240 γ 0.5 twice.
+/// * `TeeBlackSoft` (tee black 2): negative, the same Levels once.
+/// * `TeeWhite` (tee blanc): no negative, the Levels twice.
+/// * `BlackWhite` (Noir et Blanc): negative, no Levels; the dots print white.
+/// * `Uniform`: a black fill through Levels 0–185 → 20–255, an even screen over the visual.
+///
+/// The frequency, angle and shape come with the recipe (`dtf_cmds`); the alpha weighs the
+/// coverage, as the transparent areas fall on Photoshop's white when the image is flattened.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum HalftoneRecipe {
+    TeeBlack,
+    TeeBlackSoft,
+    TeeWhite,
+    BlackWhite,
+    Uniform,
+}
+
+impl HalftoneRecipe {
+    pub fn from_id(s: &str) -> Option<Self> {
+        Some(match s {
+            "teeBlack" => HalftoneRecipe::TeeBlack,
+            "teeBlackSoft" => HalftoneRecipe::TeeBlackSoft,
+            "teeWhite" => HalftoneRecipe::TeeWhite,
+            "blackWhite" => HalftoneRecipe::BlackWhite,
+            "uniform" => HalftoneRecipe::Uniform,
+            _ => return None,
+        })
+    }
+
+    /// The coverage (0–1) the recipe prints for an opaque `colour`.
+    pub fn coverage(self, colour: [f32; 4]) -> f32 {
+        let (r, g, b) = (colour[0].clamp(0.0, 1.0), colour[1].clamp(0.0, 1.0), colour[2].clamp(0.0, 1.0));
+        // Photoshop's Desaturate: the HSL lightness.
+        let l = (r.max(g).max(b) + r.min(g).min(b)) / 2.0;
+        // Levels: input 50–240, gamma 0.5 (Photoshop's output = input ^ (1 / gamma)).
+        let levels = |v: f32| ((v - 50.0 / 255.0) / (190.0 / 255.0)).clamp(0.0, 1.0).powi(2);
+        // The grey screened: black (0) gives a full dot.
+        let grey = match self {
+            HalftoneRecipe::TeeBlack => levels(levels(1.0 - l)),
+            HalftoneRecipe::TeeBlackSoft => levels(1.0 - l),
+            HalftoneRecipe::TeeWhite => levels(levels(l)),
+            HalftoneRecipe::BlackWhite => 1.0 - l,
+            // Black through Levels output 20–255.
+            HalftoneRecipe::Uniform => 20.0 / 255.0,
+        };
+        (1.0 - grey).clamp(0.0, 1.0)
+    }
+
+    /// Whether the dots print white (the visual's colours replaced), rather than in its colours.
+    pub fn white_dots(self) -> bool {
+        self == HalftoneRecipe::BlackWhite
+    }
+}
+
 /// DTF halftone settings (the filter's [`crate::FilterParams::DtfHalftone`] fields).
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -63,6 +123,9 @@ pub struct HalftoneSpec {
     pub high: f32,
     /// Gamma applied to the stretched coverage (1 = linear; < 1 darker dots, > 1 lighter).
     pub gamma: f32,
+    /// An automatic halftone: its coverage replaces the mode and the tone settings above.
+    #[serde(default)]
+    pub recipe: Option<HalftoneRecipe>,
 }
 
 impl Default for HalftoneSpec {
@@ -77,6 +140,7 @@ impl Default for HalftoneSpec {
             low: 0.0,
             high: 1.0,
             gamma: 1.0,
+            recipe: None,
         }
     }
 }
@@ -97,6 +161,9 @@ fn lightness(c: [f32; 4]) -> f32 {
 /// The coverage (0–1) a pixel should print with, before the min/max dot limits.
 pub fn coverage(spec: &HalftoneSpec, colour: [f32; 4], alpha: f32) -> f32 {
     let a = alpha.clamp(0.0, 1.0);
+    if let Some(recipe) = spec.recipe {
+        return a * recipe.coverage(colour);
+    }
     let raw = match spec.target {
         HalftoneTarget::Alpha => a,
         HalftoneTarget::DarkGarment => a * lightness(colour),
@@ -153,6 +220,10 @@ pub(crate) fn halftone(src: &Image, out: Rect, ctx: &Ctx, spec: &HalftoneSpec) -
             } else {
                 inside(spec, &table, sincos, fx, fy, cov)
             };
+            // Black and White: the dots print white.
+            if on && spec.recipe.is_some_and(HalftoneRecipe::white_dots) {
+                crate::fxutil::set_rgba(ctx, px, [1.0, 1.0, 1.0, 1.0]);
+            }
             if let Some(a) = px.last_mut() {
                 *a = if on { 1.0 } else { 0.0 };
             }
@@ -826,6 +897,47 @@ mod tests {
         // Opaque white: the reverse.
         assert_eq!(coverage(&dark, [1.0, 1.0, 1.0, 1.0], 1.0), 1.0);
         assert_eq!(coverage(&light, [1.0, 1.0, 1.0, 1.0], 1.0), 0.0);
+    }
+
+    /// The automatic halftones follow the Photoshop actions: on a black tee the light colours
+    /// print and the dark ones fade (Levels darken the negative: more dots), the reverse on a
+    /// white tee; Black and White prints the lightness in white; Uniform prints 92 % everywhere.
+    #[test]
+    fn recipes_follow_the_photoshop_actions() {
+        let cov = |r: HalftoneRecipe, v: f32| r.coverage([v, v, v, 1.0]);
+        let levels = |v: f32| ((v - 50.0 / 255.0) / (190.0 / 255.0)).clamp(0.0, 1.0).powi(2);
+        // White: solid on a black tee; black: nothing.
+        assert_eq!(cov(HalftoneRecipe::TeeBlack, 1.0), 1.0);
+        assert_eq!(cov(HalftoneRecipe::TeeBlack, 0.0), 0.0);
+        // Mid grey: the negative (0.5) through the Levels twice, then its dots.
+        let twice = 1.0 - levels(levels(0.5));
+        assert!((cov(HalftoneRecipe::TeeBlack, 0.5) - twice).abs() < 1e-6);
+        assert!((cov(HalftoneRecipe::TeeBlackSoft, 0.5) - (1.0 - levels(0.5))).abs() < 1e-6);
+        assert!(cov(HalftoneRecipe::TeeBlack, 0.5) > cov(HalftoneRecipe::TeeBlackSoft, 0.5), "twice the Levels: more ink");
+        // White tee: black prints, white doesn't.
+        assert_eq!(cov(HalftoneRecipe::TeeWhite, 0.0), 1.0);
+        assert_eq!(cov(HalftoneRecipe::TeeWhite, 1.0), 0.0);
+        // Black and White: the lightness, as is.
+        assert!((cov(HalftoneRecipe::BlackWhite, 0.3) - 0.3).abs() < 1e-6);
+        // The HSL lightness of pure red is 0.5 (Desaturate), not its luma.
+        assert!((HalftoneRecipe::BlackWhite.coverage([1.0, 0.0, 0.0, 1.0]) - 0.5).abs() < 1e-6);
+        // Uniform: 235 / 255 whatever the colour.
+        for v in [0.0, 0.4, 1.0] {
+            assert!((cov(HalftoneRecipe::Uniform, v) - 235.0 / 255.0).abs() < 1e-6);
+        }
+        // Half transparent: half the coverage.
+        let spec = HalftoneSpec { recipe: Some(HalftoneRecipe::TeeBlack), ..HalftoneSpec::default() };
+        assert!((coverage(&spec, [1.0, 1.0, 1.0, 0.5], 0.5) - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn black_and_white_prints_white_dots() {
+        let spec = HalftoneSpec { cell: 8.0, angle: 0.0, min_dot: 0.0, max_dot: 1.0, recipe: Some(HalftoneRecipe::BlackWhite), ..HalftoneSpec::default() };
+        let src = ramp([1.0, 0.0, 0.0]);
+        let out = halftone(&src, src.rect, &ctx(), &spec);
+        let printed: Vec<&[f32]> = out.chunks_exact(4).filter(|p| p[3] == 1.0).collect();
+        assert!(!printed.is_empty());
+        assert!(printed.iter().all(|p| p[0] == 1.0 && p[1] == 1.0 && p[2] == 1.0), "the dots are white");
     }
 
     #[test]

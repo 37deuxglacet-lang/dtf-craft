@@ -57,7 +57,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
         "filter.dtf.halftone" => Sheet {
             what: "Remplacer les zones semi-transparentes, ou tout le visuel, par une trame de points pleins. Le dégradé reste visible tout en s'imprimant en pixels opaques. Le résultat est un groupe « Halftone DTF » au-dessus du calque : le calque tramé « Halftone » sur un fond de contrôle ; le calque source est masqué et intact.",
             when: "Ombres douces, dégradés vers le vide, effets vintage ; pour un visuel entier tramé sur textile foncé ou clair.",
-            advice: "25 lpi, angle 22,5°, point rond, point minimal 5 %, maximal 95 %. Montez la fréquence pour une trame plus fine, baissez-la pour un effet plus marqué.",
+            advice: "Onglet Automatique : un préréglage par action Photoshop (T-shirt noir, T-shirt noir doux, T-shirt blanc, Noir et blanc, Uniforme). Onglet Manuel : 25 lpi, angle 22,5°, point rond, point minimal 5 %, maximal 95 %. Montez la fréquence pour une trame plus fine, baissez-la pour un effet plus marqué.",
         },
         "dtf.colorAnalyzer" => Sheet {
             what: "Relever les couleurs principales du visuel (RVB, profil sRGB, transparence ignorée) et trouver pour chacune la couleur la plus proche d'un nuancier que vous chargez (.ase, .aco, .csv). L'écart est donné en ΔE 2000. Dans « Couleurs remplacées », des patchs avec les références s'affichent à côté du visuel ; une fiche PDF A4 les reprend. L'export PNG remplace les couleurs cochées par celles du nuancier dans une copie, ouverte dans un nouvel onglet : le document n'est jamais modifié.",
@@ -81,6 +81,8 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         (_, "apply") => "Applique l'outil au calque actif. Annulable avec Édition › Annuler.",
         (_, "cancel") => "Arrête l'aperçu : l'image revient à son état actuel.",
         (_, "showBefore") => "Cochée : l'image d'origine. Décochée : le résultat de l'aperçu.",
+        (_, "lock") => "Les réglages sont verrouillés à l'ouverture de la fenêtre : l'outil s'applique tel quel. Cliquez pour les déverrouiller et déplacer les curseurs ; un second clic les verrouille.",
+        (_, "reset") => "Remet les valeurs d'usine de l'outil (fenêtre déverrouillée). Rien n'est enregistré avant Appliquer : Annuler garde les réglages précédents.",
         ("dtf.conformity", "width") => "Largeur d'impression du visuel, en cm. La hauteur suit les proportions. Saisir une valeur redimensionne l'image.",
         ("dtf.conformity", "height") => "Hauteur d'impression du visuel, en cm. La largeur suit les proportions. Saisir une valeur redimensionne l'image.",
         ("dtf.conformity", "resolution") => "Points par pouce à l'impression ; 300 ppp pour le DTF. La changer recalcule la largeur et la hauteur en cm : les pixels ne changent pas.",
@@ -110,6 +112,12 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("dtf.sharpen", "radius") => "Largeur, en px, de la zone accentuée autour de chaque contour. 0,5 à 2 px à 300 ppp.",
         ("dtf.sharpen", "reduceNoise") => "Limite l'accentuation du grain et des artefacts JPEG, en %.",
         ("dtf.saturation", "saturation") => "De −100 (noir et blanc) à +100. Valeur positive : couleurs plus vives ; négative : plus ternes.",
+        ("filter.dtf.halftone", "teeBlack") => "Pour textile noir (action « Rasterization tee black 1 ») : négatif du visuel désaturé, Niveaux 50–240 gamma 0,5 appliqués deux fois, trame 25 lpi, 22°, point rond. Les couleurs claires s'impriment pleines, les foncées s'effacent. Fond de contrôle noir.",
+        ("filter.dtf.halftone", "teeBlackSoft") => "Pour textile noir, plus doux (action « Rasterization tee black 2 ») : les mêmes Niveaux appliqués une seule fois, donc moins d'encre dans les tons moyens. Trame 25 lpi, 22°, point rond. Fond de contrôle noir.",
+        ("filter.dtf.halftone", "teeWhite") => "Pour textile blanc (action « Rasterization tee blanc ») : visuel désaturé sans négatif, Niveaux 50–240 gamma 0,5 deux fois, trame 25 lpi, 22°, point rond. Les couleurs foncées s'impriment pleines, les claires s'effacent. Fond de contrôle blanc.",
+        ("filter.dtf.halftone", "blackWhite") => "Noir et blanc (action « Rasterization Noir et Blanc ») : la clarté du visuel en points blancs, trame fine 55 lpi, 22°, point rond, sans Niveaux. Les couleurs du visuel sont remplacées par le blanc. Fond de contrôle noir.",
+        ("filter.dtf.halftone", "uniform") => "Trame uniforme (action « Rasterization uniforme ») : des points réguliers de 92 % sur tout le visuel, quelle que soit sa couleur ; 25 lpi, 22°, point rond. Pas de fond de contrôle.",
+        ("filter.dtf.halftone", "rasterFx") => "Ajoute, masqué, le groupe « RasterFx » de l'action : un calque Luminosité/Contraste +32 et un calque Teinte/Saturation +16 au-dessus du calque tramé. Affichez-le pour éclaircir et raviver les couleurs.",
         ("filter.dtf.halftone", "mode") => "Ce qui est tramé : les pixels semi-transparents seulement, ou le visuel entier selon sa luminosité pour un textile foncé ou clair.",
         ("filter.dtf.halftone", "frequency") => "Nombre de lignes de points par pouce (lpi), à la résolution du document. Plus haut : points plus petits et plus serrés.",
         ("filter.dtf.halftone", "angle") => "Inclinaison de la trame, en degrés. 22,5° ou 45° limitent l'effet d'escalier sur les lignes.",
@@ -126,25 +134,81 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
 /// The "?" button and, while it is on, the tool's sheet, at the top of its tab or dialog. The
 /// open state lives in the fields (`__help`).
 pub fn sheet_ui(ui: &mut egui::Ui, f: &mut Map<String, Value>, command: &str) {
+    // A DTF window with the lock bar draws the "?" and the sheet itself, above its settings.
+    if f.get(BAR).and_then(Value::as_bool) == Some(true) {
+        return;
+    }
     let mut open = f.get("__help").and_then(Value::as_bool).unwrap_or(false);
     sheet_toggle(ui, &mut open, command);
     f.insert("__help".into(), json!(open));
 }
 
+/// Set in a tool's fields when its window draws the "?" in its lock bar (`dtf_panel`):
+/// [`sheet_ui`] then leaves the button and the sheet to it.
+pub const BAR: &str = "__helpBar";
+
 /// The "?" button and, while `open`, the tool's sheet.
 pub fn sheet_toggle(ui: &mut egui::Ui, open: &mut bool, command: &str) {
-    let Some(sheet) = sheet(command) else { return };
-    let t = Tokens::get(ui.ctx());
-    // One row's height: a right-to-left layout alone would take the whole tab's height.
-    ui.allocate_ui_with_layout(egui::vec2(ui.available_width(), 22.0), egui::Layout::right_to_left(egui::Align::Center), |ui| {
-        let b = egui::Button::new(RichText::new("?").strong()).selected(*open).min_size(egui::vec2(22.0, 20.0));
-        if ui.add(b).on_hover_text(if *open { "Masquer l'aide" } else { "Aide de l'outil" }).clicked() {
-            *open = !*open;
-        }
-    });
-    if !*open {
+    if sheet(command).is_none() {
         return;
     }
+    // One row's height: a right-to-left layout alone would take the whole tab's height.
+    ui.allocate_ui_with_layout(egui::vec2(ui.available_width(), 22.0), egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        sheet_button(ui, open, command);
+    });
+    if *open {
+        sheet_content(ui, command);
+    }
+}
+
+/// The "?" button alone: pressed while the sheet is open.
+pub fn sheet_button(ui: &mut egui::Ui, open: &mut bool, command: &str) {
+    if sheet(command).is_none() {
+        return;
+    }
+    let b = egui::Button::new(RichText::new("?").strong()).selected(*open).min_size(egui::vec2(22.0, 20.0));
+    if ui.add(b).on_hover_text(if *open { "Masquer l'aide" } else { "Aide de l'outil" }).clicked() {
+        *open = !*open;
+    }
+}
+
+/// The lock row of a DTF window: the lock (pressed while unlocked), Reset (usable only unlocked)
+/// and the "?" on the right. True when Reset was clicked, unlocked.
+pub fn lock_row(ui: &mut egui::Ui, command: &str, unlocked: &mut bool, open: &mut bool) -> bool {
+    let t = Tokens::get(ui.ctx());
+    let mut reset = false;
+    ui.allocate_ui_with_layout(egui::vec2(ui.available_width(), 24.0), egui::Layout::left_to_right(egui::Align::Center), |ui| {
+        let tint = if *unlocked { ui.visuals().selection.stroke.color } else { t.text };
+        let (icon, label) = if *unlocked { ("lock-open", tl!("Unlocked")) } else { ("lock", tl!("Locked")) };
+        let lock = egui::Button::image_and_text(crate::icons::image(icon, 14.0, tint), RichText::new(label).color(tint)).selected(*unlocked);
+        let r = ui.add(lock);
+        let r = match tip(command, "lock") {
+            Some(text) => r.on_hover_text(text),
+            None => r,
+        };
+        if r.clicked() {
+            *unlocked = !*unlocked;
+        }
+        let on = *unlocked;
+        ui.add_enabled_ui(on, |ui| {
+            let r = ui.add(egui::Button::image_and_text(crate::icons::image("undo-2", 14.0, t.text), tl!("Reset")));
+            let r = match tip(command, "reset") {
+                Some(text) => r.on_hover_text(text).on_disabled_hover_text(text),
+                None => r,
+            };
+            reset = r.clicked() && on;
+        });
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            sheet_button(ui, open, command);
+        });
+    });
+    reset
+}
+
+/// The tool's sheet: what it is for, when to use it, the advised settings and the links.
+pub fn sheet_content(ui: &mut egui::Ui, command: &str) {
+    let Some(sheet) = sheet(command) else { return };
+    let t = Tokens::get(ui.ctx());
     egui::Frame::group(ui.style()).fill(t.card).show(ui, |ui| {
         ui.set_width(ui.available_width());
         for (title, text) in [("À quoi ça sert", sheet.what), ("Quand l'utiliser", sheet.when), ("Réglages conseillés", sheet.advice)] {
@@ -168,5 +232,6 @@ pub fn tip_over(ui: &mut egui::Ui, command: &str, key: &str, top: f32) {
     }
     let rect = egui::Rect::from_x_y_ranges(ui.max_rect().x_range(), top..=bottom);
     let id = ui.id().with(("dtf-help-tip", command, key));
-    ui.interact(rect, id, egui::Sense::hover()).on_hover_text(text);
+    // Also over locked (disabled) settings.
+    ui.interact(rect, id, egui::Sense::hover()).on_hover_text(text).on_disabled_hover_text(text);
 }

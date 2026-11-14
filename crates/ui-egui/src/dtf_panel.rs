@@ -34,6 +34,17 @@ pub const TOOLS: [&str; 7] = [
 /// The tabs' labels (and dock panel names), in [`TOOLS`] order.
 pub const TABS: [&str; 7] = ["Conformity", "Cutout", "Control Background", "Transparent Pixels", "Remove Fringe", "Sharpness", "Saturation"];
 
+/// The windows whose settings open locked, with the lock bar (lock, Reset, "?"): every tool but
+/// Print Conformity.
+const LOCKABLE: [&str; 6] = [
+    "filter.dtf.removeWhiteBackground",
+    "dtf.controlBackground",
+    "filter.dtf.removeSemiTransparent",
+    "dtf.defringe",
+    "dtf.sharpen",
+    "dtf.saturation",
+];
+
 /// Tools applied on Apply only: Print Conformity resizes the image.
 const WITHOUT_PREVIEW: [&str; 1] = ["dtf.conformity"];
 
@@ -106,6 +117,9 @@ pub struct DtfPanelUi {
     /// The DTF tool whose window is open (its command id).
     #[serde(skip)]
     pub window: Option<String>,
+    /// The open window's settings are unlocked (its lock clicked): each window opens locked.
+    #[serde(skip)]
+    pub unlocked: bool,
 }
 
 /// The layout version DTF Craft last set up (remembered with the preferences): raising it
@@ -237,6 +251,34 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
             crate::notices::error(app, error);
         }
     }
+}
+
+/// Reset: the tool's factory settings (its schema defaults), over `f`. The cut-out's holes stay
+/// (they belong to the image), as does its preview colour (the last colour picked).
+fn factory_settings(app: &PhotocraftApp, command: &str, f: &mut Map<String, Value>) {
+    let Some(spec) = photocraft_engine::commands::find(command) else { return };
+    for p in crate::filter_dialog::parse_spec(spec.params) {
+        if p.key == HOLES {
+            continue;
+        }
+        if let Some(v) = crate::filter_dialog::default_value(app, command, &p) {
+            f.insert(p.key.clone(), v);
+        }
+    }
+}
+
+/// The lock bar at the top of a lockable window (`dtf_help::lock_row`), the tool's sheet under it
+/// while the "?" is on. True when Reset was clicked (unlocked).
+fn lock_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui, cmd: &str, f: &mut Map<String, Value>) -> bool {
+    let mut unlocked = app.ui.dtf_panel.unlocked;
+    let mut open = f.get("__help").and_then(Value::as_bool).unwrap_or(false);
+    let reset = crate::dtf_help::lock_row(ui, cmd, &mut unlocked, &mut open);
+    app.ui.dtf_panel.unlocked = unlocked;
+    f.insert("__help".into(), json!(open));
+    if open {
+        crate::dtf_help::sheet_content(ui, cmd);
+    }
+    reset
 }
 
 /// A colour row (Control Background's colour, the cut-out's preview colour): a swatch with egui's
@@ -631,6 +673,8 @@ pub fn open_window(app: &mut PhotocraftApp, cmd: &str) {
         app.ui.dtf_panel.fields.insert(cmd.to_string(), f);
     }
     app.ui.dtf_panel.window = Some(cmd.to_string());
+    // Each window opens with its settings locked.
+    app.ui.dtf_panel.unlocked = false;
     let auto = RETOUCH.contains(&cmd) || cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE;
     if auto && app.session.active().is_some() && app.session.is_enabled(cmd) {
         app.ui.dtf_panel.previewing = Some(cmd.to_string());
@@ -905,17 +949,26 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         f.insert("previewColor".into(), json!(color.unwrap_or_else(|| PREVIEW_COLOR.to_string())));
     }
     let before = f.clone();
+    // The lock bar: the settings below are greyed until the lock is clicked; Reset brings the
+    // factory values (previewed, saved only by Apply).
+    let lockable = LOCKABLE.contains(&cmd);
+    if lockable {
+        f.insert(crate::dtf_help::BAR.into(), json!(true));
+        if lock_bar(app, ui, cmd, &mut f) {
+            factory_settings(app, cmd, &mut f);
+        }
+    }
+    let locked = lockable && !app.ui.dtf_panel.unlocked;
     if cmd == "dtf.controlBackground" {
         crate::dtf_help::sheet_ui(ui, &mut f, cmd);
         let top = ui.cursor().top();
-        if color_row(ui, &mut f, "color", &crate::filter_dialog::label("color"))
-            && let Some(hex) = f.get("color").and_then(Value::as_str).map(str::to_string)
-        {
+        let picked = ui.add_enabled_ui(!locked, |ui| color_row(ui, &mut f, "color", &crate::filter_dialog::label("color"))).inner;
+        if picked && let Some(hex) = f.get("color").and_then(Value::as_str).map(str::to_string) {
             set_last_color(app, &hex);
         }
         crate::dtf_help::tip_over(ui, cmd, "color", top);
     } else {
-        crate::filter_dialog::body(ui, &mut f);
+        ui.add_enabled_ui(!locked, |ui| crate::filter_dialog::body(ui, &mut f));
     }
     let mut upscaled = false;
     if cmd == "dtf.conformity" {
@@ -936,15 +989,17 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         }
         // The control colour the cut-out previews on (the garment's).
         let top = ui.cursor().top();
-        if color_row(ui, &mut f, "previewColor", tl!("Preview Background"))
-            && let Some(hex) = f.get("previewColor").and_then(Value::as_str).map(str::to_string)
-        {
+        let picked = ui.add_enabled_ui(!locked, |ui| color_row(ui, &mut f, "previewColor", tl!("Preview Background"))).inner;
+        if picked && let Some(hex) = f.get("previewColor").and_then(Value::as_str).map(str::to_string) {
             set_last_color(app, &hex);
         }
         crate::dtf_help::tip_over(ui, cmd, "previewColor", top);
         // The background colour taken from the image with the eyedropper: a toggle button,
-        // exclusive with Add Holes (below).
-        ui.add_enabled_ui(have_doc, |ui| {
+        // exclusive with Add Holes (below). It changes a setting: locked with them.
+        if locked {
+            picker = false;
+        }
+        ui.add_enabled_ui(have_doc && !locked, |ui| {
             if help(mode_button(ui, "pipette", tl!("Pick the Background Colour"), picker), cmd, "backgroundPicker").clicked() {
                 picker = !picker;
                 eraser &= !picker;
@@ -1151,7 +1206,7 @@ mod tests {
         assert_eq!(f.get("trim"), Some(&json!(true)));
         let ht = parse_spec(photocraft_engine::commands::find("filter.dtf.halftone").unwrap().params);
         let keys: Vec<&str> = ht.iter().map(|p| p.key.as_str()).collect();
-        assert_eq!(keys, ["mode", "frequency", "angle", "shape", "minDot", "maxDot", "inBlack", "inWhite", "gamma"]);
+        assert_eq!(keys, ["mode", "frequency", "angle", "shape", "minDot", "maxDot", "inBlack", "inWhite", "gamma", "preset", "rasterFx"]);
         assert!(matches!(&ht[1].kind, Kind::Range { default, .. } if *default == 25.0));
         let up = parse_spec(photocraft_engine::commands::find("dtf.upscale").unwrap().params);
         assert!(up.iter().any(|p| p.key == "keepPrintSize" && p.kind == Kind::Bool(true)), "{up:?}");
@@ -1578,22 +1633,88 @@ mod tests {
         for _ in 0..90 {
             h.run_steps(1);
         }
-        assert!(h.query_by_label_contains("De −100").is_some(), "the setting's tooltip shows");
-        let before = h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap();
-        h.event(egui::Event::PointerButton { pos: from, button: egui::PointerButton::Primary, pressed: true, modifiers: egui::Modifiers::NONE });
-        h.run_steps(1);
-        for k in 1..=8 {
-            h.event(egui::Event::PointerMoved(from + (to - from) * (k as f32 / 8.0)));
+        assert!(h.query_by_label_contains("De −100").is_some(), "the setting's tooltip shows, the settings locked");
+        let drag = |h: &mut egui_kittest::Harness<'static, PhotocraftApp>| {
+            h.event(egui::Event::PointerMoved(from));
             h.run_steps(1);
-        }
-        h.event(egui::Event::PointerButton { pos: to, button: egui::PointerButton::Primary, pressed: false, modifiers: egui::Modifiers::NONE });
+            h.event(egui::Event::PointerButton { pos: from, button: egui::PointerButton::Primary, pressed: true, modifiers: egui::Modifiers::NONE });
+            h.run_steps(1);
+            for k in 1..=8 {
+                h.event(egui::Event::PointerMoved(from + (to - from) * (k as f32 / 8.0)));
+                h.run_steps(1);
+            }
+            h.event(egui::Event::PointerButton { pos: to, button: egui::PointerButton::Primary, pressed: false, modifiers: egui::Modifiers::NONE });
+            h.run_steps(2);
+            h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap()
+        };
+        let before = h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap();
+        // Locked (the window opens so): the slider doesn't move.
+        assert_eq!(drag(&mut h), before, "a locked setting stays");
+        h.get_by_label("Locked").click();
         h.run_steps(2);
-        let after = h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap();
-        assert!(after < before - 50.0, "the slider drags under its tooltip: {before} → {after}");
+        assert!(h.state().ui.dtf_panel.unlocked);
+        let after = drag(&mut h);
+        assert!(after < before - 50.0, "unlocked, the slider drags under its tooltip: {before} → {after}");
         assert!(h.query_by_label_contains("Renforcer ou atténuer").is_none(), "the sheet starts closed");
         h.get_by_label("?").click();
         h.run_steps(2);
         assert!(h.query_by_label_contains("Renforcer ou atténuer").is_some(), "the sheet opens");
+    }
+
+    /// Every tool window but Print Conformity opens locked; Reset (unlocked only) brings the
+    /// factory values, previewed and saved only by Apply; the cut-out's eyedropper locks, its
+    /// holes don't.
+    #[test]
+    fn the_windows_open_locked_and_reset_brings_the_factory_values() {
+        use egui_kittest::kittest::Queryable;
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
+        app.session.prefs.edit(|prefs| prefs.dialogs.insert("dtf.saturation".into(), json!({"saturation": 40})));
+        open_window(&mut app, "dtf.saturation");
+        let mut h = tabs_harness(app, move |ui, app| {
+            if let Some(cmd) = app.ui.dtf_panel.window.clone() {
+                tool_body(app, ui, tab_of(&cmd));
+            }
+        });
+        h.run_steps(4);
+        let value = |h: &egui_kittest::Harness<'static, PhotocraftApp>| h.state().ui.dtf_panel.fields["dtf.saturation"]["saturation"].as_f64().unwrap();
+        assert_eq!(value(&h), 40.0, "the last values applied");
+        assert!(!h.state().ui.dtf_panel.unlocked);
+        // Locked: Reset does nothing.
+        h.get_by_label("Reset").click();
+        h.run_steps(2);
+        assert_eq!(value(&h), 40.0);
+        h.get_by_label("Locked").click();
+        h.run_steps(2);
+        assert!(h.query_by_label("Unlocked").is_some(), "the lock shows the window unlocked");
+        h.get_by_label("Reset").click();
+        h.run_steps(2);
+        assert_eq!(value(&h), 15.0, "the factory value");
+        assert_eq!(h.state().ui.dtf_panel.previewing.as_deref(), Some("dtf.saturation"), "previewed");
+        let saved = h.state().session.prefs().dialogs.get("dtf.saturation").cloned();
+        assert_eq!(saved, Some(json!({"saturation": 40})), "saved only by Apply");
+        // Opened again: locked again.
+        close_window(h.state_mut());
+        open_window(h.state_mut(), "dtf.saturation");
+        h.run_steps(2);
+        assert!(!h.state().ui.dtf_panel.unlocked);
+        assert!(h.query_by_label("Locked").is_some());
+        // Print Conformity: no lock.
+        close_window(h.state_mut());
+        open_window(h.state_mut(), "dtf.conformity");
+        h.run_steps(3);
+        assert!(h.query_by_label("Locked").is_none() && h.query_by_label("Unlocked").is_none(), "Print Conformity has no lock");
+        // The cut-out, locked: the eyedropper is greyed, Add Holes works.
+        close_window(h.state_mut());
+        open_window(h.state_mut(), photocraft_engine::dtf_cmds::REMOVE_WHITE);
+        h.run_steps(3);
+        h.get_by_label("Pick the Background Colour").click();
+        h.run_steps(2);
+        assert!(h.state().ui.dtf_panel.background_picker.is_none(), "the eyedropper is locked");
+        h.get_by_label("Add Holes").click();
+        h.run_steps(2);
+        assert!(h.state().ui.dtf_panel.hole_eraser.is_some(), "Add Holes stays usable");
+        close_window(h.state_mut());
     }
 
     /// The cut-out previews on the last colour picked, here or in Control Background.
@@ -1757,6 +1878,14 @@ mod tests {
         let mut halftoned = visual();
         halftoned.execute("filter.dtf.halftone", json!({"mode": "semiTransparent", "frequency": 25})).unwrap();
         shot(halftoned, "halftone", &|_| {});
+        // DTF Halftone's dialog: the Automatic tab (presets), then Manual (locked).
+        shot(visual(), "halftone_auto", &|app| {
+            let _ = crate::filter_dialog::open(app, photocraft_engine::dtf_cmds::HALFTONE);
+        });
+        shot(visual(), "halftone_manuel", &|app| {
+            app.session.prefs.edit(|p| p.dialogs.insert(photocraft_engine::dtf_cmds::HALFTONE.into(), json!({"preset": "none"})));
+            let _ = crate::filter_dialog::open(app, photocraft_engine::dtf_cmds::HALFTONE);
+        });
         // The Color Analyzer on a flat-colour logo, with a fictitious swatch book.
         let logo = || {
             let mut s = photocraft_engine::Session::new();
