@@ -3161,3 +3161,15 @@ curves	Smooth	平滑
 	Soft Black T-Shirt	黑色T恤（柔和）
 	White T-Shirt	白色T恤
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	修飾圖層（亮度 +32，飽和度 +16），隱藏
+# DTF Craft (30)
+	Cells	儲存格
+	Click: show the sheet · Double-click: rename it	按一下：顯示該頁 · 按兩下：重新命名
+	Copies to Print	列印份數
+	Custom Width	自訂寬度
+	Display	顯示
+	Drop PNG or SVG files here	將 PNG 或 SVG 檔案拖放到此處
+	Duplicate the Sheet	複製該頁
+	Every sheet emptied, the visuals kept	清空所有頁，保留圖案
+	Every visual's size and copies, then lay the sheets out	設定每個圖案的尺寸和份數，然後排版
+	Film	膜
+	Total: {sheets} sheets · {visuals} visuals	合計：{sheets} 頁 · {visuals} 個圖案

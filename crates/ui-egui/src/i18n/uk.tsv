@@ -4248,3 +4248,15 @@ curves	Smooth	Згладити
 	Soft Black T-Shirt	Чорна футболка — м’яко
 	White T-Shirt	Біла футболка
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Шари ретуші (яскравість +32, насиченість +16), приховані
+# DTF Craft (30)
+	Cells	Комірки
+	Click: show the sheet · Double-click: rename it	Клацання: показати аркуш · Подвійне клацання: перейменувати
+	Copies to Print	Копій для друку
+	Custom Width	Власна ширина
+	Display	Відображення
+	Drop PNG or SVG files here	Перетягніть сюди файли PNG або SVG
+	Duplicate the Sheet	Дублювати аркуш
+	Every sheet emptied, the visuals kept	Усі аркуші очищено, зображення збережено
+	Every visual's size and copies, then lay the sheets out	Розмір і кількість кожного зображення, потім розкладка аркушів
+	Film	Плівка
+	Total: {sheets} sheets · {visuals} visuals	Усього: аркушів {sheets} · зображень {visuals}

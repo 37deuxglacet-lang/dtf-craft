@@ -4614,3 +4614,14 @@ shape	Appearance	Izgled
 	Soft Black T-Shirt	Crna majica – meko
 	White T-Shirt	Bela majica
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Slojevi retuša (svetlina +32, zasićenost +16), skriveni
+# DTF Craft (30)
+	Cells	Ćelije
+	Click: show the sheet · Double-click: rename it	Klik: prikaži list · Dvoklik: preimenuj
+	Copies to Print	Primeraka za štampu
+	Custom Width	Prilagođena širina
+	Drop PNG or SVG files here	Prevucite ovde PNG ili SVG datoteke
+	Duplicate the Sheet	Dupliraj list
+	Every sheet emptied, the visuals kept	Svi listovi ispražnjeni, slike zadržane
+	Every visual's size and copies, then lay the sheets out	Veličina i broj primeraka svake slike, zatim raspored listova
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Ukupno: {sheets} listova · {visuals} slika

@@ -4149,3 +4149,14 @@ navigator	Zoom	Zvětšení
 	Soft Black T-Shirt	Černé tričko – jemně
 	White T-Shirt	Bílé tričko
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Retušovací vrstvy (jas +32, sytost +16), skryté
+# DTF Craft (30)
+	Cells	Buňky
+	Click: show the sheet · Double-click: rename it	Klepnutí: zobrazit arch · Dvojklepnutí: přejmenovat
+	Copies to Print	Kopie k tisku
+	Custom Width	Vlastní šířka
+	Drop PNG or SVG files here	Sem přetáhněte soubory PNG nebo SVG
+	Duplicate the Sheet	Duplikovat arch
+	Every sheet emptied, the visuals kept	Všechny archy vyprázdněny, motivy zachovány
+	Every visual's size and copies, then lay the sheets out	Velikost a počet kopií každého motivu, pak rozvržení archů
+	Film	Fólie
+	Total: {sheets} sheets · {visuals} visuals	Celkem: {sheets} archů · {visuals} motivů

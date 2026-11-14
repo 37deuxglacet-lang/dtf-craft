@@ -1,19 +1,25 @@
 // DTF Craft — Copyright (c) 2026 Stéphane Glacet. Licensed under MIT OR Apache-2.0.
 //! DTF › Gang Sheet…: a full-window, light, uncluttered builder to lay visuals out on DTF film.
 //!
-//! * Header: title, Cancel, Export.
-//! * Toolbar: film size, undo/redo, grid, the spacing between visuals, the selection's tools
-//!   (turn, mirror, stretch to the film, centre, push to a side, delete, group, ungroup) and Auto
-//!   Build.
-//! * Left rail and panel: **Home** (drop zone, the visuals as thumbnails with their copies on the
-//!   sheet, and the selected visual's size, copies, own spacing, fill and duplicate) and
-//!   **Settings** (lines shown, snapping, warnings, sheet background, margins, film).
-//! * Canvas: the sheet with rulers in cm; an overlay card with the line switches, the legend and
-//!   the hovered or selected visual's position, size, resolution and warnings.
-//! * Right panel: the active gang sheets (name, visuals, copies to print, duplicate, delete), New
-//!   Sheet, Auto Build and Start Over.
+//! * Header: the DTF Craft logo, "Gang sheet", one tab per sheet (name and copies; a click shows
+//!   it, a double-click renames it) and "+", then Cancel and Export.
+//! * Left column: the drop zone (Import, Add Open Document), Auto Build, and the visuals as rows
+//!   (thumbnail, name, print size and resolution, copies − field +; a click shows its settings,
+//!   a double-click adds a copy, × removes it).
+//! * Canvas: the sheet with rulers in cm, a tool palette floating at its left (undo, redo, turn,
+//!   mirror, stretch to the film, centre, push to a side, group, ungroup, delete) and the zoom.
+//! * Right column, in folding sections: **Sheet** (name, size, copies to print, duplicate,
+//!   delete, start over), **Film** (width, cells, margins, longest sheet, rotation), **Selected
+//!   Visual** (size, proportions, resolution, warnings, copies, own spacing, fill, duplicate; or
+//!   several: align, distribute, group) and **Display** (lines, snapping, warnings, grid,
+//!   background).
+//! * Status bar: the resolution legend, the hovered or selected visual's place, size and
+//!   resolution, the last message, the length used and the totals.
 //! * Auto Build view: every visual with its size, proportions lock, resolution and copies; Apply
 //!   lays them all out again, opening new sheets when one is full.
+//!
+//! Colours after the DTF Craft logo: white and mauve-grey panels, its magenta for Export, the
+//! selection and the cells, its blue for Import and Auto Build.
 //!
 //! Visuals keep a margin from the film edges and a spacing between them (each visual may ask for
 //! its own); a visual dropped closer than that to another goes back where it was.
@@ -67,13 +73,13 @@ use crate::theme::{ThemeKind, Tokens};
 use crate::widgets;
 
 const HEADER_H: f32 = 52.0;
-const TOOLBAR_H: f32 = 40.0;
-const RAIL_W: f32 = 70.0;
-const LEFT_W: f32 = 300.0;
-const RIGHT_W: f32 = 290.0;
+const STATUS_H: f32 = 30.0;
+const LEFT_W: f32 = 290.0;
+const RIGHT_W: f32 = 320.0;
 const RULER: f32 = 20.0;
-/// Width of the overlay card on the sheet view.
-const CARD_W: f32 = 250.0;
+/// The tool palette floating at the left of the sheet, and the room the sheet leaves it.
+const PALETTE_W: f32 = 44.0;
+const PALETTE_ROOM: f32 = PALETTE_W + 24.0;
 /// Longest side of a visual's preview texture.
 const THUMB: u32 = 640;
 /// Arrow-key nudge: 1 mm, 1 cm with Shift (layout units).
@@ -93,29 +99,30 @@ const COLUMN_PRESETS: [u32; 6] = [2, 3, 4, 5, 6, 8];
 
 // ---------------------------------------------------------------- light look
 
-/// The window's palette: white panels, hairline borders, navy controls, a blue call to action.
+/// The window's palette, after the DTF Craft logo: white and mauve-grey panels, ink text, the
+/// logo's magenta for the main actions and the selection, its blue for Import and Auto Build.
 pub(crate) fn light_tokens() -> Tokens {
     let mut t = Tokens::for_kind(ThemeKind::StudioLight);
-    let navy = Color32::from_rgb(17, 24, 39);
+    let ink = Color32::from_rgb(34, 34, 58);
     t.chrome = Color32::WHITE;
-    t.dock = Color32::WHITE;
+    t.dock = Color32::from_rgb(251, 250, 253);
     t.card = Color32::WHITE;
-    t.canvas = Color32::from_rgb(243, 244, 246);
-    t.card_border = Color32::from_rgb(229, 231, 235);
-    t.separator = Color32::from_rgb(229, 231, 235);
-    t.field = Color32::WHITE;
-    t.field_border = Color32::from_rgb(209, 213, 219);
-    t.hover = Color32::from_rgb(243, 244, 246);
-    t.pressed = Color32::from_rgb(229, 231, 235);
-    t.text = navy;
-    t.text_dim = Color32::from_rgb(55, 65, 81);
-    t.text_faint = Color32::from_rgb(107, 114, 128);
-    t.icon = navy;
-    t.accent = navy;
-    t.accent_soft = Color32::from_rgba_unmultiplied(17, 24, 39, 24);
-    t.accent_border = Color32::from_rgba_unmultiplied(17, 24, 39, 120);
-    t.accent_text = navy;
-    t.primary_bg = navy;
+    t.canvas = Color32::from_rgb(236, 234, 242);
+    t.card_border = Color32::from_rgb(235, 233, 240);
+    t.separator = Color32::from_rgb(227, 225, 234);
+    t.field = Color32::from_rgb(248, 247, 251);
+    t.field_border = Color32::from_rgb(214, 211, 223);
+    t.hover = Color32::from_rgb(239, 237, 243);
+    t.pressed = Color32::from_rgb(230, 226, 238);
+    t.text = ink;
+    t.text_dim = Color32::from_rgb(74, 72, 98);
+    t.text_faint = Color32::from_rgb(138, 135, 160);
+    t.icon = ink;
+    t.accent = MAGENTA;
+    t.accent_soft = Color32::from_rgba_unmultiplied(192, 58, 168, 28);
+    t.accent_border = Color32::from_rgba_unmultiplied(192, 58, 168, 140);
+    t.accent_text = ACCENT_TEXT;
+    t.primary_bg = MAGENTA;
     t.primary_text = Color32::WHITE;
     t.danger = Color32::from_rgb(220, 38, 38);
     t.warning = Color32::from_rgb(217, 119, 6);
@@ -125,8 +132,16 @@ pub(crate) fn light_tokens() -> Tokens {
     t
 }
 
-/// The blue of Auto Build and of overlapping visuals.
-const BLUE: Color32 = Color32::from_rgb(29, 155, 240);
+/// The logo's magenta ("craft"): Export, the selection, the cells, the end of the sheet.
+const MAGENTA: Color32 = Color32::from_rgb(192, 58, 168);
+/// Darker magenta for text on light magenta (the active sheet's tab).
+const ACCENT_TEXT: Color32 = Color32::from_rgb(156, 31, 138);
+/// The active sheet's tab and the visual shown in the list.
+const TAB_ACTIVE: Color32 = Color32::from_rgb(251, 233, 247);
+const ROW_SELECTED: Color32 = Color32::from_rgb(253, 241, 251);
+/// The logo's blue: Import, Auto Build (pressed: darker), overlapping visuals.
+const BLUE: Color32 = Color32::from_rgb(47, 111, 214);
+const BLUE_DARK: Color32 = Color32::from_rgb(33, 84, 170);
 
 /// Runs `f` with the window's light tokens and style, then gives the app its own back.
 fn light_scope<R>(ctx: &egui::Context, f: impl FnOnce() -> R) -> R {
@@ -291,12 +306,6 @@ impl Default for Settings {
 
 static LAST_SETTINGS: Mutex<Option<Settings>> = Mutex::new(None);
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Tab {
-    Home,
-    Settings,
-}
-
 /// The selection being dragged: where it was grabbed (units from its box's corner), its box and
 /// where each of its visuals was before.
 #[derive(Clone, Debug)]
@@ -371,7 +380,8 @@ pub struct GangSheetDialog {
     hovered: Option<usize>,
     drag: Option<Drag>,
     marquee: Option<Marquee>,
-    tab: Tab,
+    /// The right column\'s sections folded (Sheet, Film, Selected Visual, Display).
+    closed: [bool; 4],
     auto_view: bool,
     /// 1 = the whole sheet fits; more zooms in.
     zoom: f32,
@@ -423,7 +433,7 @@ impl GangSheetDialog {
             hovered: None,
             drag: None,
             marquee: None,
-            tab: Tab::Home,
+            closed: [false, false, false, true],
             auto_view: false,
             zoom: 1.0,
             scroll: Vec2::ZERO,
@@ -1977,7 +1987,11 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         }
     }
     if let Some(tab) = ui.get("tab").and_then(Value::as_str) {
-        d.tab = if tab == "settings" { Tab::Settings } else { Tab::Home };
+        // The window has no tabs any more: "settings" opens the Film and Display sections.
+        if tab == "settings" {
+            d.closed[SECTION_FILM] = false;
+            d.closed[SECTION_DISPLAY] = false;
+        }
     }
     if let Some(on) = ui.get("autoView").and_then(Value::as_bool) {
         d.auto_view = on;
@@ -2214,6 +2228,28 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     }
 }
 
+/// The window's regions: header (title, sheet tabs, Cancel, Export), the visuals on the left,
+/// the canvas, the settings on the right and the status bar along the bottom. `body` is the
+/// canvas and the right column together (the Auto Build view takes it).
+struct Regions {
+    header: ERect,
+    left: ERect,
+    canvas: ERect,
+    right: ERect,
+    status: ERect,
+    body: ERect,
+}
+
+fn regions(full: ERect) -> Regions {
+    let header = ERect::from_min_size(full.min, vec2(full.width(), HEADER_H));
+    let status = ERect::from_min_max(pos2(full.left(), full.bottom() - STATUS_H), full.max);
+    let left = ERect::from_min_max(pos2(full.left(), header.bottom()), pos2(full.left() + LEFT_W, status.top()));
+    let body = ERect::from_min_max(pos2(left.right(), header.bottom()), pos2(full.right(), status.top()));
+    let right = ERect::from_min_max(pos2(body.right() - RIGHT_W, body.top()), body.max);
+    let canvas = ERect::from_min_max(body.min, pos2(right.left(), body.bottom()));
+    Regions { header, left, canvas, right, status, body }
+}
+
 fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut Actions) {
     let screen = ctx.content_rect();
     egui::Area::new(egui::Id::new("gang-sheet-dialog")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
@@ -2227,33 +2263,20 @@ fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut A
         }
         let (full, _) = ui.allocate_exact_size(screen.size(), Sense::click());
         let p = ui.painter().clone();
-        p.rect_filled(full, 0.0, Color32::WHITE);
-        let header = ERect::from_min_size(full.min, vec2(full.width(), HEADER_H));
-        let toolbar = ERect::from_min_size(pos2(full.left() + RAIL_W + LEFT_W, header.bottom()), vec2(full.width() - RAIL_W - LEFT_W, TOOLBAR_H));
-        let rail = ERect::from_min_max(pos2(full.left(), header.bottom()), pos2(full.left() + RAIL_W, full.bottom()));
-        let left = ERect::from_min_max(pos2(rail.right(), header.bottom()), pos2(rail.right() + LEFT_W, full.bottom()));
-        let body = ERect::from_min_max(pos2(left.right(), toolbar.bottom()), full.max);
-        let right = ERect::from_min_max(pos2(body.right() - RIGHT_W, body.top()), body.max);
-        let canvas = ERect::from_min_max(body.min, pos2(right.left(), body.bottom()));
-        header_bar(ui, d, header, &t, act);
-        rail_bar(ui, d, rail, &t);
-        match d.tab {
-            Tab::Home => home_panel(ui, d, left, &t, has_doc, act),
-            Tab::Settings => settings_panel(ui, d, left, &t),
-        }
-        toolbar_bar(ui, d, toolbar, &t);
+        p.rect_filled(full, 0.0, t.canvas);
+        let r = regions(full);
+        header_bar(ui, d, r.header, &t, act);
+        visuals_panel(ui, d, r.left, &t, has_doc, act);
         if d.auto_view {
-            auto_view(ui, d, body, &t, act, has_doc);
+            auto_view(ui, d, r.body, &t, act, has_doc);
         } else {
-            sheet_view(ui, d, canvas, &t);
-            sheets_panel(ui, d, right, &t);
+            sheet_view(ui, d, r.canvas, &t);
+            settings_column(ui, d, r.right, &t);
         }
-        for line in [header.left_bottom(), toolbar.left_bottom()] {
-            let to = if line == header.left_bottom() { header.right_bottom() } else { toolbar.right_bottom() };
-            p.line_segment([line, to], Stroke::new(1.0, t.separator));
-        }
-        p.line_segment([rail.right_top(), rail.right_bottom()], Stroke::new(1.0, t.separator));
-        p.line_segment([left.right_top(), left.right_bottom()], Stroke::new(1.0, t.separator));
+        status_bar(ui, d, r.status, &t);
+        p.line_segment([r.header.left_bottom(), r.header.right_bottom()], Stroke::new(1.0, t.separator));
+        p.line_segment([r.left.right_top(), r.left.right_bottom()], Stroke::new(1.0, t.separator));
+        p.line_segment([r.status.left_top(), r.status.right_top()], Stroke::new(1.0, t.separator));
     });
     if !ctx.text_edit_focused()
         && let Some(d) = app.gang_sheet.as_mut()
@@ -2264,117 +2287,239 @@ fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut A
     }
 }
 
+/// A filled button in the logo's blue (Import, Auto Build), pressed while `on`.
+fn blue_button(ui: &mut egui::Ui, label: &str, width: f32, on: bool) -> egui::Response {
+    let w = width.max(widgets::button_width(ui, &[label]));
+    let (r, resp) = ui.allocate_exact_size(vec2(w, 30.0), Sense::click());
+    let fill = if on {
+        BLUE_DARK
+    } else if resp.hovered() {
+        BLUE.gamma_multiply(0.92)
+    } else {
+        BLUE
+    };
+    ui.painter().rect_filled(r, 7.0, fill);
+    ui.painter().text(r.center(), Align2::CENTER_CENTER, label, crate::theme::medium(12.5), Color32::WHITE);
+    resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, label));
+    resp.on_hover_cursor(egui::CursorIcon::PointingHand)
+}
+
+/// The header: the logo, "Gang sheet" (its last word in the logo's magenta), one tab per sheet
+/// (its name and copies; a click shows it, a double-click renames it) and "+", then Cancel and
+/// Export on the right.
 fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens, act: &mut Actions) {
-    let mut h = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(18.0, 10.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
-    crate::icons::image("layers", 20.0, t.text).paint_at(&h, ERect::from_min_size(h.cursor().min + vec2(0.0, 6.0), vec2(20.0, 20.0)));
-    h.add_space(28.0);
-    h.label(egui::RichText::new(tl!("Gang Sheet")).font(crate::theme::semibold(16.0)).color(t.text));
-    h.add_space(16.0);
-    if !d.status.is_empty() {
-        h.label(egui::RichText::new(&d.status).color(t.warning));
+    let p = ui.painter().clone();
+    p.rect_filled(rect, 0.0, Color32::WHITE);
+    let mark = ERect::from_center_size(pos2(rect.left() + 30.0, rect.center().y), vec2(28.0, 28.0));
+    crate::brand::paint_mark(ui, mark);
+    let title = tl!("Gang Sheet");
+    let (first, last) = title.rsplit_once(' ').map_or((title, ""), |(a, b)| (a, b));
+    let font = crate::theme::semibold(16.0);
+    let ga = p.layout_no_wrap(format!("{first} "), font.clone(), t.text);
+    let gb = p.layout_no_wrap(last.to_string(), font, MAGENTA);
+    let y = rect.center().y - ga.size().y / 2.0;
+    let mut x = mark.right() + 10.0;
+    let (wa, wb) = (ga.size().x, gb.size().x);
+    p.galley(pos2(x, y), ga, t.text);
+    p.galley(pos2(x + wa, y), gb, MAGENTA);
+    ui.interact(ERect::from_min_size(pos2(x, y), vec2(wa + wb, 20.0)), ui.id().with("gang-title"), Sense::hover())
+        .widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Label, true, title));
+    x += wa + wb + 28.0;
+    // Cancel and Export, right-aligned.
+    let buttons = ERect::from_min_max(pos2(rect.right() - 330.0, rect.top()), rect.max).shrink2(vec2(16.0, 10.0));
+    let mut b = ui.new_child(egui::UiBuilder::new().max_rect(buttons).layout(egui::Layout::right_to_left(egui::Align::Center)));
+    let any = d.sheets.iter().any(|s| !s.placed.is_empty());
+    let label = if d.sheets.len() > 1 { tl!("Export Sheets (PNG)…") } else { tl!("Export PNG…") };
+    if b.add_enabled_ui(any, |h| widgets::primary_button(h, label, 150.0)).inner.clicked() {
+        act.export = true;
     }
-    h.with_layout(egui::Layout::right_to_left(egui::Align::Center), |h| {
-        let any = d.sheets.iter().any(|s| !s.placed.is_empty());
-        let label = if d.sheets.len() > 1 { tl!("Export Sheets (PNG)…") } else { tl!("Export PNG…") };
-        if h.add_enabled_ui(any, |h| widgets::primary_button(h, label, 150.0)).inner.clicked() {
-            act.export = true;
+    if widgets::secondary_button(&mut b, tl!("Cancel"), 90.0).clicked() {
+        act.cancel = true;
+    }
+    // The sheet tabs, up to the buttons.
+    let end = buttons.left() - 16.0;
+    let (tab_h, top) = (32.0, rect.bottom() - 34.0);
+    let font = FontId::proportional(12.5);
+    let mut pick = None;
+    let mut rename = None;
+    let mut hidden = 0;
+    for k in 0..d.sheets.len() {
+        let Some(doc) = d.sheets.get(k) else { continue };
+        let active = k == d.active;
+        let color = if active { ACCENT_TEXT } else { t.text_dim };
+        let label = format!("{} · ×{}", doc.name, doc.copies);
+        let g = p.layout_no_wrap(label.clone(), font.clone(), color);
+        let w = g.size().x + 26.0;
+        if x + w > end - 70.0 {
+            hidden = d.sheets.len() - k;
+            break;
         }
-        if widgets::secondary_button(h, tl!("Cancel"), 90.0).clicked() {
-            act.cancel = true;
-        }
-    });
-}
-
-fn rail_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
-    let mut y = rect.top() + 8.0;
-    for (tab, icon, label) in [(Tab::Home, "house", tl!("Home")), (Tab::Settings, "settings", tl!("Settings"))] {
-        let r = ERect::from_min_size(pos2(rect.left() + 5.0, y), vec2(RAIL_W - 10.0, 52.0));
-        let resp = ui.interact(r, ui.id().with(("gang-rail", label)), Sense::click());
-        let on = d.tab == tab;
-        let (bg, fg) = if on {
-            (t.primary_bg, t.primary_text)
+        let r = ERect::from_min_size(pos2(x, top), vec2(w, tab_h));
+        let resp = ui.interact(r, ui.id().with(("gang-tab", k)), Sense::click());
+        let fill = if active {
+            TAB_ACTIVE
         } else if resp.hovered() {
-            (t.hover, t.text)
+            t.pressed
         } else {
-            (Color32::TRANSPARENT, t.text)
+            t.hover
         };
-        ui.painter().rect_filled(r, 8.0, bg);
-        crate::icons::image(icon, 18.0, fg).paint_at(ui, ERect::from_center_size(r.center() - vec2(0.0, 8.0), vec2(18.0, 18.0)));
-        ui.painter().text(r.center() + vec2(0.0, 13.0), Align2::CENTER_CENTER, label, FontId::proportional(10.0), fg);
-        if resp.on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
-            d.tab = tab;
+        let corners = CornerRadius { nw: 7, ne: 7, sw: 0, se: 0 };
+        p.rect_filled(r, corners, fill);
+        if active {
+            p.rect_filled(ERect::from_min_size(r.min, vec2(w, 2.0)), corners, MAGENTA);
         }
-        y += 58.0;
+        p.galley(pos2(r.left() + 13.0, r.center().y - g.size().y / 2.0), g, color);
+        resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, &label));
+        let resp = resp.on_hover_text(tl!("Click: show the sheet · Double-click: rename it")).on_hover_cursor(egui::CursorIcon::PointingHand);
+        if resp.double_clicked() {
+            rename = Some(k);
+        } else if resp.clicked() {
+            pick = Some(k);
+        }
+        x += w + 4.0;
+    }
+    if hidden > 0 {
+        let g = p.layout_no_wrap(format!("+{hidden}"), font.clone(), t.text_faint);
+        p.galley(pos2(x + 4.0, top + (tab_h - g.size().y) / 2.0), g, t.text_faint);
+        x += 30.0;
+    }
+    let plus = ERect::from_min_size(pos2(x + 2.0, top + 3.0), vec2(26.0, 26.0));
+    let resp = ui.interact(plus, ui.id().with("gang-tab-new"), Sense::click());
+    if resp.hovered() {
+        p.rect_filled(plus, 6.0, t.hover);
+    }
+    crate::icons::image("plus", 14.0, t.text_dim).paint_at(ui, ERect::from_center_size(plus.center(), vec2(14.0, 14.0)));
+    if resp.on_hover_text(tl!("Add a New Sheet")).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
+        d.checkpoint(None);
+        d.new_sheet();
+    }
+    if let Some(k) = pick {
+        d.active = k;
+        d.selected.clear();
+    }
+    if let Some(k) = rename {
+        d.active = k;
+        d.selected.clear();
+        d.closed[SECTION_SHEET] = false;
+        d.renaming = d.sheets.get(k).map(|s| (k, s.name.clone()));
     }
 }
 
-fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens, has_doc: bool, act: &mut Actions) {
-    let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 14.0))));
+/// The left column: the drop zone (Import, Add Open Document), Auto Build, then every visual on a
+/// row: thumbnail, name, print size and resolution, copies (− field +). A click shows its
+/// settings, a double-click adds a copy to the sheet, × removes it.
+fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens, has_doc: bool, act: &mut Actions) {
+    ui.painter().rect_filled(rect, 0.0, t.dock);
+    let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 12.0))));
     panel.spacing_mut().item_spacing.y = 8.0;
     let w = panel.available_width();
-    // Drop zone.
-    let zone = egui::Frame::NONE.stroke(Stroke::new(1.0, t.field_border)).corner_radius(CornerRadius::same(8)).inner_margin(egui::Margin::same(12));
+    panel.label(egui::RichText::new(tl!("Visuals").to_uppercase()).font(crate::theme::semibold(11.0)).color(t.text_faint));
+    let zone = egui::Frame::NONE
+        .fill(Color32::WHITE)
+        .stroke(Stroke::new(1.0, MAGENTA.gamma_multiply(0.45)))
+        .corner_radius(CornerRadius::same(10))
+        .inner_margin(egui::Margin::same(12));
     zone.show(&mut panel, |ui| {
         ui.set_width(w - 24.0);
         ui.vertical_centered(|ui| {
-            ui.label(egui::RichText::new(tl!("Drag and drop a file here or click to")).color(t.text));
-            if widgets::primary_button(ui, tl!("Import Images"), 150.0).clicked() {
+            ui.label(egui::RichText::new(tl!("Drop PNG or SVG files here")).color(t.text_dim));
+            let bw = ui.available_width();
+            if blue_button(ui, tl!("Import Images"), bw, false).clicked() {
                 act.add_files = true;
             }
-            ui.label(egui::RichText::new(tl!("Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)")).color(t.text_faint).size(11.0));
-            if ui.add_enabled_ui(has_doc, |ui| widgets::secondary_button(ui, tl!("Add Open Document"), 180.0)).inner.clicked() {
+            if ui.add_enabled_ui(has_doc, |ui| widgets::secondary_button(ui, tl!("Add Open Document"), bw)).inner.clicked() {
                 act.add_document = true;
             }
+            ui.label(egui::RichText::new(tl!("Supported formats: PNG (cropped to its visible pixels) and SVG (drawn at its print size)")).color(t.text_faint).size(10.5));
         });
     });
-    // Thumbnails: click shows the visual's settings, double-click adds a copy, × removes the
-    // visual; the badge counts its copies on this sheet, the visual shown is framed.
+    if blue_button(&mut panel, tl!("Auto Build"), w, d.auto_view).on_hover_text(tl!("Every visual's size and copies, then lay the sheets out")).clicked() {
+        d.auto_view = !d.auto_view;
+    }
     let shown = d.shown_source();
+    let organized = d.organizes();
     let mut add = None;
     let mut pick = None;
     let mut remove = None;
-    if !d.sources.is_empty() {
-        let cell = 80.0;
-        let per_row = ((w + 8.0) / (cell + 8.0)).floor().max(1.0) as usize;
-        for row in d.sources.chunks(per_row).enumerate() {
-            panel.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 8.0;
-                for (k, s) in row.1.iter().enumerate() {
-                    let i = row.0 * per_row + k;
-                    let (r, resp) = ui.allocate_exact_size(vec2(cell, cell + 16.0), Sense::click());
-                    let img = ERect::from_min_size(r.min, vec2(cell, cell));
-                    widgets::checker(ui.painter(), img, 6.0);
-                    if let Some(tex) = &s.tex {
-                        let k = (cell / s.px.0.max(1) as f32).min(cell / s.px.1.max(1) as f32);
-                        let ir = ERect::from_center_size(img.center(), vec2(s.px.0 as f32 * k, s.px.1 as f32 * k));
-                        ui.painter().image(tex.id(), ir, ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
-                    }
-                    let stroke = if shown == Some(i) { Stroke::new(2.0, t.accent) } else { Stroke::new(1.0, if resp.hovered() { t.text } else { t.card_border }) };
-                    ui.painter().rect_stroke(img, 4.0, stroke, StrokeKind::Inside);
-                    let name_r = ERect::from_min_size(pos2(r.left(), img.bottom()), vec2(cell, 16.0));
-                    ui.painter().rect_filled(name_r, 0.0, t.primary_bg);
-                    let name = if s.name.chars().count() > 12 { format!("{}…", s.name.chars().take(11).collect::<String>()) } else { s.name.clone() };
-                    ui.painter().text(name_r.center(), Align2::CENTER_CENTER, name, FontId::proportional(9.5), t.primary_text);
-                    let n = d.sheets.get(d.active).map_or(0, |sh| sh.placed.iter().filter(|p| p.source == i).count());
-                    let badge = ERect::from_min_size(pos2(img.right() - 16.0, img.bottom() - 16.0), vec2(16.0, 16.0));
-                    ui.painter().rect_filled(badge, 0.0, t.primary_bg);
-                    ui.painter().text(badge.center(), Align2::CENTER_CENTER, n.to_string(), FontId::proportional(9.5), t.primary_text);
-                    let x = ERect::from_min_size(pos2(img.right() - 15.0, img.top() + 1.0), vec2(14.0, 14.0));
-                    let xr = ui.interact(x, ui.id().with(("gang-x", i)), Sense::click());
-                    ui.painter().rect_filled(x, 3.0, t.danger);
-                    crate::icons::image("x", 10.0, Color32::WHITE).paint_at(ui, ERect::from_center_size(x.center(), vec2(10.0, 10.0)));
-                    if xr.on_hover_text(tl!("Remove")).clicked() {
-                        remove = Some(i);
-                    } else {
-                        let resp = resp.on_hover_text(tl!("Click: its settings · Double-click: add a copy to the sheet"));
-                        if resp.double_clicked() {
-                            add = Some(i);
-                        } else if resp.clicked() {
-                            pick = Some(i);
-                        }
-                    }
+    let mut quantity: Option<(usize, usize)> = None;
+    egui::ScrollArea::vertical().id_salt("gang-visuals").auto_shrink([false, false]).show(&mut panel, |ui| {
+        ui.spacing_mut().item_spacing.y = 6.0;
+        for i in 0..d.sources.len() {
+            let Some(s) = d.sources.get(i) else { continue };
+            let (row, resp) = ui.allocate_exact_size(vec2(w, 56.0), Sense::click());
+            let on = shown == Some(i);
+            let (fill, stroke) = if on {
+                (ROW_SELECTED, Stroke::new(1.5, MAGENTA))
+            } else {
+                (Color32::WHITE, Stroke::new(1.0, if resp.hovered() { t.field_border } else { t.card_border }))
+            };
+            ui.painter().rect(row, 8.0, fill, stroke, StrokeKind::Inside);
+            // Thumbnail.
+            let img = ERect::from_min_size(row.min + vec2(8.0, 8.0), vec2(40.0, 40.0));
+            widgets::checker_rounded(ui.painter(), img, 5.0, 5);
+            if let Some(tex) = &s.tex {
+                let k = (img.width() / s.px.0.max(1) as f32).min(img.height() / s.px.1.max(1) as f32);
+                let ir = ERect::from_center_size(img.center(), vec2(s.px.0 as f32 * k, s.px.1 as f32 * k));
+                ui.painter().image(tex.id(), ir, ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
+            }
+            // Copies: − field +, on the right.
+            let copies = if organized { s.quantity } else { d.copies_on_sheet(i) };
+            let qr = ERect::from_min_size(pos2(row.right() - 96.0, row.center().y - 12.0), vec2(88.0, 24.0));
+            let mut q = ui.new_child(egui::UiBuilder::new().max_rect(qr).layout(egui::Layout::left_to_right(egui::Align::Center)));
+            q.spacing_mut().item_spacing.x = 2.0;
+            let mut v = copies as f32;
+            if tool_button(&mut q, "minus", tl!("One copy less"), copies > 0, 0.0, false).clicked() {
+                v -= 1.0;
+            }
+            let typed = widgets::typed_value_field(&mut q, &mut v, 0.0..=MAX_QUANTITY as f32, "", 30.0, 0).changed();
+            if tool_button(&mut q, "plus", tl!("One copy more"), copies < MAX_QUANTITY, 0.0, false).clicked() {
+                v += 1.0;
+            }
+            let v = v.round().clamp(0.0, MAX_QUANTITY as f32) as usize;
+            if typed || v != copies {
+                quantity = Some((i, v));
+            }
+            // The resolution dot, then the name and size.
+            let dpi = s.dpi();
+            ui.painter().circle_filled(pos2(qr.left() - 10.0, row.center().y), 4.0, level_color(DpiLevel::of(dpi)));
+            let text_w = qr.left() - 18.0 - (img.right() + 10.0);
+            let name = ui.painter().layout(s.name.clone(), crate::theme::medium(12.5), t.text, text_w);
+            let name = if name.rows.len() > 1 {
+                let short: String = s.name.chars().take(((text_w / 7.0) as usize).max(4)).collect();
+                ui.painter().layout_no_wrap(format!("{short}…"), crate::theme::medium(12.5), t.text)
+            } else {
+                name
+            };
+            ui.painter().galley(pos2(img.right() + 10.0, row.top() + 10.0), name, t.text);
+            let size = format!("{} × {} cm · {}", cm_text(s.w), cm_text(s.h), ppi_text(dpi));
+            let sub = ui.painter().layout(size, FontId::proportional(11.0), t.text_faint, text_w);
+            ui.painter().galley(pos2(img.right() + 10.0, row.top() + 29.0), sub, t.text_faint);
+            // Remove: × at the top right corner, while the pointer is over the row.
+            let x = ERect::from_min_size(pos2(row.right() - 17.0, row.top() + 3.0), vec2(14.0, 14.0));
+            let xr = ui.interact(x, ui.id().with(("gang-x", i)), Sense::click());
+            if resp.hovered() || xr.hovered() {
+                ui.painter().rect_filled(x, 3.0, if xr.hovered() { t.danger } else { t.text_faint });
+                crate::icons::image("x", 10.0, Color32::WHITE).paint_at(ui, ERect::from_center_size(x.center(), vec2(10.0, 10.0)));
+            }
+            resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, &s.name));
+            if xr.on_hover_text(tl!("Remove")).clicked() {
+                remove = Some(i);
+            } else {
+                let resp = resp.on_hover_text(tl!("Click: its settings · Double-click: add a copy to the sheet"));
+                if resp.double_clicked() {
+                    add = Some(i);
+                } else if resp.clicked() {
+                    pick = Some(i);
                 }
-            });
+            }
+        }
+    });
+    if let Some((i, q)) = quantity {
+        if organized {
+            d.set_quantity(i, q);
+        } else {
+            d.checkpoint(Some(format!("q{i}")));
+            d.set_copies_on_sheet(i, q);
         }
     }
     if let Some(i) = remove {
@@ -2384,6 +2529,7 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
         // Its first copy on this sheet selected, else just its settings shown.
         d.focus = Some(i);
         d.selected = d.placed().iter().position(|p| p.source == i).into_iter().collect();
+        d.closed[SECTION_VISUAL] = false;
     }
     if let Some(i) = add {
         d.checkpoint(None);
@@ -2394,10 +2540,195 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
             d.selected = vec![d.placed().len() - 1];
         }
     }
-    widgets::hairline(&mut panel);
+}
+
+/// The right column's sections, in order (`GangSheetDialog::closed`).
+const SECTION_SHEET: usize = 0;
+const SECTION_FILM: usize = 1;
+const SECTION_VISUAL: usize = 2;
+const SECTION_DISPLAY: usize = 3;
+
+/// A section of the right column: a card whose title row opens or closes it.
+fn section(ui: &mut egui::Ui, d: &mut GangSheetDialog, k: usize, title: &str, t: &Tokens, body: impl FnOnce(&mut egui::Ui, &mut GangSheetDialog)) {
+    card_frame(t).show(ui, |ui| {
+        ui.set_width(ui.available_width());
+        let open = !d.closed[k];
+        let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 22.0), Sense::click());
+        ui.painter().text(r.left_center(), Align2::LEFT_CENTER, title, crate::theme::semibold(13.0), t.text);
+        let icon = if open { "chevron-down" } else { "chevron-right" };
+        crate::icons::image(icon, 14.0, t.text_dim).paint_at(ui, ERect::from_center_size(r.right_center() - vec2(8.0, 0.0), vec2(14.0, 14.0)));
+        resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::CollapsingHeader, true, title));
+        if resp.on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
+            d.closed[k] = open;
+        }
+        if open {
+            ui.add_space(6.0);
+            ui.spacing_mut().item_spacing.y = 6.0;
+            body(ui, d);
+        }
+    });
+    ui.add_space(8.0);
+}
+
+/// The right column: Sheet, Film, Selected Visual and Display, each a section that folds.
+fn settings_column(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
+    ui.painter().rect_filled(rect, 0.0, t.dock);
+    ui.painter().line_segment([rect.left_top(), rect.left_bottom()], Stroke::new(1.0, t.separator));
+    let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(12.0, 12.0))));
+    egui::ScrollArea::vertical().id_salt("gang-settings").auto_shrink([false, false]).show(&mut panel, |ui| {
+        section(ui, d, SECTION_SHEET, tl!("Sheet"), t, |ui, d| sheet_section(ui, d, t));
+        section(ui, d, SECTION_FILM, tl!("Film"), t, |ui, d| film_section(ui, d, t));
+        section(ui, d, SECTION_VISUAL, tl!("Selected Visual"), t, |ui, d| visual_section(ui, d, t));
+        section(ui, d, SECTION_DISPLAY, tl!("Display"), t, |ui, d| display_section(ui, d, t));
+    });
+}
+
+/// The active sheet: its name (renamed here), size, copies to print, Duplicate, Delete, Start Over.
+fn sheet_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
+    let k = d.active;
+    let Some(doc) = d.sheets.get(k).cloned() else { return };
+    let mut rename_done = None;
+    ui.horizontal(|ui| match d.renaming.as_mut() {
+        Some((rk, text)) if *rk == k => {
+            let r = widgets::text_field(ui, egui::Id::new(("gang-rename", k)), text, "", ui.available_width() - 4.0, false);
+            r.request_focus();
+            if r.lost_focus() {
+                rename_done = Some(text.clone());
+            }
+        }
+        _ => {
+            ui.label(egui::RichText::new(&doc.name).font(crate::theme::medium(13.0)).color(t.text));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if tool_button(ui, "pencil", tl!("Rename"), true, 0.0, false).clicked() {
+                    d.renaming = Some((k, doc.name.clone()));
+                }
+            });
+        }
+    });
+    if let Some(name) = rename_done {
+        if let Some(s) = d.sheets.get_mut(k)
+            && !name.trim().is_empty()
+        {
+            s.name = name.trim().to_string();
+        }
+        d.renaming = None;
+    }
+    let film = crate::i18n::fmt(
+        tl!("{width} × {length} cm (max {max})"),
+        &[
+            ("width", &widgets::fmt_num(f64::from(d.settings.width_cm))),
+            ("length", &cm_text(d.used_on(k))),
+            ("max", &widgets::fmt_num(f64::from(d.settings.max_length_cm))),
+        ],
+    );
+    ui.label(egui::RichText::new(format!("{film} · {}", crate::i18n::fmt(tl!("{n} images"), &[("n", &doc.placed.len().to_string())]))).size(11.5).color(t.text_faint));
+    let mut q = doc.copies as f32;
+    ui.horizontal(|ui| {
+        fixed_label(ui, egui::RichText::new(tl!("Copies to Print")).color(t.text), 128.0, 24.0);
+        if widgets::typed_value_field(ui, &mut q, 1.0..=999.0, "", 70.0, 0).on_hover_text(tl!("Copies of this sheet to print")).changed()
+            && let Some(s) = d.sheets.get_mut(k)
+        {
+            s.copies = q.round().clamp(1.0, 999.0) as usize;
+        }
+    });
+    let bw = ui.available_width();
+    if widgets::secondary_button(ui, tl!("Duplicate"), bw).on_hover_text(tl!("Duplicate the Sheet")).clicked() {
+        d.checkpoint(None);
+        d.duplicate_sheet(k);
+    }
+    if ui.add_enabled_ui(d.sheets.len() > 1, |ui| widgets::secondary_button(ui, tl!("Delete the Sheet"), bw)).inner.clicked() {
+        d.checkpoint(None);
+        d.delete_sheet(k);
+    }
+    if widgets::secondary_button(ui, tl!("Start Over"), bw).on_hover_text(tl!("Every sheet emptied, the visuals kept")).clicked() {
+        d.checkpoint(None);
+        d.start_over();
+    }
+}
+
+/// The film: width, cells, margins, longest sheet, rotation in Auto Build.
+fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
+    let mut s = d.settings;
+    // Film width: the presets (and the width set, if another).
+    let mut width = s.width_cm;
+    let labels: Vec<(f32, String)> = {
+        let mut v: Vec<f32> = FILM_PRESETS.to_vec();
+        if !v.iter().any(|p| (p - width).abs() < 0.05) {
+            v.push(width);
+        }
+        v.iter().map(|w| (*w, format!("{} cm", widgets::fmt_num(f64::from(*w))))).collect()
+    };
+    let opts: Vec<(f32, &str)> = labels.iter().map(|(w, l)| (*w, l.as_str())).collect();
+    ui.horizontal(|ui| {
+        fixed_label(ui, egui::RichText::new(tl!("Film Width")).color(t.text), 128.0, 24.0);
+        if widgets::dropdown(ui, "gang-film", &mut width, &opts, 120.0) {
+            s.width_cm = width;
+        }
+    });
+    // Cells: none, or the printed width in so many columns.
+    let mut cols = if s.cells_on { s.cells_cols } else { 0 };
+    let cell_labels: Vec<(u32, String)> = {
+        let mut v: Vec<u32> = COLUMN_PRESETS.to_vec();
+        if cols > 0 && !v.contains(&cols) {
+            v.push(cols);
+            v.sort_unstable();
+        }
+        let sheet = d.sheet();
+        let mut out = vec![(0, tl!("No Cells").to_string())];
+        out.extend(v.iter().map(|n| (*n, format!("{n} × {} cm", cm_text(sheet.cell_size(*n))))));
+        out
+    };
+    let cell_opts: Vec<(u32, &str)> = cell_labels.iter().map(|(n, l)| (*n, l.as_str())).collect();
+    ui.horizontal(|ui| {
+        fixed_label(ui, egui::RichText::new(tl!("Cells")).color(t.text), 128.0, 24.0);
+        if widgets::dropdown(ui, "gang-cells", &mut cols, &cell_opts, 120.0) {
+            s.cells_on = cols > 0;
+            if cols > 0 {
+                s.cells_cols = cols;
+            }
+        }
+    });
+    if s.cells_on {
+        let edge = if s.edge_on { cm_units(s.edge_cm) } else { 0 };
+        let (sheet, n) = (Sheet::new(cm_units(s.width_cm), cm_units(s.max_length_cm), edge, 0), s.cells_cols);
+        ui.label(
+            egui::RichText::new(crate::i18n::fmt(
+                tl!("Cells of {size} × {size} cm · {rows} rows"),
+                &[("size", &cm_text(sheet.cell_size(n))), ("rows", &sheet.cell_rows(n).to_string())],
+            ))
+            .size(11.5)
+            .color(t.text_faint),
+        );
+        switch_row(ui, tl!("Organize Automatically on Import"), &mut s.cells_auto);
+        switch_row(ui, tl!("Snap to the Cells"), &mut s.cells_snap);
+    }
+    widgets::hairline(ui);
+    switch_row(ui, tl!("Sheet Margin"), &mut s.edge_on);
+    if s.edge_on {
+        number_row(ui, tl!("Along the edges"), &mut s.edge_cm, 0.0..=10.0, "cm", 2);
+    }
+    if s.cells_on {
+        ui.label(egui::RichText::new(tl!("Cells touch: no spacing between images.")).size(11.5).color(t.text_faint));
+    } else {
+        switch_row(ui, tl!("Image Margin"), &mut s.gap_on);
+        if s.gap_on {
+            number_row(ui, tl!("Between images"), &mut s.gap_cm, 0.0..=10.0, "cm", 2);
+        }
+    }
+    let printed = s.width_cm - if s.edge_on { 2.0 * s.edge_cm } else { 0.0 };
+    ui.label(egui::RichText::new(crate::i18n::fmt(tl!("Printed width: {width} cm"), &[("width", &widgets::fmt_num(f64::from(printed)))])).size(11.5).color(t.text_faint));
+    widgets::hairline(ui);
+    number_row(ui, tl!("Custom Width"), &mut s.width_cm, 10.0..=300.0, "cm", 1);
+    number_row(ui, tl!("Max Length"), &mut s.max_length_cm, 10.0..=MAX_LENGTH_CM, "cm", 1);
+    switch_row(ui, tl!("Auto Build May Rotate"), &mut s.rotate);
+    d.set_settings(s);
+}
+
+/// The visual selected (or last shown), several selected, or a hint.
+fn visual_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let list = d.sel();
     if list.len() > 1 {
-        multi_panel(&mut panel, d, &list, t);
+        multi_panel(ui, d, &list, t);
         return;
     }
     // One visual selected on the sheet: its settings; none: those of the visual last shown, so
@@ -2405,25 +2736,259 @@ fn home_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
     if let Some(i) = list.first().copied() {
         if let Some(source) = d.placed().get(i).map(|p| p.source) {
             d.focus = Some(source);
-            selection_panel(&mut panel, d, source, Some(i), t);
+            selection_panel(ui, d, source, Some(i), t);
         }
         return;
     }
     if let Some(source) = d.shown_source() {
-        selection_panel(&mut panel, d, source, None, t);
+        selection_panel(ui, d, source, None, t);
         return;
     }
-    {
-        panel.add_space(30.0);
-        panel.vertical_centered(|ui| {
-            let (r, _) = ui.allocate_exact_size(vec2(90.0, 90.0), Sense::hover());
-            ui.painter().rect_stroke(r, 6.0, Stroke::new(1.0, t.card_border), StrokeKind::Inside);
-            crate::icons::image("mouse-pointer-2", 34.0, t.text_faint).paint_at(ui, ERect::from_center_size(r.center() + vec2(18.0, 18.0), vec2(34.0, 34.0)));
-            ui.add_space(12.0);
-            ui.label(egui::RichText::new(tl!("Select an object to edit.")).color(t.text));
+    ui.label(egui::RichText::new(tl!("Select an object to edit.")).color(t.text_faint));
+}
+
+/// What the sheet shows: lines, snapping, warnings, grid, background.
+fn display_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
+    let mut s = d.settings;
+    switch_row(ui, tl!("Show Resolution Lines"), &mut s.show_res);
+    switch_row(ui, tl!("Overlap Lines"), &mut s.show_overlap);
+    switch_row(ui, tl!("Snap While Moving"), &mut s.snap);
+    switch_row(ui, tl!("Background Warning:"), &mut s.warn_background);
+    switch_row(ui, tl!("Transparency Warning:"), &mut s.warn_semi);
+    switch_row(ui, tl!("Grid (1 cm)"), &mut s.grid);
+    ui.horizontal(|ui| {
+        ui.label(egui::RichText::new(tl!("Sheet Background")).color(t.text));
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            let r = widgets::color_edit_button_srgb(ui, &mut s.custom).on_hover_text(tl!("Custom Color"));
+            if r.changed() || r.clicked() {
+                s.backdrop = Backdrop::Color(Color32::from_rgb(s.custom[0], s.custom[1], s.custom[2]));
+            }
+            for (bd, tip) in [
+                (Backdrop::Color(Color32::WHITE), tl!("White")),
+                (Backdrop::Color(Color32::BLACK), tl!("Black")),
+                (Backdrop::Color(Color32::from_gray(128)), tl!("Gray")),
+                (Backdrop::Checker, tl!("Transparent")),
+            ] {
+                let (r, resp) = ui.allocate_exact_size(vec2(20.0, 20.0), Sense::click());
+                match bd {
+                    Backdrop::Checker => widgets::checker(ui.painter(), r, 5.0),
+                    Backdrop::Color(c) => {
+                        ui.painter().rect_filled(r, 3.0, c);
+                    }
+                }
+                let sel = s.backdrop == bd;
+                ui.painter().rect_stroke(r, 3.0, Stroke::new(if sel { 2.0 } else { 1.0 }, if sel { MAGENTA } else { t.field_border }), StrokeKind::Outside);
+                if resp.on_hover_text(tip).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
+                    s.backdrop = bd;
+                }
+            }
         });
+    });
+    d.set_settings(s);
+}
+
+/// The tools, in a column floating at the left of the sheet: history, turn and mirror, stretch,
+/// centre, push, group, delete.
+fn tool_palette(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tokens) {
+    let list = d.sel();
+    let on = !list.is_empty();
+    let single = d.single();
+    let q = std::f32::consts::FRAC_PI_2;
+    type Op = (&'static str, &'static str, f32, bool, u8);
+    let ops: [Op; 18] = [
+        ("undo-2", tl!("Undo (Ctrl+Z)"), 0.0, false, 16),
+        ("redo-2", tl!("Redo (Ctrl+Y)"), 0.0, false, 17),
+        ("rotate-cw", tl!("Rotate 90° Counterclockwise"), 0.0, true, 0),
+        ("rotate-cw", tl!("Rotate 90° Clockwise"), 0.0, false, 1),
+        ("flip-h", tl!("Flip Horizontally"), 0.0, false, 2),
+        ("flip-v", tl!("Flip Vertically"), 0.0, false, 3),
+        ("stretch-h", tl!("Stretch to the Film Width"), 0.0, false, 4),
+        ("stretch-v", tl!("Stretch to the Sheet Length"), 0.0, false, 5),
+        ("align-center", tl!("Center Horizontally"), 0.0, false, 6),
+        ("align-center", tl!("Center Vertically"), q, false, 7),
+        ("scan", tl!("Center on the Sheet"), 0.0, false, 8),
+        ("align-left", tl!("Push Left"), 0.0, false, 9),
+        ("align-right", tl!("Push Right"), 0.0, false, 10),
+        ("align-left", tl!("Push Up"), q, false, 11),
+        ("align-right", tl!("Push Down"), q, false, 12),
+        ("link", tl!("Group (Ctrl+G)"), 0.0, false, 14),
+        ("unlink", tl!("Ungroup (Ctrl+Shift+G)"), 0.0, false, 15),
+        ("trash", tl!("Delete (Del)"), 0.0, false, 13),
+    ];
+    // Separators after these.
+    let breaks = [17u8, 3, 5, 8, 12, 15];
+    let height = ops.len() as f32 * 30.0 + breaks.len() as f32 * 9.0 + 12.0;
+    let r = ERect::from_min_size(area.min + vec2(10.0, 10.0), vec2(PALETTE_W, height.min(area.height() - 20.0)));
+    ui.painter().rect(r.translate(vec2(0.0, 2.0)), 10.0, Color32::from_black_alpha(12), Stroke::NONE, StrokeKind::Inside);
+    ui.painter().rect(r, 10.0, Color32::WHITE, Stroke::new(1.0, t.card_border), StrokeKind::Inside);
+    let mut col = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(8.0, 6.0))).layout(egui::Layout::top_down(egui::Align::Center)));
+    col.spacing_mut().item_spacing.y = 2.0;
+    let mut op = None;
+    for (icon, tip, angle, mirror, id) in ops {
+        // Stretching resizes the visual's source (all its copies): one visual alone only.
+        let enabled = match id {
+            16 => !d.undo.is_empty(),
+            17 => !d.redo.is_empty(),
+            4 | 5 => single.is_some(),
+            14 => list.len() > 1 && !d.is_one_group(&list),
+            15 => d.any_grouped(&list),
+            _ => on,
+        };
+        if tool_button(&mut col, icon, tip, enabled, angle, mirror).clicked() {
+            op = Some(id);
+        }
+        if breaks.contains(&id) {
+            let (line, _) = col.allocate_exact_size(vec2(PALETTE_W - 16.0, 7.0), Sense::hover());
+            col.painter().line_segment([line.left_center(), line.right_center()], Stroke::new(1.0, t.separator));
+        }
+    }
+    match op {
+        Some(16) => {
+            d.undo();
+        }
+        Some(17) => {
+            d.redo();
+        }
+        Some(op) if on => {
+            d.checkpoint(None);
+            let ok = match op {
+                0 => d.rotate_block(&list, -1),
+                1 => d.rotate_block(&list, 1),
+                2 => {
+                    d.mirror_block(&list, true);
+                    true
+                }
+                3 => {
+                    d.mirror_block(&list, false);
+                    true
+                }
+                4 | 5 => {
+                    if let Some(i) = single {
+                        d.stretch(i, op == 4);
+                    }
+                    true
+                }
+                6 => d.center_block(&list, true, false),
+                7 => d.center_block(&list, false, true),
+                8 => d.center_block(&list, true, true),
+                9 => {
+                    d.align_block(&list, Side::Left);
+                    true
+                }
+                10 => {
+                    d.align_block(&list, Side::Right);
+                    true
+                }
+                11 => {
+                    d.align_block(&list, Side::Top);
+                    true
+                }
+                12 => {
+                    d.align_block(&list, Side::Bottom);
+                    true
+                }
+                14 => d.group(),
+                15 => d.ungroup(),
+                _ => {
+                    d.delete_block(&list);
+                    true
+                }
+            };
+            if !ok {
+                if op >= 14 {
+                    d.undo.pop();
+                } else {
+                    d.status = if op <= 1 { tl!("No room to turn this visual") } else { tl!("Too close to another visual") }.to_string();
+                }
+            }
+        }
+        _ => {}
     }
 }
+
+/// The warnings a visual carries (background left, semi-transparent pixels), as shown.
+fn warning_texts(d: &GangSheetDialog, src: &Source) -> Vec<String> {
+    let mut lines = Vec::new();
+    if d.settings.warn_background && src.background {
+        lines.push(tl!("Background not removed (opaque corners)").to_string());
+    }
+    if d.settings.warn_semi && src.semi > cmd::SEMI_TRANSPARENT_WARNING {
+        lines.push(crate::i18n::fmt(tl!("Semi-transparent pixels: {p} %"), &[("p", &widgets::fmt_num_prec(src.semi * 100.0, 1))]));
+    }
+    lines
+}
+
+/// The status bar: the resolution legend, the hovered or selected visual's place, size and
+/// resolution (or the selection's box), the last message, and the sheets' totals on the right.
+fn status_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
+    ui.painter().rect_filled(rect, 0.0, Color32::WHITE);
+    let mut bar = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+    bar.spacing_mut().item_spacing.x = 6.0;
+    let small = |text: String, c: Color32| egui::RichText::new(text).size(11.5).color(c);
+    if d.settings.show_res {
+        for (level, short, long) in [
+            (DpiLevel::Optimal, "≥ 300 ppi", tl!("Optimal resolution >= 300 dpi")),
+            (DpiLevel::Good, "≥ 250", tl!("Good resolution >= 250 dpi")),
+            (DpiLevel::Low, "≥ 200", tl!("Poor resolution >= 200 dpi")),
+            (DpiLevel::Poor, "< 200", tl!("Very poor resolution < 200 dpi")),
+        ] {
+            let (b, _) = bar.allocate_exact_size(vec2(9.0, 9.0), Sense::hover());
+            bar.painter().rect_filled(b, 2.0, level_color(level));
+            bar.label(small(short.to_string(), t.text_dim)).on_hover_text(long);
+            bar.add_space(6.0);
+        }
+    }
+    if d.settings.show_overlap {
+        let (b, _) = bar.allocate_exact_size(vec2(9.0, 9.0), Sense::hover());
+        bar.painter().rect_filled(b, 2.0, BLUE);
+        bar.label(small(tl!("Overlapping or too close").to_string(), t.text_dim));
+        bar.add_space(6.0);
+    }
+    widgets::vline(&mut bar, 16.0);
+    let list = d.sel();
+    let shown = d.hovered.or(d.single()).filter(|i| *i < d.placed().len());
+    if let Some(i) = shown
+        && let Some(src) = d.placed().get(i).and_then(|p| d.sources.get(p.source)).cloned()
+    {
+        let it = d.item(i);
+        let place = format!(
+            "{} {} cm · {} {} cm · {} × {} cm · {}",
+            tl!("Left"),
+            cm_text(it.x),
+            tl!("Top"),
+            cm_text(it.y),
+            cm_text(it.w),
+            cm_text(it.h),
+            ppi_text(src.dpi())
+        );
+        bar.label(small(place, t.text));
+        for w in warning_texts(d, &src) {
+            bar.label(small(w, t.warning));
+        }
+    } else if list.len() > 1 {
+        let b = d.bbox(&list);
+        let n = crate::i18n::fmt(tl!("{n} visuals selected"), &[("n", &list.len().to_string())]);
+        bar.label(small(format!("{n} · {} × {} cm", cm_text(b.w), cm_text(b.h)), t.text));
+    }
+    if !d.status.is_empty() {
+        bar.label(small(d.status.clone(), t.warning));
+    }
+    bar.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        let visuals: usize = d.sheets.iter().map(|s| s.placed.len() * s.copies).sum();
+        let sheets: usize = d.sheets.iter().map(|s| s.copies).sum();
+        ui.label(small(
+            crate::i18n::fmt(tl!("Total: {sheets} sheets · {visuals} visuals"), &[("sheets", &sheets.to_string()), ("visuals", &visuals.to_string())]),
+            t.text_dim,
+        ));
+        let items = d.items();
+        let used = d.sheet().used_length(&items);
+        ui.label(small(crate::i18n::fmt(tl!("Length used: {length} cm"), &[("length", &cm_text(used))]), t.text_dim));
+    });
+}
+
+
+
+
 
 /// The settings of visual `source`; `placed`: its copy selected on the sheet, if any.
 fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, source: usize, placed: Option<usize>, t: &Tokens) {
@@ -2629,14 +3194,7 @@ fn multi_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, list: &[usize], t: &T
 }
 
 fn warnings_lines(ui: &mut egui::Ui, d: &GangSheetDialog, src: &Source, t: &Tokens) {
-    let mut lines = Vec::new();
-    if d.settings.warn_background && src.background {
-        lines.push(tl!("Background not removed (opaque corners)").to_string());
-    }
-    if d.settings.warn_semi && src.semi > cmd::SEMI_TRANSPARENT_WARNING {
-        lines.push(crate::i18n::fmt(tl!("Semi-transparent pixels: {p} %"), &[("p", &widgets::fmt_num_prec(src.semi * 100.0, 1))]));
-    }
-    for l in lines {
+    for l in warning_texts(d, src) {
         ui.horizontal(|ui| {
             crate::icons::image("triangle-alert", 13.0, t.warning).paint_at(ui, ERect::from_min_size(ui.cursor().min + vec2(0.0, 3.0), vec2(13.0, 13.0)));
             ui.add_space(18.0);
@@ -2645,256 +3203,7 @@ fn warnings_lines(ui: &mut egui::Ui, d: &GangSheetDialog, src: &Source, t: &Toke
     }
 }
 
-fn settings_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
-    let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 14.0))));
-    panel.spacing_mut().item_spacing.y = 6.0;
-    let mut s = d.settings;
-    egui::ScrollArea::vertical().id_salt("gang-settings").auto_shrink([false, false]).show(&mut panel, |ui| {
-        switch_row(ui, tl!("Show Resolution Lines"), &mut s.show_res);
-        switch_row(ui, tl!("Overlap Lines"), &mut s.show_overlap);
-        switch_row(ui, tl!("Snap While Moving"), &mut s.snap);
-        switch_row(ui, tl!("Background Warning:"), &mut s.warn_background);
-        switch_row(ui, tl!("Transparency Warning:"), &mut s.warn_semi);
-        switch_row(ui, tl!("Grid (1 cm)"), &mut s.grid);
-        ui.add_space(4.0);
-        ui.horizontal(|ui| {
-            ui.label(egui::RichText::new(tl!("Sheet Background")).color(t.text));
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                let custom = Color32::from_rgb(s.custom[0], s.custom[1], s.custom[2]);
-                let r = widgets::color_edit_button_srgb(ui, &mut s.custom).on_hover_text(tl!("Custom Color"));
-                if r.changed() || r.clicked() {
-                    s.backdrop = Backdrop::Color(Color32::from_rgb(s.custom[0], s.custom[1], s.custom[2]));
-                }
-                let _ = custom;
-                for (bd, tip) in [
-                    (Backdrop::Color(Color32::WHITE), tl!("White")),
-                    (Backdrop::Color(Color32::BLACK), tl!("Black")),
-                    (Backdrop::Color(Color32::from_gray(128)), tl!("Gray")),
-                    (Backdrop::Checker, tl!("Transparent")),
-                ] {
-                    let (r, resp) = ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
-                    match bd {
-                        Backdrop::Checker => widgets::checker(ui.painter(), r, 5.5),
-                        Backdrop::Color(c) => {
-                            ui.painter().rect_filled(r, 3.0, c);
-                        }
-                    }
-                    let sel = s.backdrop == bd;
-                    ui.painter().rect_stroke(r, 3.0, Stroke::new(if sel { 2.0 } else { 1.0 }, if sel { t.text } else { t.field_border }), StrokeKind::Outside);
-                    if resp.on_hover_text(tip).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
-                        s.backdrop = bd;
-                    }
-                }
-            });
-        });
-        widgets::hairline(ui);
-        switch_row(ui, tl!("Sheet Margin"), &mut s.edge_on);
-        if s.edge_on {
-            number_row(ui, tl!("Along the edges"), &mut s.edge_cm, 0.0..=10.0, "cm", 2);
-        }
-        if s.cells_on {
-            ui.label(egui::RichText::new(tl!("Cells touch: no spacing between images.")).size(11.5).color(t.text_faint));
-        } else {
-            switch_row(ui, tl!("Image Margin"), &mut s.gap_on);
-            if s.gap_on {
-                number_row(ui, tl!("Between images"), &mut s.gap_cm, 0.0..=10.0, "cm", 2);
-            }
-        }
-        widgets::hairline(ui);
-        number_row(ui, tl!("Film Width"), &mut s.width_cm, 10.0..=300.0, "cm", 1);
-        let printed = s.width_cm - if s.edge_on { 2.0 * s.edge_cm } else { 0.0 };
-        ui.label(egui::RichText::new(crate::i18n::fmt(tl!("Printed width: {width} cm"), &[("width", &widgets::fmt_num(f64::from(printed)))])).size(11.5).color(t.text_faint));
-        number_row(ui, tl!("Max Length"), &mut s.max_length_cm, 10.0..=MAX_LENGTH_CM, "cm", 1);
-        switch_row(ui, tl!("Auto Build May Rotate"), &mut s.rotate);
-        widgets::hairline(ui);
-        switch_row(ui, tl!("Split the Width into Cells"), &mut s.cells_on);
-        if s.cells_on {
-            let mut cols = s.cells_cols as f32;
-            if number_row(ui, tl!("Columns"), &mut cols, 1.0..=cmd::MAX_COLUMNS as f32, "", 0) {
-                s.cells_cols = (cols.round() as u32).clamp(1, cmd::MAX_COLUMNS);
-            }
-            let edge = if s.edge_on { cm_units(s.edge_cm) } else { 0 };
-            let (sheet, n) = (Sheet::new(cm_units(s.width_cm), cm_units(s.max_length_cm), edge, 0), s.cells_cols);
-            ui.label(
-                egui::RichText::new(crate::i18n::fmt(
-                    tl!("Cells of {size} × {size} cm · {rows} rows"),
-                    &[("size", &cm_text(sheet.cell_size(n))), ("rows", &sheet.cell_rows(n).to_string())],
-                ))
-                .size(11.5)
-                .color(t.text_faint),
-            );
-            switch_row(ui, tl!("Organize Automatically on Import"), &mut s.cells_auto);
-            switch_row(ui, tl!("Snap to the Cells"), &mut s.cells_snap);
-        }
-    });
-    d.set_settings(s);
-}
 
-fn toolbar_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
-    let mut bar = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(10.0, 6.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
-    bar.spacing_mut().item_spacing.x = 2.0;
-    // Film size.
-    let mut s = d.settings;
-    let mut width = s.width_cm;
-    let labels: Vec<(f32, String)> = {
-        let mut v: Vec<f32> = FILM_PRESETS.to_vec();
-        if !v.iter().any(|p| (p - width).abs() < 0.05) {
-            v.push(width);
-        }
-        v.iter().map(|w| (*w, format!("{} cm x {} cm", widgets::fmt_num(f64::from(*w)), widgets::fmt_num(f64::from(s.max_length_cm))))).collect()
-    };
-    let opts: Vec<(f32, &str)> = labels.iter().map(|(w, l)| (*w, l.as_str())).collect();
-    if widgets::dropdown(&mut bar, "gang-film", &mut width, &opts, 140.0) {
-        s.width_cm = width;
-    }
-    bar.add_space(4.0);
-    // Cells: none, or the printed width in so many columns.
-    let mut cols = d.cols();
-    let cell_labels: Vec<(u32, String)> = {
-        let mut v: Vec<u32> = COLUMN_PRESETS.to_vec();
-        if cols > 0 && !v.contains(&cols) {
-            v.push(cols);
-            v.sort_unstable();
-        }
-        let sheet = d.sheet();
-        let mut out = vec![(0, tl!("No Cells").to_string())];
-        out.extend(v.iter().map(|n| (*n, format!("{n} × {} cm", cm_text(sheet.cell_size(*n))))));
-        out
-    };
-    let cell_opts: Vec<(u32, &str)> = cell_labels.iter().map(|(n, l)| (*n, l.as_str())).collect();
-    if widgets::dropdown(&mut bar, "gang-cells", &mut cols, &cell_opts, 110.0) {
-        s.cells_on = cols > 0;
-        if cols > 0 {
-            s.cells_cols = cols;
-        }
-    }
-    bar.add_space(8.0);
-    widgets::vline(&mut bar, 22.0);
-    if tool_button(&mut bar, "undo-2", tl!("Undo (Ctrl+Z)"), !d.undo.is_empty(), 0.0, false).clicked() {
-        d.undo();
-    }
-    if tool_button(&mut bar, "redo-2", tl!("Redo (Ctrl+Y)"), !d.redo.is_empty(), 0.0, false).clicked() {
-        d.redo();
-    }
-    widgets::vline(&mut bar, 22.0);
-    if tool_button(&mut bar, "grid-2x2", tl!("Grid (1 cm)"), true, 0.0, false).clicked() {
-        s.grid = !s.grid;
-    }
-    // A narrow window leaves the spacing to Settings and Auto Build, so every tool keeps its room.
-    let narrow = rect.width() < 1160.0;
-    if !narrow && !s.cells_on {
-        widgets::vline(&mut bar, 22.0);
-        widgets::checkbox(&mut bar, &mut s.gap_on, tl!("Image Margin"));
-        bar.add_space(4.0);
-        bar.add_enabled_ui(s.gap_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 64.0, 2));
-    }
-    d.set_settings(s);
-    widgets::vline(&mut bar, 22.0);
-    let list = d.sel();
-    let on = !list.is_empty();
-    let single = d.single();
-    let q = std::f32::consts::FRAC_PI_2;
-    type Op = (&'static str, &'static str, f32, bool, u8);
-    let ops: [Op; 16] = [
-        ("rotate-cw", tl!("Rotate 90° Counterclockwise"), 0.0, true, 0),
-        ("rotate-cw", tl!("Rotate 90° Clockwise"), 0.0, false, 1),
-        ("flip-h", tl!("Flip Horizontally"), 0.0, false, 2),
-        ("flip-v", tl!("Flip Vertically"), 0.0, false, 3),
-        ("stretch-h", tl!("Stretch to the Film Width"), 0.0, false, 4),
-        ("stretch-v", tl!("Stretch to the Sheet Length"), 0.0, false, 5),
-        ("align-center", tl!("Center Horizontally"), 0.0, false, 6),
-        ("align-center", tl!("Center Vertically"), q, false, 7),
-        ("scan", tl!("Center on the Sheet"), 0.0, false, 8),
-        ("align-left", tl!("Push Left"), 0.0, false, 9),
-        ("align-right", tl!("Push Right"), 0.0, false, 10),
-        ("align-left", tl!("Push Up"), q, false, 11),
-        ("align-right", tl!("Push Down"), q, false, 12),
-        ("link", tl!("Group (Ctrl+G)"), 0.0, false, 14),
-        ("unlink", tl!("Ungroup (Ctrl+Shift+G)"), 0.0, false, 15),
-        ("trash", tl!("Delete (Del)"), 0.0, false, 13),
-    ];
-    let mut op = None;
-    for (icon, tip, angle, mirror, id) in ops {
-        // Stretching resizes the visual's source (all its copies): one visual alone only.
-        let enabled = match id {
-            4 | 5 => single.is_some(),
-            14 => list.len() > 1 && !d.is_one_group(&list),
-            15 => d.any_grouped(&list),
-            _ => on,
-        };
-        if tool_button(&mut bar, icon, tip, enabled, angle, mirror).clicked() {
-            op = Some(id);
-        }
-        if matches!(id, 3 | 5 | 8 | 12 | 15) {
-            widgets::vline(&mut bar, 22.0);
-        }
-    }
-    if let Some(op) = op
-        && on
-    {
-        d.checkpoint(None);
-        let ok = match op {
-            0 => d.rotate_block(&list, -1),
-            1 => d.rotate_block(&list, 1),
-            2 => {
-                d.mirror_block(&list, true);
-                true
-            }
-            3 => {
-                d.mirror_block(&list, false);
-                true
-            }
-            4 | 5 => {
-                if let Some(i) = single {
-                    d.stretch(i, op == 4);
-                }
-                true
-            }
-            6 => d.center_block(&list, true, false),
-            7 => d.center_block(&list, false, true),
-            8 => d.center_block(&list, true, true),
-            9 => {
-                d.align_block(&list, Side::Left);
-                true
-            }
-            10 => {
-                d.align_block(&list, Side::Right);
-                true
-            }
-            11 => {
-                d.align_block(&list, Side::Top);
-                true
-            }
-            12 => {
-                d.align_block(&list, Side::Bottom);
-                true
-            }
-            14 => d.group(),
-            15 => d.ungroup(),
-            _ => {
-                d.delete_block(&list);
-                true
-            }
-        };
-        if !ok {
-            if op >= 14 {
-                d.undo.pop();
-            } else {
-                d.status = if op <= 1 { tl!("No room to turn this visual") } else { tl!("Too close to another visual") }.to_string();
-            }
-        }
-    }
-    bar.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-        let label = tl!("Auto Build");
-        let (r, resp) = ui.allocate_exact_size(vec2(widgets::button_width(ui, &[label]).max(if narrow { 0.0 } else { 150.0 }), 28.0), Sense::click());
-        let fill = if d.auto_view { t.primary_bg } else { BLUE };
-        ui.painter().rect_filled(r, 6.0, if resp.hovered() { fill.gamma_multiply(0.9) } else { fill });
-        ui.painter().text(r.center(), Align2::CENTER_CENTER, label, FontId::proportional(12.5), Color32::WHITE);
-        if resp.on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
-            d.auto_view = !d.auto_view;
-        }
-    });
-}
 
 /// Auto Build: every visual's size and copies, then Apply.
 fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens, act: &mut Actions, has_doc: bool) {
@@ -3057,142 +3366,6 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
     });
 }
 
-/// The active gang sheets.
-fn sheets_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
-    ui.painter().rect_filled(rect, 0.0, Color32::WHITE);
-    ui.painter().line_segment([rect.left_top(), rect.left_bottom()], Stroke::new(1.0, t.separator));
-    let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 12.0))));
-    panel.spacing_mut().item_spacing.y = 8.0;
-    panel.label(egui::RichText::new(format!("({})   {}", d.sheets.len(), tl!("Active Gang Sheets"))).font(crate::theme::semibold(13.0)).color(t.text));
-    let mut pick = None;
-    let mut dup = None;
-    let mut del = None;
-    let mut rename_done = None;
-    let many = d.sheets.len() > 1;
-    egui::ScrollArea::vertical().id_salt("gang-sheets").max_height(panel.available_height() * 0.6).auto_shrink([false, true]).show(&mut panel, |ui| {
-        for k in 0..d.sheets.len() {
-            let active = k == d.active;
-            let Some(doc) = d.sheets.get(k).cloned() else { continue };
-            // The sheet's real size: as long as its visuals need.
-            let film = crate::i18n::fmt(
-                tl!("{width} × {length} cm (max {max})"),
-                &[
-                    ("width", &widgets::fmt_num(f64::from(d.settings.width_cm))),
-                    ("length", &cm_text(d.used_on(k))),
-                    ("max", &widgets::fmt_num(f64::from(d.settings.max_length_cm))),
-                ],
-            );
-            let frame = egui::Frame::NONE
-                .fill(Color32::WHITE)
-                .stroke(Stroke::new(if active { 1.5 } else { 1.0 }, if active { t.text } else { t.card_border }))
-                .corner_radius(CornerRadius::same(8))
-                .inner_margin(egui::Margin::same(10));
-            let resp = frame
-                .show(ui, |ui| {
-                    ui.set_width(ui.available_width());
-                    ui.spacing_mut().item_spacing.y = 4.0;
-                    ui.horizontal(|ui| {
-                        crate::icons::image("house", 12.0, t.text).paint_at(ui, ERect::from_min_size(ui.cursor().min + vec2(0.0, 2.0), vec2(12.0, 12.0)));
-                        ui.add_space(16.0);
-                        ui.label(egui::RichText::new(&film).size(11.0).color(t.text));
-                        if many {
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                if tool_button(ui, "x", tl!("Delete the Sheet"), true, 0.0, false).clicked() {
-                                    del = Some(k);
-                                }
-                            });
-                        }
-                    });
-                    ui.horizontal(|ui| match d.renaming.as_mut() {
-                        Some((rk, text)) if *rk == k => {
-                            let r = widgets::text_field(ui, egui::Id::new(("gang-rename", k)), text, "", ui.available_width() - 4.0, false);
-                            r.request_focus();
-                            if r.lost_focus() {
-                                rename_done = Some((k, text.clone()));
-                            }
-                        }
-                        _ => {
-                            ui.label(egui::RichText::new(&doc.name).color(t.text));
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                if tool_button(ui, "pencil", tl!("Rename"), true, 0.0, false).clicked() {
-                                    d.renaming = Some((k, doc.name.clone()));
-                                }
-                            });
-                        }
-                    });
-                    ui.label(egui::RichText::new(crate::i18n::fmt(tl!("{n} images"), &[("n", &doc.placed.len().to_string())])).size(11.0).color(t.text_faint));
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(tl!("Qty:")).color(t.text));
-                        let mut q = doc.copies as f32;
-                        if widgets::typed_value_field(ui, &mut q, 1.0..=999.0, "", 56.0, 0).on_hover_text(tl!("Copies of this sheet to print")).changed()
-                            && let Some(s) = d.sheets.get_mut(k)
-                        {
-                            s.copies = q.round().clamp(1.0, 999.0) as usize;
-                        }
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            if ui
-                                .add(egui::Label::new(egui::RichText::new(tl!("Duplicate")).color(t.text)).sense(Sense::click()))
-                                .on_hover_cursor(egui::CursorIcon::PointingHand)
-                                .clicked()
-                            {
-                                dup = Some(k);
-                            }
-                        });
-                    });
-                })
-                .response;
-            if !active && ui.interact(resp.rect, ui.id().with(("gang-sheet-card", k)), Sense::click()).clicked() {
-                pick = Some(k);
-            }
-        }
-    });
-    if let Some((k, name)) = rename_done {
-        if let Some(s) = d.sheets.get_mut(k)
-            && !name.trim().is_empty()
-        {
-            s.name = name.trim().to_string();
-        }
-        d.renaming = None;
-    }
-    if let Some(k) = pick {
-        d.active = k;
-        d.selected.clear();
-    }
-    if let Some(k) = dup {
-        d.checkpoint(None);
-        d.duplicate_sheet(k);
-    }
-    if let Some(k) = del {
-        d.checkpoint(None);
-        d.delete_sheet(k);
-    }
-    panel.add_space(8.0);
-    let link = |ui: &mut egui::Ui, icon: &str, label: &str| -> bool {
-        let r = ui
-            .horizontal(|ui| {
-                crate::icons::image(icon, 15.0, t.text).paint_at(ui, ERect::from_min_size(ui.cursor().min + vec2(0.0, 2.0), vec2(15.0, 15.0)));
-                ui.add_space(22.0);
-                ui.add(egui::Label::new(egui::RichText::new(label).color(t.text)).sense(Sense::click()))
-            })
-            .inner;
-        r.on_hover_cursor(egui::CursorIcon::PointingHand).clicked()
-    };
-    if link(&mut panel, "file-plus", tl!("Add a New Sheet")) {
-        d.checkpoint(None);
-        d.new_sheet();
-    }
-    if link(&mut panel, "layers", tl!("Auto Build")) {
-        d.auto_view = true;
-    }
-    if link(&mut panel, "undo-2", tl!("Start Over")) {
-        d.checkpoint(None);
-        d.start_over();
-    }
-    let items = d.items();
-    let used = d.sheet().used_length(&items);
-    panel.add_space(8.0);
-    panel.label(egui::RichText::new(crate::i18n::fmt(tl!("Length used: {length} cm"), &[("length", &cm_text(used))])).color(t.text_dim));
-}
 
 fn keys(d: &mut GangSheetDialog, ctx: &egui::Context, act: &mut Actions) {
     use egui::{Key, Modifiers};
@@ -3411,11 +3584,12 @@ fn svg_dialog(app: &mut PhotocraftApp, ctx: &egui::Context) {
 fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Tokens) {
     let sheet = d.sheet();
     let painter = ui.painter_at(view);
-    painter.rect_filled(view, 0.0, Color32::WHITE);
+    painter.rect_filled(view, 0.0, t.canvas);
     let area = ERect::from_min_max(view.min + vec2(RULER, RULER), view.max);
     let (sw, sl) = (sheet.width.max(1) as f32, sheet.max_length.max(1) as f32);
     // The overlay card sits at the top left: the sheet fits in the room beside it when there is.
-    let beside = if area.width() > CARD_W + 320.0 { CARD_W + 20.0 } else { 0.0 };
+    // The tool palette floats at the left: the sheet fits in the room beside it.
+    let beside = PALETTE_ROOM;
     let fit = ((area.width() - beside - 40.0) / sw).min((area.height() - 40.0) / sl).max(1e-4);
     let resp = ui.interact(area, ui.id().with("gang-sheet-view"), Sense::click_and_drag());
     if resp.hovered() {
@@ -3453,7 +3627,7 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     let px_per_cm = UNITS_PER_CM as f32 * s;
     if d.settings.grid && px_per_cm >= 4.0 {
         let line = |strong: bool| {
-            Stroke::new(1.0, if strong { Color32::from_rgba_unmultiplied(29, 155, 240, 90) } else { Color32::from_rgba_unmultiplied(29, 155, 240, 40) })
+            Stroke::new(1.0, if strong { Color32::from_rgba_unmultiplied(192, 58, 168, 80) } else { Color32::from_rgba_unmultiplied(192, 58, 168, 34) })
         };
         for c in 1..(sheet.width / UNITS_PER_CM) {
             let x = origin.x + c as f32 * px_per_cm;
@@ -3481,7 +3655,7 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     let cols = d.cols();
     let (cell, rows) = (sheet.cell_size(cols), sheet.cell_rows(cols));
     if cell > 0 && rows > 0 && cell as f32 * s >= 6.0 {
-        let stroke = Stroke::new(1.0, Color32::from_rgba_unmultiplied(29, 99, 235, 110));
+        let stroke = Stroke::new(1.0, Color32::from_rgba_unmultiplied(192, 58, 168, 110));
         let (x0, y0) = (sheet.edge, sheet.edge);
         let (x1, y1) = (x0 + i64::from(cols) * cell, y0 + rows * cell);
         for k in 0..=i64::from(cols) {
@@ -3498,12 +3672,12 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     // Below the length the visuals need: hatched, not exported.
     if used > 0 && used < sheet.max_length {
         let r = ERect::from_min_max(to_screen(0, used), to_screen(sheet.width, sheet.max_length));
-        clip.rect_filled(r, 0.0, Color32::from_rgba_unmultiplied(226, 229, 234, 215));
+        clip.rect_filled(r, 0.0, Color32::from_rgba_unmultiplied(234, 231, 240, 215));
         let hatch = clip.with_clip_rect(r.intersect(area));
         let step = 12.0;
         let mut off = -r.height();
         while off < r.width() {
-            hatch.line_segment([pos2(r.left() + off, r.bottom()), pos2(r.left() + off + r.height(), r.top())], Stroke::new(1.0, Color32::from_rgba_unmultiplied(150, 156, 166, 70)));
+            hatch.line_segment([pos2(r.left() + off, r.bottom()), pos2(r.left() + off + r.height(), r.top())], Stroke::new(1.0, Color32::from_rgba_unmultiplied(160, 150, 178, 70)));
             off += step;
         }
         if r.height() > 30.0 && r.width() > 120.0 {
@@ -3516,8 +3690,8 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     }
     if used > 0 {
         let y = origin.y + used as f32 * s;
-        clip.extend(Shape::dashed_line(&[pos2(film_r.left(), y), pos2(film_r.right(), y)], Stroke::new(1.5, BLUE), 6.0, 4.0));
-        clip.text(pos2(film_r.right() - 4.0, y - 3.0), Align2::RIGHT_BOTTOM, format!("{} cm", cm_text(used)), FontId::proportional(11.0), BLUE);
+        clip.extend(Shape::dashed_line(&[pos2(film_r.left(), y), pos2(film_r.right(), y)], Stroke::new(1.5, MAGENTA), 6.0, 4.0));
+        clip.text(pos2(film_r.right() - 4.0, y - 3.0), Align2::RIGHT_BOTTOM, format!("{} cm", cm_text(used)), FontId::proportional(11.0), MAGENTA);
     }
     // Pointer: pick (Shift or Ctrl adds), drag the selection, draw a rectangle from empty film.
     let hit = |p: Pos2| -> Option<usize> {
@@ -3746,9 +3920,9 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
     if !list.is_empty() {
         let b = d.bbox(&list);
         let rect = if list.len() > 1 { frame_of(b) } else { ERect::from_min_max(to_screen(b.x, b.y), to_screen(b.x + b.w, b.y + b.h)) };
-        clip.rect_stroke(rect, 0.0, Stroke::new(1.5, t.text), StrokeKind::Outside);
+        clip.rect_stroke(rect, 0.0, Stroke::new(1.5, MAGENTA), StrokeKind::Outside);
         for c in [rect.left_top(), rect.right_top(), rect.right_bottom(), rect.left_bottom()] {
-            clip.circle_filled(c, 4.0, t.text);
+            clip.circle_filled(c, 4.0, MAGENTA);
         }
     }
     if let Some(m) = &d.marquee {
@@ -3784,87 +3958,10 @@ fn sheet_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, view: ERect, t: &Token
             side_p.text(pos2(side.left() + 1.0, y + 2.0), Align2::LEFT_TOP, c.to_string(), FontId::proportional(9.0), t.text_dim);
         }
     }
-    overlay_card(ui, d, area, t);
+    tool_palette(ui, d, area, t);
     zoom_controls(ui, d, area, t);
 }
 
-/// The card at the top left of the sheet: line switches, legend, and the hovered or selected
-/// visual's figures.
-fn overlay_card(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tokens) {
-    let r = ERect::from_min_size(area.min + vec2(10.0, 10.0), vec2(250.0, 0.0));
-    let mut card = ui.new_child(egui::UiBuilder::new().max_rect(ERect::from_min_size(r.min, vec2(250.0, area.height() - 20.0))));
-    let mut s = d.settings;
-    card_frame(t).show(&mut card, |ui| {
-        ui.set_width(228.0);
-        ui.spacing_mut().item_spacing.y = 3.0;
-        widgets::checkbox(ui, &mut s.show_overlap, tl!("Show Overlap Lines"));
-        ui.add_space(2.0);
-        widgets::checkbox(ui, &mut s.show_res, tl!("Show Resolution Lines"));
-        if s.show_res || s.show_overlap {
-            ui.add_space(4.0);
-            let mut legend: Vec<(Color32, &str)> = Vec::new();
-            if s.show_res {
-                legend.extend([
-                    (level_color(DpiLevel::Optimal), tl!("Optimal resolution >= 300 dpi")),
-                    (level_color(DpiLevel::Good), tl!("Good resolution >= 250 dpi")),
-                    (level_color(DpiLevel::Low), tl!("Poor resolution >= 200 dpi")),
-                    (level_color(DpiLevel::Poor), tl!("Very poor resolution < 200 dpi")),
-                ]);
-            }
-            if s.show_overlap {
-                legend.push((BLUE, tl!("Overlapping or too close")));
-            }
-            for (c, label) in legend {
-                ui.horizontal(|ui| {
-                    let (b, _) = ui.allocate_exact_size(vec2(10.0, 10.0), Sense::hover());
-                    ui.painter().rect_filled(b, 1.0, c);
-                    ui.label(egui::RichText::new(label).size(11.0).color(t.text));
-                });
-            }
-        }
-        let list = d.sel();
-        let shown = d.hovered.or(d.single()).filter(|i| *i < d.placed().len());
-        if shown.is_none() && list.len() > 1 {
-            // Several selected: their box.
-            let b = d.bbox(&list);
-            widgets::hairline(ui);
-            ui.label(egui::RichText::new(crate::i18n::fmt(tl!("{n} visuals selected"), &[("n", &list.len().to_string())])).size(11.0).color(t.text));
-            egui::Grid::new("gang-info-multi").num_columns(2).spacing(vec2(24.0, 2.0)).show(ui, |ui| {
-                for (k, v) in [
-                    (tl!("Left"), format!("{} cm", cm_text(b.x))),
-                    (tl!("Top"), format!("{} cm", cm_text(b.y))),
-                    (tl!("Width"), format!("{} cm", cm_text(b.w))),
-                    (tl!("Height"), format!("{} cm", cm_text(b.h))),
-                ] {
-                    ui.label(egui::RichText::new(k).size(11.0).color(t.text));
-                    ui.label(egui::RichText::new(v).size(11.0).color(t.text));
-                    ui.end_row();
-                }
-            });
-        }
-        if let Some(i) = shown
-            && let Some(src) = d.placed().get(i).and_then(|p| d.sources.get(p.source)).cloned()
-        {
-            let it = d.item(i);
-            widgets::hairline(ui);
-            egui::Grid::new("gang-info").num_columns(2).spacing(vec2(24.0, 2.0)).show(ui, |ui| {
-                for (k, v) in [
-                    (tl!("Left"), format!("{} cm", cm_text(it.x))),
-                    (tl!("Top"), format!("{} cm", cm_text(it.y))),
-                    (tl!("Width"), format!("{} cm", cm_text(it.w))),
-                    (tl!("Height"), format!("{} cm", cm_text(it.h))),
-                    (tl!("Resolution"), ppi_text(src.dpi())),
-                ] {
-                    ui.label(egui::RichText::new(k).size(11.0).color(t.text));
-                    ui.label(egui::RichText::new(v).size(11.0).color(t.text));
-                    ui.end_row();
-                }
-            });
-            warnings_lines(ui, d, &src, t);
-        }
-    });
-    d.set_settings(s);
-}
 
 fn zoom_controls(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tokens) {
     let r = ERect::from_min_size(pos2(area.right() - 190.0, area.bottom() - 40.0), vec2(180.0, 30.0));
@@ -4195,10 +4292,10 @@ mod tests {
         let screen = |h: &Harness<'_, (PhotocraftApp, bool)>, i: usize| -> Pos2 {
             let d = h.state().0.gang_sheet.as_ref().unwrap();
             let r = d.item(i);
-            let view = ERect::from_min_max(pos2(RAIL_W + LEFT_W, HEADER_H + TOOLBAR_H), pos2(1600.0 - RIGHT_W, 1000.0));
+            let view = regions(ERect::from_min_size(Pos2::ZERO, vec2(1600.0, 1000.0))).canvas;
             let area = ERect::from_min_max(view.min + vec2(RULER, RULER), view.max);
             let sheet = d.sheet();
-            let beside = if area.width() > CARD_W + 320.0 { CARD_W + 20.0 } else { 0.0 };
+            let beside = PALETTE_ROOM;
             let fit = ((area.width() - beside - 40.0) / sheet.width as f32).min((area.height() - 40.0) / sheet.max_length as f32);
             let origin = area.min + d.scroll;
             pos2(origin.x + (r.x + r.w / 2) as f32 * fit, origin.y + (r.y + r.h / 2) as f32 * fit)
@@ -4452,9 +4549,9 @@ mod tests {
         crate::theme::apply(&ctx, ThemeKind::ProMedium);
         app.run("file.new", json!({"width": 400, "height": 200, "resolution": 300})).unwrap();
         invoke(&mut app, &ctx, json!({"addDocument": true, "source": {"index": 0, "onSheet": 3}}));
-        for tab in [Tab::Home, Tab::Settings] {
+        for closed in [[false; 4], [true; 4]] {
             if let Some(d) = app.gang_sheet.as_mut() {
-                d.tab = tab;
+                d.closed = closed;
                 d.selected = vec![0];
             }
             ctx.run_ui(Default::default(), |ui| show(&mut app, ui.ctx())).textures_delta.clear();

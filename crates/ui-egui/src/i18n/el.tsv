@@ -4241,3 +4241,14 @@ curves	Smooth	Εξομάλυνση
 	Soft Black T-Shirt	Μαύρο μπλουζάκι – απαλό
 	White T-Shirt	Λευκό μπλουζάκι
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Επίπεδα ρετούς (φωτεινότητα +32, κορεσμός +16), κρυφά
+# DTF Craft (30)
+	Cells	Κελιά
+	Click: show the sheet · Double-click: rename it	Κλικ: εμφάνιση φύλλου · Διπλό κλικ: μετονομασία
+	Copies to Print	Αντίτυπα για εκτύπωση
+	Custom Width	Προσαρμοσμένο πλάτος
+	Drop PNG or SVG files here	Αποθέστε εδώ αρχεία PNG ή SVG
+	Duplicate the Sheet	Αντιγραφή φύλλου
+	Every sheet emptied, the visuals kept	Όλα τα φύλλα αδειάζουν, τα σχέδια μένουν
+	Every visual's size and copies, then lay the sheets out	Μέγεθος και αντίτυπα κάθε σχεδίου, μετά διάταξη των φύλλων
+	Film	Φιλμ
+	Total: {sheets} sheets · {visuals} visuals	Σύνολο: {sheets} φύλλα · {visuals} σχέδια

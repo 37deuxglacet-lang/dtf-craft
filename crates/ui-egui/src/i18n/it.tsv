@@ -4503,3 +4503,14 @@ navigator	Zoom	Zoom
 	Soft Black T-Shirt	T-shirt nera morbida
 	White T-Shirt	T-shirt bianca
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Livelli di ritocco (luminosità +32, saturazione +16), nascosti
+# DTF Craft (30)
+	Cells	Celle
+	Click: show the sheet · Double-click: rename it	Clic: mostra il foglio · Doppio clic: rinomina
+	Copies to Print	Copie da stampare
+	Custom Width	Larghezza personalizzata
+	Drop PNG or SVG files here	Trascina qui file PNG o SVG
+	Duplicate the Sheet	Duplica il foglio
+	Every sheet emptied, the visuals kept	Tutti i fogli svuotati, le grafiche restano
+	Every visual's size and copies, then lay the sheets out	Dimensioni e copie di ogni grafica, poi disposizione dei fogli
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Totale: {sheets} fogli · {visuals} grafiche

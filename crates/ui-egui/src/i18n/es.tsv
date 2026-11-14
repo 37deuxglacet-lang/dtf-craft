@@ -3248,3 +3248,15 @@ curves	Smooth	Suavizar
 	Soft Black T-Shirt	Camiseta negra suave
 	White T-Shirt	Camiseta blanca
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Capas de retoque (brillo +32, saturación +16), ocultas
+# DTF Craft (30)
+	Cells	Celdas
+	Click: show the sheet · Double-click: rename it	Clic: mostrar la hoja · Doble clic: cambiar el nombre
+	Copies to Print	Copias a imprimir
+	Custom Width	Ancho personalizado
+	Display	Visualización
+	Drop PNG or SVG files here	Suelte aquí archivos PNG o SVG
+	Duplicate the Sheet	Duplicar la hoja
+	Every sheet emptied, the visuals kept	Todas las hojas vaciadas, los diseños se conservan
+	Every visual's size and copies, then lay the sheets out	Tamaño y copias de cada diseño, luego organizar las hojas
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Total: {sheets} hojas · {visuals} diseños

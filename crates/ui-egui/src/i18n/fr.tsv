@@ -3584,3 +3584,15 @@ curves	Smooth	Lisser
 	Soft Black T-Shirt	T-shirt noir doux
 	White T-Shirt	T-shirt blanc
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Calques de retouche (luminosité +32, saturation +16), masqués
+# DTF Craft (30)
+	Cells	Subdivision
+	Click: show the sheet · Double-click: rename it	Clic : afficher la planche · Double-clic : la renommer
+	Copies to Print	Exemplaires
+	Custom Width	Laize personnalisée
+	Display	Affichage
+	Drop PNG or SVG files here	Déposez vos fichiers PNG ou SVG ici
+	Duplicate the Sheet	Dupliquer la planche
+	Every sheet emptied, the visuals kept	Toutes les planches vidées, les visuels gardés
+	Every visual's size and copies, then lay the sheets out	Taille et quantité de chaque visuel, puis mise en planche
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Total : {sheets} planches · {visuals} visuels

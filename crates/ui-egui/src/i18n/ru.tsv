@@ -3522,3 +3522,15 @@ curves	Smooth	Сгладить
 	Soft Black T-Shirt	Чёрная футболка — мягко
 	White T-Shirt	Белая футболка
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Слои ретуши (яркость +32, насыщенность +16), скрыты
+# DTF Craft (30)
+	Cells	Ячейки
+	Click: show the sheet · Double-click: rename it	Щелчок: показать лист · Двойной щелчок: переименовать
+	Copies to Print	Копий для печати
+	Custom Width	Своя ширина
+	Display	Отображение
+	Drop PNG or SVG files here	Перетащите сюда файлы PNG или SVG
+	Duplicate the Sheet	Дублировать лист
+	Every sheet emptied, the visuals kept	Все листы очищены, изображения сохранены
+	Every visual's size and copies, then lay the sheets out	Размер и количество каждого изображения, затем раскладка листов
+	Film	Плёнка
+	Total: {sheets} sheets · {visuals} visuals	Всего: листов {sheets} · изображений {visuals}

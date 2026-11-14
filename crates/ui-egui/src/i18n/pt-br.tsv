@@ -4330,3 +4330,14 @@ layerLabel	No Color	Sem cor
 	Soft Black T-Shirt	Camiseta preta suave
 	White T-Shirt	Camiseta branca
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Camadas de retoque (brilho +32, saturação +16), ocultas
+# DTF Craft (30)
+	Cells	Células
+	Click: show the sheet · Double-click: rename it	Clique: mostrar a folha · Clique duplo: renomear
+	Copies to Print	Cópias a imprimir
+	Custom Width	Largura personalizada
+	Drop PNG or SVG files here	Solte arquivos PNG ou SVG aqui
+	Duplicate the Sheet	Duplicar a folha
+	Every sheet emptied, the visuals kept	Todas as folhas esvaziadas, os visuais mantidos
+	Every visual's size and copies, then lay the sheets out	Tamanho e cópias de cada visual, depois montar as folhas
+	Film	Filme
+	Total: {sheets} sheets · {visuals} visuals	Total: {sheets} folhas · {visuals} visuais

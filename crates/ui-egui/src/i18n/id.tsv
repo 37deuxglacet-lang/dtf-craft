@@ -3546,3 +3546,15 @@ curves	Smooth	Haluskan
 	Soft Black T-Shirt	Kaus hitam lembut
 	White T-Shirt	Kaus putih
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Layer retus (kecerahan +32, saturasi +16), tersembunyi
+# DTF Craft (30)
+	Cells	Sel
+	Click: show the sheet · Double-click: rename it	Klik: tampilkan lembar · Klik ganda: ganti nama
+	Copies to Print	Salinan untuk dicetak
+	Custom Width	Lebar khusus
+	Display	Tampilan
+	Drop PNG or SVG files here	Letakkan file PNG atau SVG di sini
+	Duplicate the Sheet	Duplikat lembar
+	Every sheet emptied, the visuals kept	Semua lembar dikosongkan, visual tetap ada
+	Every visual's size and copies, then lay the sheets out	Ukuran dan jumlah tiap visual, lalu tata lembar
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Total: {sheets} lembar · {visuals} visual

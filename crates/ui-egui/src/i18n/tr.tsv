@@ -4272,3 +4272,14 @@ cameraData	Lens	Lens
 	Soft Black T-Shirt	Siyah tişört – yumuşak
 	White T-Shirt	Beyaz tişört
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Rötuş katmanları (parlaklık +32, doygunluk +16), gizli
+# DTF Craft (30)
+	Cells	Hücreler
+	Click: show the sheet · Double-click: rename it	Tıklama: sayfayı göster · Çift tıklama: yeniden adlandır
+	Copies to Print	Basılacak kopya
+	Custom Width	Özel genişlik
+	Drop PNG or SVG files here	PNG veya SVG dosyalarını buraya bırakın
+	Duplicate the Sheet	Sayfayı çoğalt
+	Every sheet emptied, the visuals kept	Tüm sayfalar boşaltılır, görseller kalır
+	Every visual's size and copies, then lay the sheets out	Her görselin boyutu ve adedi, ardından sayfa yerleşimi
+	Film	Film
+	Total: {sheets} sheets · {visuals} visuals	Toplam: {sheets} sayfa · {visuals} görsel

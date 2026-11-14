@@ -3726,3 +3726,15 @@ curves	Smooth	매끄럽게
 	Soft Black T-Shirt	검정 티셔츠 (부드럽게)
 	White T-Shirt	흰색 티셔츠
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	보정 레이어 (명도 +32, 채도 +16), 숨김
+# DTF Craft (30)
+	Cells	셀
+	Click: show the sheet · Double-click: rename it	클릭: 시트 표시 · 더블클릭: 이름 바꾸기
+	Copies to Print	인쇄 매수
+	Custom Width	사용자 지정 너비
+	Display	표시
+	Drop PNG or SVG files here	PNG 또는 SVG 파일을 여기에 놓으세요
+	Duplicate the Sheet	시트 복제
+	Every sheet emptied, the visuals kept	모든 시트를 비우고 이미지는 유지
+	Every visual's size and copies, then lay the sheets out	각 이미지의 크기와 수량을 정한 뒤 시트 배치
+	Film	필름
+	Total: {sheets} sheets · {visuals} visuals	합계: {sheets}개 시트 · {visuals}개 이미지

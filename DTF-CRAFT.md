@@ -20,7 +20,7 @@ produit officiel du projet PhotoCraft.
 | Netteté… | Netteté optimisée avec aperçu |
 | Saturation… | Saturation (+15 par défaut) avec aperçu |
 | Halftone DTF… | Deux onglets. Automatique : cinq préréglages repris des actions Photoshop de Stéphane Glacet — T-shirt noir (négatif, Niveaux 50–240 γ 0,5 deux fois, 25 lpi, 22°, rond, fond noir), T-shirt noir doux (Niveaux une fois), T-shirt blanc (sans négatif, Niveaux deux fois, fond blanc), Noir et blanc (55 lpi, points blancs, fond noir), Uniforme (trame régulière à 92 %, sans fond) ; option « Calques de retouche » : groupe masqué « RasterFx » (Luminosité/Contraste +32, Teinte/Saturation +16) au-dessus du calque tramé. Manuel (réglages verrouillés à l'ouverture, cadenas et Réinitialiser) : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat |
-| Gang sheet… | Fenêtre plein écran claire : import, réglages, plusieurs planches, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
+| Gang sheet… | Fenêtre plein écran claire, aux couleurs du logo DTF Craft : import, réglages, plusieurs planches en onglets, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
 | Vectorisation… | Module plein écran (comme Camera Raw) : le visuel est réduit à une palette (8 couleurs par défaut, 2 à 16) puis nettoyé (les liserés trop fins d'une couleur intermédiaire entre deux autres, typiques des bords flous ou JPEG, reviennent à la plus proche des deux ; les contours sont lissés à la couleur majoritaire du voisinage, sans dents ni marches, à une échelle fixée par le niveau de détail) et tracé en formes vectorielles découpées, une couleur unie par forme, sans superposition. Réglages : type de visuel (logo · aplats / illustration · nuances), niveau de détail, lissage (courbes / angles vifs), suppression du fond lu au bord du visuel, joints fermés entre couleurs (chaque forme déborde d'un demi-pixel sur ses voisines ; à décocher pour un traceur de découpe). Aperçu original / vectorisé / côte à côte, contours, zoom jusqu'à 800 % (Ctrl+molette, boutons − / +, double-clic ; glisser ou molette pour se déplacer ; les deux images suivent en côte à côte ; la partie visible du vectorisé est redessinée nette à la résolution de l'écran), palette où décocher une couleur la retire du SVG. Nuancier de référence partagé avec l'Analyseur couleur : référence la plus proche et ΔE 2000 par couleur détectée, « Changer… », case ⇄ (auto jusqu'à ΔE 5) qui remplace la couleur par la référence dans l'aperçu et le SVG, formes nommées d'après la référence (id SVG, calques à l'ouverture). Fiche PDF A4 : original et vectorisé côte à côte, couleurs du SVG et leurs références. Deux moteurs au choix : « DTF Craft » (ci-dessus) et « VectorCraft » (Image Trace de VectorCraft, copié sans modification) avec ses 15 préréglages et tous ses réglages : mode (noir et blanc avec seuil, niveaux de gris, couleur, logo aplats), palette (limitée, tons continus, automatique, ou le nuancier de référence), couleurs, détail couleur, tracés, angles, bruit, méthode (juxtaposée / superposée), remplissages et traits en lignes centrales avec leur épaisseur, ignorer une couleur, accrocher les courbes aux lignes, formes exactes, dégradés linéaires ; la table des couleurs, le nuancier, la fiche PDF et l'export sont les mêmes avec les deux moteurs. Export SVG à la taille d'impression du document, ouvert en option dans un nouvel onglet en calques de forme ; le document n'est pas modifié. Traceurs : visioncortex (MIT OR Apache-2.0) et VectorCraft Image Trace (ArtCraft Team et contributeurs VectorCraft, MIT OR Apache-2.0) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
@@ -82,72 +82,82 @@ Ctrl+Alt+Z annule puis rétablit le dernier changement avant « Appliquer ».
 
 ## Gang sheet
 
-DTF › Gang sheet… ouvre une fenêtre plein écran, toujours claire (quel que soit le thème), sur le
-modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
+DTF › Gang sheet… ouvre une fenêtre plein écran, toujours claire (quel que soit le thème), aux
+couleurs du logo DTF Craft : panneaux blancs et gris mauve, magenta pour Exporter, la sélection,
+les cases et la fin de planche, bleu pour Importer et Construction auto. Échap ou Annuler la
+referme.
 
-- **En-tête** : Annuler, Exporter le PNG… (ou Exporter les planches quand il y en a plusieurs).
-- **Barre d'outils** : format de la planche (laize × longueur), subdivision (sans, ou 2, 3, 4, 5,
-  6, 8 colonnes, affichées avec la taille des cases, par exemple « 4 × 10 cm »), annuler /
-  rétablir, grille, marge
-  de l'image (masquée sur un écran étroit, toujours dans Paramètres), outils de la sélection
-  (rotation 90° dans les deux sens, retournement horizontal et vertical, étirement à la laize ou à
-  la longueur pour un visuel seul, centrage horizontal, vertical ou sur la planche, pousser à
-  gauche, à droite, en haut, en bas, grouper, dégrouper, supprimer) et Construction auto.
-- **Accueil** (colonne de gauche) : zone d'import (« Importer des images », PNG ou SVG, ou
-  fichiers glissés sur la fenêtre ; « Ajouter le document ouvert », aplati). Chaque visuel est
-  rogné à ses pixels visibles et apparaît en vignette avec son nombre d'exemplaires sur la planche
-  (clic : afficher ses réglages ; double-clic : un exemplaire de plus ; × : retirer le visuel ; le
-  visuel affiché est encadré). Les réglages du dernier visuel sélectionné, importé ou modifié
-  restent affichés à droite tant qu'il y a des visuels, même quand les planches sont reconstruites.
-  Le visuel affiché se règle :
-  largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
-  d'images (en mode cases : la quantité totale, toutes planches confondues ; les planches sont
-  reconstruites et générées autant qu'il en faut, 124 logos de 10 cm donnent 36 + 36 + 36 + 16 ;
-  sans cases : la quantité sur la planche, l'excédent part sur de nouvelles planches), marge propre
-  (interrupteur), Remplissage automatique (remplit la place restante), Dupliquer l'image. En mode
-  cases, un exemplaire supprimé ou dupliqué à la main compte dans la quantité à la réorganisation
-  suivante. Plusieurs visuels sélectionnés (ou un groupe) : leur nombre, la
-  taille de leur cadre, Aligner (bords gauches, centres horizontaux, bords droits, bords hauts,
-  centres verticaux, bords bas, sur le cadre de la sélection ; 2 blocs au moins), Répartir
-  (horizontalement ou verticalement, à espacement égal, le premier et le dernier restant en place ;
-  3 blocs au moins), Grouper, Dégrouper, Dupliquer, Supprimer. Un groupe compte comme un seul bloc ;
-  un alignement ou une répartition qui rapprocherait deux visuels à moins de la marge est refusé
-  (rien ne bouge).
+- **En-tête** : logo, « Gang sheet », un onglet par planche (nom et nombre d'exemplaires à
+  imprimer, par exemple « Gang sheet 1 · ×1 » ; clic : afficher la planche ; double-clic : la
+  renommer) et « + » (nouvelle planche), puis Annuler et Exporter le PNG… (ou Exporter les
+  planches quand il y en a plusieurs).
+- **Colonne de gauche** : zone d'import (« Importer des images », PNG ou SVG, ou fichiers glissés
+  sur la fenêtre ; « Ajouter le document ouvert », aplati), puis **Construction auto**, puis la
+  liste des visuels : une ligne par visuel avec vignette, nom, taille d'impression et résolution,
+  pastille de résolution et quantité (− champ +). Chaque visuel est rogné à ses pixels visibles.
+  Clic : afficher ses réglages (ligne encadrée en magenta) ; double-clic : un exemplaire de plus ;
+  × (au survol) : retirer le visuel.
+- **Palette d'outils** (flottante, à gauche de la planche) : annuler / rétablir, rotation 90° dans
+  les deux sens, retournement horizontal et vertical, étirement à la laize ou à la longueur pour un
+  visuel seul, centrage horizontal, vertical ou sur la planche, pousser à gauche, à droite, en haut,
+  en bas, grouper, dégrouper, supprimer.
+- **Colonne de droite**, en sections repliables :
+  - **Planche** : nom (crayon pour renommer), taille réelle (par exemple « 42 × 62 cm (max 100) »)
+    et nombre d'images, exemplaires à imprimer, Dupliquer, Supprimer la planche, Recommencer.
+  - **Film** : laize (30, 40, 42, 56, 57 ou 60 cm), subdivision (sans, ou 2, 3, 4, 5, 6, 8 colonnes,
+    avec la taille des cases, par exemple « 4 × 10 cm »), organisation automatique à l'import,
+    aimantation aux cases, marge du plan de travail (le long des bords, 1 cm par défaut), marge de
+    l'image (entre les visuels, 1 cm par défaut, sans objet avec les cases), largeur imprimable
+    (laize moins les deux marges : 40 cm), laize personnalisée, longueur max (100 cm au plus),
+    rotation autorisée pour la construction auto.
+  - **Visuel sélectionné** : les réglages du dernier visuel sélectionné, importé ou modifié
+    (ils restent affichés tant qu'il y a des visuels, même quand les planches sont reconstruites) :
+    largeur et hauteur en cm, proportions verrouillables, résolution, avertissements, quantité
+    d'images (en mode cases : la quantité totale, toutes planches confondues ; les planches sont
+    reconstruites et générées autant qu'il en faut, 124 logos de 10 cm donnent 36 + 36 + 36 + 16 ;
+    sans cases : la quantité sur la planche, l'excédent part sur de nouvelles planches), marge propre
+    (interrupteur), Remplissage automatique (remplit la place restante), Dupliquer l'image. En mode
+    cases, un exemplaire supprimé ou dupliqué à la main compte dans la quantité à la réorganisation
+    suivante. Plusieurs visuels sélectionnés (ou un groupe) : leur nombre, la taille de leur cadre,
+    Aligner (bords gauches, centres horizontaux, bords droits, bords hauts, centres verticaux, bords
+    bas, sur le cadre de la sélection ; 2 blocs au moins), Répartir (horizontalement ou
+    verticalement, à espacement égal, le premier et le dernier restant en place ; 3 blocs au moins),
+    Grouper, Dégrouper, Dupliquer, Supprimer. Un groupe compte comme un seul bloc ; un alignement ou
+    une répartition qui rapprocherait deux visuels à moins de la marge est refusé (rien ne bouge).
+  - **Affichage** (replié à l'ouverture) : lignes de résolution, lignes en chevauchement,
+    alignement automatique pendant le déplacement, avertissement sur l'arrière-plan (coins opaques :
+    fond non détouré), avertissement de transparence (plus de 0,5 % de pixels semi-transparents),
+    grille 1 cm, fond de la planche (damier, gris, noir, blanc, couleur au choix).
+
+  Ces réglages sont repris à l'ouverture suivante.
+- **Barre d'état** (en bas) : légende des résolutions (≥ 300 ppp, ≥ 250, ≥ 200, < 200) et des
+  chevauchements ; pour le visuel survolé ou sélectionné : position gauche / haut, taille,
+  résolution et avertissements (ou le nombre et le cadre des visuels sélectionnés) ; le dernier
+  message ; à droite, la longueur utilisée et le total des planches et des visuels.
 - **Champs numériques** : ils se saisissent au clavier ; glisser la souris dessus ne change rien.
-- **Paramètres** : lignes de résolution, lignes en chevauchement, alignement automatique pendant
-  le déplacement, avertissement sur l'arrière-plan (coins opaques : fond non détouré),
-  avertissement de transparence (plus de 0,5 % de pixels semi-transparents), grille 1 cm, fond de
-  la planche (damier, gris, noir, blanc, couleur au choix), marge du plan de travail (le long des
-  bords, 1 cm par défaut), marge de l'image (entre les visuels, 1 cm par défaut, sans objet avec
-  les cases), laize (42 cm par défaut) et largeur imprimable qui en découle (laize moins les deux
-  marges : 40 cm), longueur max (100 cm au plus), rotation autorisée pour la construction auto,
-  subdivision de la largeur en cases (activée par défaut : 4 colonnes), organisation automatique à
-  l'import, aimantation aux cases. Ces réglages sont repris à l'ouverture suivante.
 - **Cases** : la largeur imprimable est découpée en colonnes de cases carrées (40 cm en 4
   colonnes : cases de 10 × 10 cm, 9 rangées entières dans les 98 cm entre les marges d'une planche
   de 100 cm). Chaque visuel occupe les cases entières qu'il lui faut (0,5 mm de tolérance) et y est
   centré en largeur et en hauteur ; les cases se touchent, sans espacement. Chaque import replace
   tous les visuels (les plus grands d'abord, rotation si elle raccourcit la planche) et ouvre une
   nouvelle planche quand une est pleine. Un visuel déplacé à la main se pose dans les cases les
-  plus proches. Les cases sont tracées en pointillés bleus (non imprimés).
+  plus proches. Les cases sont tracées en pointillés magenta (non imprimés).
 - **SVG** : chaque fichier SVG déposé ou importé ouvre une fenêtre « Taille d'impression du SVG »
   (aperçu, largeur et hauteur liées, boutons « Largeur en cases » 1, 2, 3, 4…), une fenêtre par
   fichier ; Placer ou Passer. Taille proposée : celle du fichier quand elle est en cm, mm, in, pt
   ou pc, sinon une case (10 cm). Le dessin est rogné à sa partie visible et rendu directement à
   sa taille d'impression à l'export (300 ppp), même agrandi après coup : jamais pixellisé. Les
   textes utilisent les polices installées ; une image incluse garde sa propre résolution.
-- **Planche** : la longueur utile (bas du dernier visuel plus la marge) est marquée en bleu ; au
-  delà, jusqu'à la longueur max, la zone est hachurée (« Réserve jusqu'à 100 cm · non exportée »).
-  Règles en cm, carte en haut à gauche (afficher les lignes en chevauchement et de
-  résolution, légende, et pour le visuel survolé ou sélectionné : position gauche / haut, largeur,
-  hauteur, résolution, avertissements). Contours : vert ≥ 300 ppp, jaune ≥ 250, rouge ≥ 200, noir
-  en dessous ; bleu pour un visuel en chevauchement ou trop proche. Molette : défilement ;
+- **Planche** : la longueur utile (bas du dernier visuel plus la marge) est marquée en magenta ;
+  au delà, jusqu'à la longueur max, la zone est hachurée (« Réserve jusqu'à 100 cm · non
+  exportée »). Règles en cm. Contours : vert ≥ 300 ppp, jaune ≥ 250, rouge ≥ 200, noir en dessous ;
+  bleu pour un visuel en chevauchement ou trop proche ; la sélection est encadrée en magenta. Molette : défilement ;
   Ctrl + molette : zoom ; boutons de zoom en bas à droite.
 - **Sélection** : clic sur un visuel ; Maj+clic (ou Ctrl+clic) ajoute ou retire un visuel ; un
   rectangle tracé depuis une zone vide du film prend tous les visuels qu'il touche (Maj : ajoutés à
   la sélection) ; Ctrl+A : tous ; Échap : plus rien.
-- **Groupes** : Ctrl+G groupe la sélection, Ctrl+Maj+G dégroupe (aussi dans la barre d'outils, le
-  clic droit et la colonne de gauche). Un clic sur un visuel du groupe prend tout le groupe ; un
+- **Groupes** : Ctrl+G groupe la sélection, Ctrl+Maj+G dégroupe (aussi dans la palette d'outils,
+  le clic droit et la section Visuel sélectionné). Un clic sur un visuel du groupe prend tout le groupe ; un
   groupe est entouré d'un cadre pointillé et garde les écarts entre ses visuels. Annuler revient
   sur un groupage.
 - **Déplacement** : glisser au millimètre ; la sélection se déplace d'un bloc et reste sur le
@@ -156,10 +166,6 @@ modèle des constructeurs de planches en ligne. Échap ou Annuler la referme.
   chaque visuel tourne avec lui ; retournement : le bloc est retourné. Flèches : 1 mm (Maj : 1 cm) ;
   Suppr, Ctrl+C / Ctrl+X / Ctrl+V, Ctrl+D, Ctrl+Z / Ctrl+Y ; clic droit : copier, coller,
   supprimer, dupliquer, grouper, dégrouper, tout sélectionner, remplissage automatique, rotation.
-- **Gang sheets actives** (colonne de droite) : une carte par planche (taille réelle, par exemple
-  « 42 × 62 cm (max 100) », nom modifiable,
-  nombre d'images, quantité à imprimer, dupliquer, supprimer) ; Ajouter une nouvelle planche,
-  Construction auto, Recommencer ; longueur utilisée.
 - **Construction auto** : tous les visuels avec largeur, hauteur, verrou des proportions,
   résolution et nombre d'exemplaires (dupliquer : même image, autre taille) ; marges et rotation ;
   Appliquer replace tout, les plus grands d'abord, et ouvre une nouvelle planche quand une est

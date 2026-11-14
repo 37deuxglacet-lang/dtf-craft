@@ -4148,3 +4148,15 @@ curves	Smooth	Wygładź
 	Soft Black T-Shirt	Czarna koszulka – łagodnie
 	White T-Shirt	Biała koszulka
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Warstwy retuszu (jasność +32, nasycenie +16), ukryte
+# DTF Craft (30)
+	Cells	Komórki
+	Click: show the sheet · Double-click: rename it	Kliknięcie: pokaż arkusz · Dwukrotne kliknięcie: zmień nazwę
+	Copies to Print	Kopie do druku
+	Custom Width	Własna szerokość
+	Display	Wyświetlanie
+	Drop PNG or SVG files here	Upuść tutaj pliki PNG lub SVG
+	Duplicate the Sheet	Powiel arkusz
+	Every sheet emptied, the visuals kept	Wszystkie arkusze opróżnione, grafiki zachowane
+	Every visual's size and copies, then lay the sheets out	Rozmiar i liczba kopii każdej grafiki, potem układ arkuszy
+	Film	Folia
+	Total: {sheets} sheets · {visuals} visuals	Razem: {sheets} arkuszy · {visuals} grafik

@@ -4461,3 +4461,14 @@ cameraRaw	Yellow	Sárga
 	Soft Black T-Shirt	Fekete póló – lágy
 	White T-Shirt	Fehér póló
 	Retouch Layers (Brightness +32, Saturation +16), Hidden	Retusáló rétegek (fényerő +32, telítettség +16), rejtve
+# DTF Craft (30)
+	Cells	Cellák
+	Click: show the sheet · Double-click: rename it	Kattintás: ív megjelenítése · Dupla kattintás: átnevezés
+	Copies to Print	Nyomtatandó példányok
+	Custom Width	Egyéni szélesség
+	Drop PNG or SVG files here	Ide húzza a PNG- vagy SVG-fájlokat
+	Duplicate the Sheet	Ív kettőzése
+	Every sheet emptied, the visuals kept	Minden ív kiürítve, a képek megmaradnak
+	Every visual's size and copies, then lay the sheets out	Minden kép mérete és példányszáma, majd az ívek elrendezése
+	Film	Fólia
+	Total: {sheets} sheets · {visuals} visuals	Összesen: {sheets} ív · {visuals} kép
