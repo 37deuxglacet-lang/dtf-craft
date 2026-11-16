@@ -742,6 +742,7 @@ enum Action {
 
 /// The module, over the main window while it is open.
 pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let _dtf = crate::dtf_i18n::scope();
     let Some(a) = app.color_analyzer.as_ref() else { return };
     // Its document was closed.
     if !app.session.documents().iter().any(|d| d.doc.id == a.doc) {

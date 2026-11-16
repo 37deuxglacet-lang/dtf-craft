@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! UI localisation. Strings in code stay English and are the default lookup keys; the craft-i18n
 //! catalogs map them to display text at render time. Command ids, menu paths used for logic, the
 //! control channel, the CLI and MCP never see translated text, so agents and scripts are
@@ -428,6 +430,12 @@ pub fn t(s: &str) -> &str {
 
 /// Translate an English UI string; unknown strings come back unchanged.
 pub fn tr(lang: Lang, s: &str) -> &str {
+    // DTF Craft: in a DTF window, its own wording first (`dtf_i18n`).
+    if crate::dtf_i18n::active()
+        && let Some(own) = lang.i18n().get(lang.lang, crate::dtf_i18n::CONTEXT, s)
+    {
+        return own;
+    }
     lang.i18n().t(lang.lang, s)
 }
 

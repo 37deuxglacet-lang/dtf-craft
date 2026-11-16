@@ -8,7 +8,7 @@ lists every file changed from that base (`PHOTOCRAFT-BASE.toml` records it for u
 All changes: Copyright (c) 2026 Stéphane Glacet, under the same terms as the original
 (MIT OR Apache-2.0, at your option).
 
-## Modified (95)
+## Modified (96)
 
 The DTF code lives in the added files; the PhotoCraft files below only hook it in.
 
@@ -54,7 +54,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/engine/src/lib.rs` | declares the DTF command modules |
 | `crates/engine/src/shell_commands.rs` | Help › About DTF Craft |
 | `crates/io/src/svg.rs` | declares `svg/dtf.rs` (gang sheet SVG helpers) |
-| `crates/ui-egui/build.rs` | adds `src/i18n/dtf/<locale>.tsv` to each craft-i18n catalog |
+| `crates/ui-egui/build.rs` | adds `src/i18n/dtf/<locale>.tsv` to each craft-i18n catalog (strings PhotoCraft also has under the `dtf` context) |
 | `crates/ui-egui/examples/snapshot.rs` | `--dtf-craft` flag for DTF captures |
 | `crates/ui-egui/src/app.rs` | initial state of the DTF modules |
 | `crates/ui-egui/src/app/commands.rs` | cut-out's Toggle Last State |
@@ -64,7 +64,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/canvas/start_screen.rs` | hands the start screen to `dtf_home.rs` |
 | `crates/ui-egui/src/canvas/tabs.rs` | `paint_dots` made `pub(crate)` |
 | `crates/ui-egui/src/canvas/tool_input.rs` | cut-out clicks (holes, background eyedropper) |
-| `crates/ui-egui/src/dialogs.rs` | About: DTF Craft, then its base |
+| `crates/ui-egui/src/dialogs.rs` | About: DTF Craft, then its base; DTF dialogs in the DTF wording |
 | `crates/ui-egui/src/dialogs/credits/ui_tests.rs` | About test with the DTF Craft name |
 | `crates/ui-egui/src/dialogs/file_ui/print.rs` | rebranded label |
 | `crates/ui-egui/src/dialogs/filter_dialog.rs` | DTF dialogs: param spec extras (cm, text defaults, descriptions), DTF Halftone tabs and lock, help sheet and tooltips, cut-out preview |
@@ -75,6 +75,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/dock/tests.rs` | dock tests with the DTF group |
 | `crates/ui-egui/src/gpu_status.rs` | rebranded label |
 | `crates/ui-egui/src/i18n/live_tests.rs` | menu test with the DTF Craft name |
+| `crates/ui-egui/src/i18n.rs` | DTF windows read the `dtf` rows first (`dtf_i18n.rs`) |
 | `crates/ui-egui/src/icon_data.rs` | DTF icons |
 | `crates/ui-egui/src/input/shortcuts.rs` | DTF full-window modules keep the keyboard |
 | `crates/ui-egui/src/lib.rs` | declares the DTF modules and their state |
@@ -110,7 +111,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/widgets/tests.rs` | test of the typed-only field |
 | `crates/ui-egui/src/widgets/units.rs` | typed-only number fields (Gang Sheet) |
 
-## Added (40)
+## Added (41)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -130,6 +131,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 - `crates/engine/src/gang_sheet_cmds.rs`
 - `crates/ui-egui/src/dtf_halftone_ui.rs`
 - `crates/ui-egui/src/dtf_help.rs`
+- `crates/ui-egui/src/dtf_i18n.rs`
 - `crates/ui-egui/src/dtf_panel.rs`
 - `crates/ui-egui/src/dtf_upscale_gpu_tests.rs`
 - `crates/ui-egui/src/gang_sheet_ui.rs`

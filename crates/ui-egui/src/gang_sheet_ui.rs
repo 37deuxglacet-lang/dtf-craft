@@ -2193,6 +2193,7 @@ struct Actions {
 }
 
 pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let _dtf = crate::dtf_i18n::scope();
     if app.gang_sheet.is_none() {
         return;
     }

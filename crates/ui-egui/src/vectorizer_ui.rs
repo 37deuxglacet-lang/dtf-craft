@@ -1004,6 +1004,7 @@ enum Action {
 
 /// The module, over the main window while it is open.
 pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let _dtf = crate::dtf_i18n::scope();
     let Some(v) = app.vectorizer.as_ref() else { return };
     // Its document was closed.
     if !app.session.documents().iter().any(|d| d.doc.id == v.doc) {
@@ -1014,8 +1015,10 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let mut action = None;
     let screen = ctx.content_rect();
     egui::Area::new(egui::Id::unique("dtf-vectorizer")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
+        // An export's error goes to the status bar, which the module covers: shown in its footer.
+        let failed = app.ui.status_error.then(|| app.ui.status.clone()).filter(|s| !s.is_empty());
         let Some(v) = app.vectorizer.as_mut() else { return };
-        action = draw(ui, v, screen);
+        action = draw(ui, v, screen, failed.as_deref());
     });
     if let Some(v) = app.vectorizer.as_mut()
         && v.changing.is_some()
@@ -1059,7 +1062,10 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             close(app);
             return;
         }
-        Some(Action::Export) => export_svg(app),
+        Some(Action::Export) => {
+            app.ui.status_error = false;
+            export_svg(app)
+        }
         Some(Action::LoadBook) => analyzer::load_swatch_book(app),
         Some(Action::Pdf) => export_pdf(app),
     };
@@ -1069,7 +1075,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     }
 }
 
-fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
+fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect, failed: Option<&str>) -> Option<Action> {
     let t = Tokens::get(ui.ctx());
     let (full, _) = ui.allocate_exact_size(screen.size(), Sense::click_and_drag());
     let painter = ui.painter().clone();
@@ -1123,6 +1129,12 @@ fn draw(ui: &mut egui::Ui, v: &mut Vectorizer, screen: Rect) -> Option<Action> {
     }
     if buttons.button(tl!("Close")).clicked() {
         action = Some(Action::Close);
+    }
+    if let Some(msg) = failed {
+        let room = (buttons.min_rect().left() - foot.left() - 40.0).max(80.0);
+        let mut left = ui.new_child(egui::UiBuilder::new().max_rect(foot.shrink2(vec2(16.0, 10.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+        left.set_max_width(room);
+        left.add(egui::Label::new(RichText::new(msg).color(t.danger)).wrap_mode(egui::TextWrapMode::Truncate)).on_hover_text(msg);
     }
     action
 }
@@ -2124,6 +2136,32 @@ mod tests {
         h.get_by_label("Fit on Screen").click();
         h.run_steps(2);
         assert_eq!(h.state().vectorizer.as_ref().unwrap().zoom, 1.0);
+    }
+
+    /// An export that fails says why in the module's footer: the status bar is under the module.
+    #[test]
+    fn an_export_error_shows_in_the_footer() {
+        let (mut app, _) = app();
+        open(&mut app).unwrap();
+        app.ui.status = "the export failed: disk full".into();
+        app.ui.status_error = true;
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).with_accessibility_check(false).build_ui_state(
+            |ui, app: &mut PhotocraftApp| {
+                let ready = egui::Id::unique("vectorizer-error-fonts");
+                if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
+                    PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
+                    ui.ctx().data_mut(|d| d.insert_temp(ready, true));
+                    return;
+                }
+                show(app, ui.ctx());
+            },
+            app,
+        );
+        h.run_steps(3);
+        assert!(h.query_by_label("the export failed: disk full").is_some());
+        h.state_mut().ui.status_error = false;
+        h.run_steps(2);
+        assert!(h.query_by_label("the export failed: disk full").is_none(), "only an error");
     }
 
     #[test]

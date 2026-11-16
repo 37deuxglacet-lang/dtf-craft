@@ -616,6 +616,8 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             crate::i18n::current()
         };
         let _language = crate::i18n::language_scope(lang);
+        // DTF Craft: a DTF command's dialog (DTF Halftone…) in the DTF windows' wording.
+        let _dtf = d.fields.get("__command").and_then(Value::as_str).filter(|c| crate::dtf_i18n::is_dtf_command(c)).map(|_| crate::dtf_i18n::scope());
         let interactive = top == Some(d.id);
         let mut fields = d.fields.clone();
         let mut outcome: Option<bool> = None; // Some(true)=OK, Some(false)=Cancel

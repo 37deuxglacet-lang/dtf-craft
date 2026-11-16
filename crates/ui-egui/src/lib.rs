@@ -64,6 +64,8 @@ pub mod color_analyzer_ui;
 pub mod color_sheet;
 pub mod dtf_halftone_ui;
 pub mod dtf_help;
+/// DTF Craft: the DTF windows' own wording where PhotoCraft has the same English string.
+pub mod dtf_i18n;
 /// DTF Craft: its start screen (PhotoCraft's `canvas::start_screen` hands over to it).
 pub(crate) mod dtf_home;
 pub mod dtf_panel;

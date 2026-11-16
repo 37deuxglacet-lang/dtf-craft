@@ -116,7 +116,8 @@ fn locales(dir: &std::path::Path) -> Result<Vec<Locale>, String> {
 /// DTF Craft: `app` (PhotoCraft's catalog for `code`) followed by `src/i18n/dtf/<code>.tsv`, written
 /// to `OUT_DIR/dtf_i18n/`; `app` itself when DTF Craft has no strings for that locale. Serbian
 /// (Latin) was `sr` in PhotoCraft's own catalogs. A DTF entry whose key PhotoCraft's catalog or the
-/// shared one already has is left out: the catalog keeps one translation per key.
+/// shared one already has goes in under the `dtf` context: PhotoCraft keeps its wording, and the
+/// DTF windows show theirs (`dtf_i18n.rs`).
 fn dtf_catalog(code: &str, app: &std::path::Path, shared: Option<&std::path::Path>) -> Result<std::path::PathBuf, String> {
     let dtf_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/i18n/dtf");
     println!("cargo::rerun-if-changed={}", dtf_dir.display());
@@ -142,10 +143,18 @@ fn dtf_catalog(code: &str, app: &std::path::Path, shared: Option<&std::path::Pat
         text.push('\n');
     }
     for line in read(&dtf)?.lines() {
-        if key(line).is_some_and(|k| !known.insert(k)) {
-            continue;
+        let mut line = line.to_string();
+        if let Some(k) = key(&line)
+            && !known.insert(k)
+        {
+            // Taken by PhotoCraft: a plain entry goes in under the `dtf` context.
+            let Some(rest) = line.strip_prefix('\t') else { continue };
+            line = format!("dtf\t{rest}");
+            if !key(&line).is_some_and(|k| known.insert(k)) {
+                continue;
+            }
         }
-        text.push_str(line);
+        text.push_str(&line);
         text.push('\n');
     }
     let out = std::path::PathBuf::from(std::env::var_os("OUT_DIR").unwrap_or_default()).join("dtf_i18n");

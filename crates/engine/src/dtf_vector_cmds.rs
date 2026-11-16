@@ -119,7 +119,9 @@ pub fn vc_param(p: &Value) -> Result<vectorize_vc::TraceParams> {
         let list = list.as_array().ok_or_else(|| bad("`swatches` must be a list of #rrggbb colours"))?;
         params.swatches = list.iter().map(|h| h.as_str().and_then(parse_hex).ok_or_else(|| bad(format!("`swatches`: bad colour {h}")))).collect::<Result<_>>()?;
     }
-    if params.palette == vectorize_vc::Palette::DocumentLibrary && params.swatches.is_empty() {
+    // Only Color traces with the palette (as the module previews): Black and White, Grayscale
+    // and Logo leave a Swatch Book palette set from before unused.
+    if params.mode == vectorize_vc::Mode::Color && params.palette == vectorize_vc::Palette::DocumentLibrary && params.swatches.is_empty() {
         return Err(bad("the swatch-book palette needs `swatches`: [#rrggbb…]"));
     }
     Ok(params)
@@ -421,6 +423,11 @@ mod tests {
         let r = s.execute(VECTORIZE, json!({"engine": "vectorcraft", "vectorcraft": {"mode": "color", "palette": "documentLibrary", "colors": 2}, "swatches": ["#0000FF", "#FF8000", "#FFFFFF"]})).unwrap();
         let hexes: Vec<&str> = r["palette"].as_array().unwrap().iter().map(|c| c["hex"].as_str().unwrap()).collect();
         assert!(hexes.iter().all(|h| ["#0000FF", "#FF8000", "#FFFFFF"].contains(h)), "{hexes:?}");
+        // A Swatch Book palette left from Color does not stop the other modes (the export failed).
+        for mode in ["bw", "grayscale", "logo"] {
+            let r = s.execute(VECTORIZE, json!({"engine": "vectorcraft", "vectorcraft": {"mode": mode, "palette": "documentLibrary"}}));
+            assert!(r.is_ok(), "{mode}: {r:?}");
+        }
         for p in [
             json!({"engine": "potrace"}),
             json!({"engine": "vectorcraft", "preset": "Nope"}),

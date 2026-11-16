@@ -705,6 +705,7 @@ pub fn keep_dtf_out_of_the_dock(app: &mut PhotocraftApp) {
 /// The DTF window, when one is open: the tool's title, its settings (scrolled when taller than
 /// the screen), closed by its × or Esc, and after Apply or Cancel.
 pub fn window(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let _dtf = crate::dtf_i18n::scope();
     keep_dtf_out_of_the_dock(app);
     let Some(cmd) = app.ui.dtf_panel.window.clone() else { return };
     let Some(tab) = TOOLS.iter().position(|t| *t == cmd) else {
