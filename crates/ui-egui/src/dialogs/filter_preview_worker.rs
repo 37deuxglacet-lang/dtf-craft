@@ -197,7 +197,7 @@ mod tests {
         assert!((worker.progress_of("image.mode.indexedColor").unwrap() - 0.4).abs() < 1e-6);
         assert!(worker.progress_of("filter.dtf.halftone").is_none(), "another command");
         release.send(()).unwrap();
-        finish(&mut worker);
+        let _ = finish(&mut worker);
         assert!(worker.progress_of("image.mode.indexedColor").is_none());
     }
 

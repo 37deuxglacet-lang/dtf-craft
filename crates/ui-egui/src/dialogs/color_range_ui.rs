@@ -1,3 +1,5 @@
+// Modified by Stéphane Glacet for DTF Craft (2026). Original file from PhotoCraft
+// (ArtCraft Team and the PhotoCraft contributors), MIT OR Apache-2.0. See MODIFICATIONS.md.
 //! Select › Color Range… as Photoshop lays it out: the Select menu (Sampled Colors, the six hue
 //! families, Highlights / Midtones / Shadows, Out Of Gamut), Fuzziness, Localized Color Clusters
 //! with Range, the tonal range of Highlights / Midtones / Shadows, the three eyedroppers (sample,
@@ -112,6 +114,33 @@ pub fn open(app: &mut PhotocraftApp) -> u64 {
     app.ui.open_dialog(DialogKind::Command, f)
 }
 
+/// DTF Craft: Color Range opened from DTF Halftone (`dtf_panel`): no sample selects nothing, and
+/// OK hands the settings back to DTF Halftone instead of selecting.
+pub fn dtf(f: &Map<String, Value>) -> bool {
+    f.contains_key("__dtfHalftone")
+}
+
+/// DTF Craft: Color Range's first fields (as [`open`] sets them) for the step in Halftone DTF.
+pub fn dtf_fields() -> Map<String, Value> {
+    let mut f = Map::new();
+    f.insert("select".into(), json!("sampledColors"));
+    f.insert("fuzziness".into(), json!(40.0));
+    f.insert("localized".into(), json!(false));
+    f.insert("range".into(), json!(100.0));
+    f.insert("toneFuzziness".into(), json!(20.0));
+    f.insert("shadowsLevel".into(), json!(65.0));
+    f.insert("highlightsLevel".into(), json!(190.0));
+    f.insert("midtonesLow".into(), json!(105.0));
+    f.insert("midtonesHigh".into(), json!(150.0));
+    f.insert("invert".into(), json!(false));
+    f.insert("points".into(), json!([]));
+    f.insert("subtractPoints".into(), json!([]));
+    f.insert("__order".into(), json!([]));
+    f.insert("__tool".into(), json!("sample"));
+    f.insert("__view".into(), json!("selection"));
+    f
+}
+
 pub fn owns(f: &Map<String, Value>) -> bool {
     f.contains_key("__colorRange")
 }
@@ -161,6 +190,10 @@ pub fn params(f: &Map<String, Value>) -> Value {
 /// OK: run the command on the document (one history step).
 pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value, String> {
     app.color_range = None;
+    // DTF Craft: opened from DTF Halftone, OK gives it the background's settings.
+    if dtf(f) {
+        return Ok(crate::dtf_panel::color_range_confirmed(app, f));
+    }
     app.run(COMMAND, params(f))
 }
 
@@ -325,6 +358,8 @@ fn preview(app: &mut PhotocraftApp, ctx: &egui::Context, f: &Map<String, Value>)
         });
     }
     let image_view = (s(f, "__view", "selection") == "image") ^ ctx.input(|i| i.modifiers.command || (!cfg!(target_os = "macos") && i.modifiers.ctrl));
+    // DTF Craft: in Halftone DTF, Sampled Colors without a sample selects nothing: show the image.
+    let image_view = image_view || (dtf(f) && controls(f).sampling && points(f, "points").is_empty());
     let params = params(f);
     let key = query_key(app, &params);
     let (proxy, k) = {
@@ -528,6 +563,8 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, Valu
                 });
                 let (add, sub) = (points(f, "points").len(), points(f, "subtractPoints").len());
                 let what = match (add, sub) {
+                    // DTF Craft: in Halftone DTF, no sample erases nothing.
+                    (0, 0) if dtf(f) => tl!("No sample: click the background on the image").to_string(),
                     (0, 0) => tl!("Sample: foreground color").to_string(),
                     (a, 0) => crate::i18n::trn(crate::i18n::current(), a as u64, "{n} sample", "{n} samples"),
                     (a, s) => crate::i18n::fmt(

@@ -183,6 +183,15 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     }
     let lpi = num(p, "frequency", 25.0).clamp(1.0, 300.0);
     let mut p2 = if p.is_object() { p.clone() } else { json!({}) };
+    // The background to erase on the copy first (Select › Color Range's settings), if asked.
+    let erase = match (p2.get("removeBackground").and_then(Value::as_bool), p2.get("colorRange")) {
+        (Some(true), Some(range)) if picks_something(range) => Some(range.clone()),
+        _ => None,
+    };
+    if let Value::Object(m) = &mut p2 {
+        m.remove("removeBackground");
+        m.remove("colorRange");
+    }
     if let Value::Object(m) = &mut p2 {
         let mode = match (m.remove("mode"), m.remove("target")) {
             (Some(Value::String(mode)), _) => mode,
@@ -198,6 +207,9 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
     let screened = s.keeping_background(|s| crate::analysis_cmds::compound(s, HALFTONE_GROUP, |s| {
         s.execute("layer.duplicate", json!({"layer": source.0, "name": HALFTONE_LAYER}))?;
         let copy = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
+        if let Some(range) = &erase {
+            erase_color_range(s, range)?;
+        }
         if let Some(color) = background {
             s.execute("layer.newFillLayer.solidColor", json!({"color": color}))?;
             let fill = s.active().and_then(|d| d.active_layer).ok_or(EngineError::NoDocument)?;
@@ -238,6 +250,37 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
         return halftone_in_bands(s, screened, fp);
     }
     crate::filters::run_filter(s, HALFTONE, &p2)
+}
+
+/// Whether a Color Range request picks anything: Sampled Colors needs a point clicked or a colour
+/// given (without, Color Range would take the foreground colour, which the halftone doesn't).
+fn picks_something(range: &Value) -> bool {
+    let select = range.get("select").and_then(Value::as_str).unwrap_or("sampledColors");
+    let has = |k: &str| range.get(k).and_then(Value::as_array).is_some_and(|a| !a.is_empty());
+    select != "sampledColors" || has("points") || has("colors") || range.get("color").and_then(Value::as_str).is_some()
+}
+
+/// Erase the active layer's pixels in the colour range `range` (`select.colorRange`'s params,
+/// taken from this layer alone), partially where the range is partial (its fuzziness), then put
+/// the document's selection back as it was.
+fn erase_color_range(s: &mut Session, range: &Value) -> Result<()> {
+    let saved = s.active().ok_or(EngineError::NoDocument)?.doc.selection.clone();
+    let mut p = if range.is_object() { range.clone() } else { json!({}) };
+    if let Value::Object(m) = &mut p {
+        m.insert("sampleAllLayers".into(), json!(false));
+        m.insert("mode".into(), json!("replace"));
+    }
+    s.execute("select.colorRange", p)?;
+    // Nothing in the range: nothing to erase (a clear without a selection would empty the layer).
+    let selected = s.active().is_some_and(|d| d.doc.selection.as_ref().is_some_and(|m| !m.content_bounds().is_empty()));
+    if selected {
+        s.execute("edit.clear", json!({}))?;
+    }
+    s.edit("Color Range", move |doc, _| {
+        doc.selection = saved;
+        Ok(())
+    })?;
+    Ok(())
 }
 
 /// Rows per band of [`halftone_in_bands`]: about 8 MB of samples at a time, a whole number of
@@ -890,7 +933,7 @@ pub fn specs() -> Vec<CommandSpec> {
             label: "DTF Halftone…",
             menu: &["DTF"],
             shortcut: None,
-            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone", over a "Fond de contrôle" fill for a garment (#231c1c dark, #ffffff light; none for the semi-transparent pixels); the source layer is hidden, unchanged"##,
+            params: r##"{"mode":"semiTransparent|darkGarment|lightGarment"="semiTransparent" (semi-transparent pixels only, or the whole visual by its lightness for a dark or light garment),"frequency":1..300=25,"angle":-180..180=22.5,"shape":"round|ellipse|line|square|diamond|cross"="round","minDot":0..100=5,"maxDot":0..100=95,"inBlack":0..255=0,"inWhite":0..255=255,"gamma":0.1..9.99=1,"removeBackground":bool=false (erase the background on the copy first, with colorRange),"colorRange":json (Select › Color Range's settings for the background: select, points, subtractPoints, order, fuzziness, localized, range, tonalRange, invert; read from the copy alone; Sampled Colors without a point erases nothing)} (frequency in lines/inch at the document resolution; alpha becomes 0 or 1, colours are kept). Builds a "Halftone DTF" group above the layer: the screened copy "Halftone", over a "Fond de contrôle" fill for a garment (#231c1c dark, #ffffff light; none for the semi-transparent pixels); the source layer is hidden, unchanged"##,
             enabled: crate::filters::has_filterable_layer,
             run: halftone,
             journal: true,
@@ -963,6 +1006,57 @@ mod tests {
         assert_eq!(differ, 0, "banded and whole differ on {differ} samples");
         // Undo: one step back to the document before the screen's last step.
         assert_eq!(s.active().unwrap().history.entries().last().map(String::as_str), Some("DTF Halftone"));
+    }
+
+    /// Remove Background: Color Range's range, picked on the image, is erased on the copy before
+    /// the screen (the source stays whole); without a point, nothing is erased; the document's
+    /// selection is left as it was.
+    #[test]
+    fn halftone_erases_the_colour_range_first() {
+        let new = || {
+            let mut s = Session::new();
+            s.execute("file.new", json!({"width": 60, "height": 60, "resolution": 300, "background": "transparent"})).unwrap();
+            s.edit("Paint", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 0..60 {
+                    for x in 0..60 {
+                        // A white background around a red square.
+                        let red = (20..40).contains(&x) && (20..40).contains(&y);
+                        surf.write_pixel(x, y, &if red { [1.0, 0.0, 0.0, 1.0] } else { [1.0, 1.0, 1.0, 1.0] });
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+            s
+        };
+        let alpha_at = |s: &Session, x: i32, y: i32| {
+            let d = s.active().unwrap();
+            d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().read_region(photocraft_geom::Rect::new(x, y, x + 1, y + 1))[3]
+        };
+        let mut s = new();
+        let source = s.active().unwrap().active_layer.unwrap();
+        let range = json!({"select": "sampledColors", "points": [[2, 2]], "fuzziness": 10});
+        s.execute(HALFTONE, json!({"removeBackground": true, "colorRange": range})).unwrap();
+        assert_eq!(alpha_at(&s, 2, 2), 0.0, "the white background is erased");
+        assert_eq!(alpha_at(&s, 30, 30), 1.0, "the red square stays");
+        let d = s.active().unwrap();
+        assert!(d.doc.selection.is_none(), "no selection left behind");
+        let src = d.doc.layer(source).unwrap().surface().unwrap().read_region(photocraft_geom::Rect::new(2, 2, 3, 3));
+        assert_eq!(src[3], 1.0, "the source is untouched");
+        // No point clicked: nothing erased (not the foreground colour).
+        let mut s = new();
+        s.execute(HALFTONE, json!({"removeBackground": true, "colorRange": {"select": "sampledColors"}})).unwrap();
+        assert_eq!(alpha_at(&s, 2, 2), 1.0);
+        // Unchecked: the range is ignored.
+        let mut s = new();
+        s.execute(HALFTONE, json!({"removeBackground": false, "colorRange": range})).unwrap();
+        assert_eq!(alpha_at(&s, 2, 2), 1.0);
+        // A selection made before is kept.
+        let mut s = new();
+        s.execute("select.all", json!({})).unwrap();
+        s.execute(HALFTONE, json!({"removeBackground": true, "colorRange": range})).unwrap();
+        assert!(s.active().unwrap().doc.selection.is_some(), "the selection is put back");
     }
 
     fn session_with_ramp() -> Session {

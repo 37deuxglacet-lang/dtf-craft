@@ -445,6 +445,8 @@ fn filter_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, d: &Dialog, fields: &
             if crate::bitmap_dialog::owns(fields) {
                 crate::bitmap_dialog::body(app, ui, fields);
             } else {
+                // DTF Craft: DTF Halftone's Remove Background step (Color Range), above its rows.
+                crate::dtf_panel::halftone_background(ui, fields);
                 crate::filter_dialog::body(ui, fields);
             }
         });
@@ -801,6 +803,8 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         // A colour swatch (Edit › Fill, Edit › Stroke) opens the Color Picker over the dialog.
         if outcome.is_none() {
             crate::color_picker_ui::open_requested(app, d.id);
+            // DTF Craft: DTF Halftone's "Color Range…" opens Color Range over it.
+            crate::dtf_panel::open_color_range_requested(app, d.id);
         }
         if apply_requested && outcome.is_none() {
             let _ = crate::prefs_ui::apply(app, d.id);
