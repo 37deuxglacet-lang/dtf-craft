@@ -389,11 +389,6 @@
 	The preparation stopped unexpectedly.	La preparazione si è interrotta in modo imprevisto.
 # DTF Craft (27)
 	Click: its settings · Double-click: add a copy to the sheet	Clic: le sue impostazioni · Doppio clic: aggiungi una copia al foglio
-# DTF Craft (29)
-	Black T-Shirt	T-shirt nera
-	Soft Black T-Shirt	T-shirt nera morbida
-	White T-Shirt	T-shirt bianca
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Livelli di ritocco (luminosità +32, saturazione +16), nascosti
 # DTF Craft (30)
 	Cells	Celle
 	Click: show the sheet · Double-click: rename it	Clic: mostra il foglio · Doppio clic: rinomina
@@ -405,3 +400,5 @@
 	Every visual's size and copies, then lay the sheets out	Dimensioni e copie di ogni grafica, poi disposizione dei fogli
 	Film	Film
 	Total: {sheets} sheets · {visuals} visuals	Totale: {sheets} fogli · {visuals} grafiche
+# DTF Craft (31)
+	Computing the preview…	Calcolo dell'anteprima…

@@ -392,11 +392,6 @@
 	The preparation stopped unexpectedly.	Η προετοιμασία σταμάτησε απρόσμενα.
 # DTF Craft (27)
 	Click: its settings · Double-click: add a copy to the sheet	Κλικ: οι ρυθμίσεις του · Διπλό κλικ: προσθήκη αντιγράφου στο φύλλο
-# DTF Craft (29)
-	Black T-Shirt	Μαύρο μπλουζάκι
-	Soft Black T-Shirt	Μαύρο μπλουζάκι – απαλό
-	White T-Shirt	Λευκό μπλουζάκι
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Επίπεδα ρετούς (φωτεινότητα +32, κορεσμός +16), κρυφά
 # DTF Craft (30)
 	Cells	Κελιά
 	Click: show the sheet · Double-click: rename it	Κλικ: εμφάνιση φύλλου · Διπλό κλικ: μετονομασία
@@ -408,3 +403,5 @@
 	Every visual's size and copies, then lay the sheets out	Μέγεθος και αντίτυπα κάθε σχεδίου, μετά διάταξη των φύλλων
 	Film	Φιλμ
 	Total: {sheets} sheets · {visuals} visuals	Σύνολο: {sheets} φύλλα · {visuals} σχέδια
+# DTF Craft (31)
+	Computing the preview…	Υπολογισμός προεπισκόπησης…

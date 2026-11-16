@@ -57,7 +57,7 @@ pub fn sheet(command: &str) -> Option<Sheet> {
         "filter.dtf.halftone" => Sheet {
             what: "Remplacer les zones semi-transparentes, ou tout le visuel, par une trame de points pleins. Le dégradé reste visible tout en s'imprimant en pixels opaques. Le résultat est un groupe « Halftone DTF » au-dessus du calque : le calque tramé « Halftone » sur un fond de contrôle ; le calque source est masqué et intact.",
             when: "Ombres douces, dégradés vers le vide, effets vintage ; pour un visuel entier tramé sur textile foncé ou clair.",
-            advice: "Onglet Automatique : un préréglage par action Photoshop (T-shirt noir, T-shirt noir doux, T-shirt blanc, Noir et blanc, Uniforme). Onglet Manuel : 25 lpi, angle 22,5°, point rond, point minimal 5 %, maximal 95 %. Montez la fréquence pour une trame plus fine, baissez-la pour un effet plus marqué.",
+            advice: "25 lpi, angle 22,5°, point rond, point minimal 5 %, maximal 95 %. Montez la fréquence pour une trame plus fine, baissez-la pour un effet plus marqué.",
         },
         "dtf.colorAnalyzer" => Sheet {
             what: "Relever les couleurs principales du visuel (RVB, profil sRGB, transparence ignorée) et trouver pour chacune la couleur la plus proche d'un nuancier que vous chargez (.ase, .aco, .csv). L'écart est donné en ΔE 2000. Dans « Couleurs remplacées », des patchs avec les références s'affichent à côté du visuel ; une fiche PDF A4 les reprend. L'export PNG remplace les couleurs cochées par celles du nuancier dans une copie, ouverte dans un nouvel onglet : le document n'est jamais modifié.",
@@ -112,12 +112,6 @@ pub fn tip(command: &str, key: &str) -> Option<&'static str> {
         ("dtf.sharpen", "radius") => "Largeur, en px, de la zone accentuée autour de chaque contour. 0,5 à 2 px à 300 ppp.",
         ("dtf.sharpen", "reduceNoise") => "Limite l'accentuation du grain et des artefacts JPEG, en %.",
         ("dtf.saturation", "saturation") => "De −100 (noir et blanc) à +100. Valeur positive : couleurs plus vives ; négative : plus ternes.",
-        ("filter.dtf.halftone", "teeBlack") => "Pour textile noir (action « Rasterization tee black 1 ») : négatif du visuel désaturé, Niveaux 50–240 gamma 0,5 appliqués deux fois, trame 25 lpi, 22°, point rond. Les couleurs claires s'impriment pleines, les foncées s'effacent. Fond de contrôle noir.",
-        ("filter.dtf.halftone", "teeBlackSoft") => "Pour textile noir, plus doux (action « Rasterization tee black 2 ») : les mêmes Niveaux appliqués une seule fois, donc moins d'encre dans les tons moyens. Trame 25 lpi, 22°, point rond. Fond de contrôle noir.",
-        ("filter.dtf.halftone", "teeWhite") => "Pour textile blanc (action « Rasterization tee blanc ») : visuel désaturé sans négatif, Niveaux 50–240 gamma 0,5 deux fois, trame 25 lpi, 22°, point rond. Les couleurs foncées s'impriment pleines, les claires s'effacent. Fond de contrôle blanc.",
-        ("filter.dtf.halftone", "blackWhite") => "Noir et blanc (action « Rasterization Noir et Blanc ») : la clarté du visuel en points blancs, trame fine 55 lpi, 22°, point rond, sans Niveaux. Les couleurs du visuel sont remplacées par le blanc. Fond de contrôle noir.",
-        ("filter.dtf.halftone", "uniform") => "Trame uniforme (action « Rasterization uniforme ») : des points réguliers de 92 % sur tout le visuel, quelle que soit sa couleur ; 25 lpi, 22°, point rond. Pas de fond de contrôle.",
-        ("filter.dtf.halftone", "rasterFx") => "Ajoute, masqué, le groupe « RasterFx » de l'action : un calque Luminosité/Contraste +32 et un calque Teinte/Saturation +16 au-dessus du calque tramé. Affichez-le pour éclaircir et raviver les couleurs.",
         ("filter.dtf.halftone", "mode") => "Ce qui est tramé : les pixels semi-transparents seulement, ou le visuel entier selon sa luminosité pour un textile foncé ou clair.",
         ("filter.dtf.halftone", "frequency") => "Nombre de lignes de points par pouce (lpi), à la résolution du document. Plus haut : points plus petits et plus serrés.",
         ("filter.dtf.halftone", "angle") => "Inclinaison de la trame, en degrés. 22,5° ou 45° limitent l'effet d'escalier sur les lignes.",

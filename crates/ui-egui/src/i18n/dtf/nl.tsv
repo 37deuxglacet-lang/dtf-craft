@@ -389,11 +389,6 @@
 	The preparation stopped unexpectedly.	De voorbereiding is onverwacht gestopt.
 # DTF Craft (27)
 	Click: its settings · Double-click: add a copy to the sheet	Klik: de instellingen · Dubbelklik: een kopie aan het vel toevoegen
-# DTF Craft (29)
-	Black T-Shirt	Zwart T-shirt
-	Soft Black T-Shirt	Zwart T-shirt – zacht
-	White T-Shirt	Wit T-shirt
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Retoucheerlagen (helderheid +32, verzadiging +16), verborgen
 # DTF Craft (30)
 	Cells	Cellen
 	Click: show the sheet · Double-click: rename it	Klik: vel tonen · Dubbelklik: hernoemen
@@ -405,3 +400,5 @@
 	Every visual's size and copies, then lay the sheets out	Formaat en aantal van elk ontwerp, dan de vellen indelen
 	Film	Film
 	Total: {sheets} sheets · {visuals} visuals	Totaal: {sheets} vellen · {visuals} ontwerpen
+# DTF Craft (31)
+	Computing the preview…	Voorbeeld wordt berekend…

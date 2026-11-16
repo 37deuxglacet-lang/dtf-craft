@@ -408,10 +408,6 @@
 	Unlocked	Entsperrt
 # DTF Craft (29)
 	Manual	Manuell
-	Black T-Shirt	Schwarzes T-Shirt
-	Soft Black T-Shirt	Schwarzes T-Shirt – sanft
-	White T-Shirt	Weißes T-Shirt
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Retusche-Ebenen (Helligkeit +32, Sättigung +16), ausgeblendet
 # DTF Craft (30)
 	Cells	Zellen
 	Click: show the sheet · Double-click: rename it	Klick: Bogen anzeigen · Doppelklick: umbenennen
@@ -424,3 +420,5 @@
 	Every visual's size and copies, then lay the sheets out	Größe und Anzahl jedes Motivs, dann die Bögen anordnen
 	Film	Folie
 	Total: {sheets} sheets · {visuals} visuals	Gesamt: {sheets} Bögen · {visuals} Motive
+# DTF Craft (31)
+	Computing the preview…	Vorschau wird berechnet…

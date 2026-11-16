@@ -111,7 +111,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/widgets/tests.rs` | test of the typed-only field |
 | `crates/ui-egui/src/widgets/units.rs` | typed-only number fields (Gang Sheet) |
 
-## Added (41)
+## Added (40)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -129,7 +129,6 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 - `crates/algo/src/vectorize.rs`
 - `crates/engine/src/dtf_cmds.rs`
 - `crates/engine/src/gang_sheet_cmds.rs`
-- `crates/ui-egui/src/dtf_halftone_ui.rs`
 - `crates/ui-egui/src/dtf_help.rs`
 - `crates/ui-egui/src/dtf_i18n.rs`
 - `crates/ui-egui/src/dtf_panel.rs`

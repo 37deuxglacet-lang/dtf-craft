@@ -400,10 +400,6 @@
 	Unlocked	Odblokowane
 # DTF Craft (29)
 	Manual	Ręcznie
-	Black T-Shirt	Czarna koszulka
-	Soft Black T-Shirt	Czarna koszulka – łagodnie
-	White T-Shirt	Biała koszulka
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Warstwy retuszu (jasność +32, nasycenie +16), ukryte
 # DTF Craft (30)
 	Cells	Komórki
 	Click: show the sheet · Double-click: rename it	Kliknięcie: pokaż arkusz · Dwukrotne kliknięcie: zmień nazwę
@@ -416,3 +412,5 @@
 	Every visual's size and copies, then lay the sheets out	Rozmiar i liczba kopii każdej grafiki, potem układ arkuszy
 	Film	Folia
 	Total: {sheets} sheets · {visuals} visuals	Razem: {sheets} arkuszy · {visuals} grafik
+# DTF Craft (31)
+	Computing the preview…	Obliczanie podglądu…

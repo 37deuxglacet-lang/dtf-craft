@@ -416,10 +416,6 @@
 # DTF Craft (29)
 	Manual	手动
 	Uniform	均匀
-	Black T-Shirt	黑色T恤
-	Soft Black T-Shirt	黑色T恤（柔和）
-	White T-Shirt	白色T恤
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	修饰图层（亮度 +32，饱和度 +16），隐藏
 # DTF Craft (30)
 	Cells	单元格
 	Click: show the sheet · Double-click: rename it	单击：显示该页 · 双击：重命名
@@ -432,3 +428,5 @@
 	Every visual's size and copies, then lay the sheets out	设置每个图案的尺寸和份数，然后排版
 	Film	膜
 	Total: {sheets} sheets · {visuals} visuals	合计：{sheets} 页 · {visuals} 个图案
+# DTF Craft (31)
+	Computing the preview…	正在计算预览…

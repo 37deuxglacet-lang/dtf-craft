@@ -401,10 +401,6 @@
 	Unlocked	잠금 해제됨
 # DTF Craft (29)
 	Manual	수동
-	Black T-Shirt	검정 티셔츠
-	Soft Black T-Shirt	검정 티셔츠 (부드럽게)
-	White T-Shirt	흰색 티셔츠
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	보정 레이어 (명도 +32, 채도 +16), 숨김
 # DTF Craft (30)
 	Cells	셀
 	Click: show the sheet · Double-click: rename it	클릭: 시트 표시 · 더블클릭: 이름 바꾸기
@@ -417,3 +413,5 @@
 	Every visual's size and copies, then lay the sheets out	각 이미지의 크기와 수량을 정한 뒤 시트 배치
 	Film	필름
 	Total: {sheets} sheets · {visuals} visuals	합계: {sheets}개 시트 · {visuals}개 이미지
+# DTF Craft (31)
+	Computing the preview…	미리 보기 계산 중…

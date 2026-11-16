@@ -397,10 +397,6 @@
 	Unlocked	ロック解除
 # DTF Craft (29)
 	Manual	手動
-	Black T-Shirt	黒Tシャツ
-	Soft Black T-Shirt	黒Tシャツ（ソフト）
-	White T-Shirt	白Tシャツ
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	補正レイヤー（明るさ +32、彩度 +16）、非表示
 # DTF Craft (30)
 	Cells	セル
 	Click: show the sheet · Double-click: rename it	クリック：シートを表示 · ダブルクリック：名前を変更
@@ -413,3 +409,5 @@
 	Every visual's size and copies, then lay the sheets out	各ビジュアルのサイズと数量を決めてシートを配置
 	Film	フィルム
 	Total: {sheets} sheets · {visuals} visuals	合計：{sheets} シート · {visuals} ビジュアル
+# DTF Craft (31)
+	Computing the preview…	プレビューを計算中…

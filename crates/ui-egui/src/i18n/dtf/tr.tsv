@@ -389,11 +389,6 @@
 	The preparation stopped unexpectedly.	Hazırlık beklenmedik şekilde durdu.
 # DTF Craft (27)
 	Click: its settings · Double-click: add a copy to the sheet	Tıklama: ayarları · Çift tıklama: sayfaya bir kopya ekle
-# DTF Craft (29)
-	Black T-Shirt	Siyah tişört
-	Soft Black T-Shirt	Siyah tişört – yumuşak
-	White T-Shirt	Beyaz tişört
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Rötuş katmanları (parlaklık +32, doygunluk +16), gizli
 # DTF Craft (30)
 	Cells	Hücreler
 	Click: show the sheet · Double-click: rename it	Tıklama: sayfayı göster · Çift tıklama: yeniden adlandır
@@ -405,3 +400,5 @@
 	Every visual's size and copies, then lay the sheets out	Her görselin boyutu ve adedi, ardından sayfa yerleşimi
 	Film	Film
 	Total: {sheets} sheets · {visuals} visuals	Toplam: {sheets} sayfa · {visuals} görsel
+# DTF Craft (31)
+	Computing the preview…	Önizleme hesaplanıyor…

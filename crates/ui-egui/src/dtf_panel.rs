@@ -260,6 +260,27 @@ fn factory_settings(app: &PhotocraftApp, command: &str, f: &mut Map<String, Valu
     }
 }
 
+/// Under a DTF filter's dialog (DTF Halftone…), while its preview is computed: a progress bar
+/// with the share done, so a heavy file shows that the preview is on its way.
+pub fn preview_progress(app: &PhotocraftApp, ui: &mut egui::Ui, fields: &Map<String, Value>) {
+    let Some(cmd) = fields.get("__command").and_then(Value::as_str) else { return };
+    if !cmd.starts_with("filter.dtf.") || fields.get("__preview").and_then(Value::as_bool) == Some(false) {
+        return;
+    }
+    // The web build computes its previews inline, on the UI thread: nothing to show meanwhile.
+    #[cfg(target_arch = "wasm32")]
+    {
+        let _ = (app, ui);
+        return;
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    let Some(done) = app.filter_preview_worker.progress_of(cmd) else { return };
+    ui.add_space(4.0);
+    let text = format!("{} {} %", tl!("Computing the preview…"), (done.clamp(0.0, 1.0) * 100.0).round());
+    ui.add(egui::ProgressBar::new(done.clamp(0.0, 1.0)).desired_width(ui.available_width()).text(text));
+    ui.ctx().request_repaint_after(std::time::Duration::from_millis(100));
+}
+
 /// The lock bar at the top of a lockable window (`dtf_help::lock_row`), the tool's sheet under it
 /// while the "?" is on. True when Reset was clicked (unlocked).
 fn lock_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui, cmd: &str, f: &mut Map<String, Value>) -> bool {
@@ -1199,7 +1220,7 @@ mod tests {
         assert_eq!(f.get("trim"), Some(&json!(true)));
         let ht = parse_spec(photocraft_engine::commands::find("filter.dtf.halftone").unwrap().params);
         let keys: Vec<&str> = ht.iter().map(|p| p.key.as_str()).collect();
-        assert_eq!(keys, ["mode", "frequency", "angle", "shape", "minDot", "maxDot", "inBlack", "inWhite", "gamma", "preset", "rasterFx"]);
+        assert_eq!(keys, ["mode", "frequency", "angle", "shape", "minDot", "maxDot", "inBlack", "inWhite", "gamma"]);
         assert!(matches!(&ht[1].kind, Kind::Range { default, .. } if *default == 25.0));
         let up = parse_spec(photocraft_engine::commands::find("dtf.upscale").unwrap().params);
         assert!(up.iter().any(|p| p.key == "keepPrintSize" && p.kind == Kind::Bool(true)), "{up:?}");

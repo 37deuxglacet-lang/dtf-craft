@@ -468,10 +468,6 @@ fn text_default(command: &str, key: &str) -> Option<String> {
 
 /// Command-specific open defaults (ruler straighten, warp from layer, …), not remembered prefs.
 fn apply_command_defaults(app: &PhotocraftApp, command: &str, fields: &mut Map<String, Value>) {
-    // DTF Craft: DTF Halftone opens on its Automatic tab unless Manual was left last time.
-    if command == crate::dtf_halftone_ui::COMMAND {
-        crate::dtf_halftone_ui::defaults(app.session.prefs().dialogs.get(command), fields);
-    }
     if command == "image.mode.indexedColor" {
         indexed_matte_defaults(app, fields);
     }
@@ -820,16 +816,11 @@ pub(crate) fn source_label(key: &str) -> String {
         return "Localized Color Clusters".into();
     }
     // DTF Craft: DTF Halftone's modes, the semi-transparent pixels only or the whole visual by
-    // lightness; its automatic presets (the Photoshop actions) and their retouching option.
+    // lightness.
     match key {
         "semiTransparent" => return "Semi-Transparent Pixels Only".into(),
         "darkGarment" => return "Whole Visual — Dark Garment".into(),
         "lightGarment" => return "Whole Visual — Light Garment".into(),
-        "teeBlack" => return "Black T-Shirt".into(),
-        "teeBlackSoft" => return "Soft Black T-Shirt".into(),
-        "teeWhite" => return "White T-Shirt".into(),
-        "blackWhite" => return "Black and White".into(),
-        "rasterFx" => return "Retouch Layers (Brightness +32, Saturation +16), Hidden".into(),
         _ => {}
     }
     // Convert to Profile's, Proof Setup's…: spelled out, as in Photoshop (not "Bpc").
@@ -1197,24 +1188,10 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
     if crate::select_mask_view::owns(f) {
         crate::select_mask_view::controls(ui, f);
     }
-    // DTF Craft: DTF Halftone's tabs (Automatic presets, or the Manual rows below, locked).
-    let halftone = cmd == crate::dtf_halftone_ui::COMMAND;
-    let (auto, locked) = if halftone { crate::dtf_halftone_ui::header(ui, f) } else { (false, false) };
     // DTF Craft: the tool's help sheet ("?"), and a tooltip over each setting's rows.
     crate::dtf_help::sheet_ui(ui, f, &cmd);
     let mut tip_from: Option<(String, f32)> = None;
-    // DTF Craft: the rows go in a child Ui (as `ui.scope` would), disabled while DTF Halftone's
-    // settings are locked; written this way so PhotoCraft's loop keeps its indentation.
-    let outer = ui;
-    let mut rows = outer.new_child(egui::UiBuilder::new());
-    if locked {
-        rows.disable();
-    }
-    let ui = &mut rows;
     for p in parse_spec(&spec) {
-        if halftone && (auto || !crate::dtf_halftone_ui::manual_row(&p.key)) {
-            continue;
-        }
         // DTF Craft: Remove White Background's colour only shows once detection on the edges is
         // off, and the minimum hole size once interior holes are on.
         if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE
@@ -1497,8 +1474,6 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
             }
         }
     }
-    outer.advance_cursor_after_rect(rows.min_rect());
-    let ui = outer;
     if let Some((key, top)) = tip_from.take() {
         crate::dtf_help::tip_over(ui, &cmd, &key, top);
     }

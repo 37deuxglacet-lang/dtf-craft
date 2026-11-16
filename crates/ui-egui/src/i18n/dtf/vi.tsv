@@ -397,10 +397,6 @@
 	Unlocked	Đã mở khóa
 # DTF Craft (29)
 	Manual	Thủ công
-	Black T-Shirt	Áo thun đen
-	Soft Black T-Shirt	Áo thun đen (dịu)
-	White T-Shirt	Áo thun trắng
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Lớp chỉnh sửa (độ sáng +32, độ bão hòa +16), ẩn
 # DTF Craft (30)
 	Cells	Ô
 	Click: show the sheet · Double-click: rename it	Nhấp: hiện tờ · Nhấp đúp: đổi tên
@@ -413,3 +409,5 @@
 	Every visual's size and copies, then lay the sheets out	Kích thước và số bản mỗi hình, rồi xếp các tờ
 	Film	Phim
 	Total: {sheets} sheets · {visuals} visuals	Tổng: {sheets} tờ · {visuals} hình
+# DTF Craft (31)
+	Computing the preview…	Đang tính bản xem trước…

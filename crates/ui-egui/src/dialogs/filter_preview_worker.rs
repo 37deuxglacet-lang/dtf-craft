@@ -41,6 +41,12 @@ impl Worker {
         self.running.is_some()
     }
 
+    /// DTF Craft: the running preview's progress (0–1, as its job reports it), for the
+    /// command `command`; `None` when no preview of it is running.
+    pub fn progress_of(&self, command: &str) -> Option<f32> {
+        self.running.as_ref().filter(|r| r.key.command == command).map(|r| r.job.fraction())
+    }
+
     /// Never wait for a previous computation and never spawn a second concurrent preview.
     /// `compute` gets the preview's cancellation context ([`Worker::supersede`]).
     pub fn start(&mut self, key: FilterPreviewKey, ctx: egui::Context, compute: impl FnOnce(&JobCtx) -> Computed + Send + 'static) -> Result<bool, String> {
@@ -170,6 +176,29 @@ mod tests {
         assert_ne!(old, latest); // The canvas paints this as the drag's frame; the newest one is computed next.
         assert!(worker.start(latest.clone(), ctx, |_| Computed { result: None, ms: 1.0 }).unwrap());
         assert_eq!(finish(&mut worker).0, latest);
+    }
+
+    /// DTF Craft: the running preview's progress, read for its own command only, gone once done.
+    #[test]
+    fn the_running_preview_reports_its_progress() {
+        let mut worker = Worker::default();
+        let (release, wait) = std::sync::mpsc::channel();
+        let (reported, reached) = std::sync::mpsc::channel();
+        assert!(worker.progress_of("image.mode.indexedColor").is_none());
+        worker
+            .start(key(1, 0, 8), egui::Context::default(), move |job| {
+                job.progress(0.4, "");
+                reported.send(()).unwrap();
+                wait.recv_timeout(std::time::Duration::from_secs(5)).unwrap();
+                Computed { result: None, ms: 0.0 }
+            })
+            .unwrap();
+        reached.recv_timeout(std::time::Duration::from_secs(5)).unwrap();
+        assert!((worker.progress_of("image.mode.indexedColor").unwrap() - 0.4).abs() < 1e-6);
+        assert!(worker.progress_of("filter.dtf.halftone").is_none(), "another command");
+        release.send(()).unwrap();
+        finish(&mut worker);
+        assert!(worker.progress_of("image.mode.indexedColor").is_none());
     }
 
     #[test]

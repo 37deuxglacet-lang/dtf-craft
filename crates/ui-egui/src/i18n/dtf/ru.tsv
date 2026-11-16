@@ -406,10 +406,6 @@
 # DTF Craft (29)
 	Manual	Вручную
 	Uniform	Равномерно
-	Black T-Shirt	Чёрная футболка
-	Soft Black T-Shirt	Чёрная футболка — мягко
-	White T-Shirt	Белая футболка
-	Retouch Layers (Brightness +32, Saturation +16), Hidden	Слои ретуши (яркость +32, насыщенность +16), скрыты
 # DTF Craft (30)
 	Cells	Ячейки
 	Click: show the sheet · Double-click: rename it	Щелчок: показать лист · Двойной щелчок: переименовать
@@ -422,3 +418,5 @@
 	Every visual's size and copies, then lay the sheets out	Размер и количество каждого изображения, затем раскладка листов
 	Film	Плёнка
 	Total: {sheets} sheets · {visuals} visuals	Всего: листов {sheets} · изображений {visuals}
+# DTF Craft (31)
+	Computing the preview…	Расчёт предпросмотра…

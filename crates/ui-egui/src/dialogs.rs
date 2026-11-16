@@ -451,6 +451,8 @@ fn filter_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, d: &Dialog, fields: &
         // The in-dialog preview window sits under the scrolling parameters (#3769),
         // so it never shifts them.
         crate::filter_preview_ui::window(app, d.id, ui, fields);
+        // DTF Craft: a DTF filter's preview being computed (a heavy file): its progress.
+        crate::dtf_panel::preview_progress(app, ui, fields);
     };
     // Select and Mask leaves the keyboard to its view keys (F, X, O, V…).
     if crate::select_mask_view::owns(fields) {
