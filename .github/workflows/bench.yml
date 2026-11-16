@@ -1,7 +1,7 @@
 name: Bench V1.0 vs 1.1
 
 # Temporary: times the DTF commands of the CLI built from main (V1.0.x) and from the PhotoCraft
-# 0.23.1 branch, on the same Windows runner type and the same images.
+# 0.23.1 branch, both on the same runner, runs alternated.
 on:
   push:
     branches: ["bench/**"]
@@ -11,16 +11,8 @@ permissions:
 
 jobs:
   bench:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: v1.0-main
-            ref: 426b3974175537d090ca8433f392c84315fdfdfc
-          - name: v1.1-branch
-            ref: maj/photocraft-v0.23.1
     runs-on: windows-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       RUSTFLAGS: "-C target-feature=+crt-static"
       CARGO_TERM_COLOR: always
@@ -30,38 +22,41 @@ jobs:
           path: benchfiles
       - uses: actions/checkout@v4
         with:
-          ref: ${{ matrix.ref }}
-          path: src
+          ref: 426b3974175537d090ca8433f392c84315fdfdfc
+          path: a
+      - uses: actions/checkout@v4
+        with:
+          ref: 16638e590cb7d3288c3706f67e98473c81661b22
+          path: b
       - name: Rust toolchain
         run: rustup toolchain install stable --profile minimal && rustup default stable
-      - name: Build CLI
-        working-directory: src
+      - name: Build V1.0 CLI
+        working-directory: a
         run: cargo build --release -p photocraft-cli
-      - name: Time the commands
+      - name: Build 1.1 CLI
+        working-directory: b
+        run: cargo build --release -p photocraft-cli
+      - name: Time the commands (alternated)
         shell: pwsh
-        working-directory: src
         run: |
-          $cli = "target\release\photocraft-cli.exe"
-          if (-not (Test-Path $cli)) { $cli = (Get-ChildItem target\release\*cli*.exe | Select-Object -First 1).FullName }
-          $img = "..\benchfiles\bench\visuel.png"
-          $logo = "..\benchfiles\bench\logo.png"
+          (Get-CimInstance Win32_Processor).Name
           "CPU: $env:NUMBER_OF_PROCESSORS logical"
+          $img = "benchfiles\bench\visuel.png"
+          $logo = "benchfiles\bench\logo.png"
           $cases = @(
             @{ n = "upscale x2 900x600"; f = $img; a = @("--cmd", "dtf.upscale", "--params", '{"scale":"2"}') },
-            @{ n = "upscale x4 900x600"; f = $img; a = @("--cmd", "dtf.upscale", "--params", '{"scale":"4"}') },
-            @{ n = "optimizeForVectorization"; f = $logo; a = @("--cmd", "dtf.optimizeForVectorization") },
-            @{ n = "vectorize dtfcraft"; f = $logo; a = @("--cmd", "dtf.vectorize") },
-            @{ n = "vectorize vectorcraft"; f = $logo; a = @("--cmd", "dtf.vectorize", "--params", '{"engine":"vectorcraft","preset":"6 Colors"}') },
-            @{ n = "halftone"; f = $img; a = @("--cmd", "filter.dtf.halftone", "--params", '{"preset":"none"}') },
-            @{ n = "gaussian blur 20"; f = $img; a = @("--cmd", "filter.blur.gaussianBlur", "--params", '{"radius":20}') }
+            @{ n = "optimizeForVectorization"; f = $logo; a = @("--cmd", "dtf.optimizeForVectorization") }
           )
           foreach ($c in $cases) {
-            $times = @()
+            $res = @{ a = @(); b = @() }
             for ($i = 0; $i -lt 3; $i++) {
-              $t = Measure-Command { & $cli run $c.f @($c.a) --out "$env:RUNNER_TEMP\o.png" *> "$env:RUNNER_TEMP\log.txt" }
-              $times += [math]::Round($t.TotalSeconds, 2)
+              foreach ($v in @("a", "b")) {
+                $cli = "$v\target\release\photocraft-cli.exe"
+                $t = Measure-Command { & $cli run $c.f @($c.a) --out "$env:RUNNER_TEMP\o.png" *> "$env:RUNNER_TEMP\log-$v.txt" }
+                $res[$v] += [math]::Round($t.TotalSeconds, 1)
+              }
             }
-            $ok = $LASTEXITCODE
-            "::notice title=${{ matrix.name }}::$($c.n): $($times -join ' / ') s (exit $ok)"
-            Get-Content "$env:RUNNER_TEMP\log.txt" -TotalCount 2
+            "::notice title=$($c.n)::V1.0 $($res.a -join ' / ') s | 1.1 $($res.b -join ' / ') s"
+            Get-Content "$env:RUNNER_TEMP\log-a.txt" -TotalCount 1
+            Get-Content "$env:RUNNER_TEMP\log-b.txt" -TotalCount 1
           }
