@@ -167,7 +167,7 @@ mod tests {
     fn harness(f: Map<String, Value>) -> egui_kittest::Harness<'static, Map<String, Value>> {
         egui_kittest::Harness::builder().with_size(vec2(380.0, 900.0)).build_ui_state(
             |ui, f: &mut Map<String, Value>| {
-                let ready = egui::Id::new("halftone-test-fonts");
+                let ready = egui::Id::unique("halftone-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     crate::PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));
@@ -199,7 +199,8 @@ mod tests {
         h.get_by_label("Manual").click();
         h.run_steps(2);
         assert_eq!(h.state()["preset"], json!("none"));
-        assert!(h.query_by_label("Frequency").is_some());
+        // The row's slider and number both carry its name (egui 0.37).
+        assert!(h.query_all_by_label("Frequency").next().is_some());
         assert!(h.query_by_label("Locked").is_some());
         assert!(h.query_by_label_contains("Retouch Layers").is_none());
         h.state_mut().insert("frequency".into(), json!(60));

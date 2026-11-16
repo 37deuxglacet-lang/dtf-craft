@@ -245,6 +245,11 @@ fn halftone(s: &mut Session, p: &Value) -> Result<Value> {
             s.execute("layer.select", json!({"layer": copy.0}))?;
         }
         s.execute("layer.groupLayers", json!({"name": HALFTONE_GROUP}))?;
+        // The group opens now: the Layers panel would open it to show the selected copy while the
+        // screen runs, and the app discards a background job whose document changed meanwhile.
+        if let Some(group) = s.active().and_then(|d| d.active_layer) {
+            s.execute("layer.setExpanded", json!({"layer": group.0, "expanded": true}))?;
+        }
         s.execute("layer.setProps", json!({"layer": source.0, "visible": false}))?;
         s.execute("layer.select", json!({"layer": copy.0}))?;
         if raster_fx {
@@ -445,7 +450,7 @@ fn upscale(s: &mut Session, p: &Value) -> Result<Value> {
                     _ => None,
                 })
                 .collect();
-            crate::image_cmds::resample_doc(doc, nw, nh, photocraft_algo::resample::Resample::BicubicSmoother);
+            crate::image_cmds::resample_doc(doc, UPSCALE, nw, nh, photocraft_algo::resample::Resample::BicubicSmoother)?;
             if let Some(dpi) = resolution {
                 doc.resolution_dpi = dpi as f32;
             } else if keep_print {
@@ -980,6 +985,10 @@ mod tests {
         let src = d.doc.layer(source).unwrap();
         assert!(!src.visible, "the source is hidden");
         assert_eq!(d.doc.layer(d.active_layer.unwrap()).unwrap().name, HALFTONE_LAYER);
+        // The group is open: the Layers panel, revealing the copy, would otherwise open it while
+        // the screen runs, and the app discards a job whose document changed.
+        let group = d.doc.walk().into_iter().find(|(_, _, l)| l.name == HALFTONE_GROUP).map(|(_, _, l)| l.content.clone());
+        assert!(matches!(group, Some(photocraft_doc::LayerContent::Group(g)) if g.expanded), "the Halftone DTF group is open");
         // The screened copy is binary; the source keeps its soft alpha.
         assert!(alphas(&s).iter().all(|v| *v == 0.0 || *v == 1.0));
         let surf = d.doc.layer(source).unwrap().surface().unwrap();

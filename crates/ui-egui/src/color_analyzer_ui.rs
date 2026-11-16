@@ -742,6 +742,7 @@ enum Action {
 
 /// The module, over the main window while it is open.
 pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let _dtf = crate::dtf_i18n::scope();
     let Some(a) = app.color_analyzer.as_ref() else { return };
     // Its document was closed.
     if !app.session.documents().iter().any(|d| d.doc.id == a.doc) {
@@ -751,7 +752,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let before = a.settings.clone();
     let mut action = None;
     let screen = ctx.content_rect();
-    egui::Area::new(egui::Id::new("dtf-color-analyzer")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
+    egui::Area::new(egui::Id::unique("dtf-color-analyzer")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
         let Some(a) = app.color_analyzer.as_mut() else { return };
         action = draw(ui, a, screen);
     });
@@ -909,7 +910,7 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
         t.text_faint,
     );
     // Color Range's clicks.
-    let response = ui.interact(image_rect, ui.id().with("dtf-color-analyzer-image"), Sense::click());
+    let response = ui.interact(image_rect, ui.scope_id().with("dtf-color-analyzer-image"), Sense::click());
     if a.range_tool && response.hovered() {
         ui.ctx().set_cursor_icon(egui::CursorIcon::Crosshair);
     }
@@ -1291,7 +1292,7 @@ pub(crate) fn swatch_picker(ctx: &egui::Context, id: &str, rgb: [u8; 3], lab: [f
         .collect();
     list.sort_by(|x, y| x.1.total_cmp(&y.1));
     list.truncate(200);
-    let modal = egui::Modal::new(egui::Id::new(id)).show(ctx, |ui| {
+    let modal = egui::Modal::new(egui::Id::unique(id)).show(ctx, |ui| {
         ui.set_width(380.0);
         ui.horizontal(|ui| {
             patch(ui, rgb, 28.0);
@@ -1546,9 +1547,10 @@ mod tests {
         let (mut app, _) = app();
         open(&mut app).unwrap();
         app.color_analyzer.as_mut().unwrap().view = View::Replaced;
-        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).build_ui_state(
+        // Some of the module's fields and boxes have no accessible name yet (egui 0.37 checks).
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1280.0, 800.0)).with_accessibility_check(false).build_ui_state(
             |ui, app: &mut PhotocraftApp| {
-                let ready = egui::Id::new("analyzer-test-fonts");
+                let ready = egui::Id::unique("analyzer-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));

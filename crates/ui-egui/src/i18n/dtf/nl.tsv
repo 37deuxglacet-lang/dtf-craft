@@ -290,7 +290,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG uitgevinkt: de kleur wordt uit de SVG weggelaten; de vormen worden verwijderd, niet samengevoegd.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Gedeeld met de Kleuranalyse. Formaten: .ase, .aco, .csv; verschil in ΔE 2000.
 	{name} vectorized color sheet	{name} kleurenblad gevectoriseerd
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ aangevinkt: de vormen krijgen de kleur van de referentie en dragen de naam ervan in de SVG. ΔE: tot 2 = onwaarneembaar · 2 tot 5 = zichtbaar van dichtbij · daarboven = andere tint
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ aangevinkt: de vormen krijgen de kleur van de referentie en dragen de naam ervan in de SVG. ΔE: tot 2 = onwaarneembaar · 2 tot 5 = zichtbaar van dichtbij · daarboven = andere tint
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	'{color}' is geen kleur: schrijf het als #rrggbb.
 	16 Colors	16 kleuren

@@ -292,7 +292,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG のチェックなし：その色は SVG から除外され、形状は統合されず削除されます。
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	カラー分析と共有。形式：.ase、.aco、.csv。差は ΔE 2000。
 	{name} vectorized color sheet	{name} ベクトル化カラーシート
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ チェック：形状は参照色になり、SVG ではその名前が付きます。ΔE：2 以下 = 知覚できない · 2〜5 = 近くで見える · それ以上 = 別の色相
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ チェック：形状は参照色になり、SVG ではその名前が付きます。ΔE：2 以下 = 知覚できない · 2〜5 = 近くで見える · それ以上 = 別の色相
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	「{color}」は色ではありません。#rrggbb の形式で書いてください。
 	16 Colors	16色

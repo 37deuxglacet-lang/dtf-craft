@@ -299,7 +299,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG снят: цвет исключается из SVG; его фигуры удаляются, а не объединяются.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Общий с Анализатором цвета. Форматы: .ase, .aco, .csv; разница в ΔE 2000.
 	{name} vectorized color sheet	{name} цветовой лист векторизации
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ отмечено: фигуры принимают цвет эталона и в SVG носят его имя. ΔE: до 2 = незаметно · от 2 до 5 = заметно вблизи · выше = другой оттенок
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ отмечено: фигуры принимают цвет эталона и в SVG носят его имя. ΔE: до 2 = незаметно · от 2 до 5 = заметно вблизи · выше = другой оттенок
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	«{color}» — не цвет: запишите его как #rrggbb.
 	16 Colors	16 цветов

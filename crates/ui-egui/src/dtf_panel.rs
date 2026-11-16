@@ -127,13 +127,6 @@ pub struct DtfPanelUi {
 const LAYOUT_VERSION: u64 = 6;
 const LAYOUT_PREF: &str = "dtfCraft.layoutVersion";
 
-/// The DTF workspace (Window › Workspace › DTF): Layers alone in the right column (the DTF tools
-/// open from the DTF menu); every other panel (Channels and Paths included) in the Window menu.
-pub(crate) fn dtf_layout() -> craft_ui::docking::Layout<String> {
-    use craft_ui::docking::{Layout, Node};
-    Layout { root: Some(Node::Tabs { panels: vec!["layers".to_string()], active: 0 }), floating: Vec::new() }
-}
-
 /// DTF Craft's start: the DTF tools, and on the first launch of this layout the DTF workspace.
 pub fn dtf_craft_startup(app: &mut PhotocraftApp) {
     app.dtf_craft = true;
@@ -515,7 +508,7 @@ pub(crate) fn poll_vectorize(app: &mut PhotocraftApp, ctx: &egui::Context) {
             let t = crate::theme::Tokens::get(ctx);
             let f = f32::from_bits(p.progress.load(Ordering::Relaxed));
             let mut cancel = false;
-            egui::Modal::new(egui::Id::new("dtf-vector-prep")).show(ctx, |ui| {
+            egui::Modal::new(egui::Id::unique("dtf-vector-prep")).show(ctx, |ui| {
                 ui.set_width(380.0);
                 ui.label(egui::RichText::new(tl!("Preparing for Vectorization")).font(crate::theme::semibold(15.0)).color(t.text));
                 ui.label(egui::RichText::new(&p.name).color(t.text_dim));
@@ -702,16 +695,17 @@ pub fn close_window(app: &mut PhotocraftApp) {
 /// off and the old DTF tabs (`dtf…` panels) leave a docking layout. Run every frame (cheap).
 pub fn keep_dtf_out_of_the_dock(app: &mut PhotocraftApp) {
     app.ui.panels.dtf = false;
-    let Some(layout) = app.ui.docking.as_mut() else { return };
-    let old: Vec<String> = layout.panels().into_iter().filter(|p| p.starts_with("dtf")).cloned().collect();
+    let Some(workspace) = app.ui.docking.as_mut() else { return };
+    let old: Vec<String> = workspace.layout.panels().into_iter().filter(|p| p.starts_with("dtf")).cloned().collect();
     for panel in old {
-        let _ = layout.apply(craft_ui::docking::Action::Close { panel });
+        let _ = workspace.apply(craft_ui::docking::Action::Close { panel }, |_| craft_ui::docking::Permissions::default());
     }
 }
 
 /// The DTF window, when one is open: the tool's title, its settings (scrolled when taller than
 /// the screen), closed by its × or Esc, and after Apply or Cancel.
 pub fn window(app: &mut PhotocraftApp, ctx: &egui::Context) {
+    let _dtf = crate::dtf_i18n::scope();
     keep_dtf_out_of_the_dock(app);
     let Some(cmd) = app.ui.dtf_panel.window.clone() else { return };
     let Some(tab) = TOOLS.iter().position(|t| *t == cmd) else {
@@ -723,7 +717,7 @@ pub fn window(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let max_h = (ctx.content_rect().height() - 120.0).max(240.0);
     // The window's title is the tool's name, as in the DTF menu.
     egui::Window::new(tl!(TABS[tab]))
-        .id(egui::Id::new("dtf-tool-window"))
+        .id(egui::Id::unique("dtf-tool-window"))
         .open(&mut open)
         .collapsible(false)
         .resizable(false)
@@ -1137,10 +1131,8 @@ mod tests {
         let ctx = egui::Context::default();
         dtf_craft_startup(&mut app);
         assert_eq!(app.ui.workspace, "DTF");
-        let layout = app.ui.docking.clone().expect("the DTF workspace's layout");
-        assert_eq!(layout, dtf_layout());
-        assert!(crate::panel_docking::valid(&layout));
-        assert!(matches!(&layout.root, Some(craft_ui::docking::Node::Tabs { panels, .. }) if panels == &["layers".to_string()]), "{layout:?}");
+        // The DTF workspace: the native dock built from the panel flags, Layers alone on the right.
+        assert!(app.ui.docking.is_none());
         let p = &app.ui.panels;
         assert!(!p.dtf && p.layers && !p.color && !p.properties && !p.history && !p.navigator);
         // The Window menu no longer lists the DTF tools.
@@ -1150,7 +1142,8 @@ mod tests {
         let shown: Vec<&str> = app.ui.dock.visible_tabs(crate::dock::Group::Layers, false).into_iter().map(|(_, n)| n).collect();
         assert_eq!(shown, ["Layers"]);
         crate::menus::invoke(&mut app, &ctx, "window.workspace.dtf", json!({})).unwrap();
-        assert_eq!(app.ui.docking, Some(dtf_layout()));
+        let p = &app.ui.panels;
+        assert!(app.ui.docking.is_none() && !p.dtf && p.layers && !p.color && !p.properties && !p.history && !p.navigator);
         // DTF › Saturation… opens its window, which previews at once and is modal.
         app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
         crate::menus::invoke(&mut app, &ctx, "dtf.saturation", json!({})).unwrap();
@@ -1186,13 +1179,13 @@ mod tests {
         }
         // The right column never shows the DTF tools again, even from an old saved layout.
         app.ui.panels.dtf = true;
-        app.ui.docking = Some(craft_ui::docking::Layout {
+        app.ui.docking = Some(craft_ui::docking::Workspace::new(craft_ui::docking::Layout {
             root: Some(craft_ui::docking::Node::Tabs { panels: vec!["layers".into(), "dtfConformity".into()], active: 1 }),
             floating: Vec::new(),
-        });
+        }));
         keep_dtf_out_of_the_dock(&mut app);
         assert!(!app.ui.panels.dtf);
-        assert_eq!(app.ui.docking.as_ref().unwrap().panels(), vec![&"layers".to_string()]);
+        assert_eq!(app.ui.docking.as_ref().unwrap().layout.panels(), vec![&"layers".to_string()]);
     }
 
     /// The DTF specs carry descriptions in parentheses (with commas): their keys and defaults
@@ -1316,7 +1309,7 @@ mod tests {
         let mut h = egui_kittest::Harness::builder().with_size(vec2(300.0, 900.0)).build_ui_state(
             move |ui, app: &mut PhotocraftApp| {
                 // The app's fonts are set up before the first frame draws a tab.
-                let ready = egui::Id::new("dtf-test-fonts");
+                let ready = egui::Id::unique("dtf-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));
@@ -1337,7 +1330,7 @@ mod tests {
         let mut draw = draw;
         egui_kittest::Harness::builder().with_size(vec2(320.0, 900.0)).build_ui_state(
             move |ui, app: &mut PhotocraftApp| {
-                let ready = egui::Id::new("dtf-test-fonts");
+                let ready = egui::Id::unique("dtf-test-fonts");
                 if !ui.ctx().data(|d| d.get_temp::<bool>(ready)).unwrap_or(false) {
                     PhotocraftApp::setup_context(ui.ctx(), crate::theme::ThemeKind::ALL[0]);
                     ui.ctx().data_mut(|d| d.insert_temp(ready, true));
@@ -1625,9 +1618,9 @@ mod tests {
             tool_body(app, ui, sat);
         });
         h.run_steps(4);
-        // The slider runs under the "Saturation" label, across the tab.
-        let label = h.get_by_label("Saturation").rect();
-        let y = label.bottom() + 14.0;
+        // The slider runs across the tab (it carries the row's name, egui 0.37).
+        let slider = h.get_by_role_and_label(egui::accesskit::Role::Slider, "Saturation").rect();
+        let y = slider.center().y;
         let (from, to) = (egui::pos2(170.0, y), egui::pos2(4.0, y));
         h.event(egui::Event::PointerMoved(from));
         for _ in 0..90 {

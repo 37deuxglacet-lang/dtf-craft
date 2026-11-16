@@ -7,12 +7,14 @@
 
 [photocraft]
 repository = "https://github.com/storytold/photocraft"
-# Commit PhotoCraft de base (main du 14/10/2026, entre v0.8.2 et v0.9.0).
-commit = "ed7df56a2455375240959bae6e5273a71d858d84"
-version = "0.8.2+"
+# Commit PhotoCraft de base (mis à jour par `scripts/dtf-sync-photocraft.sh finish`).
+commit = "45066c48292e92229ada3459a83453439514c83d"
+version = "0.23.1"
 
-# Fichiers PhotoCraft supprimés dans DTF Craft : une fusion ne doit pas les réintroduire.
+# Fichiers PhotoCraft supprimés dans DTF Craft : une fusion ne doit pas les réintroduire (tous les
+# workflows GitHub de PhotoCraft sont aussi retirés, sauf celui de DTF Craft).
 removed = [
+    ".github/dependabot.yml",
     ".github/workflows/ci.yml",
     ".github/workflows/docs.yml",
     ".github/workflows/freebsd.yml",

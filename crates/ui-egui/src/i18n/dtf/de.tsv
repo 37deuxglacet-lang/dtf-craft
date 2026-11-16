@@ -302,7 +302,7 @@
 	SVG unchecked: the color is left out of the SVG; its shapes are removed, not merged.	SVG nicht markiert: Die Farbe fehlt im SVG; ihre Formen werden entfernt, nicht zusammengeführt.
 	Shared with the Color Analyzer. Formats: .ase, .aco, .csv; difference in ΔE 2000.	Mit dem Farbanalysator geteilt. Formate: .ase, .aco, .csv; Abweichung in ΔE 2000.
 	{name} vectorized color sheet	{name} Farbdatenblatt vektorisiert
-	⇄ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	⇄ markiert: Die Formen übernehmen die Farbe der Referenz und tragen im SVG ihren Namen. ΔE: bis 2 = nicht wahrnehmbar · 2 bis 5 = aus der Nähe sichtbar · darüber = anderer Farbton
+	↔ checked: the shapes take the reference's color and are named after it in the SVG. ΔE: up to 2 = imperceptible · 2 to 5 = visible up close · above = another hue	↔ markiert: Die Formen übernehmen die Farbe der Referenz und tragen im SVG ihren Namen. ΔE: bis 2 = nicht wahrnehmbar · 2 bis 5 = aus der Nähe sichtbar · darüber = anderer Farbton
 # DTF Craft (19)
 	"{color}" is not a color: write it as #rrggbb.	„{color}“ ist keine Farbe: als #rrggbb schreiben.
 	16 Colors	16 Farben

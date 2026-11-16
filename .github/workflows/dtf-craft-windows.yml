@@ -33,6 +33,17 @@ jobs:
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
     steps:
       - uses: actions/checkout@v4
+      # The interface translations (PhotoCraft's and DTF Craft's): PhotoCraft reads them from a
+      # craft-i18n checkout at the revision in craft-i18n.rev (crates/ui-egui/build.rs).
+      - name: Translations (craft-i18n)
+        shell: bash
+        run: |
+          rev=$(tr -d '[:space:]' < craft-i18n.rev)
+          git init -q craft-i18n
+          git -C craft-i18n fetch -q --depth 1 https://github.com/storytold/craft-i18n "$rev"
+          git -C craft-i18n checkout -q FETCH_HEAD
+          echo "CRAFT_I18N_DIR=${GITHUB_WORKSPACE}/craft-i18n" >> "$GITHUB_ENV"
+          echo "CRAFT_I18N_REQUIRED=1" >> "$GITHUB_ENV"
       - name: Rust toolchain
         run: rustup toolchain install stable --profile minimal && rustup default stable
       - uses: Swatinem/rust-cache@v2
