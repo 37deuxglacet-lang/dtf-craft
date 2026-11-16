@@ -1,0 +1,67 @@
+name: Bench V1.0 vs 1.1
+
+# Temporary: times the DTF commands of the CLI built from main (V1.0.x) and from the PhotoCraft
+# 0.23.1 branch, on the same Windows runner type and the same images.
+on:
+  push:
+    branches: ["bench/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: v1.0-main
+            ref: 426b3974175537d090ca8433f392c84315fdfdfc
+          - name: v1.1-branch
+            ref: maj/photocraft-v0.23.1
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      RUSTFLAGS: "-C target-feature=+crt-static"
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: benchfiles
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          path: src
+      - name: Rust toolchain
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - name: Build CLI
+        working-directory: src
+        run: cargo build --release -p photocraft-cli
+      - name: Time the commands
+        shell: pwsh
+        working-directory: src
+        run: |
+          $cli = "target\release\photocraft-cli.exe"
+          if (-not (Test-Path $cli)) { $cli = (Get-ChildItem target\release\*cli*.exe | Select-Object -First 1).FullName }
+          $img = "..\benchfiles\bench\visuel.png"
+          $logo = "..\benchfiles\bench\logo.png"
+          "CPU: $env:NUMBER_OF_PROCESSORS logical"
+          $cases = @(
+            @{ n = "upscale x2 900x600"; f = $img; a = @("--cmd", "dtf.upscale", "--params", '{"scale":"2"}') },
+            @{ n = "upscale x4 900x600"; f = $img; a = @("--cmd", "dtf.upscale", "--params", '{"scale":"4"}') },
+            @{ n = "optimizeForVectorization"; f = $logo; a = @("--cmd", "dtf.optimizeForVectorization") },
+            @{ n = "vectorize dtfcraft"; f = $logo; a = @("--cmd", "dtf.vectorize") },
+            @{ n = "vectorize vectorcraft"; f = $logo; a = @("--cmd", "dtf.vectorize", "--params", '{"engine":"vectorcraft","preset":"6 Colors"}') },
+            @{ n = "halftone"; f = $img; a = @("--cmd", "filter.dtf.halftone", "--params", '{"preset":"none"}') },
+            @{ n = "gaussian blur 20"; f = $img; a = @("--cmd", "filter.blur.gaussianBlur", "--params", '{"radius":20}') }
+          )
+          foreach ($c in $cases) {
+            $times = @()
+            for ($i = 0; $i -lt 3; $i++) {
+              $t = Measure-Command { & $cli run $c.f @($c.a) --out "$env:RUNNER_TEMP\o.png" *> "$env:RUNNER_TEMP\log.txt" }
+              $times += [math]::Round($t.TotalSeconds, 2)
+            }
+            $ok = $LASTEXITCODE
+            "::notice title=${{ matrix.name }}::$($c.n): $($times -join ' / ') s (exit $ok)"
+            Get-Content "$env:RUNNER_TEMP\log.txt" -TotalCount 2
+          }
