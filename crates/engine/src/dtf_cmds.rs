@@ -21,6 +21,8 @@ use crate::{EngineError, Result, Session};
 pub const HALFTONE: &str = "filter.dtf.halftone";
 pub const REMOVE_SEMI_TRANSPARENT: &str = "filter.dtf.removeSemiTransparent";
 pub const REMOVE_WHITE: &str = "filter.dtf.removeWhiteBackground";
+/// Flat Colour: the dark fringe an AI upscale leaves along flat shapes' edges, cleaned.
+pub const FLAT_COLOR: &str = "filter.dtf.flatColor";
 /// Name of the copy Remove White Background cuts out (the source layer stays, hidden).
 pub const CUTOUT_LAYER: &str = "Sans fond";
 
@@ -80,6 +82,24 @@ pub fn params_for(id: &str, p: &Value) -> Option<FilterParams> {
                 seeds: hole_points(p),
             };
             Some(FilterParams::DtfCutout { spec })
+        }
+        FLAT_COLOR => {
+            let auto = p.get("autoColors").and_then(Value::as_bool).unwrap_or(true);
+            let spec = photocraft_algo::dtf_flat::FlatColorSpec {
+                colors: (!auto).then(|| num(p, "colorCount", 8.0).clamp(2.0, f64::from(photocraft_algo::dtf_flat::MAX_COLORS)).round() as u32),
+                band: num(p, "bandWidth", 2.0).clamp(1.0, 5.0) as f32,
+                darken: num(p, "darkening", 8.0).clamp(0.0, 40.0) as f32,
+                tolerance: num(p, "hueTolerance", 15.0).clamp(0.0, 50.0) as f32,
+                antialias: text(p, "edges", "sharp") == "antialias",
+                protected: p
+                    .get("protectedColors")
+                    .and_then(Value::as_array)
+                    .map(|a| a.iter().filter_map(Value::as_str).filter_map(hex_rgb).take(64).collect())
+                    .unwrap_or_default(),
+                // The preview's view of the pixels changed (the window's "Highlight changes").
+                highlight: p.get("highlight").and_then(Value::as_bool).unwrap_or(false),
+            };
+            Some(FilterParams::DtfFlatColor { spec })
         }
         _ => None,
     }
@@ -293,6 +313,20 @@ fn halftone_in_bands(s: &mut Session, layer: photocraft_doc::LayerId, fp: Filter
         },
         move |fp| json!({ "layer": layer.0, "filter": serde_json::to_value(&fp).unwrap_or(Value::Null) }),
     )
+}
+
+fn flat_color(s: &mut Session, p: &Value) -> Result<Value> {
+    check_range(FLAT_COLOR, p, "colorCount", 2.0, f64::from(photocraft_algo::dtf_flat::MAX_COLORS))?;
+    check_range(FLAT_COLOR, p, "bandWidth", 1.0, 5.0)?;
+    check_range(FLAT_COLOR, p, "darkening", 0.0, 40.0)?;
+    check_range(FLAT_COLOR, p, "hueTolerance", 0.0, 50.0)?;
+    check_choice(FLAT_COLOR, p, "edges", &["sharp", "antialias"])?;
+    if let Some(v) = p.get("protectedColors").filter(|v| !v.is_null())
+        && !v.as_array().is_some_and(|a| a.iter().all(|c| c.as_str().and_then(hex_rgb).is_some()))
+    {
+        return Err(bad(FLAT_COLOR, "`protectedColors` must be a list of #rrggbb colours"));
+    }
+    crate::filters::run_filter(s, FLAT_COLOR, p)
 }
 
 fn remove_semi(s: &mut Session, p: &Value) -> Result<Value> {
@@ -985,6 +1019,16 @@ pub fn specs() -> Vec<CommandSpec> {
             journal: true,
         },
         CommandSpec {
+            id: FLAT_COLOR,
+            label: "Flat Color…",
+            menu: &["DTF"],
+            shortcut: None,
+            params: r##"{"autoColors":bool=true (palette size found from the image),"colorCount":2..32=8 (palette size when not automatic),"bandWidth":1..5=2 (px from a contour examined),"darkening":0..40=8 (ΔL* darker than the shape to count as fringe),"hueTolerance":0..50=15 (ΔH* hue distance to the shape),"edges":"sharp|antialias"="sharp" (sharp edges, or a 1 px blend of the two colours),"protectedColors":json (["#rrggbb", …]: colours never replaced, an outline's black)} Cleans the dark fringe an AI upscale leaves along flat colour shapes: the colours grouped in a palette (k-means in L*a*b*), the shapes found, and the pixels of the edge band darker than their shape and of its hue given the shape's colour (the median of its inner pixels). Alpha is kept. `highlight`: true paints the pixels changed magenta (preview)"##,
+            enabled: crate::filters::has_filterable_layer,
+            run: flat_color,
+            journal: true,
+        },
+        CommandSpec {
             id: REMOVE_SEMI_TRANSPARENT,
             label: "Remove Semi-Transparent Pixels…",
             menu: &["DTF"],
@@ -1000,6 +1044,44 @@ pub fn specs() -> Vec<CommandSpec> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Flat Colour on the active layer: the dark fringe of a red square on blue takes the red;
+    /// the inside, the blue and alpha stay; one history step; bad settings are refused.
+    #[test]
+    fn flat_color_cleans_the_fringe() {
+        let mut s = Session::new();
+        s.execute("file.new", json!({"width": 40, "height": 40, "resolution": 300, "background": "transparent"})).unwrap();
+        s.edit("Paint", |doc, active| {
+            let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+            for y in 0..40 {
+                for x in 0..40 {
+                    let inside = (10..30).contains(&x) && (10..30).contains(&y);
+                    let edge = inside && (x < 12 || x >= 28 || y < 12 || y >= 28);
+                    let px = if edge {
+                        [0.55, 0.05, 0.05, 1.0]
+                    } else if inside {
+                        [0.85, 0.1, 0.1, 1.0]
+                    } else {
+                        [0.1, 0.2, 0.85, 1.0]
+                    };
+                    surf.write_pixel(x, y, &px);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        let layer = s.active().unwrap().active_layer.unwrap();
+        let px = |s: &Session, x: i32, y: i32| s.active().unwrap().doc.layer(layer).unwrap().surface().unwrap().read_region(photocraft_geom::Rect::new(x, y, x + 1, y + 1));
+        let before = s.active().unwrap().history.entries().len();
+        s.execute(FLAT_COLOR, json!({"autoColors": false, "colorCount": 2})).unwrap();
+        let p = px(&s, 10, 20);
+        assert!((p[0] - 0.85).abs() < 0.02 && p[3] == 1.0, "{p:?}");
+        assert!((px(&s, 2, 2)[2] - 0.85).abs() < 0.01, "the blue stays");
+        assert_eq!(s.active().unwrap().history.entries().len(), before + 1);
+        assert!(s.execute(FLAT_COLOR, json!({"bandWidth": 9})).is_err());
+        assert!(s.execute(FLAT_COLOR, json!({"protectedColors": ["black"]})).is_err());
+        assert!(s.execute(FLAT_COLOR, json!({"protectedColors": ["#000000"], "edges": "antialias"})).is_ok());
+    }
 
     /// DTF Color Range: the range picked on the image is erased on a copy "Sans fond" (partially by
     /// its fuzziness), the source is hidden and whole, one history step; without a sample nothing

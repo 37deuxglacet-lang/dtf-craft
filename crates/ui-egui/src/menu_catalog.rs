@@ -658,6 +658,7 @@ pub static CATALOG: &[(&[&str], &str, Option<&str>, &str)] = &[
     (&["DTF"], "Remove Fringe…", None, "dtf.defringe"),
     (&["DTF"], "Sharpness…", None, "dtf.sharpen"),
     (&["DTF"], "Saturation…", None, "dtf.saturation"),
+    (&["DTF"], "Flat Color…", None, "filter.dtf.flatColor"),
     (&["DTF"], "---", None, "---"),
     (&["DTF"], "Color Range…", None, "dtf.colorRange"),
     (&["DTF"], "DTF Halftone…", None, "filter.dtf.halftone"),

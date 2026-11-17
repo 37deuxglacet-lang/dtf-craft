@@ -404,3 +404,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Nema uzorka: kliknite pozadinu na slici
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK briše opseg na kopiji sloja (belo u pregledu = obrisano).
+# DTF Craft (33)
+	Close {name}	Zatvori {name}
+	Close the sheet (its visuals stay in the list)	Zatvori tabak (njegovi motivi ostaju na listi)
+	The values each new gang sheet opens with, kept from one session to the next.	Vrednosti sa kojima se otvara svaki novi gang sheet, čuvaju se od sesije do sesije.
+	Copies per Visual	Kopija po motivu
+	Factory Values	Fabričke vrednosti
+	The Preferences back to DTF Craft's values	Podešavanja nazad na vrednosti DTF Craft-a
+	Preferences	Podešavanja
+	Align Left Edges	Poravnaj leve ivice
+	Align Horizontal Centers	Poravnaj horizontalne centre
+	Align Right Edges	Poravnaj desne ivice
+	Align Top Edges	Poravnaj gornje ivice
+	Align Vertical Centers	Poravnaj vertikalne centre
+	Align Bottom Edges	Poravnaj donje ivice
+	Distribute Horizontally	Rasporedi horizontalno
+	Distribute Vertically	Rasporedi vertikalno
+	Copies of {name}	Kopije: {name}
+# DTF Craft (34)
+	Flat Color…	Ravna boja…
+	Flat Color	Ravna boja
+	Auto Colors	Broj boja automatski
+	Color Count	Broj boja
+	Band Width	Širina pojasa (px)
+	Darkening	Prag tamnjenja ΔL*
+	Hue Tolerance	Tolerancija nijanse ΔE
+	Edges	Ivice
+	Sharp	Oštre
+	Antialias	Uglađivanje 1 px
+	Protected Colors	Zaštićene boje
+	Protect a Color Picked on the Image	Zaštiti boju uzetu sa slike
+	Clear	Obriši
+	No protected colour	Nema zaštićene boje
+	None: click the eyedropper, then a colour to keep (an outline's black).	Nijedna: kliknite pipetu, pa boju koju treba zadržati (crnu konture).
+	Remove {color}	Ukloni {color}
+	Highlight Changes	Istakni izmene

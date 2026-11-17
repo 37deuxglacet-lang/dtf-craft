@@ -62,6 +62,8 @@ pub mod theme;
 // ---- DTF Craft ----
 pub mod color_analyzer_ui;
 pub mod color_sheet;
+/// DTF Craft: DTF › Flat Color…'s own rows (protected colours, preview views).
+pub mod dtf_flat_ui;
 pub mod dtf_help;
 /// DTF Craft: the DTF windows' own wording where PhotoCraft has the same English string.
 pub mod dtf_i18n;

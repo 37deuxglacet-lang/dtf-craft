@@ -424,3 +424,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Belum ada sampel: klik latar pada gambar
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK menghapus rentang pada salinan lapisan (putih di pratinjau = dihapus).
+# DTF Craft (33)
+	Close {name}	Tutup {name}
+	Close the sheet (its visuals stay in the list)	Tutup lembar (visualnya tetap di daftar)
+	The values each new gang sheet opens with, kept from one session to the next.	Nilai awal setiap gang sheet baru, disimpan dari sesi ke sesi.
+	Copies per Visual	Salinan per visual
+	Factory Values	Nilai pabrik
+	The Preferences back to DTF Craft's values	Preferensi kembali ke nilai DTF Craft
+	Preferences	Preferensi
+	Align Left Edges	Ratakan tepi kiri
+	Align Horizontal Centers	Ratakan tengah horizontal
+	Align Right Edges	Ratakan tepi kanan
+	Align Top Edges	Ratakan tepi atas
+	Align Vertical Centers	Ratakan tengah vertikal
+	Align Bottom Edges	Ratakan tepi bawah
+	Distribute Horizontally	Sebarkan horizontal
+	Distribute Vertically	Sebarkan vertikal
+	Copies of {name}	Salinan {name}
+# DTF Craft (34)
+	Flat Color…	Warna rata…
+	Flat Color	Warna rata
+	Auto Colors	Jumlah warna otomatis
+	Color Count	Jumlah warna
+	Band Width	Lebar pita (px)
+	Darkening	Ambang penggelapan ΔL*
+	Hue Tolerance	Toleransi rona ΔE
+	Edges	Tepi
+	Sharp	Tajam
+	Antialias	Antialias 1 px
+	Protected Colors	Warna dilindungi
+	Protect a Color Picked on the Image	Lindungi warna yang diambil dari gambar
+	Clear	Hapus
+	No protected colour	Tidak ada warna dilindungi
+	None: click the eyedropper, then a colour to keep (an outline's black).	Tidak ada: klik pipet, lalu warna yang ingin dipertahankan (hitam kontur).
+	Remove {color}	Hapus {color}
+	Highlight Changes	Sorot perubahan

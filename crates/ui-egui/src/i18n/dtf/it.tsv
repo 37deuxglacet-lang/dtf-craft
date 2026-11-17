@@ -405,3 +405,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Nessun campione: fai clic sullo sfondo nell'immagine
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK cancella l'intervallo su una copia del livello (bianco nell'anteprima = cancellato).
+# DTF Craft (33)
+	Close {name}	Chiudi {name}
+	Close the sheet (its visuals stay in the list)	Chiudi il foglio (le sue grafiche restano nell'elenco)
+	The values each new gang sheet opens with, kept from one session to the next.	I valori con cui si apre ogni nuovo gang sheet, conservati da una sessione all'altra.
+	Copies per Visual	Copie per grafica
+	Factory Values	Valori di fabbrica
+	The Preferences back to DTF Craft's values	Le preferenze tornano ai valori di DTF Craft
+	Preferences	Preferenze
+	Align Left Edges	Allinea bordi sinistri
+	Align Horizontal Centers	Allinea centri orizzontali
+	Align Right Edges	Allinea bordi destri
+	Align Top Edges	Allinea bordi superiori
+	Align Vertical Centers	Allinea centri verticali
+	Align Bottom Edges	Allinea bordi inferiori
+	Distribute Horizontally	Distribuisci orizzontalmente
+	Distribute Vertically	Distribuisci verticalmente
+	Copies of {name}	Copie di {name}
+# DTF Craft (34)
+	Flat Color…	Tinta piatta…
+	Flat Color	Tinta piatta
+	Auto Colors	Numero di colori automatico
+	Color Count	Numero di colori
+	Band Width	Larghezza banda (px)
+	Darkening	Soglia di scurimento ΔL*
+	Hue Tolerance	Tolleranza di tinta ΔE
+	Edges	Bordi
+	Sharp	Netti
+	Antialias	Antialias 1 px
+	Protected Colors	Colori protetti
+	Protect a Color Picked on the Image	Proteggi un colore preso dall'immagine
+	Clear	Cancella
+	No protected colour	Nessun colore protetto
+	None: click the eyedropper, then a colour to keep (an outline's black).	Nessuno: fai clic sul contagocce, poi su un colore da mantenere (il nero di un contorno).
+	Remove {color}	Rimuovi {color}
+	Highlight Changes	Evidenzia le modifiche

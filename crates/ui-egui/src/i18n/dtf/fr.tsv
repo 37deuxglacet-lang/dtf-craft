@@ -449,3 +449,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Aucun échantillon : cliquez le fond sur l'image
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK efface la plage sur une copie du calque (blanc dans l'aperçu = effacé).
+# DTF Craft (33)
+	Close {name}	Fermer {name}
+	Close the sheet (its visuals stay in the list)	Fermer la planche (ses visuels restent dans la liste)
+	The values each new gang sheet opens with, kept from one session to the next.	Les valeurs de départ de chaque nouveau gang sheet, gardées d'une session à l'autre.
+	Copies per Visual	Copies par visuel
+	Factory Values	Valeurs d'usine
+	The Preferences back to DTF Craft's values	Les préférences reviennent aux valeurs de DTF Craft
+	Preferences	Préférences
+	Align Left Edges	Aligner les bords gauches
+	Align Horizontal Centers	Aligner les centres horizontaux
+	Align Right Edges	Aligner les bords droits
+	Align Top Edges	Aligner les bords supérieurs
+	Align Vertical Centers	Aligner les centres verticaux
+	Align Bottom Edges	Aligner les bords inférieurs
+	Distribute Horizontally	Répartir horizontalement
+	Distribute Vertically	Répartir verticalement
+	Copies of {name}	Copies de {name}
+# DTF Craft (34)
+	Flat Color…	Aplat couleur…
+	Flat Color	Aplat couleur
+	Auto Colors	Nombre de couleurs auto
+	Color Count	Nombre de couleurs
+	Band Width	Largeur de bande (px)
+	Darkening	Seuil d'assombrissement ΔL*
+	Hue Tolerance	Tolérance de teinte ΔE
+	Edges	Bords
+	Sharp	Nets
+	Antialias	Anticrénelage 1 px
+	Protected Colors	Couleurs protégées
+	Protect a Color Picked on the Image	Protéger une couleur prise sur l'image
+	Clear	Effacer
+	No protected colour	Aucune couleur protégée
+	None: click the eyedropper, then a colour to keep (an outline's black).	Aucune : cliquez la pipette, puis une couleur à garder (le noir d'un contour).
+	Remove {color}	Retirer {color}
+	Highlight Changes	Surligner les modifications

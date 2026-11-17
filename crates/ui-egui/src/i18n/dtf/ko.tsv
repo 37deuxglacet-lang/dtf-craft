@@ -418,3 +418,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	샘플 없음: 이미지의 배경을 클릭하세요
 	OK erases the range on a copy of the layer (white in the preview = erased).	확인을 누르면 레이어 사본에서 범위를 지웁니다 (미리 보기의 흰색 = 지워짐).
+# DTF Craft (33)
+	Close {name}	{name} 닫기
+	Close the sheet (its visuals stay in the list)	시트 닫기 (이미지는 목록에 남습니다)
+	The values each new gang sheet opens with, kept from one session to the next.	새 갱 시트가 열릴 때의 시작 값으로, 세션 간에 유지됩니다.
+	Copies per Visual	이미지당 매수
+	Factory Values	초기값
+	The Preferences back to DTF Craft's values	환경 설정을 DTF Craft 값으로 되돌리기
+	Preferences	환경 설정
+	Align Left Edges	왼쪽 가장자리 정렬
+	Align Horizontal Centers	가로 중앙 정렬
+	Align Right Edges	오른쪽 가장자리 정렬
+	Align Top Edges	위쪽 가장자리 정렬
+	Align Vertical Centers	세로 중앙 정렬
+	Align Bottom Edges	아래쪽 가장자리 정렬
+	Distribute Horizontally	가로로 분포
+	Distribute Vertically	세로로 분포
+	Copies of {name}	{name} 매수
+# DTF Craft (34)
+	Flat Color…	단색 면…
+	Flat Color	단색 면
+	Auto Colors	색상 수 자동
+	Color Count	색상 수
+	Band Width	띠 너비 (px)
+	Darkening	어두움 임계값 ΔL*
+	Hue Tolerance	색조 허용치 ΔE
+	Edges	가장자리
+	Sharp	선명
+	Antialias	안티앨리어싱 1 px
+	Protected Colors	보호 색상
+	Protect a Color Picked on the Image	이미지에서 가져온 색상 보호
+	Clear	지우기
+	No protected colour	보호 색상 없음
+	None: click the eyedropper, then a colour to keep (an outline's black).	없음: 스포이트를 클릭한 다음 유지할 색상(윤곽선의 검정 등)을 클릭하세요.
+	Remove {color}	{color} 제거
+	Highlight Changes	변경 사항 강조

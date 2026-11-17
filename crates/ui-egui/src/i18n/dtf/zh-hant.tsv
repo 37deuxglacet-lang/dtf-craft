@@ -433,3 +433,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	無樣本：按一下影像上的背景
 	OK erases the range on a copy of the layer (white in the preview = erased).	確定會在圖層副本上擦除該範圍（預覽中白色 = 擦除）。
+# DTF Craft (33)
+	Close {name}	關閉 {name}
+	Close the sheet (its visuals stay in the list)	關閉拼版（其圖案保留在清單中）
+	The values each new gang sheet opens with, kept from one session to the next.	每個新拼版開啟時使用的初始值，在工作階段之間保留。
+	Copies per Visual	每個圖案的份數
+	Factory Values	原廠值
+	The Preferences back to DTF Craft's values	將偏好設定恢復為 DTF Craft 的值
+	Preferences	偏好設定
+	Align Left Edges	左邊緣對齊
+	Align Horizontal Centers	水平置中對齊
+	Align Right Edges	右邊緣對齊
+	Align Top Edges	上邊緣對齊
+	Align Vertical Centers	垂直置中對齊
+	Align Bottom Edges	下邊緣對齊
+	Distribute Horizontally	水平分佈
+	Distribute Vertically	垂直分佈
+	Copies of {name}	{name} 的份數
+# DTF Craft (34)
+	Flat Color…	純色平塗…
+	Flat Color	純色平塗
+	Auto Colors	自動顏色數
+	Color Count	顏色數
+	Band Width	邊帶寬度 (像素)
+	Darkening	變暗臨界值 ΔL*
+	Hue Tolerance	色相容許度 ΔE
+	Edges	邊緣
+	Sharp	銳利
+	Antialias	消除鋸齒 1 像素
+	Protected Colors	受保護顏色
+	Protect a Color Picked on the Image	保護從影像中取的顏色
+	Clear	清除
+	No protected colour	沒有受保護的顏色
+	None: click the eyedropper, then a colour to keep (an outline's black).	無：按一下滴管，再按一下要保留的顏色（例如輪廓的黑色）。
+	Remove {color}	移除 {color}
+	Highlight Changes	醒目提示變更

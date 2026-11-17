@@ -44,7 +44,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `assets/app-icon/photocraft.icns` | DTF Craft icon |
 | `assets/app-icon/photocraft.ico` | DTF Craft icon |
 | `crates/algo/Cargo.toml` | tracers of the Vectorisation module |
-| `crates/algo/src/lib.rs` | declares the DTF modules and DTF filters |
+| `crates/algo/src/lib.rs` | declares the DTF modules and DTF filters (Flat Color prepared once over the area, its progress first) |
 | `crates/algo/src/quantize.rs` | `spot` made `pub(crate)` (DTF Halftone) |
 | `crates/engine/src/build_info.rs` | DTF Craft's version (the subscription follows it), then the base's |
 | `crates/engine/src/cmd.rs` | registers the DTF commands |
@@ -60,7 +60,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/app/commands.rs` | cut-out's Toggle Last State |
 | `crates/ui-egui/src/app/files.rs` | Save As starts from the save hint |
 | `crates/ui-egui/src/app/frame.rs` | DTF windows each frame, drops onto the Gang Sheet |
-| `crates/ui-egui/src/canvas/filter_preview.rs` | previews driven by the DTF panel |
+| `crates/ui-egui/src/canvas/filter_preview.rs` | previews driven by the DTF panel; Flat Color's Show Before and Highlight Changes |
 | `crates/ui-egui/src/canvas/start_screen.rs` | hands the start screen to `dtf_home.rs` |
 | `crates/ui-egui/src/canvas/tabs.rs` | `paint_dots` made `pub(crate)` |
 | `crates/ui-egui/src/canvas/tool_input.rs` | cut-out clicks (holes, background eyedropper) |
@@ -68,7 +68,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/dialogs/color_range_ui.rs` | DTF › Color Range…: the same dialog, OK erases the range on a copy (`dtf.colorRange`), no sample erases nothing, its help sheet |
 | `crates/ui-egui/src/dialogs/credits/ui_tests.rs` | About test with the DTF Craft name |
 | `crates/ui-egui/src/dialogs/file_ui/print.rs` | rebranded label |
-| `crates/ui-egui/src/dialogs/filter_dialog.rs` | DTF dialogs: param spec extras (cm, text defaults, descriptions), DTF Halftone tabs and lock, help sheet and tooltips, cut-out preview |
+| `crates/ui-egui/src/dialogs/filter_dialog.rs` | DTF dialogs: param spec extras (cm, text defaults, descriptions), DTF Halftone tabs and lock, help sheet and tooltips, cut-out preview; Flat Color's rows and its eyedropper for protected colours, previewed at full resolution |
 | `crates/ui-egui/src/dialogs/filter_dialog/tests.rs` | test of the text defaults |
 | `crates/ui-egui/src/dialogs/filter_preview_worker.rs` | previews driven by the DTF panel |
 | `crates/ui-egui/src/dialogs/screen_picker.rs` | rebranded window title |
@@ -112,7 +112,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/widgets/tests.rs` | test of the typed-only field |
 | `crates/ui-egui/src/widgets/units.rs` | typed-only number fields (Gang Sheet) |
 
-## Added (40)
+## Added (42)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -141,6 +141,8 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 - `assets/icons/graduation-cap.svg`
 - `assets/icons/wrench.svg`
 - `crates/algo/src/dtf_color.rs`
+- `crates/algo/src/dtf_flat.rs`
+- `crates/ui-egui/src/dtf_flat_ui.rs`
 - `crates/engine/src/dtf_color_cmds.rs`
 - `crates/ui-egui/src/color_analyzer_ui.rs`
 - `crates/ui-egui/src/color_sheet.rs`

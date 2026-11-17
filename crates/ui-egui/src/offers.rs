@@ -58,6 +58,7 @@ pub fn tool_name(command: &str) -> Option<&'static str> {
         "dtf.sharpen" => "Netteté",
         "dtf.saturation" => "Saturation",
         "dtf.colorRange" => "Plage de couleurs",
+        "filter.dtf.flatColor" => "Aplat couleur",
         "filter.dtf.halftone" => "Halftone DTF",
         "dtf.colorAnalyzer" => "Analyseur couleur",
         "dtf.gangSheet" => "Gang sheet",

@@ -433,3 +433,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	无样本：单击图像上的背景
 	OK erases the range on a copy of the layer (white in the preview = erased).	确定会在图层副本上擦除该范围（预览中白色 = 擦除）。
+# DTF Craft (33)
+	Close {name}	关闭 {name}
+	Close the sheet (its visuals stay in the list)	关闭拼版（其图案保留在列表中）
+	The values each new gang sheet opens with, kept from one session to the next.	每个新拼版打开时使用的初始值，在会话之间保留。
+	Copies per Visual	每个图案的份数
+	Factory Values	出厂值
+	The Preferences back to DTF Craft's values	将首选项恢复为 DTF Craft 的值
+	Preferences	首选项
+	Align Left Edges	左边缘对齐
+	Align Horizontal Centers	水平居中对齐
+	Align Right Edges	右边缘对齐
+	Align Top Edges	上边缘对齐
+	Align Vertical Centers	垂直居中对齐
+	Align Bottom Edges	下边缘对齐
+	Distribute Horizontally	水平分布
+	Distribute Vertically	垂直分布
+	Copies of {name}	{name} 的份数
+# DTF Craft (34)
+	Flat Color…	纯色平涂…
+	Flat Color	纯色平涂
+	Auto Colors	自动颜色数
+	Color Count	颜色数
+	Band Width	边带宽度 (像素)
+	Darkening	变暗阈值 ΔL*
+	Hue Tolerance	色相容差 ΔE
+	Edges	边缘
+	Sharp	锐利
+	Antialias	抗锯齿 1 像素
+	Protected Colors	受保护颜色
+	Protect a Color Picked on the Image	保护从图像中取的颜色
+	Clear	清除
+	No protected colour	没有受保护的颜色
+	None: click the eyedropper, then a colour to keep (an outline's black).	无：点按吸管，再点按要保留的颜色（例如轮廓的黑色）。
+	Remove {color}	移除 {color}
+	Highlight Changes	高亮显示更改

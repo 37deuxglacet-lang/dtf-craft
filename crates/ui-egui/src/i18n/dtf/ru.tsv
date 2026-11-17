@@ -423,3 +423,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Нет образца: щёлкните фон на изображении
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK стирает диапазон на копии слоя (белое в просмотре = стёрто).
+# DTF Craft (33)
+	Close {name}	Закрыть {name}
+	Close the sheet (its visuals stay in the list)	Закрыть лист (его макеты остаются в списке)
+	The values each new gang sheet opens with, kept from one session to the next.	Значения, с которыми открывается каждый новый gang sheet; сохраняются между сеансами.
+	Copies per Visual	Копий на макет
+	Factory Values	Заводские значения
+	The Preferences back to DTF Craft's values	Вернуть настройки к значениям DTF Craft
+	Preferences	Настройки
+	Align Left Edges	Выровнять левые края
+	Align Horizontal Centers	Выровнять центры по горизонтали
+	Align Right Edges	Выровнять правые края
+	Align Top Edges	Выровнять верхние края
+	Align Vertical Centers	Выровнять центры по вертикали
+	Align Bottom Edges	Выровнять нижние края
+	Distribute Horizontally	Распределить по горизонтали
+	Distribute Vertically	Распределить по вертикали
+	Copies of {name}	Копии: {name}
+# DTF Craft (34)
+	Flat Color…	Плоский цвет…
+	Flat Color	Плоский цвет
+	Auto Colors	Число цветов автоматически
+	Color Count	Число цветов
+	Band Width	Ширина полосы (пикс.)
+	Darkening	Порог затемнения ΔL*
+	Hue Tolerance	Допуск по тону ΔE
+	Edges	Края
+	Sharp	Резкие
+	Antialias	Сглаживание 1 пикс.
+	Protected Colors	Защищённые цвета
+	Protect a Color Picked on the Image	Защитить цвет, взятый с изображения
+	Clear	Очистить
+	No protected colour	Нет защищённых цветов
+	None: click the eyedropper, then a colour to keep (an outline's black).	Нет: нажмите пипетку, затем цвет, который нужно сохранить (чёрный контур).
+	Remove {color}	Убрать {color}
+	Highlight Changes	Выделить изменения

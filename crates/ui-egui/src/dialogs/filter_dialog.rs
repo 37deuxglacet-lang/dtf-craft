@@ -245,6 +245,8 @@ const FULL_RESOLUTION_PREVIEW: &[&str] = &[
     "filter.dtf.halftone",
     "filter.dtf.removeWhiteBackground",
     "dtf.sharpen",
+    // DTF Craft: Flat Color's band and shapes are in document pixels.
+    "filter.dtf.flatColor",
     "filter.distort.ripple",
     "filter.stylize.diffuse",
     "filter.stylize.oilPaint",
@@ -954,11 +956,12 @@ fn field_scale(command: &str, key: &str, min: f32, max: f32) -> f32 {
 const REPLACE_COLOR: &str = "image.adjustments.replaceColor";
 /// What OK on an edited smart filter runs (`smart_ui::confirm_command`).
 const SMART_FILTER_SET_PARAMS: &str = "layer.smartFilter.setParams";
-const COLOR_EYEDROPPER: &str = "__colorEyedropper";
+pub(crate) const COLOR_EYEDROPPER: &str = "__colorEyedropper";
 
 fn color_eyedropper_owns(f: &Map<String, Value>) -> bool {
+    // DTF Craft: Flat Color picks its protected colours on the image the same way.
     f.get("__filter").and_then(Value::as_bool) == Some(true)
-        && f.get("__command").and_then(Value::as_str) == Some(REPLACE_COLOR)
+        && matches!(f.get("__command").and_then(Value::as_str), Some(REPLACE_COLOR | crate::dtf_flat_ui::COMMAND))
         && f.get(COLOR_EYEDROPPER).and_then(Value::as_bool) == Some(true)
 }
 
@@ -978,6 +981,14 @@ pub(crate) fn color_eyedropper_sample(app: &mut PhotocraftApp, x: f64, y: f64, m
     };
     let Some(rgb) = crate::canvas::composite_color(app, x, y) else { return true };
     let Some(mut f) = app.ui.dialogs.last().map(|d| d.fields.clone()) else { return true };
+    // DTF Craft: a colour Flat Color must never replace.
+    if crate::dtf_flat_ui::owns(&f) {
+        crate::dtf_flat_ui::add_protected(&mut f, rgb);
+        if let Some(d) = app.ui.dialog_mut(id) {
+            d.fields = f;
+        }
+        return true;
+    }
     let tool = f.get("__tool").and_then(Value::as_str);
     let sample = !mods.shift && !mods.alt && tool.is_none_or(|t| t == "sample");
     // A first Add to Sample, before any sample, starts from the clicked colour too: one point
@@ -1200,8 +1211,19 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
         {
             continue;
         }
+        // DTF Craft: Flat Color's palette size only shows when it isn't automatic, and its
+        // protected colours (with its preview views) have their own rows.
+        if cmd == crate::dtf_flat_ui::COMMAND && p.key == "colorCount" && f.get("autoColors").and_then(Value::as_bool) != Some(false) {
+            continue;
+        }
         if let Some((key, top)) = tip_from.take() {
             crate::dtf_help::tip_over(ui, &cmd, &key, top);
+        }
+        if cmd == crate::dtf_flat_ui::COMMAND && p.key == crate::dtf_flat_ui::PROTECTED {
+            let top = ui.cursor().top();
+            crate::dtf_flat_ui::rows(ui, f);
+            crate::dtf_help::tip_over(ui, &cmd, &p.key, top);
+            continue;
         }
         tip_from = Some((p.key.clone(), ui.cursor().top()));
         if cmd == "image.mode.indexedColor" && p.key == "matte" {

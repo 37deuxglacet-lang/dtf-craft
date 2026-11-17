@@ -414,3 +414,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Chưa có mẫu: nhấp vào nền trên ảnh
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK xóa dải màu trên bản sao của lớp (trắng trong xem trước = bị xóa).
+# DTF Craft (33)
+	Close {name}	Đóng {name}
+	Close the sheet (its visuals stay in the list)	Đóng tờ (các hình vẫn ở trong danh sách)
+	The values each new gang sheet opens with, kept from one session to the next.	Các giá trị mà mỗi gang sheet mới mở ra, được giữ từ phiên này sang phiên khác.
+	Copies per Visual	Số bản mỗi hình
+	Factory Values	Giá trị gốc
+	The Preferences back to DTF Craft's values	Đưa tùy chọn về giá trị của DTF Craft
+	Preferences	Tùy chọn
+	Align Left Edges	Căn mép trái
+	Align Horizontal Centers	Căn giữa theo chiều ngang
+	Align Right Edges	Căn mép phải
+	Align Top Edges	Căn mép trên
+	Align Vertical Centers	Căn giữa theo chiều dọc
+	Align Bottom Edges	Căn mép dưới
+	Distribute Horizontally	Phân bố theo chiều ngang
+	Distribute Vertically	Phân bố theo chiều dọc
+	Copies of {name}	Số bản của {name}
+# DTF Craft (34)
+	Flat Color…	Màu phẳng…
+	Flat Color	Màu phẳng
+	Auto Colors	Số màu tự động
+	Color Count	Số màu
+	Band Width	Độ rộng dải (px)
+	Darkening	Ngưỡng tối ΔL*
+	Hue Tolerance	Dung sai sắc độ ΔE
+	Edges	Cạnh
+	Sharp	Sắc nét
+	Antialias	Khử răng cưa 1 px
+	Protected Colors	Màu được bảo vệ
+	Protect a Color Picked on the Image	Bảo vệ một màu lấy từ ảnh
+	Clear	Xóa
+	No protected colour	Không có màu được bảo vệ
+	None: click the eyedropper, then a colour to keep (an outline's black).	Không có: nhấp công cụ hút màu rồi một màu cần giữ (màu đen của viền).
+	Remove {color}	Bỏ {color}
+	Highlight Changes	Đánh dấu thay đổi

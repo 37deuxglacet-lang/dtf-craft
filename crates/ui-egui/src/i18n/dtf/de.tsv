@@ -425,3 +425,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Keine Probe: Klicken Sie auf den Hintergrund im Bild
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK löscht den Bereich auf einer Kopie der Ebene (Weiß in der Vorschau = gelöscht).
+# DTF Craft (33)
+	Close {name}	{name} schließen
+	Close the sheet (its visuals stay in the list)	Bogen schließen (seine Motive bleiben in der Liste)
+	The values each new gang sheet opens with, kept from one session to the next.	Die Startwerte jedes neuen Gang Sheets, von Sitzung zu Sitzung gespeichert.
+	Copies per Visual	Kopien pro Motiv
+	Factory Values	Werkseinstellungen
+	The Preferences back to DTF Craft's values	Die Voreinstellungen zurück auf die Werte von DTF Craft
+	Preferences	Voreinstellungen
+	Align Left Edges	Linke Kanten ausrichten
+	Align Horizontal Centers	Horizontale Mitten ausrichten
+	Align Right Edges	Rechte Kanten ausrichten
+	Align Top Edges	Obere Kanten ausrichten
+	Align Vertical Centers	Vertikale Mitten ausrichten
+	Align Bottom Edges	Untere Kanten ausrichten
+	Distribute Horizontally	Horizontal verteilen
+	Distribute Vertically	Vertikal verteilen
+	Copies of {name}	Kopien von {name}
+# DTF Craft (34)
+	Flat Color…	Farbfläche…
+	Flat Color	Farbfläche
+	Auto Colors	Farbanzahl automatisch
+	Color Count	Farbanzahl
+	Band Width	Randbreite (px)
+	Darkening	Abdunklungsschwelle ΔL*
+	Hue Tolerance	Farbtontoleranz ΔE
+	Edges	Kanten
+	Sharp	Scharf
+	Antialias	Kantenglättung 1 px
+	Protected Colors	Geschützte Farben
+	Protect a Color Picked on the Image	Im Bild aufgenommene Farbe schützen
+	Clear	Löschen
+	No protected colour	Keine geschützte Farbe
+	None: click the eyedropper, then a colour to keep (an outline's black).	Keine: Pipette anklicken, dann eine zu behaltende Farbe (das Schwarz einer Kontur).
+	Remove {color}	{color} entfernen
+	Highlight Changes	Änderungen hervorheben

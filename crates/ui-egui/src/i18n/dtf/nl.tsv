@@ -405,3 +405,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Geen monster: klik op de achtergrond in de afbeelding
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK wist het bereik op een kopie van de laag (wit in de voorvertoning = gewist).
+# DTF Craft (33)
+	Close {name}	{name} sluiten
+	Close the sheet (its visuals stay in the list)	Vel sluiten (de ontwerpen blijven in de lijst)
+	The values each new gang sheet opens with, kept from one session to the next.	De beginwaarden van elk nieuw gang sheet, bewaard van sessie tot sessie.
+	Copies per Visual	Kopieën per ontwerp
+	Factory Values	Fabriekswaarden
+	The Preferences back to DTF Craft's values	De voorkeuren terug naar de waarden van DTF Craft
+	Preferences	Voorkeuren
+	Align Left Edges	Linkerranden uitlijnen
+	Align Horizontal Centers	Horizontale middens uitlijnen
+	Align Right Edges	Rechterranden uitlijnen
+	Align Top Edges	Bovenranden uitlijnen
+	Align Vertical Centers	Verticale middens uitlijnen
+	Align Bottom Edges	Onderranden uitlijnen
+	Distribute Horizontally	Horizontaal verdelen
+	Distribute Vertically	Verticaal verdelen
+	Copies of {name}	Kopieën van {name}
+# DTF Craft (34)
+	Flat Color…	Vlakke kleur…
+	Flat Color	Vlakke kleur
+	Auto Colors	Aantal kleuren automatisch
+	Color Count	Aantal kleuren
+	Band Width	Bandbreedte (px)
+	Darkening	Verdonkeringsdrempel ΔL*
+	Hue Tolerance	Tinttolerantie ΔE
+	Edges	Randen
+	Sharp	Scherp
+	Antialias	Anti-aliasing 1 px
+	Protected Colors	Beschermde kleuren
+	Protect a Color Picked on the Image	Een kleur uit de afbeelding beschermen
+	Clear	Wissen
+	No protected colour	Geen beschermde kleur
+	None: click the eyedropper, then a colour to keep (an outline's black).	Geen: klik op de pipet en dan op een kleur om te houden (het zwart van een contour).
+	Remove {color}	{color} verwijderen
+	Highlight Changes	Wijzigingen markeren

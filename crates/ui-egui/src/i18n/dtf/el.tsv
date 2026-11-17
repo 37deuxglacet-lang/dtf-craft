@@ -408,3 +408,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Κανένα δείγμα: κάντε κλικ στο φόντο της εικόνας
 	OK erases the range on a copy of the layer (white in the preview = erased).	Το OK διαγράφει το εύρος σε αντίγραφο του επιπέδου (λευκό στην προεπισκόπηση = διαγράφεται).
+# DTF Craft (33)
+	Close {name}	Κλείσιμο {name}
+	Close the sheet (its visuals stay in the list)	Κλείσιμο του φύλλου (τα σχέδιά του μένουν στη λίστα)
+	The values each new gang sheet opens with, kept from one session to the next.	Οι τιμές με τις οποίες ανοίγει κάθε νέο gang sheet, διατηρούνται από συνεδρία σε συνεδρία.
+	Copies per Visual	Αντίγραφα ανά σχέδιο
+	Factory Values	Εργοστασιακές τιμές
+	The Preferences back to DTF Craft's values	Οι προτιμήσεις επιστρέφουν στις τιμές του DTF Craft
+	Preferences	Προτιμήσεις
+	Align Left Edges	Στοίχιση αριστερών άκρων
+	Align Horizontal Centers	Στοίχιση οριζόντιων κέντρων
+	Align Right Edges	Στοίχιση δεξιών άκρων
+	Align Top Edges	Στοίχιση πάνω άκρων
+	Align Vertical Centers	Στοίχιση κάθετων κέντρων
+	Align Bottom Edges	Στοίχιση κάτω άκρων
+	Distribute Horizontally	Κατανομή οριζόντια
+	Distribute Vertically	Κατανομή κάθετα
+	Copies of {name}	Αντίγραφα του {name}
+# DTF Craft (34)
+	Flat Color…	Επίπεδο χρώμα…
+	Flat Color	Επίπεδο χρώμα
+	Auto Colors	Αυτόματος αριθμός χρωμάτων
+	Color Count	Αριθμός χρωμάτων
+	Band Width	Πλάτος ζώνης (px)
+	Darkening	Κατώφλι σκουρέματος ΔL*
+	Hue Tolerance	Ανοχή απόχρωσης ΔE
+	Edges	Άκρες
+	Sharp	Καθαρές
+	Antialias	Εξομάλυνση 1 px
+	Protected Colors	Προστατευμένα χρώματα
+	Protect a Color Picked on the Image	Προστασία χρώματος από την εικόνα
+	Clear	Απαλοιφή
+	No protected colour	Κανένα προστατευμένο χρώμα
+	None: click the eyedropper, then a colour to keep (an outline's black).	Κανένα: πατήστε το σταγονόμετρο και μετά ένα χρώμα προς διατήρηση (το μαύρο ενός περιγράμματος).
+	Remove {color}	Αφαίρεση {color}
+	Highlight Changes	Επισήμανση αλλαγών

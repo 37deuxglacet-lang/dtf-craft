@@ -406,3 +406,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Žádný vzorek: klepněte na pozadí v obrázku
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK vymaže rozsah na kopii vrstvy (bílá v náhledu = vymazáno).
+# DTF Craft (33)
+	Close {name}	Zavřít {name}
+	Close the sheet (its visuals stay in the list)	Zavřít arch (jeho motivy zůstanou v seznamu)
+	The values each new gang sheet opens with, kept from one session to the next.	Hodnoty, se kterými se otevře každý nový gang sheet, uchované mezi relacemi.
+	Copies per Visual	Kopie na motiv
+	Factory Values	Tovární hodnoty
+	The Preferences back to DTF Craft's values	Předvolby zpět na hodnoty DTF Craft
+	Preferences	Předvolby
+	Align Left Edges	Zarovnat levé okraje
+	Align Horizontal Centers	Zarovnat vodorovné středy
+	Align Right Edges	Zarovnat pravé okraje
+	Align Top Edges	Zarovnat horní okraje
+	Align Vertical Centers	Zarovnat svislé středy
+	Align Bottom Edges	Zarovnat dolní okraje
+	Distribute Horizontally	Rozmístit vodorovně
+	Distribute Vertically	Rozmístit svisle
+	Copies of {name}	Kopie: {name}
+# DTF Craft (34)
+	Flat Color…	Plochá barva…
+	Flat Color	Plochá barva
+	Auto Colors	Počet barev automaticky
+	Color Count	Počet barev
+	Band Width	Šířka pásu (px)
+	Darkening	Práh ztmavení ΔL*
+	Hue Tolerance	Tolerance odstínu ΔE
+	Edges	Okraje
+	Sharp	Ostré
+	Antialias	Vyhlazení 1 px
+	Protected Colors	Chráněné barvy
+	Protect a Color Picked on the Image	Chránit barvu nabranou z obrázku
+	Clear	Vymazat
+	No protected colour	Žádná chráněná barva
+	None: click the eyedropper, then a colour to keep (an outline's black).	Žádná: klepněte na kapátko a pak na barvu k zachování (černá obrysu).
+	Remove {color}	Odebrat {color}
+	Highlight Changes	Zvýraznit změny

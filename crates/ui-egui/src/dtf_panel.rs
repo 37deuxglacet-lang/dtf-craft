@@ -1955,6 +1955,41 @@ mod tests {
             app.session.prefs.edit(|p| p.dialogs.insert(photocraft_engine::dtf_cmds::HALFTONE.into(), json!({"preset": "none"})));
             let _ = crate::filter_dialog::open(app, photocraft_engine::dtf_cmds::HALFTONE);
         });
+        // Flat Color on a logo with a dark fringe (an AI upscale's), the changes highlighted.
+        let fringed = || {
+            let mut s = photocraft_engine::Session::new();
+            s.execute("file.new", json!({"width": 600, "height": 400, "resolution": 300, "background": "transparent", "name": "logo-x4.png"})).unwrap();
+            s.edit("Logo", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 0..400 {
+                    for x in 0..600 {
+                        let d = ((x as f32 - 300.0).powi(2) + (y as f32 - 200.0).powi(2)).sqrt();
+                        let px = if d < 128.0 {
+                            [0.85, 0.12, 0.12, 1.0]
+                        } else if d < 131.0 {
+                            [0.5, 0.06, 0.06, 1.0]
+                        } else if (40..560).contains(&x) && (40..360).contains(&y) {
+                            let edge = x < 43 || x >= 557 || y < 43 || y >= 357;
+                            if edge { [0.55, 0.5, 0.05, 1.0] } else { [0.95, 0.85, 0.1, 1.0] }
+                        } else {
+                            [0.0; 4]
+                        };
+                        surf.write_pixel(x, y, &px);
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+            s
+        };
+        shot(fringed(), "aplat_couleur", &|app| {
+            let _ = crate::filter_dialog::open(app, photocraft_engine::dtf_cmds::FLAT_COLOR);
+            if let Some(d) = app.ui.dialogs.last_mut() {
+                d.fields.insert("__highlight".into(), json!(true));
+                d.fields.insert("protectedColors".into(), json!(["#000000"]));
+            }
+        });
+
         // The Color Analyzer on a flat-colour logo, with a fictitious swatch book.
         let logo = || {
             let mut s = photocraft_engine::Session::new();

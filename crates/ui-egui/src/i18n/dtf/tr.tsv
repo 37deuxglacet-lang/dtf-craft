@@ -405,3 +405,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Örnek yok: görüntüdeki arka plana tıklayın
 	OK erases the range on a copy of the layer (white in the preview = erased).	Tamam, aralığı katmanın bir kopyasında siler (önizlemede beyaz = silinir).
+# DTF Craft (33)
+	Close {name}	{name} kapat
+	Close the sheet (its visuals stay in the list)	Sayfayı kapat (görselleri listede kalır)
+	The values each new gang sheet opens with, kept from one session to the next.	Her yeni gang sheet'in açılış değerleri, oturumdan oturuma saklanır.
+	Copies per Visual	Görsel başına kopya
+	Factory Values	Fabrika değerleri
+	The Preferences back to DTF Craft's values	Tercihleri DTF Craft değerlerine döndür
+	Preferences	Tercihler
+	Align Left Edges	Sol kenarları hizala
+	Align Horizontal Centers	Yatay merkezleri hizala
+	Align Right Edges	Sağ kenarları hizala
+	Align Top Edges	Üst kenarları hizala
+	Align Vertical Centers	Dikey merkezleri hizala
+	Align Bottom Edges	Alt kenarları hizala
+	Distribute Horizontally	Yatay dağıt
+	Distribute Vertically	Dikey dağıt
+	Copies of {name}	{name} kopyaları
+# DTF Craft (34)
+	Flat Color…	Düz renk…
+	Flat Color	Düz renk
+	Auto Colors	Renk sayısı otomatik
+	Color Count	Renk sayısı
+	Band Width	Bant genişliği (px)
+	Darkening	Koyulaşma eşiği ΔL*
+	Hue Tolerance	Ton toleransı ΔE
+	Edges	Kenarlar
+	Sharp	Keskin
+	Antialias	Kenar yumuşatma 1 px
+	Protected Colors	Korunan renkler
+	Protect a Color Picked on the Image	Görüntüden alınan bir rengi koru
+	Clear	Temizle
+	No protected colour	Korunan renk yok
+	None: click the eyedropper, then a colour to keep (an outline's black).	Yok: damlalığa, sonra korunacak bir renge tıklayın (bir konturun siyahı).
+	Remove {color}	{color} kaldır
+	Highlight Changes	Değişiklikleri vurgula

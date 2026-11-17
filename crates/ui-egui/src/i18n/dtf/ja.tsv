@@ -414,3 +414,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	サンプルなし：画像の背景をクリック
 	OK erases the range on a copy of the layer (white in the preview = erased).	OK でレイヤーのコピー上の範囲を消去します（プレビューの白 = 消去）。
+# DTF Craft (33)
+	Close {name}	{name} を閉じる
+	Close the sheet (its visuals stay in the list)	シートを閉じる（ビジュアルはリストに残ります）
+	The values each new gang sheet opens with, kept from one session to the next.	新しいギャングシートを開くときの初期値。セッションをまたいで保存されます。
+	Copies per Visual	ビジュアルごとの部数
+	Factory Values	初期設定値
+	The Preferences back to DTF Craft's values	環境設定を DTF Craft の値に戻す
+	Preferences	環境設定
+	Align Left Edges	左端を揃える
+	Align Horizontal Centers	水平方向の中央を揃える
+	Align Right Edges	右端を揃える
+	Align Top Edges	上端を揃える
+	Align Vertical Centers	垂直方向の中央を揃える
+	Align Bottom Edges	下端を揃える
+	Distribute Horizontally	水平方向に分布
+	Distribute Vertically	垂直方向に分布
+	Copies of {name}	{name} の部数
+# DTF Craft (34)
+	Flat Color…	フラットカラー…
+	Flat Color	フラットカラー
+	Auto Colors	色数を自動
+	Color Count	色数
+	Band Width	帯の幅 (px)
+	Darkening	暗さのしきい値 ΔL*
+	Hue Tolerance	色相の許容値 ΔE
+	Edges	境界
+	Sharp	シャープ
+	Antialias	アンチエイリアス 1 px
+	Protected Colors	保護する色
+	Protect a Color Picked on the Image	画像から取った色を保護
+	Clear	クリア
+	No protected colour	保護する色はありません
+	None: click the eyedropper, then a colour to keep (an outline's black).	なし：スポイトをクリックし、残す色（輪郭の黒など）をクリックします。
+	Remove {color}	{color} を削除
+	Highlight Changes	変更箇所を強調

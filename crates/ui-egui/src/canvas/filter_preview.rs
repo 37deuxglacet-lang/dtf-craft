@@ -54,7 +54,8 @@ pub(crate) fn ensure_filter_preview(app: &mut PhotocraftApp, idx: usize, ctx: &e
             crate::filter_dialog::refresh_match_color_sources(&app.session, &mut app.ui.dialogs[dialog].fields);
             let d = &app.ui.dialogs[dialog];
             crate::filter_dialog::validate_match_color_destination(app, &d.fields).ok()?;
-            if d.fields.get("__preview").and_then(serde_json::Value::as_bool) != Some(true) {
+            // DTF Craft: Flat Color's Show Before shows the image as it is.
+            if d.fields.get("__preview").and_then(serde_json::Value::as_bool) != Some(true) || crate::dtf_flat_ui::hides_preview(&d.fields) {
                 return None;
             }
             Preview { id: d.id, fields: d.fields.clone() }
@@ -69,7 +70,10 @@ pub(crate) fn ensure_filter_preview(app: &mut PhotocraftApp, idx: usize, ctx: &e
     let (cmd, mut params) = if d.fields.contains_key("__smartFilter") {
         crate::smart_filter_dialog::edit_command(app, &d.fields).ok()?
     } else {
-        (cmd.clone(), app.with_mask_target(&cmd, crate::filter_dialog::params_of(&d.fields)))
+        let mut params = crate::filter_dialog::params_of(&d.fields);
+        // DTF Craft: Flat Color's Highlight Changes, for the preview only.
+        crate::dtf_flat_ui::preview_params(&d.fields, &mut params);
+        (cmd.clone(), app.with_mask_target(&cmd, params))
     };
     // Select and Mask previews in its view mode; holding X shows the image without one.
     if crate::select_mask_view::owns(&d.fields) {

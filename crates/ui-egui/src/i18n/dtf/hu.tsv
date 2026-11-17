@@ -405,3 +405,38 @@
 # DTF Craft (32)
 	No sample: click the background on the image	Nincs minta: kattintson a háttérre a képen
 	OK erases the range on a copy of the layer (white in the preview = erased).	Az OK a réteg másolatán törli a tartományt (fehér az előnézetben = törölve).
+# DTF Craft (33)
+	Close {name}	{name} bezárása
+	Close the sheet (its visuals stay in the list)	Ív bezárása (a motívumai a listában maradnak)
+	The values each new gang sheet opens with, kept from one session to the next.	Az értékek, amelyekkel minden új gang sheet megnyílik, munkamenetek között megőrizve.
+	Copies per Visual	Példány motívumonként
+	Factory Values	Gyári értékek
+	The Preferences back to DTF Craft's values	A beállítások vissza a DTF Craft értékeire
+	Preferences	Beállítások
+	Align Left Edges	Bal szélek igazítása
+	Align Horizontal Centers	Vízszintes középek igazítása
+	Align Right Edges	Jobb szélek igazítása
+	Align Top Edges	Felső szélek igazítása
+	Align Vertical Centers	Függőleges középek igazítása
+	Align Bottom Edges	Alsó szélek igazítása
+	Distribute Horizontally	Elosztás vízszintesen
+	Distribute Vertically	Elosztás függőlegesen
+	Copies of {name}	{name} példányai
+# DTF Craft (34)
+	Flat Color…	Egyszínű felület…
+	Flat Color	Egyszínű felület
+	Auto Colors	Színek száma automatikusan
+	Color Count	Színek száma
+	Band Width	Sávszélesség (px)
+	Darkening	Sötétedési küszöb ΔL*
+	Hue Tolerance	Árnyalattűrés ΔE
+	Edges	Élek
+	Sharp	Élesek
+	Antialias	Élsimítás 1 px
+	Protected Colors	Védett színek
+	Protect a Color Picked on the Image	A képről vett szín védelme
+	Clear	Törlés
+	No protected colour	Nincs védett szín
+	None: click the eyedropper, then a colour to keep (an outline's black).	Nincs: kattintson a pipettára, majd egy megtartandó színre (egy kontúr feketéje).
+	Remove {color}	{color} eltávolítása
+	Highlight Changes	Változások kiemelése

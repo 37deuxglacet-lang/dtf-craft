@@ -37,6 +37,7 @@ mod denoise;
 pub mod dff;
 pub mod dtf;
 pub mod dtf_color;
+pub mod dtf_flat;
 pub mod gang_sheet;
 pub mod direct;
 mod distort;
@@ -622,6 +623,11 @@ pub enum FilterParams {
     DtfCutout {
         spec: dtf::CutoutSpec,
     },
+    /// Flat Colour: the dark fringe along flat shapes' edges back to the shape's colour (see
+    /// [`dtf_flat::FlatColorPlan`]).
+    DtfFlatColor {
+        spec: dtf_flat::FlatColorSpec,
+    },
 
     // ---- Video ----
     /// Removes the even (or odd) lines and rebuilds them by interpolation (or duplication).
@@ -763,6 +769,7 @@ impl FilterParams {
             FilterParams::DtfHalftone { .. } => "DTF Halftone",
             FilterParams::DtfAlphaThreshold { .. } => "Remove Semi-Transparent Pixels",
             FilterParams::DtfCutout { .. } => "Remove White Background",
+            FilterParams::DtfFlatColor { .. } => "Flat Color",
             FilterParams::MotionBlur { .. } => "Motion Blur",
             FilterParams::RadialBlur { .. } => "Radial Blur",
             FilterParams::SurfaceBlur { .. } => "Surface Blur",
@@ -862,6 +869,8 @@ fn halo_ext(p: &FilterParams) -> Halo {
         FilterParams::Tiles { .. } => Halo::Bounds,
         // The flood fill reads the whole reference area.
         FilterParams::DtfCutout { .. } => Halo::Bounds,
+        // The palette and the shapes are read over the whole reference area.
+        FilterParams::DtfFlatColor { .. } => Halo::Bounds,
         FilterParams::TraceContour { .. } => r(1.0),
         FilterParams::Wind { method, .. } => r(stylize2::wind_reach(*method)),
         FilterParams::Displace { .. } | FilterParams::Shear { .. } | FilterParams::ZigZag { .. } | FilterParams::SpinBlur { .. } => Halo::Bounds,
@@ -1106,6 +1115,7 @@ pub fn kernel(params: &FilterParams, src: &Image, out: Rect, ctx: &Ctx) -> Vec<f
         FilterParams::DtfHalftone { spec } => dtf::halftone(src, out, ctx, spec),
         FilterParams::DtfAlphaThreshold { threshold, width } => dtf::alpha_threshold(src, out, ctx, *threshold, *width),
         FilterParams::DtfCutout { spec } => dtf::cutout(src, out, ctx, spec),
+        FilterParams::DtfFlatColor { spec } => dtf_flat::flat_color(src, out, ctx, spec),
         FilterParams::DeInterlace { eliminate_even, interpolate } => video::deinterlace(src, out, ctx, *eliminate_even, *interpolate),
         FilterParams::NtscColors => video::ntsc(src, out, ctx),
         FilterParams::FilterGallery { effects } => artistic_fx::run(effects, src, out, ctx),
@@ -1469,6 +1479,13 @@ fn apply_tiled_with_impl(
         (FilterParams::DtfCutout { spec }, Some(img)) => Some(dtf::CutoutPlan::prepare(img, &ctx, spec, ctl)?),
         _ => None,
     };
+    // Flat Colour reads the palette and the shapes over the whole area once (most of the work:
+    // the tiles then only copy it, so their progress starts after it).
+    let flat = match (params, &shared) {
+        (FilterParams::DtfFlatColor { spec }, Some(img)) => Some(dtf_flat::FlatColorPlan::prepare(img, &ctx, spec, ctl)?),
+        _ => None,
+    };
+    let base = if flat.is_some() { 0.9 } else { 0.0 };
     if ctl.cancelled() {
         return None;
     }
@@ -1525,7 +1542,7 @@ fn apply_tiled_with_impl(
         let tick = || {
             let n = finished.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
             // The last few percent are the writes after each group.
-            ctl.progress(0.98 * n as f32 / total as f32);
+            ctl.progress(base + (0.98 - base) * n as f32 / total as f32);
         };
         let sparse = match *params {
             FilterParams::Crystallize { cell_size, seed } => pixelate::cells::tile(surface, *t, &ctx, cell_size, seed, None, extent),
@@ -1558,6 +1575,7 @@ fn apply_tiled_with_impl(
         let Some(mut data) = (match (&shape, &radial) {
             _ if gallery.is_some() => gallery.as_ref().map(|g| g.run(src, *t, &ctx)),
             _ if cutout.is_some() => cutout.as_ref().map(|plan| plan.apply(src, *t, &ctx)),
+            _ if flat.is_some() => flat.as_ref().map(|plan| plan.apply(src, *t, &ctx)),
             (Some(shape), _) => shape.checked_run(src, *t, &ctx, ctl),
             (None, Some(plan)) => match plan.filter(src, *t, &ctx, ctl) {
                 Some(data) => Some(data),

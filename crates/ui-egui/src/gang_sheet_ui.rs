@@ -2,17 +2,20 @@
 //! DTF › Gang Sheet…: a full-window, light, uncluttered builder to lay visuals out on DTF film.
 //!
 //! * Header: the DTF Craft logo, "Gang sheet", one tab per sheet (name and copies; a click shows
-//!   it, a double-click renames it) and "+", then Cancel and Export.
-//! * Left column: the drop zone (Import, Add Open Document), Auto Build, and the visuals as rows
+//!   it, a double-click renames it, its × closes it while another is left) and "+", then Cancel
+//!   and Export.
+//! * Left column: the drop zone (Import, Add Open Document), Auto Build, the visuals as rows
 //!   (thumbnail, name, print size and resolution, copies − field +; a click shows its settings,
-//!   a double-click adds a copy, × removes it).
-//! * Canvas: the sheet with rulers in cm, a tool palette floating at its left (undo, redo, turn,
-//!   mirror, stretch to the film, centre, push to a side, group, ungroup, delete) and the zoom.
+//!   a double-click adds a copy, × removes it: the sheets it was on are laid out again together)
+//!   and, at the bottom, the folding **Selected Visual** block (size, proportions, resolution,
+//!   warnings, copies, own spacing, fill, duplicate; or several: group, duplicate, delete).
+//! * Canvas: the sheet with rulers in cm, a tool palette floating at its left, two buttons a row
+//!   (undo, redo, turn, mirror, stretch to the film, centre, push to a side, align, distribute,
+//!   group, ungroup, delete) and the zoom.
 //! * Right column, in folding sections: **Sheet** (name, size, copies to print, duplicate,
-//!   delete, start over), **Film** (width, cells, margins, longest sheet, rotation), **Selected
-//!   Visual** (size, proportions, resolution, warnings, copies, own spacing, fill, duplicate; or
-//!   several: align, distribute, group) and **Display** (lines, snapping, warnings, grid,
-//!   background).
+//!   delete, start over; open), **Film** (width, cells, margins, longest sheet, rotation),
+//!   **Display** (lines, snapping, warnings, grid, background) and **Preferences** (the values
+//!   each new gang sheet opens with, saved with the app's preferences; Factory Values), folded.
 //! * Status bar: the resolution legend, the hovered or selected visual's place, size and
 //!   resolution, the last message, the length used and the totals.
 //! * Auto Build view: every visual with its size, proportions lock, resolution and copies; Apply
@@ -74,11 +77,11 @@ use crate::widgets;
 
 const HEADER_H: f32 = 52.0;
 const STATUS_H: f32 = 30.0;
-const LEFT_W: f32 = 290.0;
+const LEFT_W: f32 = 320.0;
 const RIGHT_W: f32 = 320.0;
 const RULER: f32 = 20.0;
 /// The tool palette floating at the left of the sheet, and the room the sheet leaves it.
-const PALETTE_W: f32 = 44.0;
+const PALETTE_W: f32 = 78.0;
 const PALETTE_ROOM: f32 = PALETTE_W + 24.0;
 /// Longest side of a visual's preview texture.
 const THUMB: u32 = 640;
@@ -94,6 +97,8 @@ const MAX_QUANTITY: usize = 999;
 const MAX_UNDO: usize = 100;
 /// Film widths offered in the toolbar (cm).
 const FILM_PRESETS: [f32; 6] = [30.0, 40.0, 42.0, 56.0, 57.0, 60.0];
+/// The film width a gang sheet starts with (cm), until the Preferences say otherwise.
+const DEFAULT_WIDTH_CM: f32 = 60.0;
 /// Column counts offered in the toolbar.
 const COLUMN_PRESETS: [u32; 6] = [2, 3, 4, 5, 6, 8];
 
@@ -276,12 +281,14 @@ struct Settings {
     cells_auto: bool,
     /// A dragged visual lands in the nearest cells.
     cells_snap: bool,
+    /// Copies of a visual imported (its quantity).
+    quantity: usize,
 }
 
 impl Default for Settings {
     fn default() -> Self {
         Settings {
-            width_cm: cmd::DEFAULT_FILM_WIDTH_CM as f32,
+            width_cm: DEFAULT_WIDTH_CM,
             max_length_cm: cmd::DEFAULT_MAX_LENGTH_CM as f32,
             edge_on: true,
             edge_cm: (cmd::DEFAULT_EDGE_MM / 10.0) as f32,
@@ -296,12 +303,87 @@ impl Default for Settings {
             grid: false,
             backdrop: Backdrop::Checker,
             custom: [35, 28, 28],
-            cells_on: true,
+            cells_on: false,
             cells_cols: cmd::DEFAULT_COLUMNS,
             cells_auto: true,
             cells_snap: true,
+            quantity: 1,
         }
     }
+}
+
+impl Settings {
+    /// The control channel's `set` (and `prefs`) keys over `self`.
+    fn with(mut self, set: &Value) -> Self {
+        let f = |k: &str, v: f32| set.get(k).and_then(Value::as_f64).filter(|f| f.is_finite()).map_or(v, |f| f as f32);
+        let b = |k: &str, v: bool| set.get(k).and_then(Value::as_bool).unwrap_or(v);
+        self.width_cm = f("filmWidth", self.width_cm).clamp(10.0, 300.0);
+        self.max_length_cm = f("maxLength", self.max_length_cm).clamp(10.0, MAX_LENGTH_CM);
+        if let Some(e) = set.get("edgeMargin").and_then(Value::as_f64).filter(|f| f.is_finite()) {
+            self.edge_on = e > 0.0;
+            self.edge_cm = if e > 0.0 { (e as f32).clamp(0.0, 10.0) } else { self.edge_cm };
+        }
+        if let Some(g) = set.get("spacing").and_then(Value::as_f64).filter(|f| f.is_finite()) {
+            self.gap_on = g > 0.0;
+            self.gap_cm = if g > 0.0 { (g as f32).clamp(0.0, 10.0) } else { self.gap_cm };
+        }
+        self.rotate = b("rotate", self.rotate);
+        self.show_res = b("showResolution", self.show_res);
+        self.show_overlap = b("showOverlap", self.show_overlap);
+        self.snap = b("snap", self.snap);
+        self.warn_background = b("warnBackground", self.warn_background);
+        self.warn_semi = b("warnTransparency", self.warn_semi);
+        self.grid = b("grid", self.grid);
+        if let Some(c) = set.get("columns").and_then(Value::as_f64).filter(|c| c.is_finite()) {
+            self.cells_on = c >= 1.0;
+            if c >= 1.0 {
+                self.cells_cols = (c.round() as u32).min(cmd::MAX_COLUMNS);
+            }
+        }
+        self.cells_auto = b("organizeOnImport", self.cells_auto);
+        self.cells_snap = b("snapToCells", self.cells_snap);
+        if let Some(q) = set.get("quantity").and_then(Value::as_u64) {
+            self.quantity = (q as usize).clamp(1, MAX_QUANTITY);
+        }
+        match set.get("background").and_then(Value::as_str) {
+            Some("transparent") => self.backdrop = Backdrop::Checker,
+            Some(hex) => {
+                if let Some(c) = Color32::from_hex(hex).ok() {
+                    self.backdrop = Backdrop::Color(c);
+                }
+            }
+            None => {}
+        }
+        if let Some(hex) = set.get("customColor").and_then(Value::as_str)
+            && let Ok(c) = Color32::from_hex(hex)
+        {
+            self.custom = [c.r(), c.g(), c.b()];
+        }
+        self
+    }
+
+    /// The settings as the control channel's keys (the Preferences are saved so).
+    fn to_json(self) -> Value {
+        let hex = |c: Color32| format!("#{:02x}{:02x}{:02x}", c.r(), c.g(), c.b());
+        json!({
+            "filmWidth": self.width_cm, "maxLength": self.max_length_cm,
+            "edgeMargin": if self.edge_on { self.edge_cm } else { 0.0 }, "spacing": if self.gap_on { self.gap_cm } else { 0.0 },
+            "rotate": self.rotate, "showResolution": self.show_res, "showOverlap": self.show_overlap, "snap": self.snap,
+            "warnBackground": self.warn_background, "warnTransparency": self.warn_semi, "grid": self.grid,
+            "columns": if self.cells_on { self.cells_cols } else { 0 }, "organizeOnImport": self.cells_auto, "snapToCells": self.cells_snap,
+            "quantity": self.quantity,
+            "background": match self.backdrop { Backdrop::Checker => "transparent".to_string(), Backdrop::Color(c) => hex(c) },
+            "customColor": hex(Color32::from_rgb(self.custom[0], self.custom[1], self.custom[2])),
+        })
+    }
+}
+
+/// The Preferences block's values, saved with the app's preferences: each gang sheet opens with them.
+const PREFS_KEY: &str = "dtfCraft.gangSheetPrefs";
+
+/// The Preferences saved, or the window's own defaults.
+fn saved_prefs(app: &PhotocraftApp) -> Option<Settings> {
+    app.session.prefs().dialogs.get(PREFS_KEY).filter(|v| v.is_object()).map(|v| Settings::default().with(v))
 }
 
 static LAST_SETTINGS: Mutex<Option<Settings>> = Mutex::new(None);
@@ -380,8 +462,13 @@ pub struct GangSheetDialog {
     hovered: Option<usize>,
     drag: Option<Drag>,
     marquee: Option<Marquee>,
-    /// The right column\'s sections folded (Sheet, Film, Selected Visual, Display).
-    closed: [bool; 4],
+    /// The sections folded: Sheet, Film, Selected Visual (left column), Display, Preferences.
+    closed: [bool; 5],
+    /// The Preferences block's values, and whether they changed since saved.
+    prefs: Settings,
+    prefs_dirty: bool,
+    /// The Selected Visual block's height last drawn (the visuals list takes the rest).
+    visual_h: f32,
     auto_view: bool,
     /// 1 = the whole sheet fits; more zooms in.
     zoom: f32,
@@ -433,7 +520,11 @@ impl GangSheetDialog {
             hovered: None,
             drag: None,
             marquee: None,
-            closed: [false, false, false, true],
+            // Sheet open; Film, Display and Preferences folded; Selected Visual open.
+            closed: [false, true, false, true, true],
+            prefs: settings,
+            prefs_dirty: false,
+            visual_h: 300.0,
             auto_view: false,
             zoom: 1.0,
             scroll: Vec2::ZERO,
@@ -844,7 +935,7 @@ impl GangSheetDialog {
             h,
             lock: true,
             margin: None,
-            quantity: 1,
+            quantity: self.settings.quantity,
             background: v.background,
             semi: v.semi_transparent,
             vector: v.vector.is_some(),
@@ -857,9 +948,12 @@ impl GangSheetDialog {
             self.relayout_keeping(Some(s));
             return;
         }
-        if self.add_copies(s, 1) == 0 {
-            self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", "1")]);
-        } else {
+        let want = self.settings.quantity.max(1);
+        let placed = self.add_copies(s, want);
+        if placed < want {
+            self.status = crate::i18n::fmt(tl!("{n} not placed"), &[("n", &(want - placed).to_string())]);
+        }
+        if placed > 0 {
             self.selected = vec![self.placed().len() - 1];
         }
     }
@@ -918,11 +1012,14 @@ impl GangSheetDialog {
         self.status = if left > 0 { crate::i18n::fmt(tl!("{n} not placed"), &[("n", &left.to_string())]) } else { String::new() };
     }
 
+    /// Removes a visual: its copies go, and when it was on the sheets they are all laid out again
+    /// together (the visuals left, their copies and groups, on as few sheets as they need).
     fn remove_source(&mut self, source: usize) {
         if source >= self.sources.len() {
             return;
         }
         self.checkpoint(None);
+        let carried = self.sheets.iter().any(|doc| doc.placed.iter().any(|p| p.source == source));
         if source < self.unplaced.len() {
             self.unplaced.remove(source);
         }
@@ -954,6 +1051,9 @@ impl GangSheetDialog {
             if clip.members.is_empty() {
                 self.clipboard = None;
             }
+        }
+        if carried {
+            self.relayout();
         }
     }
 
@@ -1460,6 +1560,10 @@ impl GangSheetDialog {
     fn delete_sheet(&mut self, k: usize) {
         if k < self.sheets.len() {
             self.sheets.remove(k);
+            // A sheet before the one shown goes: the same one stays shown.
+            if k < self.active {
+                self.active -= 1;
+            }
         }
         if self.sheets.is_empty() {
             self.sheets.push(SheetDoc::new(1));
@@ -1481,10 +1585,8 @@ impl GangSheetDialog {
         let film_changed = (s.width_cm, s.max_length_cm, s.edge_on, s.edge_cm)
             != (self.settings.width_cm, self.settings.max_length_cm, self.settings.edge_on, self.settings.edge_cm);
         let cells_changed = (s.cells_on, s.cells_cols, s.cells_auto) != (self.settings.cells_on, self.settings.cells_cols, self.settings.cells_auto);
+        // This gang sheet's own: the next one opens with the Preferences.
         self.settings = s;
-        if let Ok(mut last) = LAST_SETTINGS.lock() {
-            *last = Some(s);
-        }
         if film_changed {
             // Visuals stay within the new film: no larger than it, moved onto it.
             let (iw, il) = self.sheet().inner();
@@ -1588,6 +1690,8 @@ impl GangSheetDialog {
             "usedLengthCm": units_cm(self.sheet().used_length(&items)),
             "conflicts": conflicts.iter().filter(|c| **c).count(),
             "undo": self.undo.len(), "redo": self.redo.len(),
+            "prefs": self.prefs.to_json(),
+            "foldedSections": self.closed,
         })
     }
 }
@@ -1596,8 +1700,22 @@ impl GangSheetDialog {
 
 pub fn open(app: &mut PhotocraftApp) {
     if app.gang_sheet.is_none() {
-        app.gang_sheet = Some(GangSheetDialog::new());
+        let mut d = GangSheetDialog::new();
+        // It opens with the Preferences.
+        if let Some(p) = saved_prefs(app) {
+            d.settings = p;
+            d.prefs = p;
+        }
+        app.gang_sheet = Some(d);
     }
+}
+
+/// The Preferences changed: saved with the app's preferences.
+fn save_prefs(app: &mut PhotocraftApp) {
+    let Some(d) = app.gang_sheet.as_mut().filter(|d| d.prefs_dirty) else { return };
+    d.prefs_dirty = false;
+    let v = d.prefs.to_json();
+    app.session.prefs.edit(|prefs| prefs.dialogs.insert(PREFS_KEY.into(), v));
 }
 
 /// Adds PNG files from disk (SVG files wait for their size); failures go to the status line.
@@ -1726,7 +1844,9 @@ pub fn menu(app: &mut PhotocraftApp, _ctx: &egui::Context, id: &str, params: &Va
     }
     let ui = params.get("ui")?;
     open(app);
-    Some(control(app, ui))
+    let r = control(app, ui);
+    save_prefs(app);
+    Some(r)
 }
 
 fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
@@ -1748,35 +1868,13 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
     }
     let d = app.gang_sheet.as_mut().ok_or("Gang Sheet isn't open")?;
     if let Some(set) = ui.get("set") {
-        let mut s = d.settings;
-        let f = |k: &str, v: f32| set.get(k).and_then(Value::as_f64).filter(|f| f.is_finite()).map_or(v, |f| f as f32);
-        let b = |k: &str, v: bool| set.get(k).and_then(Value::as_bool).unwrap_or(v);
-        s.width_cm = f("filmWidth", s.width_cm).clamp(10.0, 300.0);
-        s.max_length_cm = f("maxLength", s.max_length_cm).clamp(10.0, MAX_LENGTH_CM);
-        if let Some(e) = set.get("edgeMargin").and_then(Value::as_f64) {
-            s.edge_on = e > 0.0;
-            s.edge_cm = if e > 0.0 { (e as f32).clamp(0.0, 10.0) } else { s.edge_cm };
-        }
-        if let Some(g) = set.get("spacing").and_then(Value::as_f64) {
-            s.gap_on = g > 0.0;
-            s.gap_cm = if g > 0.0 { (g as f32).clamp(0.0, 10.0) } else { s.gap_cm };
-        }
-        s.rotate = b("rotate", s.rotate);
-        s.show_res = b("showResolution", s.show_res);
-        s.show_overlap = b("showOverlap", s.show_overlap);
-        s.snap = b("snap", s.snap);
-        s.warn_background = b("warnBackground", s.warn_background);
-        s.warn_semi = b("warnTransparency", s.warn_semi);
-        s.grid = b("grid", s.grid);
-        if let Some(c) = set.get("columns").and_then(Value::as_f64).filter(|c| c.is_finite()) {
-            s.cells_on = c >= 1.0;
-            if c >= 1.0 {
-                s.cells_cols = (c.round() as u32).min(cmd::MAX_COLUMNS);
-            }
-        }
-        s.cells_auto = b("organizeOnImport", s.cells_auto);
-        s.cells_snap = b("snapToCells", s.cells_snap);
+        let s = d.settings.with(set);
         d.set_settings(s);
+    }
+    // The Preferences: the values each gang sheet opens with (saved, not applied to this one).
+    if let Some(prefs) = ui.get("prefs") {
+        d.prefs = if prefs.get("factory").and_then(Value::as_bool) == Some(true) { Settings::default() } else { d.prefs.with(prefs) };
+        d.prefs_dirty = true;
     }
     if let Some(s) = ui.get("source") {
         let i = index(s.get("index")).filter(|i| *i < d.sources.len()).ok_or("`source` needs a valid index")?;
@@ -2172,9 +2270,14 @@ fn number_row(ui: &mut egui::Ui, label: &str, value: &mut f32, range: std::ops::
     let mut changed = false;
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(label).color(t.text), 128.0, 24.0);
-        changed = widgets::typed_value_field(ui, value, range, unit, 120.0, decimals).changed();
+        changed = widgets::typed_value_field(ui, value, range, unit, 120.0, decimals).accessible_name(plain(label)).changed();
     });
     changed
+}
+
+/// A field's label as its accessible name (without the trailing colon).
+fn plain(label: &str) -> String {
+    label.trim_end().trim_end_matches(':').trim_end().to_string()
 }
 
 fn card_frame(t: &Tokens) -> egui::Frame {
@@ -2204,6 +2307,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         confirm_dialog(app, ctx, &mut act);
         svg_dialog(app, ctx);
     });
+    save_prefs(app);
     if act.add_files {
         pick_files(app);
     }
@@ -2343,14 +2447,17 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
     let font = FontId::proportional(12.5);
     let mut pick = None;
     let mut rename = None;
+    let mut close = None;
     let mut hidden = 0;
+    // A × closes a sheet (its visuals stay in the list); the last one has none.
+    let closable = d.sheets.len() > 1;
     for k in 0..d.sheets.len() {
         let Some(doc) = d.sheets.get(k) else { continue };
         let active = k == d.active;
         let color = if active { ACCENT_TEXT } else { t.text_dim };
         let label = format!("{} · ×{}", doc.name, doc.copies);
         let g = p.layout_no_wrap(label.clone(), font.clone(), color);
-        let w = g.size().x + 26.0;
+        let w = g.size().x + 26.0 + if closable { 20.0 } else { 0.0 };
         if x + w > end - 70.0 {
             hidden = d.sheets.len() - k;
             break;
@@ -2371,11 +2478,29 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
         }
         p.galley(pos2(r.left() + 13.0, r.center().y - g.size().y / 2.0), g, color);
         resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, &label));
+        if closable {
+            let x = ERect::from_center_size(pos2(r.right() - 16.0, r.center().y), vec2(16.0, 16.0));
+            let xr = ui.interact(x, ui.scope_id().with(("gang-tab-close", k)), Sense::click());
+            if xr.hovered() {
+                p.rect_filled(x, 3.0, t.danger);
+            } else if active {
+                p.rect_filled(x, 3.0, MAGENTA.gamma_multiply(0.35));
+            }
+            let c = if xr.hovered() || active { Color32::WHITE } else { t.text_faint };
+            crate::icons::image("x", 10.0, c).paint_at(ui, ERect::from_center_size(x.center(), vec2(10.0, 10.0)));
+            let name = crate::i18n::fmt(tl!("Close {name}"), &[("name", &doc.name)]);
+            xr.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, &name));
+            if xr.on_hover_text(tl!("Close the sheet (its visuals stay in the list)")).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
+                close = Some(k);
+            }
+        }
         let resp = resp.on_hover_text(tl!("Click: show the sheet · Double-click: rename it")).on_hover_cursor(egui::CursorIcon::PointingHand);
-        if resp.double_clicked() {
-            rename = Some(k);
-        } else if resp.clicked() {
-            pick = Some(k);
+        if close != Some(k) {
+            if resp.double_clicked() {
+                rename = Some(k);
+            } else if resp.clicked() {
+                pick = Some(k);
+            }
         }
         x += w + 4.0;
     }
@@ -2394,7 +2519,10 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
         d.checkpoint(None);
         d.new_sheet();
     }
-    if let Some(k) = pick {
+    if let Some(k) = close {
+        d.checkpoint(None);
+        d.delete_sheet(k);
+    } else if let Some(k) = pick {
         d.active = k;
         d.selected.clear();
     }
@@ -2443,7 +2571,9 @@ fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &To
     let mut pick = None;
     let mut remove = None;
     let mut quantity: Option<(usize, usize)> = None;
-    egui::ScrollArea::vertical().id_salt("gang-visuals").auto_shrink([false, false]).show(&mut panel, |ui| {
+    // The list takes what the Selected Visual block, below it, leaves.
+    let list_h = (panel.available_height() - d.visual_h - 8.0).max(90.0);
+    egui::ScrollArea::vertical().id_salt("gang-visuals").max_height(list_h).auto_shrink([false, false]).show(&mut panel, |ui| {
         ui.spacing_mut().item_spacing.y = 6.0;
         for i in 0..d.sources.len() {
             let Some(s) = d.sources.get(i) else { continue };
@@ -2472,7 +2602,8 @@ fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &To
             if tool_button(&mut q, "minus", tl!("One copy less"), copies > 0, 0.0, false).clicked() {
                 v -= 1.0;
             }
-            let typed = widgets::typed_value_field(&mut q, &mut v, 0.0..=MAX_QUANTITY as f32, "", 30.0, 0).changed();
+            let named = crate::i18n::fmt(tl!("Copies of {name}"), &[("name", &s.name)]);
+            let typed = widgets::typed_value_field(&mut q, &mut v, 0.0..=MAX_QUANTITY as f32, "", 30.0, 0).accessible_name(named).changed();
             if tool_button(&mut q, "plus", tl!("One copy more"), copies < MAX_QUANTITY, 0.0, false).clicked() {
                 v += 1.0;
             }
@@ -2515,6 +2646,15 @@ fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &To
             }
         }
     });
+    // Selected Visual, at the bottom of the column (scrolls when the window is short).
+    let out = egui::ScrollArea::vertical().id_salt("gang-visual-block").auto_shrink([false, true]).show(&mut panel, |ui| {
+        section(ui, d, SECTION_VISUAL, tl!("Selected Visual"), t, |ui, d| visual_section(ui, d, t));
+    });
+    let h = out.content_size.y;
+    if (h - d.visual_h).abs() > 0.5 {
+        d.visual_h = h;
+        ui.ctx().request_repaint();
+    }
     if let Some((i, q)) = quantity {
         if organized {
             d.set_quantity(i, q);
@@ -2543,11 +2683,12 @@ fn visuals_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &To
     }
 }
 
-/// The right column's sections, in order (`GangSheetDialog::closed`).
+/// The folding sections (`GangSheetDialog::closed`): Selected Visual is in the left column.
 const SECTION_SHEET: usize = 0;
 const SECTION_FILM: usize = 1;
 const SECTION_VISUAL: usize = 2;
 const SECTION_DISPLAY: usize = 3;
+const SECTION_PREFS: usize = 4;
 
 /// A section of the right column: a card whose title row opens or closes it.
 fn section(ui: &mut egui::Ui, d: &mut GangSheetDialog, k: usize, title: &str, t: &Tokens, body: impl FnOnce(&mut egui::Ui, &mut GangSheetDialog)) {
@@ -2571,7 +2712,7 @@ fn section(ui: &mut egui::Ui, d: &mut GangSheetDialog, k: usize, title: &str, t:
     ui.add_space(8.0);
 }
 
-/// The right column: Sheet, Film, Selected Visual and Display, each a section that folds.
+/// The right column: Sheet, Film, Display and Preferences, each a section that folds.
 fn settings_column(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens) {
     ui.painter().rect_filled(rect, 0.0, t.dock);
     ui.painter().line_segment([rect.left_top(), rect.left_bottom()], Stroke::new(1.0, t.separator));
@@ -2579,8 +2720,8 @@ fn settings_column(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &
     egui::ScrollArea::vertical().id_salt("gang-settings").auto_shrink([false, false]).show(&mut panel, |ui| {
         section(ui, d, SECTION_SHEET, tl!("Sheet"), t, |ui, d| sheet_section(ui, d, t));
         section(ui, d, SECTION_FILM, tl!("Film"), t, |ui, d| film_section(ui, d, t));
-        section(ui, d, SECTION_VISUAL, tl!("Selected Visual"), t, |ui, d| visual_section(ui, d, t));
         section(ui, d, SECTION_DISPLAY, tl!("Display"), t, |ui, d| display_section(ui, d, t));
+        section(ui, d, SECTION_PREFS, tl!("Preferences"), t, |ui, d| prefs_section(ui, d, t));
     });
 }
 
@@ -2626,7 +2767,7 @@ fn sheet_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let mut q = doc.copies as f32;
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(tl!("Copies to Print")).color(t.text), 128.0, 24.0);
-        if widgets::typed_value_field(ui, &mut q, 1.0..=999.0, "", 70.0, 0).on_hover_text(tl!("Copies of this sheet to print")).changed()
+        if widgets::typed_value_field(ui, &mut q, 1.0..=999.0, "", 70.0, 0).accessible_name(tl!("Copies to Print")).on_hover_text(tl!("Copies of this sheet to print")).changed()
             && let Some(s) = d.sheets.get_mut(k)
         {
             s.copies = q.round().clamp(1.0, 999.0) as usize;
@@ -2650,6 +2791,12 @@ fn sheet_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
 /// The film: width, cells, margins, longest sheet, rotation in Auto Build.
 fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let mut s = d.settings;
+    film_fields(ui, &mut s, t, "gang");
+    d.set_settings(s);
+}
+
+/// The film's fields (the Film block, and the Preferences' start values): `salt` keeps their ids apart.
+fn film_fields(ui: &mut egui::Ui, s: &mut Settings, t: &Tokens, salt: &str) {
     // Film width: the presets (and the width set, if another).
     let mut width = s.width_cm;
     let labels: Vec<(f32, String)> = {
@@ -2662,7 +2809,7 @@ fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let opts: Vec<(f32, &str)> = labels.iter().map(|(w, l)| (*w, l.as_str())).collect();
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(tl!("Film Width")).color(t.text), 128.0, 24.0);
-        if widgets::dropdown(ui, "gang-film", tl!("Film Width"), &mut width, &opts, 120.0) {
+        if widgets::dropdown(ui, &format!("{salt}-film"), tl!("Film Width"), &mut width, &opts, 120.0) {
             s.width_cm = width;
         }
     });
@@ -2674,7 +2821,8 @@ fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
             v.push(cols);
             v.sort_unstable();
         }
-        let sheet = d.sheet();
+        let edge = if s.edge_on { cm_units(s.edge_cm) } else { 0 };
+        let sheet = Sheet::new(cm_units(s.width_cm), cm_units(s.max_length_cm), edge, 0);
         let mut out = vec![(0, tl!("No Cells").to_string())];
         out.extend(v.iter().map(|n| (*n, format!("{n} × {} cm", cm_text(sheet.cell_size(*n))))));
         out
@@ -2682,7 +2830,7 @@ fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let cell_opts: Vec<(u32, &str)> = cell_labels.iter().map(|(n, l)| (*n, l.as_str())).collect();
     ui.horizontal(|ui| {
         fixed_label(ui, egui::RichText::new(tl!("Cells")).color(t.text), 128.0, 24.0);
-        if widgets::dropdown(ui, "gang-cells", tl!("Cells"), &mut cols, &cell_opts, 120.0) {
+        if widgets::dropdown(ui, &format!("{salt}-cells"), tl!("Cells"), &mut cols, &cell_opts, 120.0) {
             s.cells_on = cols > 0;
             if cols > 0 {
                 s.cells_cols = cols;
@@ -2722,7 +2870,6 @@ fn film_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     number_row(ui, tl!("Custom Width"), &mut s.width_cm, 10.0..=300.0, "cm", 1);
     number_row(ui, tl!("Max Length"), &mut s.max_length_cm, 10.0..=MAX_LENGTH_CM, "cm", 1);
     switch_row(ui, tl!("Auto Build May Rotate"), &mut s.rotate);
-    d.set_settings(s);
 }
 
 /// The visual selected (or last shown), several selected, or a hint.
@@ -2751,6 +2898,12 @@ fn visual_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
 /// What the sheet shows: lines, snapping, warnings, grid, background.
 fn display_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
     let mut s = d.settings;
+    display_fields(ui, &mut s, t);
+    d.set_settings(s);
+}
+
+/// The Display block's fields (also the Preferences' start values).
+fn display_fields(ui: &mut egui::Ui, s: &mut Settings, t: &Tokens) {
     switch_row(ui, tl!("Show Resolution Lines"), &mut s.show_res);
     switch_row(ui, tl!("Overlap Lines"), &mut s.show_overlap);
     switch_row(ui, tl!("Snap While Moving"), &mut s.snap);
@@ -2785,18 +2938,40 @@ fn display_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
             }
         });
     });
-    d.set_settings(s);
 }
 
-/// The tools, in a column floating at the left of the sheet: history, turn and mirror, stretch,
-/// centre, push, group, delete.
+/// The Preferences: the values each gang sheet opens with (film, copies of an import, display),
+/// saved from one session to the next; this gang sheet keeps its own Film and Display.
+fn prefs_section(ui: &mut egui::Ui, d: &mut GangSheetDialog, t: &Tokens) {
+    let mut s = d.prefs;
+    ui.label(egui::RichText::new(tl!("The values each new gang sheet opens with, kept from one session to the next.")).size(11.5).color(t.text_faint));
+    film_fields(ui, &mut s, t, "gang-prefs");
+    let mut q = s.quantity as f32;
+    if number_row(ui, tl!("Copies per Visual"), &mut q, 1.0..=MAX_QUANTITY as f32, "", 0) {
+        s.quantity = (q.round() as usize).clamp(1, MAX_QUANTITY);
+    }
+    widgets::hairline(ui);
+    display_fields(ui, &mut s, t);
+    widgets::hairline(ui);
+    let bw = ui.available_width();
+    if widgets::secondary_button(ui, tl!("Factory Values"), bw).on_hover_text(tl!("The Preferences back to DTF Craft's values")).clicked() {
+        s = Settings::default();
+    }
+    if s != d.prefs {
+        d.prefs = s;
+        d.prefs_dirty = true;
+    }
+}
+
+/// The tools, two by two in a column floating at the left of the sheet: history, turn and mirror,
+/// stretch and centre, push, align, distribute, group and delete.
 fn tool_palette(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tokens) {
     let list = d.sel();
     let on = !list.is_empty();
     let single = d.single();
     let q = std::f32::consts::FRAC_PI_2;
     type Op = (&'static str, &'static str, f32, bool, u8);
-    let ops: [Op; 18] = [
+    let ops: [Op; 26] = [
         ("undo-2", tl!("Undo (Ctrl+Z)"), 0.0, false, 16),
         ("redo-2", tl!("Redo (Ctrl+Y)"), 0.0, false, 17),
         ("rotate-cw", tl!("Rotate 90° Counterclockwise"), 0.0, true, 0),
@@ -2812,33 +2987,53 @@ fn tool_palette(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tok
         ("align-right", tl!("Push Right"), 0.0, false, 10),
         ("align-left", tl!("Push Up"), q, false, 11),
         ("align-right", tl!("Push Down"), q, false, 12),
+        // Align on the selection's box, distribute evenly (a group counts as one block).
+        ("al-left", tl!("Align Left Edges"), 0.0, false, 18),
+        ("al-hcenter", tl!("Align Horizontal Centers"), 0.0, false, 19),
+        ("al-right", tl!("Align Right Edges"), 0.0, false, 20),
+        ("al-top", tl!("Align Top Edges"), 0.0, false, 21),
+        ("al-vcenter", tl!("Align Vertical Centers"), 0.0, false, 22),
+        ("al-bottom", tl!("Align Bottom Edges"), 0.0, false, 23),
+        ("dist-h", tl!("Distribute Horizontally"), 0.0, false, 24),
+        ("dist-v", tl!("Distribute Vertically"), 0.0, false, 25),
         ("link", tl!("Group (Ctrl+G)"), 0.0, false, 14),
         ("unlink", tl!("Ungroup (Ctrl+Shift+G)"), 0.0, false, 15),
         ("trash", tl!("Delete (Del)"), 0.0, false, 13),
     ];
-    // Separators after these.
-    let breaks = [17u8, 3, 5, 8, 12, 15];
-    let height = ops.len() as f32 * 30.0 + breaks.len() as f32 * 9.0 + 12.0;
+    // The groups, two buttons a row, a line between them.
+    let groups: [&[u8]; 7] = [&[16, 17], &[0, 1, 2, 3], &[4, 5, 6, 7, 8], &[9, 10, 11, 12], &[18, 19, 20, 21, 22, 23], &[24, 25], &[14, 15, 13]];
+    let rows: usize = groups.iter().map(|g| g.len().div_ceil(2)).sum();
+    let height = rows as f32 * 30.0 + (groups.len() - 1) as f32 * 9.0 + 12.0;
     let r = ERect::from_min_size(area.min + vec2(10.0, 10.0), vec2(PALETTE_W, height.min(area.height() - 20.0)));
     ui.painter().rect(r.translate(vec2(0.0, 2.0)), 10.0, Color32::from_black_alpha(12), Stroke::NONE, StrokeKind::Inside);
     ui.painter().rect(r, 10.0, Color32::WHITE, Stroke::new(1.0, t.card_border), StrokeKind::Inside);
-    let mut col = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(8.0, 6.0))).layout(egui::Layout::top_down(egui::Align::Center)));
-    col.spacing_mut().item_spacing.y = 2.0;
+    let mut col = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(8.0, 6.0))).layout(egui::Layout::top_down(egui::Align::Min)));
+    col.spacing_mut().item_spacing = vec2(6.0, 2.0);
+    let blocks = if list.len() > 1 { d.units(&list).len() } else { list.len() };
     let mut op = None;
-    for (icon, tip, angle, mirror, id) in ops {
-        // Stretching resizes the visual's source (all its copies): one visual alone only.
-        let enabled = match id {
-            16 => !d.undo.is_empty(),
-            17 => !d.redo.is_empty(),
-            4 | 5 => single.is_some(),
-            14 => list.len() > 1 && !d.is_one_group(&list),
-            15 => d.any_grouped(&list),
-            _ => on,
-        };
-        if tool_button(&mut col, icon, tip, enabled, angle, mirror).clicked() {
-            op = Some(id);
+    for (n, group) in groups.iter().enumerate() {
+        for pair in group.chunks(2) {
+            col.horizontal(|ui| {
+                for id in pair {
+                    let Some(&(icon, tip, angle, mirror, _)) = ops.iter().find(|o| o.4 == *id) else { continue };
+                    // Stretching resizes the visual's source (all its copies): one visual alone only.
+                    let enabled = match id {
+                        16 => !d.undo.is_empty(),
+                        17 => !d.redo.is_empty(),
+                        4 | 5 => single.is_some(),
+                        14 => list.len() > 1 && !d.is_one_group(&list),
+                        15 => d.any_grouped(&list),
+                        18..=23 => blocks >= 2,
+                        24 | 25 => blocks >= 3,
+                        _ => on,
+                    };
+                    if tool_button(ui, icon, tip, enabled, angle, mirror).clicked() {
+                        op = Some(*id);
+                    }
+                }
+            });
         }
-        if breaks.contains(&id) {
+        if n + 1 < groups.len() {
             let (line, _) = col.allocate_exact_size(vec2(PALETTE_W - 16.0, 7.0), Sense::hover());
             col.painter().line_segment([line.left_center(), line.right_center()], Stroke::new(1.0, t.separator));
         }
@@ -2890,15 +3085,18 @@ fn tool_palette(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tok
                 }
                 14 => d.group(),
                 15 => d.ungroup(),
+                18..=23 => d.align_units(&list, op <= 20, (op - 18) % 3),
+                24 | 25 => d.distribute(&list, op == 24),
                 _ => {
                     d.delete_block(&list);
                     true
                 }
             };
             if !ok {
-                if op >= 14 {
+                if matches!(op, 14 | 15 | 18..=25) {
                     d.undo.pop();
-                } else {
+                }
+                if !matches!(op, 14 | 15) {
                     d.status = if op <= 1 { tl!("No room to turn this visual") } else { tl!("Too close to another visual") }.to_string();
                 }
             }
@@ -3038,7 +3236,7 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, source: usize, pl
         let mut q = if organized { src.quantity } else { d.copies_on_sheet(source) } as f32;
         ui.horizontal(|ui| {
             fixed_label(ui, egui::RichText::new(tl!("Number of Images:")).color(t.text), 128.0, 24.0);
-            if widgets::typed_value_field(ui, &mut q, 0.0..=MAX_QUANTITY as f32, "", 70.0, 0).changed() {
+            if widgets::typed_value_field(ui, &mut q, 0.0..=MAX_QUANTITY as f32, "", 70.0, 0).accessible_name(plain(tl!("Number of Images:"))).changed() {
                 let q = q.round().max(0.0) as usize;
                 if organized {
                     d.set_quantity(source, q);
@@ -3060,7 +3258,7 @@ fn selection_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, source: usize, pl
         let mut m = units_cm(src.margin.unwrap_or_else(|| d.gap()));
         ui.horizontal(|ui| {
             fixed_label(ui, egui::RichText::new(tl!("Margin (cm)")).color(t.text), 128.0, 24.0);
-            let changed = ui.add_enabled_ui(own, |ui| widgets::typed_value_field(ui, &mut m, 0.0..=10.0, "", 70.0, 2)).inner.changed();
+            let changed = ui.add_enabled_ui(own, |ui| widgets::typed_value_field(ui, &mut m, 0.0..=10.0, "", 70.0, 2).accessible_name(tl!("Margin (cm)"))).inner.changed();
             if changed {
                 d.checkpoint(Some(format!("m{source}")));
                 if let Some(s) = d.sources.get_mut(source) {
@@ -3115,51 +3313,7 @@ fn multi_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, list: &[usize], t: &T
             ui.end_row();
         }
     });
-    // Align on the selection's box, distribute evenly (a group counts as one block).
-    let blocks = d.units(list).len();
-    let mut op: Option<(bool, Option<u8>)> = None;
-    card_frame(t).show(ui, |ui| {
-        ui.set_width(ui.available_width());
-        ui.label(egui::RichText::new(tl!("Align")).color(t.text));
-        ui.horizontal(|ui| {
-            ui.spacing_mut().item_spacing.x = 2.0;
-            for (icon, tip, horizontal, edge) in [
-                ("al-left", tl!("Left Edges"), true, 0),
-                ("al-hcenter", tl!("Horizontal Centers"), true, 1),
-                ("al-right", tl!("Right Edges"), true, 2),
-                ("al-top", tl!("Top Edges"), false, 0),
-                ("al-vcenter", tl!("Vertical Centers"), false, 1),
-                ("al-bottom", tl!("Bottom Edges"), false, 2),
-            ] {
-                if tool_button(ui, icon, tip, blocks >= 2, 0.0, false).clicked() {
-                    op = Some((horizontal, Some(edge)));
-                }
-                if edge == 2 && horizontal {
-                    widgets::vline(ui, 22.0);
-                }
-            }
-        });
-        ui.label(egui::RichText::new(tl!("Distribute")).color(t.text));
-        ui.horizontal(|ui| {
-            ui.spacing_mut().item_spacing.x = 2.0;
-            for (icon, tip, horizontal) in [("dist-h", tl!("Horizontally"), true), ("dist-v", tl!("Vertically"), false)] {
-                if tool_button(ui, icon, tip, blocks >= 3, 0.0, false).clicked() {
-                    op = Some((horizontal, None));
-                }
-            }
-        });
-    });
-    if let Some((horizontal, edge)) = op {
-        d.checkpoint(None);
-        let ok = match edge {
-            Some(e) => d.align_units(list, horizontal, e),
-            None => d.distribute(list, horizontal),
-        };
-        if !ok {
-            d.undo.pop();
-            d.status = tl!("Too close to another visual").to_string();
-        }
-    }
+    // Align and distribute: in the tool palette.
     card_frame(t).show(ui, |ui| {
         ui.set_width(ui.available_width());
         ui.vertical(|ui| {
@@ -3222,10 +3376,10 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
     let mut s = d.settings;
     panel.horizontal(|ui| {
         widgets::checkbox(ui, &mut s.edge_on, tl!("With the sheet margin"));
-        ui.add_enabled_ui(s.edge_on, |ui| widgets::typed_value_field(ui, &mut s.edge_cm, 0.0..=10.0, "cm", 70.0, 2));
+        ui.add_enabled_ui(s.edge_on, |ui| widgets::typed_value_field(ui, &mut s.edge_cm, 0.0..=10.0, "cm", 70.0, 2).accessible_name(tl!("With the sheet margin")));
         ui.add_space(16.0);
         ui.add_enabled_ui(!s.cells_on, |ui| widgets::checkbox(ui, &mut s.gap_on, tl!("With the image margin")));
-        ui.add_enabled_ui(s.gap_on && !s.cells_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 70.0, 2));
+        ui.add_enabled_ui(s.gap_on && !s.cells_on, |ui| widgets::typed_value_field(ui, &mut s.gap_cm, 0.0..=10.0, "cm", 70.0, 2).accessible_name(tl!("With the image margin")));
         ui.add_space(16.0);
         widgets::checkbox(ui, &mut s.rotate, tl!("Allow Rotation"));
     });
@@ -3280,14 +3434,14 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
                     let (mut w, mut h) = (units_cm(src.w), units_cm(src.h));
                     f.horizontal(|ui| {
                         fixed_label(ui, egui::RichText::new(tl!("Width:")).color(t.text).size(11.5), 60.0, 22.0);
-                        if widgets::typed_value_field(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                        if widgets::typed_value_field(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).accessible_name(plain(tl!("Width:"))).changed() {
                             d.checkpoint(Some(format!("w{i}")));
                             d.set_size(i, Some(cm_units(w)), None);
                         }
                     });
                     f.horizontal(|ui| {
                         fixed_label(ui, egui::RichText::new(tl!("Height:")).color(t.text).size(11.5), 60.0, 22.0);
-                        if widgets::typed_value_field(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                        if widgets::typed_value_field(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).accessible_name(plain(tl!("Height:"))).changed() {
                             d.checkpoint(Some(format!("h{i}")));
                             d.set_size(i, None, Some(cm_units(h)));
                         }
@@ -3316,7 +3470,7 @@ fn auto_view(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Tokens
                     if tool_button(&mut b, "minus", tl!("One copy less"), src.quantity > 0, 0.0, false).clicked() {
                         q -= 1.0;
                     }
-                    let typed = widgets::typed_value_field(&mut b, &mut q, 0.0..=999.0, "", 48.0, 0).changed();
+                    let typed = widgets::typed_value_field(&mut b, &mut q, 0.0..=999.0, "", 48.0, 0).accessible_name(crate::i18n::fmt(tl!("Copies of {name}"), &[("name", &src.name)])).changed();
                     if tool_button(&mut b, "plus", tl!("One copy more"), src.quantity < 999, 0.0, false).clicked() {
                         q += 1.0;
                     }
@@ -3535,14 +3689,14 @@ fn svg_dialog(app: &mut PhotocraftApp, ctx: &egui::Context) {
             ui.horizontal(|ui| {
                 fixed_label(ui, egui::RichText::new(tl!("Width:")).color(t.text), 70.0, 24.0);
                 let mut w = p.w_cm;
-                if widgets::typed_value_field(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                if widgets::typed_value_field(ui, &mut w, 0.1..=300.0, "cm", 110.0, 2).accessible_name(plain(tl!("Width:"))).changed() {
                     set_w(p, cm_units(w));
                 }
             });
             ui.horizontal(|ui| {
                 fixed_label(ui, egui::RichText::new(tl!("Height:")).color(t.text), 70.0, 24.0);
                 let mut h = p.h_cm;
-                if widgets::typed_value_field(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).changed() {
+                if widgets::typed_value_field(ui, &mut h, 0.1..=300.0, "cm", 110.0, 2).accessible_name(plain(tl!("Height:"))).changed() {
                     set_w(p, gs::size_for_width(ph, pw, cm_units(h)).1);
                 }
             });
@@ -4005,10 +4159,14 @@ mod tests {
         }
     }
 
-    /// The window's own defaults: a 42 cm film in 4 columns of cells.
+    /// The layout in cells most cell tests check: a 42 cm film in 4 columns of cells.
+    fn cells() -> Settings {
+        Settings { width_cm: 42.0, cells_on: true, cells_cols: 4, ..Settings::default() }
+    }
+
     fn reset_to_defaults() {
         if let Ok(mut s) = LAST_SETTINGS.lock() {
-            *s = None;
+            *s = Some(cells());
         }
     }
 
@@ -4034,9 +4192,9 @@ mod tests {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         let ctx = egui::Context::default();
         menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
-        // Other tests running alongside may have left their settings: the defaults, for sure.
+        // Other tests running alongside may have left their settings: the cells, for sure.
         if let Some(d) = app.gang_sheet.as_mut() {
-            d.settings = Settings::default();
+            d.settings = cells();
         }
         let r = app.gang_sheet.as_ref().unwrap().describe();
         // 42 cm film, 1 cm edges: 40 cm printed in 4 columns of 10 × 10 cm, 9 rows within 100 cm.
@@ -4374,6 +4532,27 @@ mod tests {
             h.run_steps(8);
             h.render().unwrap().save(dir.join(format!("gang_groupes_{width}.png"))).unwrap();
         }
+        // One visual selected (its block at the bottom left), three sheets (each with its ×), the
+        // Preferences unfolded.
+        let mut h = egui_kittest::Harness::builder().with_size(vec2(1366.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
+            PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
+            let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+            crate::dtf_panel::dtf_craft_startup(&mut app);
+            app.run("file.new", json!({"width": 900, "height": 600, "resolution": 300, "background": "transparent"})).unwrap();
+            app.run("edit.fill", json!({"color": "#c8102e"})).unwrap();
+            let ctx = cc.egui_ctx.clone();
+            invoke(&mut app, &ctx, json!({"set": {"filmWidth": 60, "columns": 0}}));
+            invoke(&mut app, &ctx, json!({"addDocument": true, "source": {"index": 0, "onSheet": 3}}));
+            invoke(&mut app, &ctx, json!({"newSheet": true}));
+            invoke(&mut app, &ctx, json!({"newSheet": true}));
+            invoke(&mut app, &ctx, json!({"sheet": 0, "select": 0}));
+            if let Some(d) = app.gang_sheet.as_mut() {
+                d.closed[SECTION_PREFS] = false;
+            }
+            app
+        });
+        h.run_steps(8);
+        h.render().unwrap().save(dir.join("gang_preferences.png")).unwrap();
         reset_settings();
     }
 
@@ -4389,7 +4568,7 @@ mod tests {
         let ctx = egui::Context::default();
         menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
         if let Some(d) = app.gang_sheet.as_mut() {
-            d.settings = Settings::default();
+            d.settings = cells();
         }
         invoke(&mut app, &ctx, json!({"addFiles": [a, b]}));
         let d = app.gang_sheet.as_mut().unwrap();
@@ -4419,7 +4598,7 @@ mod tests {
         let ctx = egui::Context::default();
         menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
         if let Some(d) = app.gang_sheet.as_mut() {
-            d.settings = Settings::default();
+            d.settings = cells();
         }
         invoke(&mut app, &ctx, json!({"addFiles": [logo]}));
         // 4 × 9 cells a sheet: 36, 36, 36 and 16.
@@ -4459,7 +4638,7 @@ mod tests {
         let ctx = egui::Context::default();
         menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
         if let Some(d) = app.gang_sheet.as_mut() {
-            d.settings = Settings::default();
+            d.settings = cells();
         }
         // Both wait for their size: the file's own (12 cm), else one 10 cm cell.
         let r = invoke(&mut app, &ctx, json!({"addFiles": [logo.to_string_lossy(), round.to_string_lossy()]}));
@@ -4551,7 +4730,7 @@ mod tests {
         crate::theme::apply(&ctx, ThemeKind::ProMedium);
         app.run("file.new", json!({"width": 400, "height": 200, "resolution": 300})).unwrap();
         invoke(&mut app, &ctx, json!({"addDocument": true, "source": {"index": 0, "onSheet": 3}}));
-        for closed in [[false; 4], [true; 4]] {
+        for closed in [[false; 5], [true; 5]] {
             if let Some(d) = app.gang_sheet.as_mut() {
                 d.closed = closed;
                 d.selected = vec![0];
@@ -4565,5 +4744,65 @@ mod tests {
         assert!(app.gang_sheet.as_ref().is_some_and(|d| d.sources[0].tex.is_some()));
         assert_eq!(Tokens::get(&ctx).kind, ThemeKind::ProMedium, "the app keeps its theme");
         reset_settings();
+    }
+
+    /// A new gang sheet: 60 cm film without cells, Sheet open, Film / Display / Preferences
+    /// folded. The Preferences are saved, leave this gang sheet as it is and open the next one;
+    /// an import takes their copies; Factory Values brings DTF Craft's back.
+    #[test]
+    fn a_gang_sheet_opens_with_the_preferences() {
+        let s = Settings::default();
+        assert_eq!((s.width_cm, s.cells_on, s.quantity), (60.0, false, 1));
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        let r = menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        assert_eq!(r["foldedSections"], json!([false, true, false, true, true]));
+        let before = r["filmWidth"].clone();
+        let r = invoke(&mut app, &ctx, json!({"prefs": {"filmWidth": 57, "columns": 0, "spacing": 0.3, "quantity": 2}}));
+        assert_eq!(r["filmWidth"], before, "this gang sheet keeps its film");
+        assert_eq!((r["prefs"]["filmWidth"].as_f64(), r["prefs"]["quantity"].as_u64()), (Some(57.0), Some(2)));
+        let saved = app.session.prefs().dialogs.get(PREFS_KEY).cloned().unwrap();
+        assert_eq!(saved["filmWidth"], 57.0);
+        invoke(&mut app, &ctx, json!({"cancel": true}));
+        let r = menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        assert_eq!((r["filmWidth"].as_f64(), r["columns"].as_u64()), (Some(57.0), Some(0)));
+        assert!((r["spacing"].as_f64().unwrap() - 0.3).abs() < 1e-6, "{r}");
+        let dir = std::env::temp_dir().join(format!("gang-prefs-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let r = invoke(&mut app, &ctx, json!({"addFiles": [png_cm(&dir, "p.png", 5, 5, 25.4)]}));
+        assert_eq!((r["sources"][0]["quantity"].as_u64(), r["sources"][0]["onSheet"].as_u64()), (Some(2), Some(2)));
+        let r = invoke(&mut app, &ctx, json!({"prefs": {"factory": true}}));
+        assert_eq!(r["prefs"]["filmWidth"], 60.0);
+        assert_eq!(r["prefs"]["columns"], 0);
+    }
+
+    /// A visual removed from the list: the sheets it was on go, and the visuals left are laid out
+    /// together again on as few sheets as they need. Closing a sheet before the one shown keeps
+    /// that one shown.
+    #[test]
+    fn removing_a_visual_lays_the_others_out_together() {
+        let dir = std::env::temp_dir().join(format!("gang-merge-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let files: Vec<String> = ["a", "b", "c"].iter().map(|n| png_cm(&dir, &format!("{n}.png"), 50, 40, 25.4)).collect();
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        menu(&mut app, &ctx, cmd::GANG_SHEET, &json!({})).unwrap().unwrap();
+        invoke(&mut app, &ctx, json!({"set": {"filmWidth": 56, "columns": 0, "maxLength": 100, "edgeMargin": 1, "spacing": 1, "rotate": false}}));
+        invoke(&mut app, &ctx, json!({"addFiles": files}));
+        // Two 50 × 40 cm visuals a sheet: a, b on the first, c on the second.
+        let r = invoke(&mut app, &ctx, json!({"autoBuild": true}));
+        let images: Vec<u64> = r["sheets"].as_array().unwrap().iter().map(|s| s["images"].as_u64().unwrap()).collect();
+        assert_eq!(images, vec![2, 1], "{r}");
+        let r = invoke(&mut app, &ctx, json!({"removeSource": 0}));
+        let images: Vec<u64> = r["sheets"].as_array().unwrap().iter().map(|s| s["images"].as_u64().unwrap()).collect();
+        assert_eq!(images, vec![2], "b and c together on one sheet: {r}");
+        assert_eq!(r["conflicts"], 0);
+        let r = invoke(&mut app, &ctx, json!({"undo": true}));
+        assert_eq!(r["sheets"].as_array().unwrap().len(), 2, "undone");
+        let d = app.gang_sheet.as_mut().unwrap();
+        d.new_sheet();
+        assert_eq!(d.active, 2);
+        d.delete_sheet(0);
+        assert_eq!((d.sheets.len(), d.active), (2, 1), "the sheet shown stays shown");
     }
 }
