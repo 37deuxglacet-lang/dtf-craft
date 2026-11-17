@@ -659,6 +659,7 @@ pub static CATALOG: &[(&[&str], &str, Option<&str>, &str)] = &[
     (&["DTF"], "Sharpness…", None, "dtf.sharpen"),
     (&["DTF"], "Saturation…", None, "dtf.saturation"),
     (&["DTF"], "---", None, "---"),
+    (&["DTF"], "Color Range…", None, "dtf.colorRange"),
     (&["DTF"], "DTF Halftone…", None, "filter.dtf.halftone"),
     (&["DTF"], "---", None, "---"),
     (&["DTF"], "Color Analyzer…", None, "dtf.colorAnalyzer"),

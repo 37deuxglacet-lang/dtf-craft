@@ -412,6 +412,5 @@
 # DTF Craft (31)
 	Computing the preview…	プレビューを計算中…
 # DTF Craft (32)
-	1 · Remove the Background (Color Range)	1 · 背景を削除（色域指定）
-	2 · Screen	2 · スクリーン
 	No sample: click the background on the image	サンプルなし：画像の背景をクリック
+	OK erases the range on a copy of the layer (white in the preview = erased).	OK でレイヤーのコピー上の範囲を消去します（プレビューの白 = 消去）。

@@ -114,31 +114,29 @@ pub fn open(app: &mut PhotocraftApp) -> u64 {
     app.ui.open_dialog(DialogKind::Command, f)
 }
 
-/// DTF Craft: Color Range opened from DTF Halftone (`dtf_panel`): no sample selects nothing, and
-/// OK hands the settings back to DTF Halftone instead of selecting.
+/// DTF Craft: the dialog opened from DTF › Color Range… (`dtf.colorRange`): OK erases the range
+/// on a copy of the layer instead of selecting, and no sample erases nothing.
 pub fn dtf(f: &Map<String, Value>) -> bool {
-    f.contains_key("__dtfHalftone")
+    f.contains_key("__dtfErase")
 }
 
-/// DTF Craft: Color Range's first fields (as [`open`] sets them) for the step in Halftone DTF.
-pub fn dtf_fields() -> Map<String, Value> {
-    let mut f = Map::new();
-    f.insert("select".into(), json!("sampledColors"));
-    f.insert("fuzziness".into(), json!(40.0));
-    f.insert("localized".into(), json!(false));
-    f.insert("range".into(), json!(100.0));
-    f.insert("toneFuzziness".into(), json!(20.0));
-    f.insert("shadowsLevel".into(), json!(65.0));
-    f.insert("highlightsLevel".into(), json!(190.0));
-    f.insert("midtonesLow".into(), json!(105.0));
-    f.insert("midtonesHigh".into(), json!(150.0));
-    f.insert("invert".into(), json!(false));
-    f.insert("points".into(), json!([]));
-    f.insert("subtractPoints".into(), json!([]));
-    f.insert("__order".into(), json!([]));
-    f.insert("__tool".into(), json!("sample"));
-    f.insert("__view".into(), json!("selection"));
-    f
+/// DTF Craft: DTF › Color Range…, with Photoshop's defaults each time (nothing remembered).
+pub fn open_dtf(app: &mut PhotocraftApp) -> u64 {
+    let id = open(app);
+    let label = photocraft_engine::commands::find(photocraft_engine::dtf_cmds::COLOR_RANGE).map_or("Color Range…", |c| c.label);
+    if let Some(d) = app.ui.dialog_mut(id) {
+        d.fields.insert("__dtfErase".into(), json!(true));
+        d.fields.insert("__label".into(), json!(label));
+    }
+    id
+}
+
+/// DTF Craft: OK refused while Sampled Colors has no sample (nothing would be erased).
+pub fn dtf_check(f: &Map<String, Value>) -> Result<(), String> {
+    if dtf(f) && controls(f).sampling && points(f, "points").is_empty() {
+        return Err(tl!("No sample: click the background on the image").to_string());
+    }
+    Ok(())
 }
 
 pub fn owns(f: &Map<String, Value>) -> bool {
@@ -190,9 +188,9 @@ pub fn params(f: &Map<String, Value>) -> Value {
 /// OK: run the command on the document (one history step).
 pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value, String> {
     app.color_range = None;
-    // DTF Craft: opened from DTF Halftone, OK gives it the background's settings.
+    // DTF Craft: from DTF › Color Range…, the range is erased on a copy of the layer.
     if dtf(f) {
-        return Ok(crate::dtf_panel::color_range_confirmed(app, f));
+        return app.run(photocraft_engine::dtf_cmds::COLOR_RANGE, params(f));
     }
     app.run(COMMAND, params(f))
 }
@@ -358,7 +356,7 @@ fn preview(app: &mut PhotocraftApp, ctx: &egui::Context, f: &Map<String, Value>)
         });
     }
     let image_view = (s(f, "__view", "selection") == "image") ^ ctx.input(|i| i.modifiers.command || (!cfg!(target_os = "macos") && i.modifiers.ctrl));
-    // DTF Craft: in Halftone DTF, Sampled Colors without a sample selects nothing: show the image.
+    // DTF Craft: from DTF › Color Range…, Sampled Colors without a sample erases nothing: the image.
     let image_view = image_view || (dtf(f) && controls(f).sampling && points(f, "points").is_empty());
     let params = params(f);
     let key = query_key(app, &params);
@@ -456,6 +454,12 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, Valu
     let t = Tokens::get(ui.ctx());
     let c = controls(f);
     let select = s(f, "select", "sampledColors").to_string();
+    // DTF Craft: from DTF › Color Range…, its help sheet ("?") and what OK does.
+    if dtf(f) {
+        crate::dtf_help::sheet_ui(ui, f, photocraft_engine::dtf_cmds::COLOR_RANGE);
+        ui.label(egui::RichText::new(tl!("OK erases the range on a copy of the layer (white in the preview = erased).")).color(t.text_dim));
+        ui.add_space(4.0);
+    }
     ui.horizontal(|ui| {
         ui.label(egui::RichText::new(tl!("Select:")).color(t.text_dim));
         let mut cur: &str = &select;
@@ -563,7 +567,7 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, Valu
                 });
                 let (add, sub) = (points(f, "points").len(), points(f, "subtractPoints").len());
                 let what = match (add, sub) {
-                    // DTF Craft: in Halftone DTF, no sample erases nothing.
+                    // DTF Craft: from DTF › Color Range…, no sample erases nothing.
                     (0, 0) if dtf(f) => tl!("No sample: click the background on the image").to_string(),
                     (0, 0) => tl!("Sample: foreground color").to_string(),
                     (a, 0) => crate::i18n::trn(crate::i18n::current(), a as u64, "{n} sample", "{n} samples"),

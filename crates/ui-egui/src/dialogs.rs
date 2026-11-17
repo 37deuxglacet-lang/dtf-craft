@@ -445,8 +445,6 @@ fn filter_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, d: &Dialog, fields: &
             if crate::bitmap_dialog::owns(fields) {
                 crate::bitmap_dialog::body(app, ui, fields);
             } else {
-                // DTF Craft: DTF Halftone's Remove Background step (Color Range), above its rows.
-                crate::dtf_panel::halftone_background(ui, fields);
                 crate::filter_dialog::body(ui, fields);
             }
         });
@@ -621,7 +619,8 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         };
         let _language = crate::i18n::language_scope(lang);
         // DTF Craft: a DTF command's dialog (DTF Halftone…) in the DTF windows' wording.
-        let _dtf = d.fields.get("__command").and_then(Value::as_str).filter(|c| crate::dtf_i18n::is_dtf_command(c)).map(|_| crate::dtf_i18n::scope());
+        let dtf = d.fields.get("__command").and_then(Value::as_str).is_some_and(crate::dtf_i18n::is_dtf_command) || crate::color_range_ui::dtf(&d.fields);
+        let _dtf = dtf.then(crate::dtf_i18n::scope);
         let interactive = top == Some(d.id);
         let mut fields = d.fields.clone();
         let mut outcome: Option<bool> = None; // Some(true)=OK, Some(false)=Cancel
@@ -803,8 +802,6 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         // A colour swatch (Edit › Fill, Edit › Stroke) opens the Color Picker over the dialog.
         if outcome.is_none() {
             crate::color_picker_ui::open_requested(app, d.id);
-            // DTF Craft: DTF Halftone's "Color Range…" opens Color Range over it.
-            crate::dtf_panel::open_color_range_requested(app, d.id);
         }
         if apply_requested && outcome.is_none() {
             let _ = crate::prefs_ui::apply(app, d.id);
@@ -1104,6 +1101,8 @@ pub(crate) fn confirm_preflight(app: &mut PhotocraftApp, id: u64) -> Result<(), 
             crate::equalize_ui::validate(app, &d.fields)?;
         }
         crate::filter_dialog::validate_match_color_destination(app, &d.fields)?;
+        // DTF Craft: DTF › Color Range… without a sample stays open (nothing would be erased).
+        crate::color_range_ui::dtf_check(&d.fields)?;
     }
     // Merge Channels with too few, repeated, closed or changed documents stays open (#11451).
     merge_channels_ui::preflight(app, id)?;
@@ -1273,6 +1272,10 @@ pub fn open_command_dialog(app: &mut PhotocraftApp, command: &str, label: &str) 
     }
     if command == crate::color_range_ui::COMMAND {
         return crate::color_range_ui::open(app);
+    }
+    // DTF Craft: DTF › Color Range… is Color Range's dialog, erasing instead of selecting.
+    if command == photocraft_engine::dtf_cmds::COLOR_RANGE {
+        return crate::color_range_ui::open_dtf(app);
     }
     if let Some(id) = crate::adjust_dialog::open(app, command) {
         return id;

@@ -64,13 +64,13 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/canvas/start_screen.rs` | hands the start screen to `dtf_home.rs` |
 | `crates/ui-egui/src/canvas/tabs.rs` | `paint_dots` made `pub(crate)` |
 | `crates/ui-egui/src/canvas/tool_input.rs` | cut-out clicks (holes, background eyedropper) |
-| `crates/ui-egui/src/dialogs.rs` | About: DTF Craft, then its base; DTF dialogs in the DTF wording; DTF Halftone's Remove Background step and its Color Range popup |
+| `crates/ui-egui/src/dialogs.rs` | About: DTF Craft, then its base; DTF dialogs in the DTF wording; DTF › Color Range… opened by its command, OK refused without a sample |
+| `crates/ui-egui/src/dialogs/color_range_ui.rs` | DTF › Color Range…: the same dialog, OK erases the range on a copy (`dtf.colorRange`), no sample erases nothing, its help sheet |
 | `crates/ui-egui/src/dialogs/credits/ui_tests.rs` | About test with the DTF Craft name |
 | `crates/ui-egui/src/dialogs/file_ui/print.rs` | rebranded label |
-| `crates/ui-egui/src/dialogs/color_range_ui.rs` | Color Range opened from DTF Halftone: OK hands its settings back, no sample selects nothing |
-| `crates/ui-egui/src/dialogs/filter_dialog.rs` | DTF dialogs: param spec extras (cm, text defaults, descriptions), DTF Halftone's Remove Background params, help sheet and tooltips, cut-out preview |
+| `crates/ui-egui/src/dialogs/filter_dialog.rs` | DTF dialogs: param spec extras (cm, text defaults, descriptions), DTF Halftone tabs and lock, help sheet and tooltips, cut-out preview |
 | `crates/ui-egui/src/dialogs/filter_dialog/tests.rs` | test of the text defaults |
-| `crates/ui-egui/src/dialogs/filter_preview_worker.rs` | previews driven by the DTF panel; the running preview's progress |
+| `crates/ui-egui/src/dialogs/filter_preview_worker.rs` | previews driven by the DTF panel |
 | `crates/ui-egui/src/dialogs/screen_picker.rs` | rebranded window title |
 | `crates/ui-egui/src/dock.rs` | DTF tools dock group |
 | `crates/ui-egui/src/dock/tests.rs` | dock tests with the DTF group |

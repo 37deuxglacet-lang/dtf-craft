@@ -54,6 +54,11 @@ pub fn sheet(command: &str) -> Option<Sheet> {
             when: "En fin de préparation, après la netteté, avant l'export.",
             advice: "+15. Au-delà de +30, les aplats saturés peuvent perdre leurs détails.",
         },
+        "dtf.colorRange" => Sheet {
+            what: "Effacer une plage de couleurs du visuel, en général le fond, avec l'outil Plage de couleurs complet : couleurs échantillonnées, familles de teintes, tons clairs, moyens ou foncés, clusters de couleurs localisés, tolérance, Inverser. Le travail se fait sur une copie « Sans fond » du calque ; l'original est masqué et intact. Les pixels proches de la limite de tolérance sont effacés en partie.",
+            when: "Fond non uni, dégradé ou bruité que le Détourage ne prend pas ; une couleur à retirer partout dans le visuel ; avant le Halftone DTF.",
+            advice: "Couleurs échantillonnées, tolérance 40. Cliquez le fond sur l'image (Maj+clic pour ajouter une couleur, Alt+clic pour en retirer). Dans la vignette, le blanc sera effacé, le noir gardé. Montez la tolérance pour prendre les nuances du fond, baissez-la si le visuel est entamé. « Clusters de couleurs localisés » limite l'effacement autour des points cliqués. Sans échantillon, OK n'efface rien. Une sélection active limite la zone traitée.",
+        },
         "filter.dtf.halftone" => Sheet {
             what: "Remplacer les zones semi-transparentes, ou tout le visuel, par une trame de points pleins. Le dégradé reste visible tout en s'imprimant en pixels opaques. Le résultat est un groupe « Halftone DTF » au-dessus du calque : le calque tramé « Halftone » sur un fond de contrôle ; le calque source est masqué et intact.",
             when: "Ombres douces, dégradés vers le vide, effets vintage ; pour un visuel entier tramé sur textile foncé ou clair.",

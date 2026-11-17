@@ -260,111 +260,6 @@ fn factory_settings(app: &PhotocraftApp, command: &str, f: &mut Map<String, Valu
     }
 }
 
-/// DTF Halftone's Remove Background step: on/off, and Select › Color Range's fields.
-/// Private to the dialog (never remembered): each opening starts unchecked, without samples.
-const HALFTONE_ERASE: &str = "__removeBackground";
-const HALFTONE_RANGE: &str = "__colorRange";
-
-fn is_halftone(f: &Map<String, Value>) -> bool {
-    f.get("__command").and_then(Value::as_str) == Some(photocraft_engine::dtf_cmds::HALFTONE)
-}
-
-/// Asked by DTF Halftone's "Color Range…" button: Color Range opens over it.
-const OPEN_RANGE: &str = "__openColorRange";
-
-/// Above DTF Halftone's rows: "1 · Remove the Background (Color Range)", unchecked when the
-/// dialog opens, its "Color Range…" button (Select › Color Range in a popup, every setting and
-/// the eyedroppers on the image) and what was chosen; then "2 · Screen", the screen as before.
-pub fn halftone_background(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
-    if !is_halftone(f) {
-        return;
-    }
-    let t = Tokens::get(ui.ctx());
-    let mut on = f.get(HALFTONE_ERASE).and_then(Value::as_bool).unwrap_or(false);
-    egui::Frame::group(ui.style()).fill(t.card).show(ui, |ui| {
-        ui.set_width(ui.available_width());
-        if crate::widgets::checkbox(ui, &mut on, tl!("1 · Remove the Background (Color Range)")).changed() {
-            f.insert(HALFTONE_ERASE.into(), json!(on));
-        }
-        ui.add_enabled_ui(on, |ui| {
-            ui.horizontal(|ui| {
-                if crate::widgets::secondary_button(ui, tl!("Color Range…"), 0.0).clicked() {
-                    f.insert(OPEN_RANGE.into(), json!(true));
-                }
-                let range = f.get(HALFTONE_RANGE).and_then(Value::as_object);
-                ui.label(RichText::new(range_summary(range)).size(11.5).color(t.text_faint));
-            });
-        });
-    });
-    ui.add_space(6.0);
-    ui.label(RichText::new(tl!("2 · Screen")).strong());
-    ui.add_space(2.0);
-}
-
-/// What the background's Color Range picks, in a few words.
-fn range_summary(range: Option<&Map<String, Value>>) -> String {
-    let Some(r) = range else { return tl!("No sample: click the background on the image").to_string() };
-    let select = r.get("select").and_then(Value::as_str).unwrap_or("sampledColors");
-    if select != "sampledColors" {
-        let name = crate::color_range_ui::SELECTS.iter().find(|(k, _)| *k == select).map_or(select, |(_, l)| l);
-        return crate::i18n::tr(crate::i18n::current(), name).to_string();
-    }
-    let n = |k: &str| r.get(k).and_then(Value::as_array).map_or(0, Vec::len);
-    match (n("points"), n("subtractPoints")) {
-        (0, 0) => tl!("No sample: click the background on the image").to_string(),
-        (a, 0) => crate::i18n::trn(crate::i18n::current(), a as u64, "{n} sample", "{n} samples"),
-        (a, s) => crate::i18n::fmt(
-            tl!("{added}, {removed} subtracted"),
-            &[("added", &crate::i18n::trn(crate::i18n::current(), a as u64, "{n} sample", "{n} samples")), ("removed", &s.to_string())],
-        ),
-    }
-}
-
-/// After DTF Halftone's dialog `id` is drawn: its "Color Range…" opens Color Range over it, on
-/// the settings chosen before (none the first time).
-pub fn open_color_range_requested(app: &mut PhotocraftApp, id: u64) {
-    let Some(d) = app.ui.dialog_mut(id) else { return };
-    if d.fields.remove(OPEN_RANGE).and_then(|v| v.as_bool()) != Some(true) {
-        return;
-    }
-    let mut f = d.fields.get(HALFTONE_RANGE).and_then(Value::as_object).cloned().unwrap_or_else(crate::color_range_ui::dtf_fields);
-    f.insert("__colorRange".into(), json!(true));
-    f.insert("__dtfHalftone".into(), json!(id));
-    f.insert("__label".into(), json!(tl!("Color Range…")));
-    f.insert("__selectionPreview".into(), json!("none"));
-    app.color_range = None;
-    app.ui.open_dialog(crate::state::DialogKind::Command, f);
-}
-
-/// Color Range's OK, opened from DTF Halftone: its settings become the background to erase, and
-/// the step stays on.
-pub fn color_range_confirmed(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Value {
-    let Some(id) = f.get("__dtfHalftone").and_then(Value::as_u64) else { return Value::Null };
-    let range: Map<String, Value> = f.iter().filter(|(k, _)| !matches!(k.as_str(), "__colorRange" | "__dtfHalftone" | "__label")).map(|(k, v)| (k.clone(), v.clone())).collect();
-    if let Some(d) = app.ui.dialog_mut(id) {
-        d.fields.insert(HALFTONE_RANGE.into(), Value::Object(range));
-        d.fields.insert(HALFTONE_ERASE.into(), json!(true));
-    }
-    json!({})
-}
-
-/// DTF Halftone's params: `removeBackground` and `colorRange` from the step's own fields (the
-/// values a remembered dialog brought back are dropped).
-pub fn halftone_params(f: &Map<String, Value>, params: &mut Value) {
-    if !is_halftone(f) {
-        return;
-    }
-    let Value::Object(p) = params else { return };
-    p.remove("removeBackground");
-    p.remove("colorRange");
-    if f.get(HALFTONE_ERASE).and_then(Value::as_bool) == Some(true)
-        && let Some(range) = f.get(HALFTONE_RANGE).and_then(Value::as_object)
-    {
-        p.insert("removeBackground".into(), json!(true));
-        p.insert("colorRange".into(), crate::color_range_ui::params(range));
-    }
-}
-
 /// Under a DTF filter's dialog (DTF Halftone…), while its preview is computed: a progress bar
 /// with the share done, so a heavy file shows that the preview is on its way.
 pub fn preview_progress(app: &PhotocraftApp, ui: &mut egui::Ui, fields: &Map<String, Value>) {
@@ -773,6 +668,12 @@ pub(crate) fn modal_window(app: &PhotocraftApp) -> bool {
 /// DTF menu: a DTF tool opens its window (with no parameters; with parameters the command runs,
 /// for automation). `None` for other commands.
 pub fn menu(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Value, String>> {
+    // Color Range…: Select › Color Range's dialog, whose OK erases the range on a copy (no lock,
+    // nothing remembered). A DTF window open would keep the image from its eyedroppers: it closes.
+    if id == photocraft_engine::dtf_cmds::COLOR_RANGE && params.as_object().is_none_or(|o| o.is_empty()) {
+        close_window(app);
+        return Some(Ok(json!({"dialog": crate::color_range_ui::open_dtf(app)})));
+    }
     if !TOOLS.contains(&id) || params.as_object().is_some_and(|o| !o.is_empty()) {
         return None;
     }
@@ -1287,6 +1188,55 @@ mod tests {
         assert!(app.ui.dtf_panel.window.is_none());
     }
 
+    /// DTF › Color Range… (before DTF Halftone…) opens Select › Color Range's dialog from zero, no
+    /// lock; OK without a sample keeps it open; a click on the image samples the background and OK
+    /// erases it on a copy "Sans fond", the source hidden and whole.
+    #[test]
+    fn dtf_color_range_erases_the_picked_background_on_a_copy() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        app.run("file.new", json!({"width": 40, "height": 40, "resolution": 300, "background": "white"})).unwrap();
+        // The visual's layer: a black square on a white background.
+        app.run("layer.new.layer", json!({})).unwrap();
+        app.run("select.all", json!({})).unwrap();
+        app.run("edit.fill", json!({"color": "#ffffff"})).unwrap();
+        app.run("select.rect", json!({"x": 10, "y": 10, "width": 20, "height": 20})).unwrap();
+        app.run("edit.fill", json!({"color": "#000000"})).unwrap();
+        app.run("select.deselect", json!({})).unwrap();
+        let ids: Vec<&str> = crate::menu_catalog::CATALOG.iter().filter(|(path, _, _, id)| path == &["DTF"] && *id != "---").map(|(_, _, _, id)| *id).collect();
+        let at = |id: &str| ids.iter().position(|i| *i == id).unwrap();
+        assert_eq!(at(photocraft_engine::dtf_cmds::COLOR_RANGE) + 1, at(photocraft_engine::dtf_cmds::HALFTONE), "just before DTF Halftone…");
+        let source = app.session.active().unwrap().active_layer.unwrap();
+        // A DTF window open closes: its modal would keep the eyedroppers off the image.
+        open_window(&mut app, "dtf.saturation");
+        crate::menus::invoke(&mut app, &ctx, photocraft_engine::dtf_cmds::COLOR_RANGE, json!({})).unwrap();
+        assert!(app.ui.dtf_panel.window.is_none());
+        let d = app.ui.dialogs.last().unwrap().clone();
+        assert!(crate::color_range_ui::owns(&d.fields) && crate::color_range_ui::dtf(&d.fields));
+        assert!(!LOCKABLE.contains(&photocraft_engine::dtf_cmds::COLOR_RANGE), "no lock");
+        // No sample: OK is refused, nothing done.
+        let layers = app.session.active().unwrap().doc.layer_count();
+        assert!(crate::dialogs::confirm(&mut app, d.id).is_err());
+        assert!(app.ui.dialogs.iter().any(|x| x.id == d.id), "still open");
+        assert_eq!(app.session.active().unwrap().doc.layer_count(), layers);
+        // The background clicked on the image, then OK.
+        assert!(crate::color_range_ui::pick_top(&mut app, [2.0, 2.0], egui::Modifiers::NONE));
+        crate::dialogs::confirm(&mut app, d.id).unwrap();
+        let st = app.session.active().unwrap();
+        let copy = st.active_layer.unwrap();
+        assert_ne!(copy, source);
+        assert_eq!(st.doc.layer(copy).unwrap().name, photocraft_engine::dtf_cmds::CUTOUT_LAYER);
+        assert!(!st.doc.layer(source).unwrap().visible, "the source is hidden");
+        let alpha = |layer, x: i32, y: i32| st.doc.layer(layer).unwrap().surface().unwrap().read_region(photocraft_geom::Rect::new(x, y, x + 1, y + 1))[3];
+        assert_eq!(alpha(copy, 2, 2), 0.0, "the white background is erased");
+        assert_eq!(alpha(copy, 20, 20), 1.0, "the black square stays");
+        assert_eq!(alpha(source, 2, 2), 1.0, "the source is whole");
+        // Opened again: from zero (no sample).
+        crate::menus::invoke(&mut app, &ctx, photocraft_engine::dtf_cmds::COLOR_RANGE, json!({})).unwrap();
+        let f = &app.ui.dialogs.last().unwrap().fields;
+        assert!(f["points"].as_array().unwrap().is_empty());
+    }
+
     /// Every DTF tool is in the DTF menu under its window's title, and a click opens that window
     /// (never the old settings dialog), as the menu bar runs it.
     #[test]
@@ -1325,7 +1275,7 @@ mod tests {
         assert_eq!(f.get("trim"), Some(&json!(true)));
         let ht = parse_spec(photocraft_engine::commands::find("filter.dtf.halftone").unwrap().params);
         let keys: Vec<&str> = ht.iter().map(|p| p.key.as_str()).collect();
-        assert_eq!(keys, ["mode", "frequency", "angle", "shape", "minDot", "maxDot", "inBlack", "inWhite", "gamma", "removeBackground", "colorRange"]);
+        assert_eq!(keys, ["mode", "frequency", "angle", "shape", "minDot", "maxDot", "inBlack", "inWhite", "gamma"]);
         assert!(matches!(&ht[1].kind, Kind::Range { default, .. } if *default == 25.0));
         let up = parse_spec(photocraft_engine::commands::find("dtf.upscale").unwrap().params);
         assert!(up.iter().any(|p| p.key == "keepPrintSize" && p.kind == Kind::Bool(true)), "{up:?}");
@@ -1780,50 +1730,6 @@ mod tests {
         assert!(h.query_by_label_contains("Renforcer ou atténuer").is_some(), "the sheet opens");
     }
 
-    /// DTF Halftone's Remove Background step: unchecked at each opening (a remembered choice
-    /// doesn't bring it back); "Color Range…" opens Color Range over it, without samples the
-    /// first time; its eyedropper picks on the image; OK hands the settings to DTF Halftone
-    /// (no selection made), and the params carry them; Cancel changes nothing.
-    #[test]
-    fn halftone_takes_the_background_from_a_color_range_popup() {
-        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
-        app.run("file.new", json!({"width": 30, "height": 20, "resolution": 300, "background": "white"})).unwrap();
-        let halftone = photocraft_engine::dtf_cmds::HALFTONE;
-        app.session.prefs.edit(|p| p.dialogs.insert(halftone.into(), json!({"removeBackground": true, "colorRange": {"points": [[1, 1]]}})));
-        let _ = crate::filter_dialog::open(&mut app, halftone);
-        let id = app.ui.dialogs.last().unwrap().id;
-        let fields = |app: &PhotocraftApp| app.ui.dialogs.iter().find(|d| d.id == id).unwrap().fields.clone();
-        let p = crate::filter_dialog::params_of(&fields(&app));
-        assert!(p.get("removeBackground").is_none() && p.get("colorRange").is_none(), "unchecked when it opens: {p}");
-        // Checked, "Color Range…": the popup over DTF Halftone.
-        if let Some(d) = app.ui.dialog_mut(id) {
-            d.fields.insert(HALFTONE_ERASE.into(), json!(true));
-            d.fields.insert(OPEN_RANGE.into(), json!(true));
-        }
-        open_color_range_requested(&mut app, id);
-        let popup = app.ui.dialogs.last().unwrap().clone();
-        assert_ne!(popup.id, id);
-        assert!(crate::color_range_ui::owns(&popup.fields) && crate::color_range_ui::dtf(&popup.fields));
-        assert!(crate::color_range_ui::params(&popup.fields).get("points").is_none(), "no sample the first time");
-        // Two clicks on the image (the second with Shift), then OK.
-        let mut f = popup.fields.clone();
-        crate::color_range_ui::pick(&app, &mut f, [3.0, 4.0], egui::Modifiers::NONE);
-        crate::color_range_ui::pick(&app, &mut f, [10.0, 5.0], egui::Modifiers::SHIFT);
-        crate::color_range_ui::confirm(&mut app, &f).unwrap();
-        assert!(app.session.active().unwrap().doc.selection.is_none(), "no selection made");
-        let p = crate::filter_dialog::params_of(&fields(&app));
-        assert_eq!(p["removeBackground"], json!(true));
-        assert_eq!(p["colorRange"]["points"], json!([[3.0, 4.0], [10.0, 5.0]]));
-        // The command takes them: the white background is erased on the copy.
-        let mut params = p.clone();
-        params["mode"] = json!("semiTransparent");
-        app.run(halftone, params).unwrap();
-        let d = app.session.active().unwrap();
-        let a = d.doc.layer(d.active_layer.unwrap()).unwrap().surface().unwrap().read_region(photocraft_geom::Rect::new(3, 4, 4, 5))[3];
-        assert_eq!(a, 0.0);
-        assert_eq!(range_summary(fields(&app).get(HALFTONE_RANGE).and_then(Value::as_object)), "2 samples");
-    }
-
     /// Every tool window but Print Conformity opens locked; Reset (unlocked only) brings the
     /// factory values, previewed and saved only by Apply; the cut-out's eyedropper locks, its
     /// holes don't.
@@ -2041,20 +1947,6 @@ mod tests {
         let mut halftoned = visual();
         halftoned.execute("filter.dtf.halftone", json!({"mode": "semiTransparent", "frequency": 25})).unwrap();
         shot(halftoned, "halftone", &|_| {});
-        // DTF Halftone with its Remove Background step on, then its Color Range popup.
-        let with_step = |app: &mut PhotocraftApp, popup: bool| {
-            let _ = crate::filter_dialog::open(app, photocraft_engine::dtf_cmds::HALFTONE);
-            let id = app.ui.dialogs.last().map(|d| d.id).unwrap_or_default();
-            if let Some(d) = app.ui.dialog_mut(id) {
-                d.fields.insert(HALFTONE_ERASE.into(), json!(true));
-                d.fields.insert(OPEN_RANGE.into(), json!(popup));
-            }
-            if popup {
-                open_color_range_requested(app, id);
-            }
-        };
-        shot(visual(), "halftone_fond", &|app| with_step(app, false));
-        shot(visual(), "halftone_plage", &|app| with_step(app, true));
         // DTF Halftone's dialog: the Automatic tab (presets), then Manual (locked).
         shot(visual(), "halftone_auto", &|app| {
             let _ = crate::filter_dialog::open(app, photocraft_engine::dtf_cmds::HALFTONE);
@@ -2123,5 +2015,36 @@ mod tests {
         let mut app = PhotocraftApp::new(logo(), crate::Services::default());
         sun(&mut app, crate::color_analyzer_ui::View::Original, true);
         std::fs::write(dir.join("fiche.pdf"), crate::color_sheet::pdf(&app.color_analyzer.as_ref().unwrap().sheet())).unwrap();
+        // DTF › Color Range…: a visual on a white, slightly uneven background, sampled on the image.
+        let on_white = || {
+            let mut s = photocraft_engine::Session::new();
+            s.execute("file.new", json!({"width": 600, "height": 400, "resolution": 300, "background": "transparent"})).unwrap();
+            s.edit("Visual", |doc, active| {
+                let surf = doc.layer_mut(active.unwrap()).unwrap().surface_mut().unwrap();
+                for y in 0..400 {
+                    for x in 0..600 {
+                        let d = ((x as f32 - 300.0).powi(2) + (y as f32 - 200.0).powi(2)).sqrt();
+                        let shade = 0.93 + 0.07 * (x as f32 / 600.0);
+                        let px = if d < 140.0 { [0.85, 0.2 + d / 600.0, 0.15, 1.0] } else { [shade, shade, shade, 1.0] };
+                        surf.write_pixel(x, y, &px);
+                    }
+                }
+                Ok(())
+            })
+            .unwrap();
+            s
+        };
+        let range = |app: &mut PhotocraftApp, apply: bool| {
+            let ctx = egui::Context::default();
+            crate::menus::invoke(app, &ctx, photocraft_engine::dtf_cmds::COLOR_RANGE, json!({})).unwrap();
+            crate::color_range_ui::pick_top(app, [20.0, 20.0], egui::Modifiers::NONE);
+            crate::color_range_ui::pick_top(app, [580.0, 380.0], egui::Modifiers::SHIFT);
+            if apply {
+                let id = app.ui.dialogs.last().unwrap().id;
+                crate::dialogs::confirm(app, id).unwrap();
+            }
+        };
+        shot(on_white(), "plage_couleurs", &|app| range(app, false));
+        shot(on_white(), "plage_couleurs_appliquee", &|app| range(app, true));
     }
 }

@@ -1192,10 +1192,6 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
     crate::dtf_help::sheet_ui(ui, f, &cmd);
     let mut tip_from: Option<(String, f32)> = None;
     for p in parse_spec(&spec) {
-        // DTF Craft: DTF Halftone's Remove Background step is drawn above the rows (`dtf_panel`).
-        if cmd == photocraft_engine::dtf_cmds::HALFTONE && matches!(p.key.as_str(), "removeBackground" | "colorRange") {
-            continue;
-        }
         // DTF Craft: Remove White Background's colour only shows once detection on the edges is
         // off, and the minimum hole size once interior holes are on.
         if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE
@@ -1509,10 +1505,7 @@ fn random_seed(entropy: u64, current: i64) -> i64 {
 pub fn params_of(f: &Map<String, Value>) -> Value {
     // A document picker left at "None" (-1) means "not given".
     let unset = |k: &str, v: &Value| k == "mapDocument" && v.as_i64() == Some(-1);
-    let mut params = Value::Object(f.iter().filter(|(k, v)| !k.starts_with("__") && !unset(k, v)).map(|(k, v)| (k.clone(), v.clone())).collect());
-    // DTF Craft: DTF Halftone's Remove Background step, from its own fields.
-    crate::dtf_panel::halftone_params(f, &mut params);
-    params
+    Value::Object(f.iter().filter(|(k, v)| !k.starts_with("__") && !unset(k, v)).map(|(k, v)| (k.clone(), v.clone())).collect())
 }
 
 /// Filter › Distort › Displace confirmed with no map: no open document picked and no path typed

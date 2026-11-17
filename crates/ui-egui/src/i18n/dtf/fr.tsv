@@ -447,6 +447,5 @@
 # DTF Craft (31)
 	Computing the preview…	Calcul de l'aperçu…
 # DTF Craft (32)
-	1 · Remove the Background (Color Range)	1 · Supprimer le fond (plage de couleurs)
-	2 · Screen	2 · Trame
 	No sample: click the background on the image	Aucun échantillon : cliquez le fond sur l'image
+	OK erases the range on a copy of the layer (white in the preview = erased).	OK efface la plage sur une copie du calque (blanc dans l'aperçu = effacé).

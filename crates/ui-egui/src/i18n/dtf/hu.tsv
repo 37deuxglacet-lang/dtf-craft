@@ -403,6 +403,5 @@
 # DTF Craft (31)
 	Computing the preview…	Előnézet számítása…
 # DTF Craft (32)
-	1 · Remove the Background (Color Range)	1 · Háttér eltávolítása (színtartomány)
-	2 · Screen	2 · Raszter
 	No sample: click the background on the image	Nincs minta: kattintson a háttérre a képen
+	OK erases the range on a copy of the layer (white in the preview = erased).	Az OK a réteg másolatán törli a tartományt (fehér az előnézetben = törölve).
