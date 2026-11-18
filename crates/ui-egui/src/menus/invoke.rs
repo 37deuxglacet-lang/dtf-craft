@@ -131,6 +131,9 @@ fn invoke_early_commands(app: &mut PhotocraftApp, ctx: &egui::Context, id: &str,
         return Some(crate::symmetry_ui::begin(app).map(|_| Value::Null));
     }
     // DTF Craft: the training and quote requests (DTF and Help menus).
+    if let Some(r) = crate::beta::menu(app, id) {
+        return Some(r);
+    }
     if let Some(r) = crate::offers::menu(app, ctx, id) {
         return Some(r);
     }

@@ -459,3 +459,24 @@
 	None: click the eyedropper, then a colour to keep (an outline's black).	Tidak ada: klik pipet, lalu warna yang ingin dipertahankan (hitam kontur).
 	Remove {color}	Hapus {color}
 	Highlight Changes	Sorot perubahan
+# DTF Craft (35)
+	Gang Sheet (beta)…	Gang sheet (beta)…
+	Report a Bug…	Laporkan bug…
+	Module in Beta	Modul beta
+	{module} is still being developed. It may have bugs and change from one version to the next. Check your files before printing.	{module} masih dikembangkan. Mungkin ada bug dan berubah dari versi ke versi. Periksa file Anda sebelum mencetak.
+	Found a bug? Report it: every report helps finish the module.	Menemukan bug? Laporkan: setiap laporan membantu menyelesaikan modul.
+	Don't show again for this version	Jangan tampilkan lagi untuk versi ini
+	Continue	Lanjutkan
+	Report a Bug	Laporkan bug
+	BETA	BETA
+	Complete the report, then copy it into an e-mail to {address} (with a screenshot if you can).	Lengkapi laporan, lalu salin ke email untuk {address} (dengan tangkapan layar jika bisa).
+	Subject	Subjek
+	Subject:	Subjek:
+	Copy the Report	Salin laporan
+	Open in Mail	Buka di email
+	Opens the report in your mail program, if one is installed	Membuka laporan di program email Anda, jika ada yang terpasang
+	Close	Tutup
+	Report copied: paste it into an e-mail to {address}.	Laporan disalin: tempel ke email untuk {address}.
+	Report opened in your mail program: complete it, then send it.	Laporan dibuka di email Anda: lengkapi lalu kirim.
+	A report to complete and copy into an e-mail	Laporan untuk dilengkapi dan disalin ke email
+	Report	Laporan

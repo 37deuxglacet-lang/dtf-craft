@@ -1707,6 +1707,8 @@ pub fn open(app: &mut PhotocraftApp) {
             d.prefs = p;
         }
         app.gang_sheet = Some(d);
+        // In beta: its window, the first time in this version.
+        crate::beta::opened(app, cmd::GANG_SHEET);
     }
 }
 
@@ -2293,6 +2295,7 @@ struct Actions {
     add_document: bool,
     export: bool,
     cancel: bool,
+    report_bug: bool,
 }
 
 pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
@@ -2308,6 +2311,9 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         svg_dialog(app, ctx);
     });
     save_prefs(app);
+    if act.report_bug {
+        crate::beta::report(app, Some(cmd::GANG_SHEET));
+    }
     if act.add_files {
         pick_files(app);
     }
@@ -2429,9 +2435,12 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
     p.galley(pos2(x + wa, y), gb, MAGENTA);
     ui.interact(ERect::from_min_size(pos2(x, y), vec2(wa + wb, 20.0)), ui.scope_id().with("gang-title"), Sense::hover())
         .widget_info(|| egui::WidgetInfo::labeled(egui::Role::Label, true, title));
-    x += wa + wb + 28.0;
-    // Cancel and Export, right-aligned.
-    let buttons = ERect::from_min_max(pos2(rect.right() - 330.0, rect.top()), rect.max).shrink2(vec2(16.0, 10.0));
+    // In beta: its badge after the title.
+    let mut bx = ui.new_child(egui::UiBuilder::new().max_rect(ERect::from_min_size(pos2(x + wa + wb + 8.0, rect.center().y - 10.0), vec2(60.0, 20.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+    let badge = crate::beta::badge(&mut bx);
+    x = badge.rect.right() + 24.0;
+    // Report a Bug, Cancel and Export, right-aligned.
+    let buttons = ERect::from_min_max(pos2(rect.right() - 470.0, rect.top()), rect.max).shrink2(vec2(16.0, 10.0));
     let mut b = ui.new_child(egui::UiBuilder::new().max_rect(buttons).layout(egui::Layout::right_to_left(egui::Align::Center)));
     let any = d.sheets.iter().any(|s| !s.placed.is_empty());
     let label = if d.sheets.len() > 1 { tl!("Export Sheets (PNG)…") } else { tl!("Export PNG…") };
@@ -2440,6 +2449,10 @@ fn header_bar(ui: &mut egui::Ui, d: &mut GangSheetDialog, rect: ERect, t: &Token
     }
     if widgets::secondary_button(&mut b, tl!("Cancel"), 90.0).clicked() {
         act.cancel = true;
+    }
+    b.add_space(8.0);
+    if b.link(tl!("Report a Bug")).on_hover_text(tl!("A report to complete and copy into an e-mail")).clicked() {
+        act.report_bug = true;
     }
     // The sheet tabs, up to the buttons.
     let end = buttons.left() - 16.0;
@@ -4526,6 +4539,8 @@ mod tests {
                 invoke(&mut app, &ctx, json!({"select": [2, 3], "group": true}));
                 invoke(&mut app, &ctx, json!({"select": [0, 1], "group": true}));
                 invoke(&mut app, &ctx, json!({"select": [0, 1, 2, 3, 4]}));
+                // The beta window shown once: not in this capture.
+                app.beta = Default::default();
                 app
             });
             h.state_mut().session.prefs.edit(|p| p.interface.language = "fr".into());
@@ -4549,10 +4564,31 @@ mod tests {
             if let Some(d) = app.gang_sheet.as_mut() {
                 d.closed[SECTION_PREFS] = false;
             }
+            // The beta window shown once: not in this capture.
+            app.beta = Default::default();
             app
         });
         h.run_steps(8);
         h.render().unwrap().save(dir.join("gang_preferences.png")).unwrap();
+        // The beta window as the gang sheet opens, then the bug report.
+        for (name, report) in [("gang_beta", false), ("gang_rapport", true)] {
+            let mut h = egui_kittest::Harness::builder().with_size(vec2(1366.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
+                PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
+                let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+                crate::dtf_panel::dtf_craft_startup(&mut app);
+                app.run("file.new", json!({"width": 900, "height": 600, "resolution": 300, "background": "transparent"})).unwrap();
+                app.run("edit.fill", json!({"color": "#c8102e"})).unwrap();
+                let ctx = cc.egui_ctx.clone();
+                invoke(&mut app, &ctx, json!({"addDocument": true}));
+                if report {
+                    app.beta = Default::default();
+                    crate::beta::report(&mut app, Some(cmd::GANG_SHEET));
+                }
+                app
+            });
+            h.run_steps(8);
+            h.render().unwrap().save(dir.join(format!("{name}.png"))).unwrap();
+        }
         reset_settings();
     }
 

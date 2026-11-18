@@ -144,6 +144,8 @@ mod tests {
                 "help.reportIssue",
                 // DTF Craft: no Check for Updates (PhotoCraft's releases).
                 "---",
+                // DTF Craft: Report a Bug (a report to copy into an e-mail).
+                "help.reportBug",
                 "help.systemInfo",
                 "help.about"
             ]

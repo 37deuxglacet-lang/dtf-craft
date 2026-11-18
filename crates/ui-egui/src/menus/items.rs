@@ -198,6 +198,8 @@ pub fn menu_items(app: &PhotocraftApp) -> Vec<MenuItem> {
     }
     // DTF Craft: the training and quote requests, in French (DTF and Help menus).
     crate::offers::insert_menu_items(&mut items);
+    // DTF Craft: Help › Report a Bug….
+    crate::beta::insert_menu_items(&mut items);
     // Window: the open documents in tab order, after a separator, the active one checked.
     if let Some(last) = items.iter().rposition(|i| i.path.first().map(String::as_str) == Some("Window")) {
         let window = || vec!["Window".to_string()];

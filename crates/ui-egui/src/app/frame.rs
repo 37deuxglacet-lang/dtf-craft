@@ -390,6 +390,8 @@ impl PhotocraftApp {
         crate::dtf_panel::poll_vectorize(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         crate::gang_sheet_ui::show(self, &ctx);
+        // DTF Craft: a beta module's window and the bug report, above them.
+        crate::beta::show(self, &ctx);
         canvas::extra_windows(self, &ctx);
         notices::show(self, &ctx);
         updates_ui::show(self, &ctx);

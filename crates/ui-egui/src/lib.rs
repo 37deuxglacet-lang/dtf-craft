@@ -62,6 +62,8 @@ pub mod theme;
 // ---- DTF Craft ----
 pub mod color_analyzer_ui;
 pub mod color_sheet;
+/// DTF Craft: the beta modules' window and the bug report.
+pub mod beta;
 /// DTF Craft: DTF › Flat Color…'s own rows (protected colours, preview views).
 pub mod dtf_flat_ui;
 pub mod dtf_help;
@@ -660,6 +662,8 @@ pub struct PhotocraftApp {
     pub(crate) wide_angle: Option<wide_angle_ui::WideAngleDialog>,
     /// DTF › Gang Sheet dialog (gang_sheet_ui, DTF Craft).
     pub(crate) gang_sheet: Option<gang_sheet_ui::GangSheetDialog>,
+    /// DTF Craft: the beta window and the bug report open (beta).
+    pub(crate) beta: beta::BetaState,
     /// DTF Craft: the start screen's Pixabay illustration.
     pub(crate) home_image: home_image::HomeImage,
     /// ⌘Z history of each open parameter dialog (edit_history).

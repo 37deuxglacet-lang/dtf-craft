@@ -22,7 +22,7 @@ produit officiel du projet PhotoCraft.
 | Aplat couleur… | Nettoie le liseré sombre de 1 à 3 px qu'un Agrandissement IA laisse sur les bords des formes en aplat, sans toucher aux contours voulus. Fenêtre propre avec aperçu en direct (pleine résolution) et barre de progression ; Appliquer agit sur le calque actif (Édition › Annuler revient en arrière). Les couleurs sont regroupées en une palette (k-means en L*a*b*), découpée en formes ; chaque forme reprend sa couleur dominante (médiane de ses pixels à plus de 4 px du bord, sinon sa couleur de palette) ; seuls les pixels de la bande de bord plus sombres que la forme et de sa teinte sont corrigés ; un pixel ambigu prend la couleur de la majorité de ses voisins ; un liseré assez épais pour former sa propre couleur est comparé à la forme voisine. Réglages : nombre de couleurs auto (case) ou 2 à 32, largeur de bande 2 px (1 à 5), seuil d'assombrissement ΔL* 8 (0 à 40), tolérance de teinte ΔE 15 (0 à 50), bords nets (défaut) ou anticrénelage 1 px, couleurs protégées prises à la pipette sur l'image (jamais remplacées ; clic sur une pastille pour la retirer, Effacer), « Afficher l'avant », « Surligner les modifications » (pixels corrigés en magenta dans l'aperçu seulement). La transparence ne change pas. Aide « ? » et infobulles |
 | Plage de couleurs… | L'outil Plage de couleurs complet de PhotoCraft, dans sa propre fenêtre, sans verrou, remis à zéro à chaque ouverture : Sélection (couleurs échantillonnées, familles de teintes, tons clairs / moyens / foncés, tons chair, couleurs non imprimables), clusters de couleurs localisés et étendue, tolérance, plages de tons, pipettes échantillon / ajouter / soustraire sur l'image (Maj+clic, Alt+clic), Inverser, vignette Sélection / Image (blanc = effacé). OK efface la plage sur une copie « Sans fond » du calque, progressivement selon la tolérance ; l'original est masqué et intact ; une seule étape d'historique. Sans échantillon, OK est refusé et rien n'est effacé. Une sélection active limite la zone traitée et reste en place. À utiliser avant le Halftone DTF |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat, avec une barre de progression sous les réglages pendant son calcul. La trame est calculée par bandes sur la copie : peu de mémoire de travail, même sur un gros fichier. Réglages toujours modifiables (pas de verrou) |
-| Gang sheet… | Fenêtre plein écran claire, aux couleurs du logo DTF Craft : import, réglages, plusieurs planches en onglets, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
+| Gang sheet (bêta)… | Module en bêta. Fenêtre plein écran claire, aux couleurs du logo DTF Craft : import, réglages, plusieurs planches en onglets, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
 | Vectorisation… | Module plein écran (comme Camera Raw) : le visuel est réduit à une palette (8 couleurs par défaut, 2 à 16) puis nettoyé (les liserés trop fins d'une couleur intermédiaire entre deux autres, typiques des bords flous ou JPEG, reviennent à la plus proche des deux ; les contours sont lissés à la couleur majoritaire du voisinage, sans dents ni marches, à une échelle fixée par le niveau de détail) et tracé en formes vectorielles découpées, une couleur unie par forme, sans superposition. Réglages : type de visuel (logo · aplats / illustration · nuances), niveau de détail, lissage (courbes / angles vifs), suppression du fond lu au bord du visuel, joints fermés entre couleurs (chaque forme déborde d'un demi-pixel sur ses voisines ; à décocher pour un traceur de découpe). Aperçu original / vectorisé / côte à côte, contours, zoom jusqu'à 800 % (Ctrl+molette, boutons − / +, double-clic ; glisser ou molette pour se déplacer ; les deux images suivent en côte à côte ; la partie visible du vectorisé est redessinée nette à la résolution de l'écran), palette où décocher une couleur la retire du SVG. Nuancier de référence partagé avec l'Analyseur couleur : référence la plus proche et ΔE 2000 par couleur détectée, « Changer… », case ↔ (auto jusqu'à ΔE 5) qui remplace la couleur par la référence dans l'aperçu et le SVG, formes nommées d'après la référence (id SVG, calques à l'ouverture). Fiche PDF A4 : original et vectorisé côte à côte, couleurs du SVG et leurs références. Deux moteurs au choix : « DTF Craft » (ci-dessus) et « VectorCraft » (Image Trace de VectorCraft, copié sans modification) avec ses 15 préréglages et tous ses réglages : mode (noir et blanc avec seuil, niveaux de gris, couleur, logo aplats), palette (limitée, tons continus, automatique, ou le nuancier de référence), couleurs, détail couleur, tracés, angles, bruit, méthode (juxtaposée / superposée), remplissages et traits en lignes centrales avec leur épaisseur, ignorer une couleur, accrocher les courbes aux lignes, formes exactes, dégradés linéaires ; la table des couleurs, le nuancier, la fiche PDF et l'export sont les mêmes avec les deux moteurs. Export SVG à la taille d'impression du document, ouvert en option dans un nouvel onglet en calques de forme ; le document n'est pas modifié. Traceurs : visioncortex (MIT OR Apache-2.0) et VectorCraft Image Trace (ArtCraft Team et contributeurs VectorCraft, MIT OR Apache-2.0) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
@@ -84,16 +84,19 @@ Ctrl+Alt+Z annule puis rétablit le dernier changement avant « Appliquer ».
 
 ## Gang sheet
 
-DTF › Gang sheet… ouvre une fenêtre plein écran, toujours claire (quel que soit le thème), aux
+Module en **bêta** : « (bêta) » après son entrée de menu, pastille BÊTA dans son en-tête, fenêtre
+d'avertissement à l'ouverture (voir « Modules bêta et signalement des bugs »).
+
+DTF › Gang sheet (bêta)… ouvre une fenêtre plein écran, toujours claire (quel que soit le thème), aux
 couleurs du logo DTF Craft : panneaux blancs et gris mauve, magenta pour Exporter, la sélection,
 les cases et la fin de planche, bleu pour Importer et Construction auto. Échap ou Annuler la
 referme.
 
-- **En-tête** : logo, « Gang sheet », un onglet par planche (nom et nombre d'exemplaires à
+- **En-tête** : logo, « Gang sheet », pastille BÊTA, un onglet par planche (nom et nombre d'exemplaires à
   imprimer, par exemple « Gang sheet 1 · ×1 » ; clic : afficher la planche ; double-clic : la
   renommer ; croix : fermer la planche, ses visuels restant dans la liste, sauf quand il n'en reste
-  qu'une) et « + » (nouvelle planche), puis Annuler et Exporter le PNG… (ou Exporter les
-  planches quand il y en a plusieurs).
+  qu'une) et « + » (nouvelle planche), puis Signaler un bug, Annuler et Exporter le PNG… (ou
+  Exporter les planches quand il y en a plusieurs).
 - **Colonne de gauche** : zone d'import (« Importer des images », PNG ou SVG, ou fichiers glissés
   sur la fenêtre ; « Ajouter le document ouvert », aplati), puis **Construction auto**, puis la
   liste des visuels : une ligne par visuel avec vignette, nom, taille d'impression et résolution,
@@ -192,6 +195,23 @@ retournements), elle reprend la mise en place donnée. Marges : `edgeMargin` (bo
 (entre visuels), en mm ; `marginMm` par visuel. `columns` (construction par la commande) range
 les visuels dans les cases, sans espacement ; laize par défaut 42 cm. Un `path` SVG est rendu à
 sa taille d'impression.
+
+## Modules bêta et signalement des bugs
+
+Un module en bêta (aujourd'hui le Gang sheet) porte « (bêta) » après son entrée de menu et une
+pastille BÊTA dans sa fenêtre. À sa première ouverture dans une version, une fenêtre « Module en
+version bêta » explique qu'il est en cours de développement, peut comporter des bugs et évoluer
+d'une version à l'autre (vérifier ses fichiers avant impression) ; boutons Signaler un bug et
+Continuer, case « Ne plus afficher pour cette version » (gardée dans les préférences, la fenêtre
+revient à la version suivante).
+
+**Signaler un bug** (fenêtre bêta, en-tête du module bêta, Aide › Signaler un bug…) ouvre un
+rapport à compléter dans la fenêtre : ce que j'ai fait, ce qui s'est passé, ce que j'attendais,
+puis la version de DTF Craft (et son commit), le système, le module, le document (taille en px,
+résolution) et le dernier message affiché. **Copier le rapport** le met dans le presse-papiers
+avec son objet, à coller dans un e-mail à contact@stephane-glacet.com (capture d'écran à joindre
+soi-même) ; **Ouvrir dans la messagerie** l'ouvre dans le logiciel de messagerie, s'il y en a un.
+Rien n'est envoyé sans l'utilisateur.
 
 ## Agrandissement IA
 

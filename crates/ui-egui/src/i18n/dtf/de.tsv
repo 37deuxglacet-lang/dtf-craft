@@ -460,3 +460,24 @@
 	None: click the eyedropper, then a colour to keep (an outline's black).	Keine: Pipette anklicken, dann eine zu behaltende Farbe (das Schwarz einer Kontur).
 	Remove {color}	{color} entfernen
 	Highlight Changes	Änderungen hervorheben
+# DTF Craft (35)
+	Gang Sheet (beta)…	Gang Sheet (Beta)…
+	Report a Bug…	Fehler melden…
+	Module in Beta	Modul in der Beta
+	{module} is still being developed. It may have bugs and change from one version to the next. Check your files before printing.	{module} wird noch entwickelt. Es kann Fehler enthalten und sich von Version zu Version ändern. Prüfen Sie Ihre Dateien vor dem Druck.
+	Found a bug? Report it: every report helps finish the module.	Einen Fehler gefunden? Melden Sie ihn: Jede Meldung hilft, das Modul fertigzustellen.
+	Don't show again for this version	Für diese Version nicht mehr anzeigen
+	Continue	Weiter
+	Report a Bug	Fehler melden
+	BETA	BETA
+	Complete the report, then copy it into an e-mail to {address} (with a screenshot if you can).	Ergänzen Sie den Bericht und kopieren Sie ihn in eine E-Mail an {address} (wenn möglich mit Bildschirmfoto).
+	Subject	Betreff
+	Subject:	Betreff:
+	Copy the Report	Bericht kopieren
+	Open in Mail	In E-Mail öffnen
+	Opens the report in your mail program, if one is installed	Öffnet den Bericht in Ihrem E-Mail-Programm, falls eines installiert ist
+	Close	Schließen
+	Report copied: paste it into an e-mail to {address}.	Bericht kopiert: Fügen Sie ihn in eine E-Mail an {address} ein.
+	Report opened in your mail program: complete it, then send it.	Bericht im E-Mail-Programm geöffnet: ergänzen und senden.
+	A report to complete and copy into an e-mail	Ein Bericht zum Ergänzen und Kopieren in eine E-Mail
+	Report	Bericht

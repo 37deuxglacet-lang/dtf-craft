@@ -67,7 +67,7 @@ pub fn tool_name(command: &str) -> Option<&'static str> {
     })
 }
 
-fn system() -> &'static str {
+pub(crate) fn system() -> &'static str {
     match std::env::consts::OS {
         "windows" => "Windows",
         "macos" => "macOS",
@@ -77,7 +77,7 @@ fn system() -> &'static str {
 }
 
 /// `text` for a `mailto:` field: every byte outside the unreserved characters as `%XX`.
-fn encode(text: &str) -> String {
+pub(crate) fn encode(text: &str) -> String {
     let mut out = String::with_capacity(text.len() * 2);
     for b in text.bytes() {
         if b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.' | b'~') {

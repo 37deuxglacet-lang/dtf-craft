@@ -465,3 +465,24 @@
 	None: click the eyedropper, then a colour to keep (an outline's black).	Ninguno: haga clic en el cuentagotas y luego en un color que conservar (el negro de un contorno).
 	Remove {color}	Quitar {color}
 	Highlight Changes	Resaltar los cambios
+# DTF Craft (35)
+	Gang Sheet (beta)…	Gang sheet (beta)…
+	Report a Bug…	Informar de un error…
+	Module in Beta	Módulo en beta
+	{module} is still being developed. It may have bugs and change from one version to the next. Check your files before printing.	{module} sigue en desarrollo. Puede tener errores y cambiar de una versión a otra. Revise sus archivos antes de imprimir.
+	Found a bug? Report it: every report helps finish the module.	¿Ha encontrado un error? Infórmelo: cada aviso ayuda a terminar el módulo.
+	Don't show again for this version	No volver a mostrar en esta versión
+	Continue	Continuar
+	Report a Bug	Informar de un error
+	BETA	BETA
+	Complete the report, then copy it into an e-mail to {address} (with a screenshot if you can).	Complete el informe y cópielo en un correo a {address} (con una captura si es posible).
+	Subject	Asunto
+	Subject:	Asunto:
+	Copy the Report	Copiar el informe
+	Open in Mail	Abrir en el correo
+	Opens the report in your mail program, if one is installed	Abre el informe en su programa de correo, si hay uno instalado
+	Close	Cerrar
+	Report copied: paste it into an e-mail to {address}.	Informe copiado: péguelo en un correo a {address}.
+	Report opened in your mail program: complete it, then send it.	Informe abierto en su correo: complételo y envíelo.
+	A report to complete and copy into an e-mail	Un informe para completar y copiar en un correo
+	Report	Informe

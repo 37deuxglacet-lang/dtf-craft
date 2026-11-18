@@ -59,7 +59,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/app.rs` | initial state of the DTF modules |
 | `crates/ui-egui/src/app/commands.rs` | cut-out's Toggle Last State |
 | `crates/ui-egui/src/app/files.rs` | Save As starts from the save hint |
-| `crates/ui-egui/src/app/frame.rs` | DTF windows each frame, drops onto the Gang Sheet |
+| `crates/ui-egui/src/app/frame.rs` | DTF windows each frame, drops onto the Gang Sheet, the beta window and bug report |
 | `crates/ui-egui/src/canvas/filter_preview.rs` | previews driven by the DTF panel; Flat Color's Show Before and Highlight Changes |
 | `crates/ui-egui/src/canvas/start_screen.rs` | hands the start screen to `dtf_home.rs` |
 | `crates/ui-egui/src/canvas/tabs.rs` | `paint_dots` made `pub(crate)` |
@@ -83,8 +83,8 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/links.rs` | DTF Craft links, Stéphane Glacet's sites |
 | `crates/ui-egui/src/menu_catalog.rs` | DTF menu, DTF workspace |
 | `crates/ui-egui/src/menus.rs` | DTF menu, modal DTF windows |
-| `crates/ui-egui/src/menus/invoke.rs` | DTF menu commands, DTF workspace |
-| `crates/ui-egui/src/menus/items.rs` | training and quote requests in the menus |
+| `crates/ui-egui/src/menus/invoke.rs` | DTF menu commands, DTF workspace, Help › Report a Bug |
+| `crates/ui-egui/src/menus/items.rs` | training and quote requests in the menus, Help › Report a Bug |
 | `crates/ui-egui/src/menus/menu_keys/harness_tests.rs` | keyboard tests with the DTF menu between Filter and View |
 | `crates/ui-egui/src/menus/menu_nav/tests.rs` | tests with About DTF Craft |
 | `crates/ui-egui/src/menus/native_menu.rs` | macOS app menu name |
@@ -112,7 +112,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/widgets/tests.rs` | test of the typed-only field |
 | `crates/ui-egui/src/widgets/units.rs` | typed-only number fields (Gang Sheet) |
 
-## Added (42)
+## Added (43)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -142,6 +142,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 - `assets/icons/wrench.svg`
 - `crates/algo/src/dtf_color.rs`
 - `crates/algo/src/dtf_flat.rs`
+- `crates/ui-egui/src/beta.rs`
 - `crates/ui-egui/src/dtf_flat_ui.rs`
 - `crates/engine/src/dtf_color_cmds.rs`
 - `crates/ui-egui/src/color_analyzer_ui.rs`
