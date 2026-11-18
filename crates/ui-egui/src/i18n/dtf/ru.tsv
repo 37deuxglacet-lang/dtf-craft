@@ -589,3 +589,8 @@
 	Lasso: taken from the chosen zone	Лассо: вычтено из выбранной зоны
 	The open document has no selection	В открытом документе нет выделения
 	The open document must be the photo's size ({w} × {h} px)	Открытый документ должен быть размером с фото ({w} × {h} пикс.)
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	Уменьшить (Ctrl −)
+	Zoom In (Ctrl +)	Увеличить (Ctrl +)
+	Fit	Вписать
+	The whole photo (Ctrl 0)	Всё фото (Ctrl 0)

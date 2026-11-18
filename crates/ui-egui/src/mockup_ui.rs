@@ -68,6 +68,8 @@ const SECTION_RENDER: usize = 2;
 const SECTION_EXPORT: usize = 3;
 /// The transform palette's width on the photo.
 const PALETTE_W: f32 = 150.0;
+/// The closest zoom: screen points per photo pixel.
+const MAX_ZOOM: f32 = 8.0;
 
 // ---------------------------------------------------------------- state
 
@@ -555,6 +557,12 @@ pub struct MockupDialog {
     /// The zones' edges drawn over the preview, rebuilt when they change.
     overlay: Option<TextureHandle>,
     overlay_dirty: bool,
+    /// The zoomed view (none: the photo fitted) and the canvas it was last drawn in.
+    view: Option<View>,
+    canvas_rect: Option<ERect>,
+    /// Zoom with Scroll Wheel, Zoom with Trackpad Pinch, Animated Zoom, Enable Gestures (the
+    /// canvas's preferences).
+    nav: [bool; 4],
 }
 
 impl MockupDialog {
@@ -584,6 +592,9 @@ impl MockupDialog {
             lasso: Vec::new(),
             overlay: None,
             overlay_dirty: true,
+            view: None,
+            canvas_rect: None,
+            nav: [false, true, true, true],
         }
     }
 
@@ -637,6 +648,7 @@ impl MockupDialog {
         self.lasso.clear();
         self.lassoing = false;
         self.overlay_dirty = true;
+        self.view = None;
         for it in &mut self.items {
             it.zone = ZoneChoice::Auto;
         }
@@ -817,6 +829,8 @@ impl MockupDialog {
     /// The closed lasso applied as the mode says.
     fn close_lasso(&mut self) {
         let pts = std::mem::take(&mut self.lasso);
+        // One zone a lasso: the button turns off.
+        self.lassoing = false;
         let Some(ph) = &self.photo else { return };
         if pts.len() < 3 {
             return;
@@ -1486,6 +1500,16 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
                 _ => false,
             })
         });
+    let prefs = app.session.prefs();
+    let nav = [
+        prefs.general.zoom_with_scroll_wheel,
+        prefs.enhanced_controls.zoom_with_trackpad_pinch,
+        prefs.general.animated_zoom,
+        prefs.enhanced_controls.touch_gestures,
+    ];
+    if let Some(d) = app.mockup.as_mut() {
+        d.nav = nav;
+    }
     light_scope(ctx, || draw(app, ctx, has_doc, &mut act));
     if act.report_bug {
         crate::beta::report(app, Some(cmd::MOCKUP));
@@ -2120,20 +2144,33 @@ fn status_bar(ui: &mut egui::Ui, d: &MockupDialog, rect: ERect, t: &Tokens) {
 }
 
 /// The ruler along `edge` (top or left of the photo, `horizontal`), a tick each cm.
-fn ruler(p: &egui::Painter, photo: ERect, horizontal: bool, cm_px: f32, t: &Tokens) {
+fn ruler(p: &egui::Painter, photo: ERect, inner: ERect, horizontal: bool, cm_px: f32, t: &Tokens) {
+    // Along the visible part of the photo, at its edge or the canvas's when it is zoomed past it.
     let band = if horizontal {
-        ERect::from_min_max(pos2(photo.left(), photo.top() - RULER), pos2(photo.right(), photo.top() - 2.0))
+        let top = photo.top().max(inner.top());
+        ERect::from_min_max(pos2(photo.left().max(inner.left()), top - RULER), pos2(photo.right().min(inner.right()), top - 2.0))
     } else {
-        ERect::from_min_max(pos2(photo.left() - RULER, photo.top()), pos2(photo.left() - 2.0, photo.bottom()))
+        let left = photo.left().max(inner.left());
+        ERect::from_min_max(pos2(left - RULER, photo.top().max(inner.top())), pos2(left - 2.0, photo.bottom().min(inner.bottom())))
     };
+    if band.width() <= 0.0 || band.height() <= 0.0 {
+        return;
+    }
     p.rect_filled(band, 3.0, Color32::from_rgba_unmultiplied(255, 255, 255, 200));
     // Thin ticks when a cm is too narrow: every 5.
     let step = if cm_px < 4.0 { 5 } else { 1 };
-    let label_every = if cm_px * 10.0 < 34.0 { 20 } else { 10 };
-    let len = if horizontal { photo.width() } else { photo.height() };
-    let mut k = 0;
-    while (k as f32) * cm_px <= len + 0.5 {
-        let at = k as f32 * cm_px;
+    let label_every = if cm_px * 10.0 < 34.0 {
+        20
+    } else if cm_px * 5.0 >= 34.0 {
+        5
+    } else {
+        10
+    };
+    let (origin, from, to) = if horizontal { (photo.left(), band.left(), band.right()) } else { (photo.top(), band.top(), band.bottom()) };
+    let first = (((from - origin) / cm_px).ceil().max(0.0) as u64).div_ceil(step as u64) as i64 * step;
+    let mut k = first;
+    while origin + k as f32 * cm_px <= to + 0.5 {
+        let at = origin + k as f32 * cm_px;
         let tick = if k % 10 == 0 {
             9.0
         } else if k % 5 == 0 {
@@ -2143,16 +2180,14 @@ fn ruler(p: &egui::Painter, photo: ERect, horizontal: bool, cm_px: f32, t: &Toke
         };
         let stroke = Stroke::new(1.0, t.text_faint);
         if horizontal {
-            let x = photo.left() + at;
-            p.line_segment([pos2(x, band.bottom()), pos2(x, band.bottom() - tick)], stroke);
-            if k % label_every == 0 && k > 0 && x + 20.0 < band.right() {
-                p.text(pos2(x + 2.0, band.top() + 1.0), Align2::LEFT_TOP, k.to_string(), FontId::proportional(9.5), t.text_dim);
+            p.line_segment([pos2(at, band.bottom()), pos2(at, band.bottom() - tick)], stroke);
+            if k % label_every == 0 && k > 0 && at + 20.0 < band.right() {
+                p.text(pos2(at + 2.0, band.top() + 1.0), Align2::LEFT_TOP, k.to_string(), FontId::proportional(9.5), t.text_dim);
             }
         } else {
-            let y = photo.top() + at;
-            p.line_segment([pos2(band.right(), y), pos2(band.right() - tick, y)], stroke);
-            if k % label_every == 0 && k > 0 && y + 14.0 < band.bottom() {
-                p.text(pos2(band.left() + 1.0, y + 2.0), Align2::LEFT_TOP, k.to_string(), FontId::proportional(9.5), t.text_dim);
+            p.line_segment([pos2(band.right(), at), pos2(band.right() - tick, at)], stroke);
+            if k % label_every == 0 && k > 0 && at + 14.0 < band.bottom() {
+                p.text(pos2(band.left() + 1.0, at + 2.0), Align2::LEFT_TOP, k.to_string(), FontId::proportional(9.5), t.text_dim);
             }
         }
         k += step;
@@ -2169,9 +2204,89 @@ fn pill(p: &egui::Painter, at: Pos2, text: &str, fill: Color32, color: Color32) 
 
 /// Where the photo lies in the canvas: its rect on screen and the screen points per photo pixel.
 fn photo_rect(canvas: ERect, pw: f32, ph: f32) -> (ERect, f32) {
-    let inner = ERect::from_min_max(canvas.min + vec2(PALETTE_W + 24.0 + RULER, RULER + 16.0), canvas.max - vec2(16.0, 16.0));
-    let z = (inner.width() / pw).min(inner.height() / ph).max(1e-4);
-    (ERect::from_center_size(inner.center(), vec2(pw * z, ph * z)), z)
+    view_rect(canvas, pw, ph, None)
+}
+
+/// Where the photo's frame is drawn in the canvas: right of the palette, inside the rulers.
+fn inner_rect(canvas: ERect) -> ERect {
+    ERect::from_min_max(canvas.min + vec2(PALETTE_W + 24.0 + RULER, RULER + 16.0), canvas.max - vec2(16.0, 16.0))
+}
+
+/// The photo fitted in the canvas's frame: screen points per photo pixel.
+fn fit_zoom(canvas: ERect, pw: f32, ph: f32) -> f32 {
+    let inner = inner_rect(canvas);
+    (inner.width() / pw).min(inner.height() / ph).max(1e-4)
+}
+
+/// The photo's rect on screen and its zoom: fitted, or `view` (zoom, the photo point at the frame's
+/// centre).
+fn view_rect(canvas: ERect, pw: f32, ph: f32, view: Option<View>) -> (ERect, f32) {
+    let inner = inner_rect(canvas);
+    let fit = fit_zoom(canvas, pw, ph);
+    match view {
+        Some(v) if v.zoom > fit * 1.0001 => {
+            let z = v.zoom.min(MAX_ZOOM);
+            let min = inner.center() - vec2(v.center[0] as f32 * z, v.center[1] as f32 * z);
+            (ERect::from_min_size(min, vec2(pw * z, ph * z)), z)
+        }
+        _ => (ERect::from_center_size(inner.center(), vec2(pw * fit, ph * fit)), fit),
+    }
+}
+
+/// The zoomed view of the photo: screen points per photo pixel and the photo point at the frame's
+/// centre.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct View {
+    zoom: f32,
+    center: [f64; 2],
+}
+
+impl MockupDialog {
+    /// The photo's size and the canvas it was last drawn in.
+    fn frame(&self) -> Option<(ERect, f32, f32)> {
+        let ph = self.photo.as_ref()?;
+        Some((self.canvas_rect?, ph.width as f32, ph.height as f32))
+    }
+
+    /// The zoom as it is (fitted or not).
+    fn zoom_now(&self) -> Option<f32> {
+        let (c, pw, ph) = self.frame()?;
+        Some(view_rect(c, pw, ph, self.view).1)
+    }
+
+    /// Zoomed to `zoom` keeping the photo point under `at` (screen) where it is; at the fitted
+    /// zoom or below, fitted.
+    fn zoom_to(&mut self, zoom: f32, at: Pos2) {
+        let Some((c, pw, ph)) = self.frame() else { return };
+        let fit = fit_zoom(c, pw, ph);
+        let (rect, z) = view_rect(c, pw, ph, self.view);
+        let zoom = zoom.clamp(fit, MAX_ZOOM);
+        if zoom <= fit * 1.0001 {
+            self.view = None;
+            return;
+        }
+        let q = [f64::from((at.x - rect.left()) / z), f64::from((at.y - rect.top()) / z)];
+        let mid = inner_rect(c).center();
+        let center = [q[0] - f64::from((at.x - mid.x) / zoom), q[1] - f64::from((at.y - mid.y) / zoom)];
+        self.view = Some(View { zoom, center: [center[0].clamp(0.0, f64::from(pw)), center[1].clamp(0.0, f64::from(ph))] });
+    }
+
+    /// One rung of the zoom ladder in (1) or out (-1), about `at` (screen; the frame's centre).
+    fn zoom_step(&mut self, dir: i32, at: Option<Pos2>) {
+        let Some((c, pw, ph)) = self.frame() else { return };
+        let z = self.zoom_now().unwrap_or(1.0);
+        let next = crate::zoom_levels::step_in_range(z, dir, fit_zoom(c, pw, ph), MAX_ZOOM);
+        self.zoom_to(next, at.unwrap_or(inner_rect(c).center()));
+    }
+
+    /// The zoomed photo moved by `delta` screen points (no move while fitted).
+    fn pan(&mut self, delta: egui::Vec2) {
+        let Some((_, pw, ph)) = self.frame() else { return };
+        if let Some(v) = self.view.as_mut() {
+            v.center =
+                [(v.center[0] - f64::from(delta.x / v.zoom)).clamp(0.0, f64::from(pw)), (v.center[1] - f64::from(delta.y / v.zoom)).clamp(0.0, f64::from(ph))];
+        }
+    }
 }
 
 /// The Transform palette over the canvas's top left: Edit › Transform's six tools.
@@ -2216,13 +2331,38 @@ fn palette(ui: &mut egui::Ui, d: &mut MockupDialog, canvas: ERect, t: &Tokens) {
 /// The photo, the visuals' outlines, the reference line and the rulers; the line drawn, its ends,
 /// the visuals moved and transformed with the mouse.
 fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
-    let p = ui.painter_at(rect);
-    p.rect_filled(rect, 0.0, t.canvas);
+    let bg = ui.painter_at(rect);
+    bg.rect_filled(rect, 0.0, t.canvas);
+    d.canvas_rect = Some(rect);
     let Some((pw, ph)) = d.photo.as_ref().map(|ph| (ph.width as f32, ph.height as f32)) else {
-        p.text(rect.center(), Align2::CENTER_CENTER, tl!("Start with the product's photo (step 1)."), FontId::proportional(14.0), t.text_faint);
+        bg.text(rect.center(), Align2::CENTER_CENTER, tl!("Start with the product's photo (step 1)."), FontId::proportional(14.0), t.text_faint);
         return;
     };
-    let (photo, z) = photo_rect(rect, pw, ph);
+    // The mouse wheel and the trackpad as on DTF Craft's canvas: scroll, or zoom about the pointer.
+    let inner = inner_rect(rect);
+    let hovered = ui.rect_contains_pointer(inner);
+    let [zoom_with_wheel, pinch, animated, touch] = d.nav;
+    let wheel = crate::wheel_nav::read_with(ui.ctx(), zoom_with_wheel, pinch, animated, ui.scope_id().with("mockup-wheel"), hovered, false, touch);
+    if hovered {
+        ui.input_mut(|i| i.smooth_scroll_delta = egui::Vec2::ZERO);
+        let at = ui.input(|i| i.pointer.hover_pos()).unwrap_or(inner.center());
+        match wheel {
+            Some(crate::wheel_nav::Wheel::Zoom(f)) => {
+                let z = d.zoom_now().unwrap_or(1.0);
+                d.zoom_to(z * f, at);
+            }
+            Some(crate::wheel_nav::Wheel::SnapZoom(n)) => {
+                for _ in 0..n.unsigned_abs() {
+                    d.zoom_step(n.signum(), Some(at));
+                }
+            }
+            Some(crate::wheel_nav::Wheel::Pan(delta)) => d.pan(delta),
+            None => {}
+        }
+    }
+    let (photo, z) = view_rect(rect, pw, ph, d.view);
+    // The photo and all on it stay inside the frame; the rulers go round it.
+    let p = ui.painter_at(inner);
     let to_screen = |q: [f64; 2]| pos2(photo.left() + q[0] as f32 * z, photo.top() + q[1] as f32 * z);
     let to_photo = |s: Pos2| [f64::from((s.x - photo.left()) / z), f64::from((s.y - photo.top()) / z)];
     if let Some(tex) = &d.shown {
@@ -2235,8 +2375,8 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     let ppcm = d.ppcm();
     if let Some(k) = ppcm {
         let cm_px = k as f32 * z;
-        ruler(&p, photo, true, cm_px, t);
-        ruler(&p, photo, false, cm_px, t);
+        ruler(&bg, photo, inner, true, cm_px, t);
+        ruler(&bg, photo, inner, false, cm_px, t);
     }
     // The visuals' outlines, the selected one in magenta with its size and its tool's handles.
     let k = ppcm.unwrap_or(1.0);
@@ -2305,7 +2445,7 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     if d.drawing {
         pill(
             &p,
-            pos2(photo.center().x, photo.top() + 18.0),
+            pos2(photo.center().x.clamp(inner.left() + 160.0, inner.right() - 160.0), photo.top().max(inner.top()) + 18.0),
             tl!("Drag along a length you know (the chest width, say)"),
             Color32::from_rgb(255, 248, 214),
             Color32::from_rgb(107, 86, 0),
@@ -2314,8 +2454,26 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     // The mouse.
     let resp = ui.interact(rect, ui.scope_id().with("mockup-photo"), Sense::click_and_drag());
     resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Image, true, tl!("Product Photo")));
+    // The hand: Space held, or the middle button, moves the zoomed photo; whatever tool is on
+    // (the lasso keeps its points) waits.
+    let space = !ui.ctx().text_edit_focused() && ui.input(|i| i.key_down(egui::Key::Space));
+    let middle = resp.dragged_by(egui::PointerButton::Middle);
+    if space || middle {
+        if resp.dragged() {
+            d.pan(resp.drag_delta());
+        }
+        let _ = resp.clone().on_hover_cursor(crate::tool_cursor::hand(ui.ctx(), resp.dragged()));
+        if d.lassoing {
+            lasso_outline(d, &p, None, photo, z);
+        }
+        d.drag = None;
+        zoom_bar(ui, d, inner, t);
+        palette(ui, d, rect, t);
+        return;
+    }
     if d.lassoing {
         lasso(d, &p, &resp, photo, z);
+        zoom_bar(ui, d, inner, t);
         palette(ui, d, rect, t);
         return;
     }
@@ -2440,7 +2598,31 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
             }
         });
     }
+    zoom_bar(ui, d, inner, t);
     palette(ui, d, rect, t);
+}
+
+/// The zoom at the frame's bottom right: −, the zoom in %, + and Fit.
+fn zoom_bar(ui: &mut egui::Ui, d: &mut MockupDialog, inner: ERect, t: &Tokens) {
+    let size = vec2(196.0, 30.0);
+    let r = ERect::from_min_size(inner.max - size - vec2(6.0, 6.0), size);
+    ui.painter().rect(r, 8.0, Color32::WHITE, Stroke::new(1.0, t.card_border), StrokeKind::Inside);
+    let mut bar = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(4.0, 3.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+    bar.spacing_mut().item_spacing.x = 4.0;
+    let z = d.zoom_now().unwrap_or(1.0);
+    if widgets::secondary_button(&mut bar, "−", 26.0).on_hover_text(tl!("Zoom Out (Ctrl −)")).clicked() {
+        d.zoom_step(-1, None);
+    }
+    let pct = format!("{} %", (z * 100.0).round());
+    let (lr, _) = bar.allocate_exact_size(vec2(52.0, 22.0), Sense::hover());
+    bar.painter().text(lr.center(), Align2::CENTER_CENTER, pct, FontId::proportional(12.0), t.text);
+    if widgets::secondary_button(&mut bar, "+", 26.0).on_hover_text(tl!("Zoom In (Ctrl +)")).clicked() {
+        d.zoom_step(1, None);
+    }
+    let fit = bar.add_enabled_ui(d.view.is_some(), |ui| widgets::secondary_button(ui, tl!("Fit"), 66.0)).inner;
+    if fit.on_hover_text(tl!("The whole photo (Ctrl 0)")).clicked() {
+        d.view = None;
+    }
 }
 
 /// The polygonal lasso on the photo: a click adds a point, a click on the first point or a double
@@ -2465,8 +2647,14 @@ fn lasso(d: &mut MockupDialog, p: &egui::Painter, resp: &egui::Response, photo: 
             d.lasso.push([q[0].clamp(0.0, w), q[1].clamp(0.0, h)]);
         }
     }
+    lasso_outline(d, p, resp.hover_pos(), photo, z);
+}
+
+/// The lasso's points so far, the outline to the pointer, the first point and the mode.
+fn lasso_outline(d: &MockupDialog, p: &egui::Painter, hover: Option<Pos2>, photo: ERect, z: f32) {
+    let to_screen = |q: [f64; 2]| pos2(photo.left() + q[0] as f32 * z, photo.top() + q[1] as f32 * z);
     let mut pts: Vec<Pos2> = d.lasso.iter().map(|q| to_screen(*q)).collect();
-    if let Some(hover) = resp.hover_pos()
+    if let Some(hover) = hover
         && !pts.is_empty()
     {
         pts.push(hover);
@@ -2483,12 +2671,33 @@ fn lasso(d: &mut MockupDialog, p: &egui::Painter, resp: &egui::Response, photo: 
         ZoneMode::Add => tl!("Lasso: added to the chosen zone"),
         ZoneMode::Subtract => tl!("Lasso: taken from the chosen zone"),
     };
-    pill(p, pos2(photo.center().x, photo.top() + 18.0), hint, Color32::from_rgb(255, 248, 214), Color32::from_rgb(107, 86, 0));
+    let frame = p.clip_rect();
+    pill(
+        p,
+        pos2(photo.center().x.clamp(frame.left() + 120.0, frame.right() - 120.0), photo.top().max(frame.top()) + 18.0),
+        hint,
+        Color32::from_rgb(255, 248, 214),
+        Color32::from_rgb(107, 86, 0),
+    );
 }
 
 /// Delete removes the selected visual, the arrows move it (a mm, a cm with Shift), Enter or Esc
 /// leaves the transform tool (Esc also stops drawing the line).
 fn keys(d: &mut MockupDialog, ctx: &egui::Context) {
+    // Ctrl + / Ctrl − / Ctrl 0: zoom in, out, the whole photo.
+    let (zin, zout, fit) = ctx.input(|i| {
+        let c = i.modifiers.command;
+        (c && (i.key_pressed(egui::Key::Plus) || i.key_pressed(egui::Key::Equals)), c && i.key_pressed(egui::Key::Minus), c && i.key_pressed(egui::Key::Num0))
+    });
+    if zin {
+        d.zoom_step(1, None);
+    }
+    if zout {
+        d.zoom_step(-1, None);
+    }
+    if fit {
+        d.view = None;
+    }
     let (del, esc, enter, shift, arrows) = ctx.input(|i| {
         (
             i.key_pressed(egui::Key::Delete) || i.key_pressed(egui::Key::Backspace),
@@ -2801,6 +3010,46 @@ mod tests {
         let _ = std::fs::remove_dir_all(dir);
     }
 
+    /// The zoom keeps the photo point under the pointer, goes no further than 800 % nor below the
+    /// whole photo; the hand moves the zoomed photo; a closed lasso turns off.
+    #[test]
+    fn the_zoom_and_the_hand() {
+        let dir = temp_dir("zoom");
+        let (photo, _) = files(&dir, 600, 400, "#d8d8d8");
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        open(&mut app);
+        invoke(&mut app, &ctx, json!({"photo": photo}));
+        let canvas = ERect::from_min_size(pos2(320.0, 52.0), vec2(800.0, 800.0));
+        let d = app.mockup.as_mut().unwrap();
+        d.canvas_rect = Some(canvas);
+        let fit = fit_zoom(canvas, 600.0, 400.0);
+        let at = pos2(500.0, 300.0);
+        let (r0, z0) = view_rect(canvas, 600.0, 400.0, d.view);
+        let q0 = ((at.x - r0.left()) / z0, (at.y - r0.top()) / z0);
+        d.zoom_to(fit * 3.0, at);
+        let (r1, z1) = view_rect(canvas, 600.0, 400.0, d.view);
+        assert!((z1 - fit * 3.0).abs() < 1e-4);
+        let q1 = ((at.x - r1.left()) / z1, (at.y - r1.top()) / z1);
+        assert!((q0.0 - q1.0).abs() < 0.01 && (q0.1 - q1.1).abs() < 0.01, "{q0:?} {q1:?}");
+        d.pan(vec2(30.0, 0.0));
+        let (r2, _) = view_rect(canvas, 600.0, 400.0, d.view);
+        assert!((r2.left() - r1.left() - 30.0).abs() < 0.01, "the hand moves the photo");
+        d.zoom_to(100.0, at);
+        assert_eq!(d.zoom_now(), Some(MAX_ZOOM));
+        d.zoom_step(-1, None);
+        assert!(d.zoom_now().unwrap() < MAX_ZOOM);
+        d.zoom_to(fit * 0.5, at);
+        assert!(d.view.is_none(), "below the whole photo: fitted");
+        // The lasso turns off once its zone is closed.
+        invoke(&mut app, &ctx, json!({"zones": {"lassoOn": true}}));
+        assert!(app.mockup.as_ref().unwrap().lassoing);
+        let v = invoke(&mut app, &ctx, json!({"zones": {"lasso": [[10, 10], [100, 10], [100, 100]]}}));
+        assert_eq!(v["lasso"]["on"], false);
+        assert_eq!(v["zones"].as_array().unwrap().len(), 1);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
     /// Screenshots for review (`DTF_VISUALS=<folder>`, the photo from `MOCKUP_PHOTO` if set): the
     /// window in French with a photo, its scale and two visuals, the first selected; then empty.
     #[test]
@@ -2811,8 +3060,8 @@ mod tests {
         let dir = temp_dir("capture");
         let (flat, _) = files(&dir, 1000, 1000, "#e9e7e2");
         let photo = std::env::var("MOCKUP_PHOTO").unwrap_or(flat);
-        for (name, mode) in [("mockup", 1), ("mockup_vide", 0), ("mockup_deformer", 2), ("mockup_zones", 3)] {
-            let photo = if mode == 3 { std::env::var("MOCKUP_PHOTO4").unwrap_or_else(|_| photo.clone()) } else { photo.clone() };
+        for (name, mode) in [("mockup", 1), ("mockup_vide", 0), ("mockup_deformer", 2), ("mockup_zones", 3), ("mockup_zoom", 4)] {
+            let photo = if mode >= 3 { std::env::var("MOCKUP_PHOTO4").unwrap_or_else(|_| photo.clone()) } else { photo.clone() };
             let photo = photo.clone();
             let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
@@ -2853,6 +3102,16 @@ mod tests {
                         eprintln!("zones found: {}", v["zones"]);
                         invoke(&mut app, &ctx, json!({"visual": {"index": 0, "widthCm": 30, "x": 600, "y": 250}, "zones": {"select": 0}}));
                         invoke(&mut app, &ctx, json!({"visual": {"index": 1, "widthCm": 8, "x": 1100, "y": 200}, "select": 0}));
+                    }
+                    if mode == 4 {
+                        // Zoomed in on the front view's neck, a lasso half drawn (taking the collar
+                        // away from the front zone).
+                        invoke(&mut app, &ctx, json!({"scale": {"from": [337, 219], "to": [636, 219], "cm": 52}, "zones": {"auto": true}}));
+                        invoke(&mut app, &ctx, json!({"zones": {"select": 0, "mode": "subtract", "lassoOn": true}, "select": null}));
+                        if let Some(d) = app.mockup.as_mut() {
+                            d.view = Some(View { zoom: 2.4, center: [486.0, 160.0] });
+                            d.lasso = vec![[420.0, 92.0], [450.0, 118.0], [486.0, 128.0], [522.0, 118.0]];
+                        }
                     }
                 }
                 app.beta = Default::default();

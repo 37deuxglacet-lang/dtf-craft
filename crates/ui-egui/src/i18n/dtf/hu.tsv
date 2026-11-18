@@ -571,3 +571,8 @@
 	Lasso: taken from the chosen zone	Lasszó: kivonva a kiválasztott zónából
 	The open document has no selection	A megnyitott dokumentumban nincs kijelölés
 	The open document must be the photo's size ({w} × {h} px)	A megnyitott dokumentumnak a fénykép méretével kell egyeznie ({w} × {h} px)
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	Kicsinyítés (Ctrl −)
+	Zoom In (Ctrl +)	Nagyítás (Ctrl +)
+	Fit	Igazítás
+	The whole photo (Ctrl 0)	A teljes fénykép (Ctrl 0)

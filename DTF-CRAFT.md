@@ -245,6 +245,11 @@ le vêtement, à leur vraie taille.
   - Déformer : grille 4 × 4 de points de Bézier modifiables, ou un style (Arc, Arche,
     Renflement, Drapeau, Gonflement) avec sa courbure, horizontal ou vertical.
   Changer l'échelle (le repère) garde la taille en cm des visuels.
+- **Zoom** : comme le canevas de DTF Craft (préférences « Zoomer avec la molette », pincement,
+  zoom animé) : par défaut Alt + molette zoome autour du pointeur, la molette fait défiler ;
+  barre −, %, +, « Ajuster » en bas à droite ; Ctrl +, Ctrl −, Ctrl 0 ; jusqu'à 800 %. La main
+  (barre d'espace maintenue, ou bouton du milieu) déplace la photo zoomée sans interrompre
+  l'outil en cours : le lasso garde ses points. Le lasso se désactive une fois sa zone fermée.
 - **Barre d'état** : échelle, taille de la photo en cm, nombre de visuels, dernier message.
 
 Rendu : les plis déplacent l'encre selon la pente de la lumière floutée de la photo (jusqu'à

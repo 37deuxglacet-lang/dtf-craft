@@ -599,3 +599,8 @@
 	Lasso: taken from the chosen zone	套索：从所选区域减去
 	The open document has no selection	打开的文档没有选区
 	The open document must be the photo's size ({w} × {h} px)	打开的文档必须与照片尺寸相同（{w} × {h} 像素）
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	缩小（Ctrl −）
+	Zoom In (Ctrl +)	放大（Ctrl +）
+	Fit	适合
+	The whole photo (Ctrl 0)	整张照片（Ctrl 0）

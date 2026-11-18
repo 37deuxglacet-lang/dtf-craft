@@ -583,3 +583,8 @@
 	Lasso: taken from the chosen zone	Lasso: odjęte od wybranej strefy
 	The open document has no selection	Otwarty dokument nie ma zaznaczenia
 	The open document must be the photo's size ({w} × {h} px)	Otwarty dokument musi mieć rozmiar zdjęcia ({w} × {h} px)
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	Pomniejsz (Ctrl −)
+	Zoom In (Ctrl +)	Powiększ (Ctrl +)
+	Fit	Dopasuj
+	The whole photo (Ctrl 0)	Całe zdjęcie (Ctrl 0)

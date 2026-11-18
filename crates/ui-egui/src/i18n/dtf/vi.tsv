@@ -580,3 +580,8 @@
 	Lasso: taken from the chosen zone	Lasso: bớt khỏi vùng đã chọn
 	The open document has no selection	Tài liệu đang mở không có vùng chọn
 	The open document must be the photo's size ({w} × {h} px)	Tài liệu đang mở phải có kích thước của ảnh ({w} × {h} px)
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	Thu nhỏ (Ctrl −)
+	Zoom In (Ctrl +)	Phóng to (Ctrl +)
+	Fit	Vừa khung
+	The whole photo (Ctrl 0)	Toàn bộ ảnh (Ctrl 0)

@@ -584,3 +584,8 @@
 	Lasso: taken from the chosen zone	올가미: 선택한 영역에서 빼기
 	The open document has no selection	열린 문서에 선택 영역이 없습니다
 	The open document must be the photo's size ({w} × {h} px)	열린 문서는 사진과 같은 크기({w} × {h}px)여야 합니다
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	축소(Ctrl −)
+	Zoom In (Ctrl +)	확대(Ctrl +)
+	Fit	맞춤
+	The whole photo (Ctrl 0)	사진 전체(Ctrl 0)

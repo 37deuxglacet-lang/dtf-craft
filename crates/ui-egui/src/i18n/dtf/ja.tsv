@@ -580,3 +580,8 @@
 	Lasso: taken from the chosen zone	選択ツール：選択中のゾーンから削除
 	The open document has no selection	開いているドキュメントに選択範囲がありません
 	The open document must be the photo's size ({w} × {h} px)	開いているドキュメントは写真と同じサイズ（{w} × {h} px）である必要があります
+# DTF Craft (39)
+	Zoom Out (Ctrl −)	ズームアウト（Ctrl −）
+	Zoom In (Ctrl +)	ズームイン（Ctrl +）
+	Fit	全体表示
+	The whole photo (Ctrl 0)	写真全体（Ctrl 0）
