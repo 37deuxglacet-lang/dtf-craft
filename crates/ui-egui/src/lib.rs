@@ -73,6 +73,7 @@ pub mod dtf_i18n;
 pub(crate) mod dtf_home;
 pub mod dtf_panel;
 pub mod gang_sheet_ui;
+pub mod mockup_ui;
 /// DTF Craft: the start screen's background illustration, from Pixabay.
 pub mod home_image;
 /// DTF Craft: Stéphane Glacet's offers (training, quotes) in the DTF and Help menus.
@@ -662,6 +663,8 @@ pub struct PhotocraftApp {
     pub(crate) wide_angle: Option<wide_angle_ui::WideAngleDialog>,
     /// DTF › Gang Sheet dialog (gang_sheet_ui, DTF Craft).
     pub(crate) gang_sheet: Option<gang_sheet_ui::GangSheetDialog>,
+    /// DTF › Mockup window (mockup_ui, DTF Craft).
+    pub(crate) mockup: Option<mockup_ui::MockupDialog>,
     /// DTF Craft: the beta window and the bug report open (beta).
     pub(crate) beta: beta::BetaState,
     /// DTF Craft: the start screen's Pixabay illustration.

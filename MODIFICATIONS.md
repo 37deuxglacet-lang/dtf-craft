@@ -59,7 +59,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/app.rs` | initial state of the DTF modules |
 | `crates/ui-egui/src/app/commands.rs` | cut-out's Toggle Last State |
 | `crates/ui-egui/src/app/files.rs` | Save As starts from the save hint |
-| `crates/ui-egui/src/app/frame.rs` | DTF windows each frame, drops onto the Gang Sheet, the beta window and bug report |
+| `crates/ui-egui/src/app/frame.rs` | DTF windows each frame, drops onto the Gang Sheet and the Mockup, the beta window and bug report |
 | `crates/ui-egui/src/canvas/filter_preview.rs` | previews driven by the DTF panel; Flat Color's Show Before and Highlight Changes |
 | `crates/ui-egui/src/canvas/start_screen.rs` | hands the start screen to `dtf_home.rs` |
 | `crates/ui-egui/src/canvas/tabs.rs` | `paint_dots` made `pub(crate)` |
@@ -112,7 +112,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/widgets/tests.rs` | test of the typed-only field |
 | `crates/ui-egui/src/widgets/units.rs` | typed-only number fields (Gang Sheet) |
 
-## Added (43)
+## Added (45)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -143,6 +143,8 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 - `crates/algo/src/dtf_color.rs`
 - `crates/algo/src/dtf_flat.rs`
 - `crates/ui-egui/src/beta.rs`
+- `crates/engine/src/mockup_cmds.rs`
+- `crates/ui-egui/src/mockup_ui.rs`
 - `crates/ui-egui/src/dtf_flat_ui.rs`
 - `crates/engine/src/dtf_color_cmds.rs`
 - `crates/ui-egui/src/color_analyzer_ui.rs`

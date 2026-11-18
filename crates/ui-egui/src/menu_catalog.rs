@@ -666,6 +666,7 @@ pub static CATALOG: &[(&[&str], &str, Option<&str>, &str)] = &[
     (&["DTF"], "Color Analyzer…", None, "dtf.colorAnalyzer"),
     (&["DTF"], "---", None, "---"),
     (&["DTF"], "Gang Sheet (beta)…", None, "dtf.gangSheet"),
+    (&["DTF"], "Mockup (beta)…", None, "dtf.mockup"),
     (&["DTF"], "Vectorization…", None, "dtf.vectorize"),
     (&["View", "Proof Setup"], "Custom…", None, "view.proofSetup.custom"),
     (&["View", "Proof Setup"], "---", None, "---"),

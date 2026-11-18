@@ -489,3 +489,49 @@
 	Report opened in your mail program: complete it, then send it.	報告已在郵件中開啟：填寫後寄出。
 	A report to complete and copy into an e-mail	需填寫並複製到郵件中的報告
 	Report	報告
+# DTF Craft (36)
+	Mockup (beta)…	樣機（測試版）…
+	DTF Mockup	DTF 樣機
+	A photo, its scale and at least one visual	一張照片、它的比例和至少一個圖案
+	Add a visual first	請先加入圖案
+	At most {n} visuals	最多 {n} 個圖案
+	At the photo's resolution, then opened as a new document.	依照片解析度算繪，然後以新文件開啟。
+	Cancel	取消
+	Click a visual on the photo or in the list.	按一下照片上或清單中的圖案。
+	Delete	刪除
+	Drag along a length you know (the chest width, say)	沿已知長度拖曳（例如胸寬）
+	Drag along something whose length you know: the chest width, say	沿您知道長度的部位拖曳：例如胸寬
+	Draw a Reference Line on the Photo	在照片上畫參考線
+	Draw a line along a length you can measure on the garment, then type that length.	沿衣物上可測量的長度畫一條線，然後輸入該長度。
+	Draw the Line Again	重新畫線
+	Draw the reference line on the photo	請在照片上畫參考線
+	Each visual arrives at its print size: its pixels at its resolution.	每個圖案依其列印尺寸放置：像素依其解析度計算。
+	Export	轉存
+	Export…	轉存…
+	Fabric Shadows	布料陰影
+	Folds (Distortion)	皺褶（變形）
+	Height:	高度：
+	Import Images (PNG, SVG)	匯入影像（PNG、SVG）
+	Ink Opacity	墨水不透明度
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	其檔案列印尺寸為 {w} × {h} 公分：此尺寸僅用於樣機。
+	Keep Proportions	保持比例
+	Load a Photo (PNG, JPG)	載入照片（PNG、JPG）
+	Load a photo first	請先載入照片
+	No photo	沒有照片
+	No scale yet	尚未設定比例
+	On the middle of the reference line	放在參考線中間
+	Only a preview: what prints is your file.	僅為預覽：列印的是您的檔案。
+	Product Photo	產品照片
+	Real length:	實際長度：
+	Reference: {cm} cm	參考：{cm} 公分
+	Remove	移除
+	Remove {name}	移除 {name}
+	Rendering	算繪
+	Rotation:	旋轉：
+	Scale	比例
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	比例：1 公分 = {px} 像素 · 照片 {w} × {h} 公分 · {n} 個圖案
+	Set the scale first	請先設定比例
+	Start with the product's photo (step 1).	從產品照片開始（第 1 步）。
+	The garment from the front, flat or worn, in good light.	衣物正面照，平放或穿著，光線充足。
+	Width:	寬度：
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 照片上 1 公分 = {px} 像素 · 尺規單位為公分

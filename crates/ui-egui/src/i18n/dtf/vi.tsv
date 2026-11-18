@@ -470,3 +470,49 @@
 	Report opened in your mail program: complete it, then send it.	Đã mở báo cáo trong email: điền rồi gửi đi.
 	A report to complete and copy into an e-mail	Báo cáo cần điền và sao chép vào email
 	Report	Báo cáo
+# DTF Craft (36)
+	Mockup (beta)…	Mockup (beta)…
+	DTF Mockup	Mockup DTF
+	A photo, its scale and at least one visual	Một ảnh, tỷ lệ của ảnh và ít nhất một thiết kế
+	Add a visual first	Hãy thêm một thiết kế trước
+	At most {n} visuals	Tối đa {n} thiết kế
+	At the photo's resolution, then opened as a new document.	Theo độ phân giải của ảnh, rồi mở thành tài liệu mới.
+	Cancel	Hủy
+	Click a visual on the photo or in the list.	Nhấp vào một thiết kế trên ảnh hoặc trong danh sách.
+	Delete	Xóa
+	Drag along a length you know (the chest width, say)	Kéo dọc theo một độ dài đã biết (ví dụ chiều rộng ngực)
+	Drag along something whose length you know: the chest width, say	Kéo dọc theo thứ mà bạn biết độ dài: ví dụ chiều rộng ngực
+	Draw a Reference Line on the Photo	Vẽ đường tham chiếu trên ảnh
+	Draw a line along a length you can measure on the garment, then type that length.	Vẽ một đường dọc theo độ dài đo được trên áo, rồi nhập độ dài đó.
+	Draw the Line Again	Vẽ lại đường
+	Draw the reference line on the photo	Vẽ đường tham chiếu trên ảnh
+	Each visual arrives at its print size: its pixels at its resolution.	Mỗi thiết kế hiện ở kích thước in: điểm ảnh của nó theo độ phân giải của nó.
+	Export	Xuất
+	Export…	Xuất…
+	Fabric Shadows	Bóng của vải
+	Folds (Distortion)	Nếp gấp (biến dạng)
+	Height:	Chiều cao:
+	Import Images (PNG, SVG)	Nhập hình ảnh (PNG, SVG)
+	Ink Opacity	Độ mờ đục của mực
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	Tệp của nó in ở {w} × {h} cm: kích thước này chỉ áp dụng cho mockup.
+	Keep Proportions	Giữ tỷ lệ
+	Load a Photo (PNG, JPG)	Tải ảnh (PNG, JPG)
+	Load a photo first	Hãy tải ảnh trước
+	No photo	Không có ảnh
+	No scale yet	Chưa có tỷ lệ
+	On the middle of the reference line	Ở giữa đường tham chiếu
+	Only a preview: what prints is your file.	Chỉ là bản xem trước: thứ được in là tệp của bạn.
+	Product Photo	Ảnh sản phẩm
+	Real length:	Độ dài thật:
+	Reference: {cm} cm	Tham chiếu: {cm} cm
+	Remove	Gỡ
+	Remove {name}	Gỡ {name}
+	Rendering	Hiển thị
+	Rotation:	Xoay:
+	Scale	Tỷ lệ
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Tỷ lệ: 1 cm = {px} px · Ảnh {w} × {h} cm · {n} thiết kế
+	Set the scale first	Hãy đặt tỷ lệ trước
+	Start with the product's photo (step 1).	Bắt đầu với ảnh sản phẩm (bước 1).
+	The garment from the front, flat or worn, in good light.	Áo nhìn từ phía trước, trải phẳng hoặc đang mặc, đủ sáng.
+	Width:	Chiều rộng:
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px trên ảnh · thước theo cm

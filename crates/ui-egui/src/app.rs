@@ -190,6 +190,7 @@ impl PhotocraftApp {
             raw_redevelop: Vec::new(),
             wide_angle: None,
             gang_sheet: None,
+            mockup: None,
             beta: Default::default(),
             home_image: crate::home_image::HomeImage::default(),
             dialog_edits: Default::default(),

@@ -462,3 +462,49 @@
 	Report opened in your mail program: complete it, then send it.	Hlášení otevřeno v poště: doplňte ho a odešlete.
 	A report to complete and copy into an e-mail	Hlášení k doplnění a zkopírování do e-mailu
 	Report	Hlášení
+# DTF Craft (36)
+	Mockup (beta)…	Mockup (beta)…
+	DTF Mockup	DTF mockup
+	A photo, its scale and at least one visual	Fotografie, její měřítko a alespoň jeden motiv
+	Add a visual first	Nejprve přidejte motiv
+	At most {n} visuals	Nejvýše {n} motivů
+	At the photo's resolution, then opened as a new document.	V rozlišení fotografie, poté otevřeno jako nový dokument.
+	Cancel	Zrušit
+	Click a visual on the photo or in the list.	Klikněte na motiv na fotografii nebo v seznamu.
+	Delete	Odstranit
+	Drag along a length you know (the chest width, say)	Táhněte podél známé délky (třeba šířky hrudníku)
+	Drag along something whose length you know: the chest width, say	Táhněte podél něčeho, jehož délku znáte, třeba šířky hrudníku
+	Draw a Reference Line on the Photo	Nakreslit referenční čáru na fotografii
+	Draw a line along a length you can measure on the garment, then type that length.	Nakreslete čáru podél měřitelné délky na oděvu a zadejte tuto délku.
+	Draw the Line Again	Nakreslit čáru znovu
+	Draw the reference line on the photo	Nakreslete referenční čáru na fotografii
+	Each visual arrives at its print size: its pixels at its resolution.	Každý motiv má svou tiskovou velikost: své pixely ve svém rozlišení.
+	Export	Export
+	Export…	Exportovat…
+	Fabric Shadows	Stíny látky
+	Folds (Distortion)	Záhyby (deformace)
+	Height:	Výška:
+	Import Images (PNG, SVG)	Importovat obrázky (PNG, SVG)
+	Ink Opacity	Krytí barvy
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	Jeho soubor se tiskne ve velikosti {w} × {h} cm: tato velikost platí jen pro mockup.
+	Keep Proportions	Zachovat proporce
+	Load a Photo (PNG, JPG)	Načíst fotografii (PNG, JPG)
+	Load a photo first	Nejprve načtěte fotografii
+	No photo	Žádná fotografie
+	No scale yet	Zatím bez měřítka
+	On the middle of the reference line	Na střed referenční čáry
+	Only a preview: what prints is your file.	Jen náhled: tiskne se váš soubor.
+	Product Photo	Fotografie produktu
+	Real length:	Skutečná délka:
+	Reference: {cm} cm	Reference: {cm} cm
+	Remove	Odebrat
+	Remove {name}	Odebrat {name}
+	Rendering	Vykreslení
+	Rotation:	Otočení:
+	Scale	Měřítko
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Měřítko: 1 cm = {px} px · Fotografie {w} × {h} cm · motivy: {n}
+	Set the scale first	Nejprve nastavte měřítko
+	Start with the product's photo (step 1).	Začněte fotografií produktu (krok 1).
+	The garment from the front, flat or worn, in good light.	Oděv zepředu, rozložený nebo oblečený, dobře osvětlený.
+	Width:	Šířka:
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px na fotografii · pravítka v cm

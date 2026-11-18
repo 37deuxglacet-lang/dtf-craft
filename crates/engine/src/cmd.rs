@@ -1353,6 +1353,7 @@ fn build() -> Vec<CommandSpec> {
     v.extend(crate::dtf_cmds::specs());
     v.extend(crate::dtf_color_cmds::specs());
     v.extend(crate::gang_sheet_cmds::specs());
+    v.extend(crate::mockup_cmds::specs());
     v.extend(crate::dtf_vector_cmds::specs());
     v.extend(crate::color_to_alpha_cmds::specs());
     v.extend(crate::gallery_cmds::specs());

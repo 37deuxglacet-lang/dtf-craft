@@ -24,6 +24,7 @@ pub mod filters;
 pub mod dtf_cmds;
 pub mod dtf_color_cmds;
 pub mod gang_sheet_cmds;
+pub mod mockup_cmds;
 pub mod dtf_vector_cmds;
 pub mod filters_ext;
 mod group_options;

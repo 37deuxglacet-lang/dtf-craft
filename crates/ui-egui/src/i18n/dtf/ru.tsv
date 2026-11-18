@@ -479,3 +479,49 @@
 	Report opened in your mail program: complete it, then send it.	Отчёт открыт в почте: дополните и отправьте его.
 	A report to complete and copy into an e-mail	Отчёт, который нужно дополнить и скопировать в письмо
 	Report	Отчёт
+# DTF Craft (36)
+	Mockup (beta)…	Мокап (бета)…
+	DTF Mockup	DTF-мокап
+	A photo, its scale and at least one visual	Фото, его масштаб и хотя бы один макет
+	Add a visual first	Сначала добавьте макет
+	At most {n} visuals	Не более {n} макетов
+	At the photo's resolution, then opened as a new document.	В разрешении фото, затем открывается как новый документ.
+	Cancel	Отмена
+	Click a visual on the photo or in the list.	Щёлкните макет на фото или в списке.
+	Delete	Удалить
+	Drag along a length you know (the chest width, say)	Протяните вдоль известной длины (например, ширины груди)
+	Drag along something whose length you know: the chest width, say	Протяните вдоль того, длину чего вы знаете, например ширины груди
+	Draw a Reference Line on the Photo	Провести опорную линию на фото
+	Draw a line along a length you can measure on the garment, then type that length.	Проведите линию вдоль измеримой длины на изделии, затем введите эту длину.
+	Draw the Line Again	Провести линию заново
+	Draw the reference line on the photo	Проведите опорную линию на фото
+	Each visual arrives at its print size: its pixels at its resolution.	Каждый макет появляется в размере печати: его пиксели в его разрешении.
+	Export	Экспорт
+	Export…	Экспорт…
+	Fabric Shadows	Тени ткани
+	Folds (Distortion)	Складки (искажение)
+	Height:	Высота:
+	Import Images (PNG, SVG)	Импорт изображений (PNG, SVG)
+	Ink Opacity	Непрозрачность краски
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	Его файл печатается размером {w} × {h} см: этот размер действует только для мокапа.
+	Keep Proportions	Сохранять пропорции
+	Load a Photo (PNG, JPG)	Загрузить фото (PNG, JPG)
+	Load a photo first	Сначала загрузите фото
+	No photo	Нет фото
+	No scale yet	Масштаб ещё не задан
+	On the middle of the reference line	По центру опорной линии
+	Only a preview: what prints is your file.	Только предпросмотр: печатается ваш файл.
+	Product Photo	Фото изделия
+	Real length:	Реальная длина:
+	Reference: {cm} cm	Опора: {cm} см
+	Remove	Убрать
+	Remove {name}	Убрать {name}
+	Rendering	Отображение
+	Rotation:	Поворот:
+	Scale	Масштаб
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Масштаб: 1 см = {px} пикс. · Фото {w} × {h} см · макетов: {n}
+	Set the scale first	Сначала задайте масштаб
+	Start with the product's photo (step 1).	Начните с фото изделия (шаг 1).
+	The garment from the front, flat or worn, in good light.	Изделие спереди, разложенное или надетое, при хорошем свете.
+	Width:	Ширина:
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 см = {px} пикс. на фото · линейки в см

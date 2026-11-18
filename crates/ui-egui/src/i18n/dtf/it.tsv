@@ -461,3 +461,49 @@
 	Report opened in your mail program: complete it, then send it.	Rapporto aperto nella posta: completalo e invialo.
 	A report to complete and copy into an e-mail	Un rapporto da completare e copiare in un'e-mail
 	Report	Rapporto
+# DTF Craft (36)
+	Mockup (beta)…	Mockup (beta)…
+	DTF Mockup	Mockup DTF
+	A photo, its scale and at least one visual	Una foto, la sua scala e almeno una grafica
+	Add a visual first	Aggiungi prima una grafica
+	At most {n} visuals	Al massimo {n} grafiche
+	At the photo's resolution, then opened as a new document.	Alla risoluzione della foto, poi aperto come nuovo documento.
+	Cancel	Annulla
+	Click a visual on the photo or in the list.	Fai clic su una grafica nella foto o nell'elenco.
+	Delete	Elimina
+	Drag along a length you know (the chest width, say)	Trascina lungo una misura nota (la larghezza del petto, per esempio)
+	Drag along something whose length you know: the chest width, say	Trascina lungo qualcosa di cui conosci la lunghezza: la larghezza del petto, per esempio
+	Draw a Reference Line on the Photo	Traccia una linea di riferimento sulla foto
+	Draw a line along a length you can measure on the garment, then type that length.	Traccia una linea lungo una misura del capo, poi digita quella misura.
+	Draw the Line Again	Traccia di nuovo la linea
+	Draw the reference line on the photo	Traccia la linea di riferimento sulla foto
+	Each visual arrives at its print size: its pixels at its resolution.	Ogni grafica arriva alla sua dimensione di stampa: i suoi pixel alla sua risoluzione.
+	Export	Esporta
+	Export…	Esporta…
+	Fabric Shadows	Ombre del tessuto
+	Folds (Distortion)	Pieghe (deformazione)
+	Height:	Altezza:
+	Import Images (PNG, SVG)	Importa immagini (PNG, SVG)
+	Ink Opacity	Opacità dell'inchiostro
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	Il suo file si stampa a {w} × {h} cm: questa dimensione vale solo per il mockup.
+	Keep Proportions	Mantieni proporzioni
+	Load a Photo (PNG, JPG)	Carica una foto (PNG, JPG)
+	Load a photo first	Carica prima una foto
+	No photo	Nessuna foto
+	No scale yet	Ancora nessuna scala
+	On the middle of the reference line	Al centro della linea di riferimento
+	Only a preview: what prints is your file.	Solo un'anteprima: a essere stampato è il tuo file.
+	Product Photo	Foto del prodotto
+	Real length:	Lunghezza reale:
+	Reference: {cm} cm	Riferimento: {cm} cm
+	Remove	Rimuovi
+	Remove {name}	Rimuovi {name}
+	Rendering	Resa
+	Rotation:	Rotazione:
+	Scale	Scala
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Scala: 1 cm = {px} px · Foto {w} × {h} cm · {n} grafiche
+	Set the scale first	Indica prima la scala
+	Start with the product's photo (step 1).	Inizia dalla foto del prodotto (passo 1).
+	The garment from the front, flat or worn, in good light.	Il capo di fronte, steso o indossato, ben illuminato.
+	Width:	Larghezza:
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px sulla foto · righelli in cm

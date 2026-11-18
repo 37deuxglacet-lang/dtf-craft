@@ -359,6 +359,11 @@ fn rendition(v: &Visual, tw: i64, th: i64, o: Orientation) -> Result<Surface> {
     Ok(Surface::from_interleaved(format(), target, &bytes))
 }
 
+/// The visual at `tw × th` pixels, unturned (DTF › Mockup puts it on a photo).
+pub fn render_visual(v: &Visual, tw: i64, th: i64) -> Result<Surface> {
+    rendition(v, tw, th, Orientation::default())
+}
+
 /// How a visual is turned (`quarter` × 90° clockwise) and mirrored on the sheet.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Orientation {

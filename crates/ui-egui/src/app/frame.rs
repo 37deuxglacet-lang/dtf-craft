@@ -128,7 +128,10 @@ impl PhotocraftApp {
         }
         crate::file_open::log_drag_over(ctx, hovering);
         let dropped = ctx.input(|i| i.raw.dropped_files.clone());
-        if !dropped.is_empty() && self.gang_sheet.is_some() {
+        if !dropped.is_empty() && self.mockup.is_some() {
+            // DTF Craft: files dropped while Mockup is open: the photo, then the visuals.
+            crate::mockup_ui::drop_files(self, &dropped);
+        } else if !dropped.is_empty() && self.gang_sheet.is_some() {
             // DTF Craft: files dropped while Gang Sheet is open go onto the sheet.
             crate::gang_sheet_ui::drop_files(self, &dropped);
         } else if !dropped.is_empty() {
@@ -390,6 +393,7 @@ impl PhotocraftApp {
         crate::dtf_panel::poll_vectorize(self, &ctx);
         wide_angle_ui::show(self, &ctx);
         crate::gang_sheet_ui::show(self, &ctx);
+        crate::mockup_ui::show(self, &ctx);
         // DTF Craft: a beta module's window and the bug report, above them.
         crate::beta::show(self, &ctx);
         canvas::extra_windows(self, &ctx);

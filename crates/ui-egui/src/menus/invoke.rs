@@ -246,7 +246,10 @@ fn invoke_shell_commands(app: &mut PhotocraftApp, ctx: &egui::Context, id: &str,
     if let Some(r) = crate::wide_angle_ui::menu(app, ctx, id, params) {
         return Some(r);
     }
-    // DTF › Gang Sheet dialog (DTF Craft) and its control params.
+    // DTF › Mockup and Gang Sheet windows (DTF Craft) and their control params.
+    if let Some(r) = crate::mockup_ui::menu(app, ctx, id, params) {
+        return Some(r);
+    }
     if let Some(r) = crate::gang_sheet_ui::menu(app, ctx, id, params) {
         return Some(r);
     }

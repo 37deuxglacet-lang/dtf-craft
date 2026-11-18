@@ -138,18 +138,18 @@ pub(crate) fn light_tokens() -> Tokens {
 }
 
 /// The logo's magenta ("craft"): Export, the selection, the cells, the end of the sheet.
-const MAGENTA: Color32 = Color32::from_rgb(192, 58, 168);
+pub(crate) const MAGENTA: Color32 = Color32::from_rgb(192, 58, 168);
 /// Darker magenta for text on light magenta (the active sheet's tab).
 const ACCENT_TEXT: Color32 = Color32::from_rgb(156, 31, 138);
 /// The active sheet's tab and the visual shown in the list.
 const TAB_ACTIVE: Color32 = Color32::from_rgb(251, 233, 247);
 const ROW_SELECTED: Color32 = Color32::from_rgb(253, 241, 251);
 /// The logo's blue: Import, Auto Build (pressed: darker), overlapping visuals.
-const BLUE: Color32 = Color32::from_rgb(47, 111, 214);
+pub(crate) const BLUE: Color32 = Color32::from_rgb(47, 111, 214);
 const BLUE_DARK: Color32 = Color32::from_rgb(33, 84, 170);
 
 /// Runs `f` with the window's light tokens and style, then gives the app its own back.
-fn light_scope<R>(ctx: &egui::Context, f: impl FnOnce() -> R) -> R {
+pub(crate) fn light_scope<R>(ctx: &egui::Context, f: impl FnOnce() -> R) -> R {
     let saved = Tokens::get(ctx);
     let (light, dark) = (ctx.style_of(egui::Theme::Light), ctx.style_of(egui::Theme::Dark));
     crate::theme::apply_tokens(ctx, light_tokens());
@@ -489,7 +489,7 @@ pub struct GangSheetDialog {
     pub status: String,
 }
 
-fn preview_image(v: &Visual) -> egui::ColorImage {
+pub(crate) fn preview_image(v: &Visual) -> egui::ColorImage {
     let (w, h) = (v.width.max(1), v.height.max(1));
     let k = (f64::from(THUMB) / f64::from(w.max(h))).min(1.0);
     let src = Rect::new(0, 0, w as i32, h as i32);
@@ -2229,7 +2229,7 @@ fn align_icon(name: &str, r: ERect, c: Color32) -> Option<Vec<Shape>> {
 }
 
 /// A switch on the right of a labelled row (Settings).
-fn switch_row(ui: &mut egui::Ui, label: &str, on: &mut bool) -> bool {
+pub(crate) fn switch_row(ui: &mut egui::Ui, label: &str, on: &mut bool) -> bool {
     let t = Tokens::get(ui.ctx());
     let mut changed = false;
     let w = ui.available_width();
@@ -2244,7 +2244,7 @@ fn switch_row(ui: &mut egui::Ui, label: &str, on: &mut bool) -> bool {
 }
 
 /// A label in a box `w` wide, on the left (a column of field names).
-fn fixed_label(ui: &mut egui::Ui, text: egui::RichText, w: f32, h: f32) {
+pub(crate) fn fixed_label(ui: &mut egui::Ui, text: egui::RichText, w: f32, h: f32) {
     ui.allocate_ui_with_layout(vec2(w, h), egui::Layout::left_to_right(egui::Align::Center), |ui| {
         ui.set_min_size(vec2(w, h));
         ui.add(egui::Label::new(text).truncate());
@@ -2267,7 +2267,7 @@ fn switch(ui: &mut egui::Ui, on: &mut bool) -> bool {
 }
 
 /// A labelled number row: label on the left, field (typed) and unit on the right.
-fn number_row(ui: &mut egui::Ui, label: &str, value: &mut f32, range: std::ops::RangeInclusive<f32>, unit: &str, decimals: u32) -> bool {
+pub(crate) fn number_row(ui: &mut egui::Ui, label: &str, value: &mut f32, range: std::ops::RangeInclusive<f32>, unit: &str, decimals: u32) -> bool {
     let t = Tokens::get(ui.ctx());
     let mut changed = false;
     ui.horizontal(|ui| {
@@ -2278,11 +2278,11 @@ fn number_row(ui: &mut egui::Ui, label: &str, value: &mut f32, range: std::ops::
 }
 
 /// A field's label as its accessible name (without the trailing colon).
-fn plain(label: &str) -> String {
+pub(crate) fn plain(label: &str) -> String {
     label.trim_end().trim_end_matches(':').trim_end().to_string()
 }
 
-fn card_frame(t: &Tokens) -> egui::Frame {
+pub(crate) fn card_frame(t: &Tokens) -> egui::Frame {
     egui::Frame::NONE.fill(Color32::WHITE).stroke(Stroke::new(1.0, t.card_border)).corner_radius(CornerRadius::same(8)).inner_margin(egui::Margin::same(10))
 }
 
@@ -2399,7 +2399,7 @@ fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut A
 }
 
 /// A filled button in the logo's blue (Import, Auto Build), pressed while `on`.
-fn blue_button(ui: &mut egui::Ui, label: &str, width: f32, on: bool) -> egui::Response {
+pub(crate) fn blue_button(ui: &mut egui::Ui, label: &str, width: f32, on: bool) -> egui::Response {
     let w = width.max(widgets::button_width(ui, &[label]));
     let (r, resp) = ui.allocate_exact_size(vec2(w, 30.0), Sense::click());
     let fill = if on {

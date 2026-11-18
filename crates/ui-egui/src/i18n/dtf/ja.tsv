@@ -470,3 +470,49 @@
 	Report opened in your mail program: complete it, then send it.	レポートをメールで開きました：記入して送信してください。
 	A report to complete and copy into an e-mail	記入してメールにコピーするレポート
 	Report	レポート
+# DTF Craft (36)
+	Mockup (beta)…	モックアップ（ベータ）…
+	DTF Mockup	DTF モックアップ
+	A photo, its scale and at least one visual	写真、その縮尺、少なくとも 1 つのデザイン
+	Add a visual first	先にデザインを追加してください
+	At most {n} visuals	デザインは最大 {n} 点です
+	At the photo's resolution, then opened as a new document.	写真の解像度で書き出し、新規ドキュメントとして開きます。
+	Cancel	キャンセル
+	Click a visual on the photo or in the list.	写真上またはリストのデザインをクリックしてください。
+	Delete	削除
+	Drag along a length you know (the chest width, say)	長さのわかる部分に沿ってドラッグします（例：身幅）
+	Drag along something whose length you know: the chest width, say	長さがわかっているものに沿ってドラッグします（例：身幅）
+	Draw a Reference Line on the Photo	写真に基準線を引く
+	Draw a line along a length you can measure on the garment, then type that length.	衣類の測れる長さに沿って線を引き、その長さを入力してください。
+	Draw the Line Again	基準線を引き直す
+	Draw the reference line on the photo	写真に基準線を引いてください
+	Each visual arrives at its print size: its pixels at its resolution.	各デザインは印刷サイズで配置されます（ピクセル数と解像度から算出）。
+	Export	書き出し
+	Export…	書き出し…
+	Fabric Shadows	生地の影
+	Folds (Distortion)	しわ（変形）
+	Height:	高さ：
+	Import Images (PNG, SVG)	画像を読み込む（PNG、SVG）
+	Ink Opacity	インクの不透明度
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	このファイルの印刷サイズは {w} × {h} cm です。このサイズはモックアップ上のみです。
+	Keep Proportions	縦横比を固定
+	Load a Photo (PNG, JPG)	写真を読み込む（PNG、JPG）
+	Load a photo first	先に写真を読み込んでください
+	No photo	写真なし
+	No scale yet	縮尺未設定
+	On the middle of the reference line	基準線の中央に
+	Only a preview: what prints is your file.	プレビューのみです。印刷されるのはお使いのファイルです。
+	Product Photo	商品写真
+	Real length:	実際の長さ：
+	Reference: {cm} cm	基準：{cm} cm
+	Remove	取り除く
+	Remove {name}	{name} を取り除く
+	Rendering	レンダリング
+	Rotation:	回転：
+	Scale	縮尺
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	縮尺：1 cm = {px} px · 写真 {w} × {h} cm · デザイン {n} 点
+	Set the scale first	先に縮尺を設定してください
+	Start with the product's photo (step 1).	商品写真から始めてください（ステップ 1）。
+	The garment from the front, flat or worn, in good light.	衣類を正面から、平置きまたは着用で、明るい場所で。
+	Width:	幅：
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 写真上で 1 cm = {px} px · 定規は cm

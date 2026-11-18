@@ -18,7 +18,7 @@ use crate::theme::Tokens;
 use crate::widgets;
 
 /// The modules in beta: their command and French name (the report is read in French).
-pub const MODULES: &[(&str, &str)] = &[(photocraft_engine::gang_sheet_cmds::GANG_SHEET, "Gang sheet")];
+pub const MODULES: &[(&str, &str)] = &[(photocraft_engine::gang_sheet_cmds::GANG_SHEET, "Gang sheet"), (photocraft_engine::mockup_cmds::MOCKUP, "Mockup")];
 
 /// The badge's colour (DTF Craft's magenta).
 const BADGE: egui::Color32 = egui::Color32::from_rgb(192, 58, 168);

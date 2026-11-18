@@ -461,3 +461,49 @@
 	Report opened in your mail program: complete it, then send it.	Rapport geopend in uw e-mail: vul het aan en verstuur het.
 	A report to complete and copy into an e-mail	Een rapport om aan te vullen en in een e-mail te kopiëren
 	Report	Rapport
+# DTF Craft (36)
+	Mockup (beta)…	Mockup (bèta)…
+	DTF Mockup	DTF-mockup
+	A photo, its scale and at least one visual	Een foto, de schaal ervan en minstens één ontwerp
+	Add a visual first	Voeg eerst een ontwerp toe
+	At most {n} visuals	Hoogstens {n} ontwerpen
+	At the photo's resolution, then opened as a new document.	Op de resolutie van de foto, daarna geopend als nieuw document.
+	Cancel	Annuleren
+	Click a visual on the photo or in the list.	Klik op een ontwerp op de foto of in de lijst.
+	Delete	Verwijderen
+	Drag along a length you know (the chest width, say)	Sleep langs een bekende lengte (bijvoorbeeld de borstbreedte)
+	Drag along something whose length you know: the chest width, say	Sleep langs iets waarvan u de lengte kent, bijvoorbeeld de borstbreedte
+	Draw a Reference Line on the Photo	Referentielijn op de foto tekenen
+	Draw a line along a length you can measure on the garment, then type that length.	Teken een lijn langs een meetbare lengte op het kledingstuk en typ die lengte.
+	Draw the Line Again	Lijn opnieuw tekenen
+	Draw the reference line on the photo	Teken de referentielijn op de foto
+	Each visual arrives at its print size: its pixels at its resolution.	Elk ontwerp komt op zijn drukformaat: zijn pixels op zijn resolutie.
+	Export	Exporteren
+	Export…	Exporteren…
+	Fabric Shadows	Schaduwen van de stof
+	Folds (Distortion)	Plooien (vervorming)
+	Height:	Hoogte:
+	Import Images (PNG, SVG)	Afbeeldingen importeren (PNG, SVG)
+	Ink Opacity	Dekking van de inkt
+	Its file prints at {w} × {h} cm: this size is the mockup's only.	Het bestand drukt op {w} × {h} cm: dit formaat geldt alleen voor de mockup.
+	Keep Proportions	Verhoudingen behouden
+	Load a Photo (PNG, JPG)	Foto laden (PNG, JPG)
+	Load a photo first	Laad eerst een foto
+	No photo	Geen foto
+	No scale yet	Nog geen schaal
+	On the middle of the reference line	Op het midden van de referentielijn
+	Only a preview: what prints is your file.	Alleen een voorbeeld: uw bestand wordt gedrukt.
+	Product Photo	Productfoto
+	Real length:	Werkelijke lengte:
+	Reference: {cm} cm	Referentie: {cm} cm
+	Remove	Verwijderen
+	Remove {name}	{name} verwijderen
+	Rendering	Weergave
+	Rotation:	Rotatie:
+	Scale	Schaal
+	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Schaal: 1 cm = {px} px · Foto {w} × {h} cm · {n} ontwerpen
+	Set the scale first	Stel eerst de schaal in
+	Start with the product's photo (step 1).	Begin met de productfoto (stap 1).
+	The garment from the front, flat or worn, in good light.	Het kledingstuk van voren, plat of gedragen, goed belicht.
+	Width:	Breedte:
+	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px op de foto · linialen in cm

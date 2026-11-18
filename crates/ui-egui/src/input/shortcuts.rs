@@ -499,7 +499,7 @@ fn preflight_keys(app: &mut PhotocraftApp, ctx: &egui::Context) -> bool {
         return false;
     }
     // DTF Craft: Gang Sheet covers the window the same way and handles its own keys.
-    if app.gang_sheet.is_some() {
+    if app.gang_sheet.is_some() || app.mockup.is_some() {
         return false;
     }
     // A foreground save (Save in Background off, #6207) blocks the app until the file is written;

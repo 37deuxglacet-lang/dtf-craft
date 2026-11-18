@@ -23,6 +23,7 @@ produit officiel du projet PhotoCraft.
 | Plage de couleurs… | L'outil Plage de couleurs complet de PhotoCraft, dans sa propre fenêtre, sans verrou, remis à zéro à chaque ouverture : Sélection (couleurs échantillonnées, familles de teintes, tons clairs / moyens / foncés, tons chair, couleurs non imprimables), clusters de couleurs localisés et étendue, tolérance, plages de tons, pipettes échantillon / ajouter / soustraire sur l'image (Maj+clic, Alt+clic), Inverser, vignette Sélection / Image (blanc = effacé). OK efface la plage sur une copie « Sans fond » du calque, progressivement selon la tolérance ; l'original est masqué et intact ; une seule étape d'historique. Sans échantillon, OK est refusé et rien n'est effacé. Une sélection active limite la zone traitée et reste en place. À utiliser avant le Halftone DTF |
 | Halftone DTF… | Deux modes : pixels semi-transparents seulement, ou visuel entier (textile foncé/clair). Crée un dossier « Halftone DTF » au-dessus du calque source (masqué, intact) : calque « Halftone » tramé, sur un « Fond de contrôle » #231c1c (textile foncé) ou blanc (textile clair) ; sans fond pour les semi-transparents. L'aperçu montre ce résultat, avec une barre de progression sous les réglages pendant son calcul. La trame est calculée par bandes sur la copie : peu de mémoire de travail, même sur un gros fichier. Réglages toujours modifiables (pas de verrou) |
 | Gang sheet (bêta)… | Module en bêta. Fenêtre plein écran claire, aux couleurs du logo DTF Craft : import, réglages, plusieurs planches en onglets, construction auto, contrôle de la résolution, des chevauchements et des fonds, export PNG 300 dpi ouvert comme nouveau document (voir ci-dessous) |
+| Mockup (bêta)… | Module en bêta. Les visuels du client sur la photo du vêtement, à leur taille d'impression réelle : photo PNG/JPG, échelle par un repère tracé sur la photo et sa longueur en cm, visuels PNG/SVG ou document ouvert, ombres et plis du tissu, export PNG/JPG ouvert comme nouveau document (voir ci-dessous) |
 | Vectorisation… | Module plein écran (comme Camera Raw) : le visuel est réduit à une palette (8 couleurs par défaut, 2 à 16) puis nettoyé (les liserés trop fins d'une couleur intermédiaire entre deux autres, typiques des bords flous ou JPEG, reviennent à la plus proche des deux ; les contours sont lissés à la couleur majoritaire du voisinage, sans dents ni marches, à une échelle fixée par le niveau de détail) et tracé en formes vectorielles découpées, une couleur unie par forme, sans superposition. Réglages : type de visuel (logo · aplats / illustration · nuances), niveau de détail, lissage (courbes / angles vifs), suppression du fond lu au bord du visuel, joints fermés entre couleurs (chaque forme déborde d'un demi-pixel sur ses voisines ; à décocher pour un traceur de découpe). Aperçu original / vectorisé / côte à côte, contours, zoom jusqu'à 800 % (Ctrl+molette, boutons − / +, double-clic ; glisser ou molette pour se déplacer ; les deux images suivent en côte à côte ; la partie visible du vectorisé est redessinée nette à la résolution de l'écran), palette où décocher une couleur la retire du SVG. Nuancier de référence partagé avec l'Analyseur couleur : référence la plus proche et ΔE 2000 par couleur détectée, « Changer… », case ↔ (auto jusqu'à ΔE 5) qui remplace la couleur par la référence dans l'aperçu et le SVG, formes nommées d'après la référence (id SVG, calques à l'ouverture). Fiche PDF A4 : original et vectorisé côte à côte, couleurs du SVG et leurs références. Deux moteurs au choix : « DTF Craft » (ci-dessus) et « VectorCraft » (Image Trace de VectorCraft, copié sans modification) avec ses 15 préréglages et tous ses réglages : mode (noir et blanc avec seuil, niveaux de gris, couleur, logo aplats), palette (limitée, tons continus, automatique, ou le nuancier de référence), couleurs, détail couleur, tracés, angles, bruit, méthode (juxtaposée / superposée), remplissages et traits en lignes centrales avec leur épaisseur, ignorer une couleur, accrocher les courbes aux lignes, formes exactes, dégradés linéaires ; la table des couleurs, le nuancier, la fiche PDF et l'export sont les mêmes avec les deux moteurs. Export SVG à la taille d'impression du document, ouvert en option dans un nouvel onglet en calques de forme ; le document n'est pas modifié. Traceurs : visioncortex (MIT OR Apache-2.0) et VectorCraft Image Trace (ArtCraft Team et contributeurs VectorCraft, MIT OR Apache-2.0) |
 
 Toutes les commandes sont annulables (Édition › Annuler) et utilisables dans les actions.
@@ -196,9 +197,46 @@ retournements), elle reprend la mise en place donnée. Marges : `edgeMargin` (bo
 les visuels dans les cases, sans espacement ; laize par défaut 42 cm. Un `path` SVG est rendu à
 sa taille d'impression.
 
+## Mockup
+
+Module en **bêta** (pastille BÊTA, fenêtre d'avertissement, Signaler un bug). DTF › Mockup (bêta)…
+ouvre une fenêtre plein écran claire, comme le Gang sheet, pour montrer au client ses visuels sur
+le vêtement, à leur vraie taille.
+
+- **Colonne de gauche**, en trois étapes numérotées :
+  1. **Photo du produit** : un PNG ou un JPG du vêtement, de face, à plat ou porté.
+  2. **Échelle** : « Tracer un repère sur la photo » (glisser le long d'une longueur connue, la
+     largeur de poitrine par exemple ; les deux extrémités restent déplaçables), puis la
+     longueur réelle du repère en cm. La fenêtre en déduit les pixels par cm de la photo et
+     affiche des règles en cm le long de la photo. Le tracé est demandé dès qu'une photo est
+     chargée.
+  3. **Visuels** : PNG ou SVG importés, ou le document ouvert (aplati, rogné à ses pixels
+     visibles). Bloqués tant que l'échelle n'est pas donnée (« Indiquez d'abord l'échelle »).
+     Chaque visuel arrive à sa taille d'impression (ses pixels à sa résolution, celle que
+     l'outil Conformité impose à 300 ppp), au milieu du repère ; plusieurs visuels possibles.
+- **Photo** : le rendu tel qu'imprimé ; clic pour choisir un visuel, glisser pour le déplacer
+  (flèches : 1 mm, Maj : 1 cm ; Suppr le retire) ; sa taille en cm est écrite dessous.
+- **Colonne de droite** : **Visuel sélectionné** (largeur et hauteur en cm, proportions
+  conservées ou non, rotation, centrer horizontalement sur le milieu du repère, supprimer ;
+  un avertissement quand la taille diffère de celle du fichier : elle ne vaut que pour le
+  mockup), **Rendu** (ombres du tissu 60 %, plis 35 %, opacité de l'encre 95 %) et **Export**
+  (PNG ou JPG, replié).
+- **Barre d'état** : échelle, taille de la photo en cm, nombre de visuels, dernier message.
+
+Rendu : les plis déplacent l'encre selon la pente de la lumière floutée de la photo (jusqu'à
+0,4 cm à 100 %) ; les ombres reportent la lumière de la photo sur l'encre (plus sombre que la
+médiane de la zone : l'encre fonce d'autant ; plus clair : elle s'éclaircit peu) ; l'opacité
+laisse voir le tissu. L'aperçu est calculé sur la photo réduite à 1 400 px, l'export à la
+résolution de la photo, avec le même calcul. Les fichiers des visuels ne sont jamais modifiés.
+En bêta, pas d'enregistrement de projet : l'export est le résultat.
+
+La commande `dtf.mockup` fait le même travail sans fenêtre : `photo`, `scale` (`from`, `to` en
+pixels de la photo, `cm`) ou `pixelsPerCm`, `visuals` (`path` ou `document`, `x`, `y` du centre,
+`widthCm`, `heightCm`, `rotation`), `shadows`, `folds`, `opacity`, `output` (.png ou .jpg), `open`.
+
 ## Modules bêta et signalement des bugs
 
-Un module en bêta (aujourd'hui le Gang sheet) porte « (bêta) » après son entrée de menu et une
+Un module en bêta (aujourd'hui le Gang sheet et le Mockup) porte « (bêta) » après son entrée de menu et une
 pastille BÊTA dans sa fenêtre. À sa première ouverture dans une version, une fenêtre « Module en
 version bêta » explique qu'il est en cours de développement, peut comporter des bugs et évoluer
 d'une version à l'autre (vérifier ses fichiers avant impression) ; boutons Signaler un bug et
