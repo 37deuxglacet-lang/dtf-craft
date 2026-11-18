@@ -520,10 +520,44 @@
 	Remove {name}	{name} entfernen
 	Rendering	Darstellung
 	Rotation:	Drehung:
-	Scale	Maßstab
+	Photo Scale	Maßstab
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Maßstab: 1 cm = {px} px · Foto {w} × {h} cm · {n} Motive
 	Set the scale first	Legen Sie zuerst den Maßstab fest
 	Start with the product's photo (step 1).	Beginnen Sie mit dem Produktfoto (Schritt 1).
 	The garment from the front, flat or worn, in good light.	Das Kleidungsstück von vorn, flach oder getragen, gut beleuchtet.
 	Width:	Breite:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px im Foto · Lineale in cm
+# DTF Craft (37)
+	Scale	Skalieren
+	Rotate	Drehen
+	Skew	Neigen
+	Distort	Verzerren
+	Perspective	Perspektivisch
+	Warp	Verkrümmen
+	Move	Verschieben
+	Transform	Transformieren
+	TRANSFORM	TRANSFORMIEREN
+	Tool	Werkzeug
+	Tool:	Werkzeug:
+	Warp Style	Verkrümmungsstil
+	Warp Style:	Stil:
+	None	Ohne
+	Arc	Bogen
+	Arch	Torbogen
+	Bulge	Wulst
+	Flag	Flagge
+	Inflate	Aufblasen
+	Custom	Eigene
+	Bend	Biegung
+	Horizontal	Horizontal
+	Vertical	Vertikal
+	Reset the Transform	Transformation zurücksetzen
+	Its own print size, upright, unwarped	Seine Druckgröße, gerade, unverkrümmt
+	Drag the grid's points on the photo.	Ziehen Sie die Punkte des Rasters auf dem Foto.
+	Enter or Esc: back to moving.	Eingabe oder Esc: zurück zum Verschieben.
+	Enter or Esc: done	Eingabe oder Esc: fertig
+	Paste a Screenshot	Bildschirmfoto einfügen
+	Screenshot	Bildschirmfoto
+	The image on the clipboard (Ctrl+V)	Das Bild in der Zwischenablage (Strg+V)
+	The clipboard holds no image	Die Zwischenablage enthält kein Bild
+	The clipboard can't be read here	Die Zwischenablage kann hier nicht gelesen werden

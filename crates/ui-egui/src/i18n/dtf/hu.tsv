@@ -500,10 +500,44 @@
 	Remove {name}	{name} eltávolítása
 	Rendering	Megjelenítés
 	Rotation:	Elforgatás:
-	Scale	Mérce
+	Photo Scale	Mérce
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Mérce: 1 cm = {px} px · Fénykép {w} × {h} cm · {n} minta
 	Set the scale first	Először adja meg a mércét
 	Start with the product's photo (step 1).	Kezdje a termékfotóval (1. lépés).
 	The garment from the front, flat or worn, in good light.	A ruha elölről, kiterítve vagy viselve, jó fényben.
 	Width:	Szélesség:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px a fényképen · vonalzók cm-ben
+# DTF Craft (37)
+	Scale	Méretezés
+	Rotate	Forgatás
+	Skew	Döntés
+	Distort	Torzítás
+	Perspective	Perspektíva
+	Warp	Hajlítás
+	Move	Mozgatás
+	Transform	Átalakítás
+	TRANSFORM	ÁTALAKÍTÁS
+	Tool	Eszköz
+	Tool:	Eszköz:
+	Warp Style	Hajlítási stílus
+	Warp Style:	Stílus:
+	None	Nincs
+	Arc	Ív
+	Arch	Boltív
+	Bulge	Kidudorodás
+	Flag	Zászló
+	Inflate	Felfújás
+	Custom	Egyéni
+	Bend	Görbület
+	Horizontal	Vízszintes
+	Vertical	Függőleges
+	Reset the Transform	Átalakítás visszaállítása
+	Its own print size, upright, unwarped	A saját nyomtatási mérete, egyenesen, hajlítás nélkül
+	Drag the grid's points on the photo.	Húzza a rács pontjait a fényképen.
+	Enter or Esc: back to moving.	Enter vagy Esc: vissza a mozgatáshoz.
+	Enter or Esc: done	Enter vagy Esc: kész
+	Paste a Screenshot	Képernyőkép beillesztése
+	Screenshot	Képernyőkép
+	The image on the clipboard (Ctrl+V)	A vágólapon lévő kép (Ctrl+V)
+	The clipboard holds no image	A vágólapon nincs kép
+	The clipboard can't be read here	A vágólap itt nem olvasható

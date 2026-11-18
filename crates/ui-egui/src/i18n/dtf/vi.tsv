@@ -509,10 +509,44 @@
 	Remove {name}	Gỡ {name}
 	Rendering	Hiển thị
 	Rotation:	Xoay:
-	Scale	Tỷ lệ
+	Photo Scale	Tỷ lệ
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Tỷ lệ: 1 cm = {px} px · Ảnh {w} × {h} cm · {n} thiết kế
 	Set the scale first	Hãy đặt tỷ lệ trước
 	Start with the product's photo (step 1).	Bắt đầu với ảnh sản phẩm (bước 1).
 	The garment from the front, flat or worn, in good light.	Áo nhìn từ phía trước, trải phẳng hoặc đang mặc, đủ sáng.
 	Width:	Chiều rộng:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px trên ảnh · thước theo cm
+# DTF Craft (37)
+	Scale	Co giãn
+	Rotate	Xoay
+	Skew	Nghiêng
+	Distort	Bóp méo
+	Perspective	Phối cảnh
+	Warp	Uốn cong
+	Move	Di chuyển
+	Transform	Biến đổi
+	TRANSFORM	BIẾN ĐỔI
+	Tool	Công cụ
+	Tool:	Công cụ:
+	Warp Style	Kiểu uốn
+	Warp Style:	Kiểu:
+	None	Không
+	Arc	Vòng cung
+	Arch	Mái vòm
+	Bulge	Phình
+	Flag	Lá cờ
+	Inflate	Phồng
+	Custom	Tùy chỉnh
+	Bend	Độ cong
+	Horizontal	Ngang
+	Vertical	Dọc
+	Reset the Transform	Đặt lại biến đổi
+	Its own print size, upright, unwarped	Kích thước in của nó, thẳng, không uốn
+	Drag the grid's points on the photo.	Kéo các điểm của lưới trên ảnh.
+	Enter or Esc: back to moving.	Enter hoặc Esc: quay lại di chuyển.
+	Enter or Esc: done	Enter hoặc Esc: xong
+	Paste a Screenshot	Dán ảnh chụp màn hình
+	Screenshot	Ảnh chụp màn hình
+	The image on the clipboard (Ctrl+V)	Hình trong khay nhớ tạm (Ctrl+V)
+	The clipboard holds no image	Khay nhớ tạm không có hình
+	The clipboard can't be read here	Không đọc được khay nhớ tạm ở đây

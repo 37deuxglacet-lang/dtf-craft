@@ -500,10 +500,44 @@
 	Remove {name}	Rimuovi {name}
 	Rendering	Resa
 	Rotation:	Rotazione:
-	Scale	Scala
+	Photo Scale	Scala
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Scala: 1 cm = {px} px · Foto {w} × {h} cm · {n} grafiche
 	Set the scale first	Indica prima la scala
 	Start with the product's photo (step 1).	Inizia dalla foto del prodotto (passo 1).
 	The garment from the front, flat or worn, in good light.	Il capo di fronte, steso o indossato, ben illuminato.
 	Width:	Larghezza:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px sulla foto · righelli in cm
+# DTF Craft (37)
+	Scale	Scala
+	Rotate	Ruota
+	Skew	Inclina
+	Distort	Distorci
+	Perspective	Prospettiva
+	Warp	Altera
+	Move	Sposta
+	Transform	Trasforma
+	TRANSFORM	TRASFORMA
+	Tool	Strumento
+	Tool:	Strumento:
+	Warp Style	Stile di alterazione
+	Warp Style:	Stile:
+	None	Nessuno
+	Arc	Arco
+	Arch	Arcata
+	Bulge	Rigonfiamento
+	Flag	Bandiera
+	Inflate	Gonfiaggio
+	Custom	Personale
+	Bend	Curvatura
+	Horizontal	Orizzontale
+	Vertical	Verticale
+	Reset the Transform	Ripristina la trasformazione
+	Its own print size, upright, unwarped	La sua dimensione di stampa, dritta, senza alterazioni
+	Drag the grid's points on the photo.	Trascina i punti della griglia sulla foto.
+	Enter or Esc: back to moving.	Invio o Esc: torna allo spostamento.
+	Enter or Esc: done	Invio o Esc: fatto
+	Paste a Screenshot	Incolla uno screenshot
+	Screenshot	Screenshot
+	The image on the clipboard (Ctrl+V)	L'immagine negli appunti (Ctrl+V)
+	The clipboard holds no image	Gli appunti non contengono immagini
+	The clipboard can't be read here	Gli appunti non possono essere letti qui

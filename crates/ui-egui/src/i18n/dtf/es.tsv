@@ -525,10 +525,44 @@
 	Remove {name}	Quitar {name}
 	Rendering	Representación
 	Rotation:	Rotación:
-	Scale	Escala
+	Photo Scale	Escala
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Escala: 1 cm = {px} px · Foto {w} × {h} cm · {n} diseños
 	Set the scale first	Indique primero la escala
 	Start with the product's photo (step 1).	Empiece por la foto del producto (paso 1).
 	The garment from the front, flat or worn, in good light.	La prenda de frente, plana o puesta, con buena luz.
 	Width:	Ancho:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px en la foto · reglas en cm
+# DTF Craft (37)
+	Scale	Escala
+	Rotate	Rotar
+	Skew	Sesgar
+	Distort	Distorsionar
+	Perspective	Perspectiva
+	Warp	Deformar
+	Move	Mover
+	Transform	Transformar
+	TRANSFORM	TRANSFORMAR
+	Tool	Herramienta
+	Tool:	Herramienta:
+	Warp Style	Estilo de deformación
+	Warp Style:	Estilo:
+	None	Ninguno
+	Arc	Arco
+	Arch	Bóveda
+	Bulge	Abultamiento
+	Flag	Bandera
+	Inflate	Inflar
+	Custom	Personalizado
+	Bend	Curvatura
+	Horizontal	Horizontal
+	Vertical	Vertical
+	Reset the Transform	Restablecer la transformación
+	Its own print size, upright, unwarped	Su tamaño de impresión, recto, sin deformar
+	Drag the grid's points on the photo.	Arrastre los puntos de la cuadrícula en la foto.
+	Enter or Esc: back to moving.	Intro o Esc: volver a mover.
+	Enter or Esc: done	Intro o Esc: listo
+	Paste a Screenshot	Pegar una captura de pantalla
+	Screenshot	Captura de pantalla
+	The image on the clipboard (Ctrl+V)	La imagen del portapapeles (Ctrl+V)
+	The clipboard holds no image	El portapapeles no contiene ninguna imagen
+	The clipboard can't be read here	El portapapeles no se puede leer aquí

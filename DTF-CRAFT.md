@@ -204,7 +204,9 @@ ouvre une fenêtre plein écran claire, comme le Gang sheet, pour montrer au cli
 le vêtement, à leur vraie taille.
 
 - **Colonne de gauche**, en trois étapes numérotées :
-  1. **Photo du produit** : un PNG ou un JPG du vêtement, de face, à plat ou porté.
+  1. **Photo du produit** : un PNG ou un JPG du vêtement, de face, à plat ou porté, ou une
+     copie d'écran collée (« Coller une copie d'écran » ou Ctrl+V ; gardée en PNG dans le
+     dossier temporaire pour l'export).
   2. **Échelle** : « Tracer un repère sur la photo » (glisser le long d'une longueur connue, la
      largeur de poitrine par exemple ; les deux extrémités restent déplaçables), puis la
      longueur réelle du repère en cm. La fenêtre en déduit les pixels par cm de la photo et
@@ -221,6 +223,18 @@ le vêtement, à leur vraie taille.
   un avertissement quand la taille diffère de celle du fichier : elle ne vaut que pour le
   mockup), **Rendu** (ombres du tissu 60 %, plis 35 %, opacité de l'encre 95 %) et **Export**
   (PNG ou JPG, replié).
+- **Transformation** (les outils d'Édition › Transformation de PhotoCraft) : palette sur la photo,
+  clic droit sur le visuel ou bloc « Transformation » à droite. Modification en direct ; Entrée
+  ou Échap revient au simple déplacement ; « Réinitialiser la transformation » rend au visuel sa
+  taille d'impression, droit et sans déformation.
+  - Mise à l'échelle : 8 poignées (Maj inverse « Conserver les proportions », Alt depuis le centre).
+  - Rotation : glisser autour du visuel (Maj : pas de 15°).
+  - Inclinaison : les côtés glissent le long d'eux-mêmes.
+  - Déformation : chaque coin librement.
+  - Perspective : un coin entraîne son symétrique.
+  - Déformer : grille 4 × 4 de points de Bézier modifiables, ou un style (Arc, Arche,
+    Renflement, Drapeau, Gonflement) avec sa courbure, horizontal ou vertical.
+  Changer l'échelle (le repère) garde la taille en cm des visuels.
 - **Barre d'état** : échelle, taille de la photo en cm, nombre de visuels, dernier message.
 
 Rendu : les plis déplacent l'encre selon la pente de la lumière floutée de la photo (jusqu'à
@@ -232,7 +246,9 @@ En bêta, pas d'enregistrement de projet : l'export est le résultat.
 
 La commande `dtf.mockup` fait le même travail sans fenêtre : `photo`, `scale` (`from`, `to` en
 pixels de la photo, `cm`) ou `pixelsPerCm`, `visuals` (`path` ou `document`, `x`, `y` du centre,
-`widthCm`, `heightCm`, `rotation`), `shadows`, `folds`, `opacity`, `output` (.png ou .jpg), `open`.
+`widthCm`, `heightCm`, `rotation`, ou `corners` : ses 4 coins sur la photo, et `warp` : `style`,
+`bend`, `vertical`, `points` pour une grille personnalisée), `shadows`, `folds`, `opacity`,
+`output` (.png ou .jpg), `open`.
 
 ## Modules bêta et signalement des bugs
 

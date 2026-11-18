@@ -503,10 +503,44 @@
 	Remove {name}	Αφαίρεση {name}
 	Rendering	Απόδοση
 	Rotation:	Περιστροφή:
-	Scale	Κλίμακα
+	Photo Scale	Κλίμακα
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Κλίμακα: 1 cm = {px} px · Φωτογραφία {w} × {h} cm · σχέδια: {n}
 	Set the scale first	Ορίστε πρώτα την κλίμακα
 	Start with the product's photo (step 1).	Ξεκινήστε με τη φωτογραφία του προϊόντος (βήμα 1).
 	The garment from the front, flat or worn, in good light.	Το ρούχο από μπροστά, απλωμένο ή φορεμένο, με καλό φως.
 	Width:	Πλάτος:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px στη φωτογραφία · χάρακες σε cm
+# DTF Craft (37)
+	Scale	Κλιμάκωση
+	Rotate	Περιστροφή
+	Skew	Λοξότητα
+	Distort	Παραμόρφωση
+	Perspective	Προοπτική
+	Warp	Στρέβλωση
+	Move	Μετακίνηση
+	Transform	Μετασχηματισμός
+	TRANSFORM	ΜΕΤΑΣΧΗΜΑΤΙΣΜΟΣ
+	Tool	Εργαλείο
+	Tool:	Εργαλείο:
+	Warp Style	Στυλ στρέβλωσης
+	Warp Style:	Στυλ:
+	None	Κανένα
+	Arc	Τόξο
+	Arch	Αψίδα
+	Bulge	Διόγκωση
+	Flag	Σημαία
+	Inflate	Φούσκωμα
+	Custom	Προσαρμοσμένο
+	Bend	Κάμψη
+	Horizontal	Οριζόντια
+	Vertical	Κατακόρυφα
+	Reset the Transform	Επαναφορά μετασχηματισμού
+	Its own print size, upright, unwarped	Το μέγεθος εκτύπωσής του, ίσιο, χωρίς στρέβλωση
+	Drag the grid's points on the photo.	Σύρετε τα σημεία του πλέγματος στη φωτογραφία.
+	Enter or Esc: back to moving.	Enter ή Esc: πίσω στη μετακίνηση.
+	Enter or Esc: done	Enter ή Esc: τέλος
+	Paste a Screenshot	Επικόλληση στιγμιότυπου οθόνης
+	Screenshot	Στιγμιότυπο οθόνης
+	The image on the clipboard (Ctrl+V)	Η εικόνα του προχείρου (Ctrl+V)
+	The clipboard holds no image	Το πρόχειρο δεν περιέχει εικόνα
+	The clipboard can't be read here	Το πρόχειρο δεν μπορεί να διαβαστεί εδώ

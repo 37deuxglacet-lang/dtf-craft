@@ -518,10 +518,44 @@
 	Remove {name}	Убрать {name}
 	Rendering	Отображение
 	Rotation:	Поворот:
-	Scale	Масштаб
+	Photo Scale	Масштаб
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Масштаб: 1 см = {px} пикс. · Фото {w} × {h} см · макетов: {n}
 	Set the scale first	Сначала задайте масштаб
 	Start with the product's photo (step 1).	Начните с фото изделия (шаг 1).
 	The garment from the front, flat or worn, in good light.	Изделие спереди, разложенное или надетое, при хорошем свете.
 	Width:	Ширина:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 см = {px} пикс. на фото · линейки в см
+# DTF Craft (37)
+	Scale	Масштабирование
+	Rotate	Поворот
+	Skew	Наклон
+	Distort	Искажение
+	Perspective	Перспектива
+	Warp	Деформация
+	Move	Перемещение
+	Transform	Трансформирование
+	TRANSFORM	ТРАНСФОРМИРОВАНИЕ
+	Tool	Инструмент
+	Tool:	Инструмент:
+	Warp Style	Стиль деформации
+	Warp Style:	Стиль:
+	None	Нет
+	Arc	Дуга
+	Arch	Арка
+	Bulge	Выпуклость
+	Flag	Флаг
+	Inflate	Надутость
+	Custom	Свой
+	Bend	Изгиб
+	Horizontal	Горизонтально
+	Vertical	Вертикально
+	Reset the Transform	Сбросить трансформирование
+	Its own print size, upright, unwarped	Свой размер печати, прямо, без деформации
+	Drag the grid's points on the photo.	Перетаскивайте точки сетки на фото.
+	Enter or Esc: back to moving.	Enter или Esc: обратно к перемещению.
+	Enter or Esc: done	Enter или Esc: готово
+	Paste a Screenshot	Вставить снимок экрана
+	Screenshot	Снимок экрана
+	The image on the clipboard (Ctrl+V)	Изображение из буфера обмена (Ctrl+V)
+	The clipboard holds no image	В буфере обмена нет изображения
+	The clipboard can't be read here	Буфер обмена здесь не читается

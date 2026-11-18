@@ -31,9 +31,12 @@
 //! `format` (`png`/`jpg`), `export` (path), `cancel`.
 
 use egui::{Align2, Color32, FontId, Pos2, Rect as ERect, Sense, Shape, Stroke, StrokeKind, TextureHandle, pos2, vec2};
+use photocraft_algo::transform::Homography;
 use photocraft_doc::DocId;
 use photocraft_engine::gang_sheet_cmds::{self as gang, Visual};
-use photocraft_engine::mockup_cmds::{self as cmd, Light, Photo, Print, Render};
+use photocraft_engine::mockup_cmds::{self as cmd, Bend, Light, Photo, Placed, Placement, Print, Render};
+use photocraft_geom::warp::WarpStyle;
+use photocraft_raster::Surface;
 use serde_json::{Value, json};
 
 use crate::PhotocraftApp;
@@ -51,6 +54,8 @@ const RULER: f32 = 20.0;
 const PREVIEW_SIDE: u32 = 1400;
 /// Most visuals on a mockup.
 const MAX_ITEMS: usize = 50;
+/// A warp style's bend when it is picked.
+const DEFAULT_BEND: f64 = 50.0;
 /// Where a new visual lands, after the previous one: this far right and down (cm).
 const CASCADE_CM: f64 = 2.0;
 /// An end of the reference line is grabbed this close (screen points).
@@ -58,8 +63,11 @@ const GRAB: f32 = 10.0;
 const GREEN: Color32 = Color32::from_rgb(22, 140, 72);
 
 const SECTION_VISUAL: usize = 0;
-const SECTION_RENDER: usize = 1;
-const SECTION_EXPORT: usize = 2;
+const SECTION_TRANSFORM: usize = 1;
+const SECTION_RENDER: usize = 2;
+const SECTION_EXPORT: usize = 3;
+/// The transform palette's width on the photo.
+const PALETTE_W: f32 = 150.0;
 
 // ---------------------------------------------------------------- state
 
@@ -70,21 +78,379 @@ enum Origin {
     Document(DocId),
 }
 
+/// Edit › Transform's tools, in its menu order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Tool {
+    Scale,
+    Rotate,
+    Skew,
+    Distort,
+    Perspective,
+    Warp,
+}
+
+impl Tool {
+    const ALL: [Tool; 6] = [Tool::Scale, Tool::Rotate, Tool::Skew, Tool::Distort, Tool::Perspective, Tool::Warp];
+
+    fn label(self) -> &'static str {
+        match self {
+            Tool::Scale => tl!("Scale"),
+            Tool::Rotate => tl!("Rotate"),
+            Tool::Skew => tl!("Skew"),
+            Tool::Distort => tl!("Distort"),
+            Tool::Perspective => tl!("Perspective"),
+            Tool::Warp => tl!("Warp"),
+        }
+    }
+
+    fn id(self) -> &'static str {
+        match self {
+            Tool::Scale => "scale",
+            Tool::Rotate => "rotate",
+            Tool::Skew => "skew",
+            Tool::Distort => "distort",
+            Tool::Perspective => "perspective",
+            Tool::Warp => "warp",
+        }
+    }
+
+    fn parse(s: &str) -> Option<Tool> {
+        Tool::ALL.into_iter().find(|t| t.id().eq_ignore_ascii_case(s))
+    }
+
+    /// Its icon in the palette.
+    fn icon(self) -> &'static str {
+        match self {
+            Tool::Scale => "maximize-2",
+            Tool::Rotate => "rotate-cw",
+            Tool::Skew => "square-dashed",
+            Tool::Distort => "vector-shape",
+            Tool::Perspective => "perspective-crop",
+            Tool::Warp => "grid-3x3",
+        }
+    }
+}
+
+/// The warp style's name in the window.
+fn style_label(s: WarpStyle) -> &'static str {
+    match s {
+        WarpStyle::None => tl!("None"),
+        WarpStyle::Custom => tl!("Custom"),
+        WarpStyle::Arc => tl!("Arc"),
+        WarpStyle::Arch => tl!("Arch"),
+        WarpStyle::Bulge => tl!("Bulge"),
+        WarpStyle::Flag => tl!("Flag"),
+        WarpStyle::Inflate => tl!("Inflate"),
+        _ => s.label(),
+    }
+}
+
 /// One visual on the photo.
 struct Item {
     origin: Origin,
     visual: Visual,
-    width_cm: f32,
-    height_cm: f32,
+    /// Its corners on the photo (photo pixels, clockwise from the top left) and its warp.
+    placement: Placement,
     lock: bool,
-    /// Degrees, clockwise.
-    rotation: f32,
-    /// Its centre, in the photo's pixels.
-    center: [f64; 2],
     thumb: Option<egui::ColorImage>,
     tex: Option<TextureHandle>,
-    /// Its pixels at the preview's scale, and their size.
-    cache: Option<(usize, usize, Vec<u8>)>,
+    /// It drawn at the preview's size (unplaced), and that size.
+    cache: Option<(i64, i64, Surface)>,
+    /// It placed on the preview.
+    placed: Option<Placed>,
+}
+
+fn dist(a: [f64; 2], b: [f64; 2]) -> f64 {
+    (a[0] - b[0]).hypot(a[1] - b[1])
+}
+
+fn mid(a: [f64; 2], b: [f64; 2]) -> [f64; 2] {
+    [(a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0]
+}
+
+/// The affine frame of a quad: its top left and its top and left sides.
+struct Frame {
+    o: [f64; 2],
+    u: [f64; 2],
+    v: [f64; 2],
+}
+
+impl Frame {
+    fn of(c: &[[f64; 2]; 4]) -> Frame {
+        Frame { o: c[0], u: [c[1][0] - c[0][0], c[1][1] - c[0][1]], v: [c[3][0] - c[0][0], c[3][1] - c[0][1]] }
+    }
+
+    fn to_local(&self, p: [f64; 2]) -> [f64; 2] {
+        let det = self.u[0] * self.v[1] - self.u[1] * self.v[0];
+        if det.abs() < 1e-9 {
+            return [0.0, 0.0];
+        }
+        let (dx, dy) = (p[0] - self.o[0], p[1] - self.o[1]);
+        [(dx * self.v[1] - dy * self.v[0]) / det, (self.u[0] * dy - self.u[1] * dx) / det]
+    }
+
+    fn from_local(&self, a: [f64; 2]) -> [f64; 2] {
+        [self.o[0] + a[0] * self.u[0] + a[1] * self.v[0], self.o[1] + a[0] * self.u[1] + a[1] * self.v[1]]
+    }
+}
+
+fn unit(v: [f64; 2]) -> [f64; 2] {
+    let n = v[0].hypot(v[1]).max(1e-9);
+    [v[0] / n, v[1] / n]
+}
+
+impl Item {
+    fn corners(&self) -> [[f64; 2]; 4] {
+        self.placement.corners
+    }
+
+    fn center(&self) -> [f64; 2] {
+        let c = self.corners();
+        [(c[0][0] + c[1][0] + c[2][0] + c[3][0]) / 4.0, (c[0][1] + c[1][1] + c[2][1] + c[3][1]) / 4.0]
+    }
+
+    /// Width and height in photo pixels: the mean of opposite sides.
+    fn size_px(&self) -> (f64, f64) {
+        let c = self.corners();
+        ((dist(c[0], c[1]) + dist(c[3], c[2])) / 2.0, (dist(c[0], c[3]) + dist(c[1], c[2])) / 2.0)
+    }
+
+    /// Degrees, clockwise: the top side's direction.
+    fn rotation(&self) -> f64 {
+        let c = self.corners();
+        (c[1][1] - c[0][1]).atan2(c[1][0] - c[0][0]).to_degrees()
+    }
+
+    fn translate(&mut self, d: [f64; 2]) {
+        for p in &mut self.placement.corners {
+            p[0] += d[0];
+            p[1] += d[1];
+        }
+    }
+
+    /// Scaled about its centre along its own sides.
+    fn scale(&mut self, sx: f64, sy: f64) {
+        let f = Frame::of(&self.placement.corners);
+        let c = f.to_local(self.center());
+        for p in &mut self.placement.corners {
+            let a = f.to_local(*p);
+            *p = f.from_local([c[0] + (a[0] - c[0]) * sx, c[1] + (a[1] - c[1]) * sy]);
+        }
+    }
+
+    /// Turned `deg` clockwise about its centre.
+    fn rotate(&mut self, deg: f64) {
+        let (s, co) = deg.to_radians().sin_cos();
+        let c = self.center();
+        for p in &mut self.placement.corners {
+            let (dx, dy) = (p[0] - c[0], p[1] - c[1]);
+            *p = [c[0] + dx * co - dy * s, c[1] + dx * s + dy * co];
+        }
+    }
+
+    /// The warp's control grid (box units), `None` when nothing bends.
+    fn grid(&self) -> Option<[[f64; 2]; 16]> {
+        let (w, h) = self.placement.rendition_size();
+        self.placement.bend.grid(w as f64, h as f64)
+    }
+
+    /// Its outline on the photo (photo pixels), bent.
+    fn outline(&self) -> Vec<[f64; 2]> {
+        let g = self.grid();
+        let n = if g.is_some() { 16 } else { 1 };
+        let mut pts = Vec::with_capacity(4 * n + 1);
+        let edge = |k: usize, t: f64| match k {
+            0 => (t, 0.0),
+            1 => (1.0, t),
+            2 => (1.0 - t, 1.0),
+            _ => (0.0, 1.0 - t),
+        };
+        for k in 0..4 {
+            for i in 0..n {
+                let (u, v) = edge(k, i as f64 / n as f64);
+                if let Some(p) = self.placement.map(g.as_ref(), u, v) {
+                    pts.push(p);
+                }
+            }
+        }
+        if let Some(first) = pts.first().copied() {
+            pts.push(first);
+        }
+        pts
+    }
+
+    /// Whether `q` (photo pixels) is inside its outline.
+    fn contains(&self, q: [f64; 2]) -> bool {
+        let poly = self.outline();
+        let mut inside = false;
+        for w in poly.windows(2) {
+            let (a, b) = (w[0], w[1]);
+            if (a[1] > q[1]) != (b[1] > q[1]) && q[0] < a[0] + (q[1] - a[1]) / (b[1] - a[1]) * (b[0] - a[0]) {
+                inside = !inside;
+            }
+        }
+        inside
+    }
+
+    /// The handles of `tool` (photo pixels): for Warp the 16 control points, else the corners
+    /// (0..4) then the sides' middles (4..8: top, right, bottom, left).
+    fn handles(&self, tool: Tool) -> Vec<[f64; 2]> {
+        let c = self.corners();
+        match tool {
+            Tool::Warp => {
+                let g = self.grid().unwrap_or_else(cmd::rest_points);
+                let Some(h) = Homography::rect_to_quad([0.0, 0.0, 1.0, 1.0], c) else { return Vec::new() };
+                g.iter().map(|p| h.apply(p[0], p[1])).map(|(x, y)| [x, y]).collect()
+            }
+            _ => vec![c[0], c[1], c[2], c[3], mid(c[0], c[1]), mid(c[1], c[2]), mid(c[2], c[3]), mid(c[3], c[0])],
+        }
+    }
+
+    /// Back to its own print size, upright, unbent, where it is.
+    fn reset(&mut self, ppcm: f64) {
+        let (w, h) = cmd::natural_size_cm(&self.visual);
+        self.placement = Placement { corners: cmd::rect_corners(self.center(), w * ppcm, h * ppcm, 0.0), bend: Bend::default() };
+    }
+}
+
+/// What a drag on a handle started from.
+#[derive(Clone, Debug, PartialEq)]
+struct HandleDrag {
+    index: usize,
+    tool: Tool,
+    handle: usize,
+    from: [f64; 2],
+    start: Placement,
+}
+
+/// A drag of `tool`'s handle `handle` from `from` to `q` (photo pixels), on the placement it
+/// started from; `prop` keeps the proportions, `centered` scales about the centre, `snap` turns
+/// in 15° steps.
+fn drag_handle(d: &HandleDrag, q: [f64; 2], prop: bool, centered: bool, snap: bool) -> Placement {
+    let mut out = d.start.clone();
+    let c0 = d.start.corners;
+    let delta = [q[0] - d.from[0], q[1] - d.from[1]];
+    let center = [(c0[0][0] + c0[1][0] + c0[2][0] + c0[3][0]) / 4.0, (c0[0][1] + c0[1][1] + c0[2][1] + c0[3][1]) / 4.0];
+    match d.tool {
+        Tool::Scale => {
+            let f = Frame::of(&c0);
+            let p: Vec<[f64; 2]> = c0.iter().map(|c| f.to_local(*c)).collect();
+            let m = |a: usize, b: usize| [(p[a][0] + p[b][0]) / 2.0, (p[a][1] + p[b][1]) / 2.0];
+            let handle = if d.handle < 4 { p[d.handle] } else { m(d.handle - 4, (d.handle - 3) % 4) };
+            let anchor = if centered {
+                f.to_local(center)
+            } else if d.handle < 4 {
+                p[(d.handle + 2) % 4]
+            } else {
+                m((d.handle - 2) % 4, (d.handle - 1) % 4)
+            };
+            let qq = f.to_local(q);
+            let ratio = |i: usize| {
+                let den = handle[i] - anchor[i];
+                if den.abs() < 1e-9 { 1.0 } else { ((qq[i] - anchor[i]) / den).max(0.01) }
+            };
+            let (mut sx, mut sy) = match d.handle {
+                4 | 6 => (1.0, ratio(1)),
+                5 | 7 => (ratio(0), 1.0),
+                _ => (ratio(0), ratio(1)),
+            };
+            if prop {
+                let s = match d.handle {
+                    4 | 6 => sy,
+                    5 | 7 => sx,
+                    _ => {
+                        if (sx - 1.0).abs() > (sy - 1.0).abs() {
+                            sx
+                        } else {
+                            sy
+                        }
+                    }
+                };
+                (sx, sy) = (s, s);
+            }
+            for (k, c) in out.corners.iter_mut().enumerate() {
+                *c = f.from_local([anchor[0] + (p[k][0] - anchor[0]) * sx, anchor[1] + (p[k][1] - anchor[1]) * sy]);
+            }
+        }
+        Tool::Rotate => {
+            let a0 = (d.from[1] - center[1]).atan2(d.from[0] - center[0]);
+            let a1 = (q[1] - center[1]).atan2(q[0] - center[0]);
+            let mut deg = (a1 - a0).to_degrees();
+            if snap {
+                deg = (deg / 15.0).round() * 15.0;
+            }
+            let (s, co) = deg.to_radians().sin_cos();
+            for (k, c) in out.corners.iter_mut().enumerate() {
+                let (dx, dy) = (c0[k][0] - center[0], c0[k][1] - center[1]);
+                *c = [center[0] + dx * co - dy * s, center[1] + dx * s + dy * co];
+            }
+        }
+        Tool::Skew => {
+            let (u, v) = (unit([c0[1][0] - c0[0][0], c0[1][1] - c0[0][1]]), unit([c0[3][0] - c0[0][0], c0[3][1] - c0[0][1]]));
+            let along = |dir: [f64; 2]| {
+                let t = delta[0] * dir[0] + delta[1] * dir[1];
+                [dir[0] * t, dir[1] * t]
+            };
+            let (moved, by): (&[usize], [f64; 2]) = match d.handle {
+                4 => (&[0, 1], along(u)),
+                6 => (&[2, 3], along(u)),
+                5 => (&[1, 2], along(v)),
+                7 => (&[3, 0], along(v)),
+                k => (
+                    if k == 0 {
+                        &[0]
+                    } else if k == 1 {
+                        &[1]
+                    } else if k == 2 {
+                        &[2]
+                    } else {
+                        &[3]
+                    },
+                    along(u),
+                ),
+            };
+            for &k in moved {
+                out.corners[k] = [c0[k][0] + by[0], c0[k][1] + by[1]];
+            }
+        }
+        Tool::Distort => {
+            let moved: &[usize] = match d.handle {
+                4 => &[0, 1],
+                5 => &[1, 2],
+                6 => &[2, 3],
+                7 => &[3, 0],
+                0 => &[0],
+                1 => &[1],
+                2 => &[2],
+                _ => &[3],
+            };
+            for &k in moved {
+                out.corners[k] = [c0[k][0] + delta[0], c0[k][1] + delta[1]];
+            }
+        }
+        Tool::Perspective => {
+            if d.handle < 4 {
+                let k = d.handle;
+                let (u, v) = (unit([c0[1][0] - c0[0][0], c0[1][1] - c0[0][1]]), unit([c0[3][0] - c0[0][0], c0[3][1] - c0[0][1]]));
+                let (du, dv) = (delta[0] * u[0] + delta[1] * u[1], delta[0] * v[0] + delta[1] * v[1]);
+                let (dir, t, partner) = if du.abs() >= dv.abs() { (u, du, [1, 0, 3, 2][k]) } else { (v, dv, [3, 2, 1, 0][k]) };
+                out.corners[k] = [c0[k][0] + dir[0] * t, c0[k][1] + dir[1] * t];
+                out.corners[partner] = [c0[partner][0] - dir[0] * t, c0[partner][1] - dir[1] * t];
+            }
+        }
+        Tool::Warp => {
+            let Some(inv) = Homography::rect_to_quad([0.0, 0.0, 1.0, 1.0], c0).and_then(|h| h.inverse()) else { return out };
+            let (w, h) = d.start.rendition_size();
+            let mut pts = d.start.bend.grid(w as f64, h as f64).unwrap_or_else(cmd::rest_points);
+            let (a, b) = (inv.apply(d.from[0], d.from[1]), inv.apply(q[0], q[1]));
+            if let Some(p) = pts.get_mut(d.handle) {
+                p[0] += b.0 - a.0;
+                p[1] += b.1 - a.1;
+            }
+            out.bend = Bend { style: WarpStyle::Custom, bend: 0.0, vertical: d.start.bend.vertical, points: Some(pts) };
+        }
+    }
+    out
 }
 
 /// The loaded photo: its file and size, the preview's reduced copy and its light.
@@ -99,7 +465,7 @@ struct PhotoState {
     light: Light,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 enum Drag {
     /// Drawing the reference line from its first end.
     Line,
@@ -107,6 +473,8 @@ enum Drag {
     End(usize),
     /// Moving a visual, grabbed this far from its centre (photo pixels).
     Move { index: usize, grab: [f64; 2] },
+    /// A transform tool's handle.
+    Handle(HandleDrag),
 }
 
 pub struct MockupDialog {
@@ -115,15 +483,19 @@ pub struct MockupDialog {
     line: Option<[[f64; 2]; 2]>,
     /// Its real length.
     length_cm: f32,
+    /// The scale the visuals were last sized at: when it changes they keep their size in cm.
+    sized_at: Option<f64>,
     /// The next drag on the photo draws the line.
     drawing: bool,
     items: Vec<Item>,
     selected: Option<usize>,
+    /// The transform tool in use on the selected visual (none: a drag moves it).
+    tool: Option<Tool>,
     shadows: f32,
     folds: f32,
     opacity: f32,
     jpg: bool,
-    closed: [bool; 3],
+    closed: [bool; 4],
     status: String,
     drag: Option<Drag>,
     /// The preview needs rendering again.
@@ -137,14 +509,16 @@ impl MockupDialog {
             photo: None,
             line: None,
             length_cm: 50.0,
+            sized_at: None,
             drawing: false,
             items: Vec::new(),
             selected: None,
+            tool: None,
             shadows: cmd::DEFAULT_SHADOWS as f32,
             folds: cmd::DEFAULT_FOLDS as f32,
             opacity: cmd::DEFAULT_OPACITY as f32,
             jpg: false,
-            closed: [false, false, true],
+            closed: [false, false, false, true],
             status: String::new(),
             drag: None,
             dirty: true,
@@ -158,6 +532,23 @@ impl MockupDialog {
         cmd::pixels_per_cm(a, b, f64::from(self.length_cm))
     }
 
+    /// A new scale: the visuals keep their size in cm (scaled about their centres).
+    fn keep_sizes(&mut self) {
+        let now = self.ppcm();
+        if let (Some(old), Some(new)) = (self.sized_at, now)
+            && (old - new).abs() > 1e-9
+        {
+            let k = new / old;
+            for it in &mut self.items {
+                it.scale(k, k);
+            }
+            self.dirty = true;
+        }
+        if now.is_some() {
+            self.sized_at = now;
+        }
+    }
+
     fn render(&self) -> Render {
         Render { shadows: self.shadows / 100.0, folds: self.folds / 100.0, opacity: self.opacity / 100.0 }
     }
@@ -169,13 +560,16 @@ impl MockupDialog {
         if let Some(old) = &self.photo {
             let (kx, ky) = (f64::from(w) / f64::from(old.width.max(1)), f64::from(h) / f64::from(old.height.max(1)));
             for it in &mut self.items {
-                it.center = [it.center[0] * kx, it.center[1] * ky];
+                for p in &mut it.placement.corners {
+                    *p = [p[0] * kx, p[1] * ky];
+                }
             }
         }
         let (preview, k) = photo.reduced(PREVIEW_SIDE);
         let light = Light::new(&preview.rgba, preview.width as usize, preview.height as usize);
         self.photo = Some(PhotoState { path: path.to_string(), name: photo.name, width: w, height: h, preview, k, light });
         self.line = None;
+        self.sized_at = None;
         self.drawing = true;
         self.status = tl!("Draw the reference line on the photo").to_string();
         self.dirty = true;
@@ -185,7 +579,7 @@ impl MockupDialog {
     fn landing(&self) -> [f64; 2] {
         let Some(ph) = &self.photo else { return [0.0, 0.0] };
         let base = match self.line {
-            Some([a, b]) => [(a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0],
+            Some([a, b]) => mid(a, b),
             None => [f64::from(ph.width) / 2.0, f64::from(ph.height) / 2.0],
         };
         let step = self.ppcm().unwrap_or(0.0) * CASCADE_CM * self.items.len() as f64;
@@ -193,26 +587,23 @@ impl MockupDialog {
     }
 
     fn add_visual(&mut self, origin: Origin, v: Visual) -> Result<(), String> {
-        if self.ppcm().is_none() {
-            return Err(tl!("Set the scale first").to_string());
-        }
+        let Some(ppcm) = self.ppcm() else { return Err(tl!("Set the scale first").to_string()) };
         if self.items.len() >= MAX_ITEMS {
             return Err(crate::i18n::fmt(tl!("At most {n} visuals"), &[("n", &MAX_ITEMS.to_string())]));
         }
         let (w, h) = cmd::natural_size_cm(&v);
-        let center = self.landing();
+        let corners = cmd::rect_corners(self.landing(), w * ppcm, h * ppcm, 0.0);
         self.items.push(Item {
             origin,
             thumb: Some(preview_image(&v)),
             visual: v,
-            width_cm: w as f32,
-            height_cm: h as f32,
+            placement: Placement { corners, bend: Bend::default() },
             lock: true,
-            rotation: 0.0,
-            center,
             tex: None,
             cache: None,
+            placed: None,
         });
+        self.sized_at = Some(ppcm);
         self.selected = Some(self.items.len() - 1);
         self.closed[SECTION_VISUAL] = false;
         self.dirty = true;
@@ -227,6 +618,9 @@ impl MockupDialog {
                 Some(s) if s > i => Some(s - 1),
                 s => s,
             };
+            if self.selected.is_none() {
+                self.tool = None;
+            }
             self.dirty = true;
         }
     }
@@ -239,27 +633,35 @@ impl MockupDialog {
             _ => return,
         };
         if let Some(it) = self.items.get_mut(i) {
-            it.center[0] = x;
+            let c = it.center();
+            it.translate([x - c[0], 0.0]);
             self.dirty = true;
         }
     }
 
-    /// The visual's size in photo pixels.
-    fn size_px(&self, it: &Item) -> (f64, f64) {
-        let k = self.ppcm().unwrap_or(0.0);
-        (f64::from(it.width_cm) * k, f64::from(it.height_cm) * k)
+    /// A transform tool on the selected visual (the last one when none is).
+    fn set_tool(&mut self, tool: Option<Tool>) {
+        if tool.is_some() && self.selected.is_none() && !self.items.is_empty() {
+            self.selected = Some(self.items.len() - 1);
+        }
+        self.tool = tool.filter(|_| self.selected.is_some());
+        if self.tool.is_some() {
+            self.closed[SECTION_TRANSFORM] = false;
+        }
+    }
+
+    /// The selected visual back to its own size, upright and unbent.
+    fn reset(&mut self, i: usize) {
+        let k = self.ppcm().unwrap_or(1.0);
+        if let Some(it) = self.items.get_mut(i) {
+            it.reset(k);
+            self.dirty = true;
+        }
     }
 
     /// The top-most visual under `q` (photo pixels).
     fn hit(&self, q: [f64; 2]) -> Option<usize> {
-        (0..self.items.len()).rev().find(|i| {
-            let it = &self.items[*i];
-            let (w, h) = self.size_px(it);
-            let (s, c) = f64::from(it.rotation).to_radians().sin_cos();
-            let (dx, dy) = (q[0] - it.center[0], q[1] - it.center[1]);
-            let (u, v) = (dx * c + dy * s, -dx * s + dy * c);
-            u.abs() <= w / 2.0 && v.abs() <= h / 2.0
-        })
+        (0..self.items.len()).rev().find(|i| self.items[*i].contains(q))
     }
 
     /// The preview rendered again, if anything changed.
@@ -269,6 +671,7 @@ impl MockupDialog {
                 it.tex = Some(ctx.load_texture(format!("mockup-thumb-{i}-{}", it.visual.name), img, egui::TextureOptions::LINEAR));
             }
         }
+        self.keep_sizes();
         if !self.dirty {
             return;
         }
@@ -280,31 +683,31 @@ impl MockupDialog {
         };
         let pp = ppcm.unwrap_or(0.0) * ph.k;
         let mut errors = Vec::new();
-        if pp > 0.0 {
-            for it in &mut self.items {
-                let size = ((f64::from(it.width_cm) * pp).round().max(1.0) as usize, (f64::from(it.height_cm) * pp).round().max(1.0) as usize);
-                if it.cache.as_ref().is_none_or(|c| (c.0, c.1) != size) {
-                    it.cache = match cmd::print_pixels(&it.visual, f64::from(it.width_cm), f64::from(it.height_cm), pp) {
-                        Ok((px, w, h)) => Some((w, h, px)),
-                        Err(e) => {
-                            errors.push(e.to_string());
-                            None
-                        }
-                    };
+        for it in &mut self.items {
+            it.placed = None;
+            if pp <= 0.0 {
+                continue;
+            }
+            // On the preview: the corners scaled down with the photo.
+            let at = Placement { corners: it.placement.corners.map(|p| [p[0] * ph.k, p[1] * ph.k]), bend: it.placement.bend.clone() };
+            let (w, h) = at.rendition_size();
+            if it.cache.as_ref().is_none_or(|c| (c.0, c.1) != (w, h)) {
+                it.cache = match cmd::rendition(&it.visual, w, h) {
+                    Ok(s) => Some((w, h, s)),
+                    Err(e) => {
+                        errors.push(e.to_string());
+                        None
+                    }
+                };
+            }
+            if let Some((w, h, src)) = &it.cache {
+                match cmd::place_rendition(src, *w, *h, &at, ph.preview.width, ph.preview.height) {
+                    Ok(p) => it.placed = p,
+                    Err(e) => errors.push(e.to_string()),
                 }
             }
         }
-        let prints: Vec<Print> = if pp > 0.0 {
-            self.items
-                .iter()
-                .filter_map(|it| {
-                    let (w, h, px) = it.cache.as_ref()?;
-                    Some(Print { rgba: px, width: *w, height: *h, center: (it.center[0] * ph.k, it.center[1] * ph.k), rotation: f64::from(it.rotation) })
-                })
-                .collect()
-        } else {
-            Vec::new()
-        };
+        let prints: Vec<Print> = self.items.iter().filter_map(|it| it.placed.as_ref().map(Print::from)).collect();
         let (w, h) = (ph.preview.width as usize, ph.preview.height as usize);
         let out = cmd::composite(&ph.preview.rgba, w, h, &ph.light, &prints, self.render(), pp);
         let img = egui::ColorImage::from_rgba_unmultiplied([w, h], &out);
@@ -338,11 +741,8 @@ impl MockupDialog {
                     json!({"document": i})
                 }
             };
-            v["x"] = json!(it.center[0]);
-            v["y"] = json!(it.center[1]);
-            v["widthCm"] = json!(it.width_cm);
-            v["heightCm"] = json!(it.height_cm);
-            v["rotation"] = json!(it.rotation);
+            v["corners"] = json!(it.placement.corners);
+            v["warp"] = bend_json(&it.placement.bend);
             visuals.push(v);
         }
         Ok(json!({
@@ -357,19 +757,33 @@ impl MockupDialog {
     }
 
     fn describe(&self) -> Value {
+        let k = self.ppcm().unwrap_or(1.0);
         json!({
             "photo": self.photo.as_ref().map(|p| json!({"name": p.name, "pixels": [p.width, p.height]})),
             "line": self.line,
             "lengthCm": self.length_cm,
             "pixelsPerCm": self.ppcm(),
             "drawing": self.drawing,
-            "visuals": self.items.iter().map(|it| json!({"name": it.visual.name, "x": it.center[0], "y": it.center[1], "widthCm": it.width_cm, "heightCm": it.height_cm, "lock": it.lock, "rotation": it.rotation})).collect::<Vec<_>>(),
+            "visuals": self.items.iter().map(|it| {
+                let (w, h) = it.size_px();
+                let c = it.center();
+                json!({"name": it.visual.name, "x": c[0], "y": c[1], "widthCm": w / k, "heightCm": h / k, "lock": it.lock, "rotation": it.rotation(), "corners": it.placement.corners, "warp": bend_json(&it.placement.bend)})
+            }).collect::<Vec<_>>(),
             "selected": self.selected,
+            "tool": self.tool.map(Tool::id),
             "render": {"shadows": self.shadows, "folds": self.folds, "opacity": self.opacity},
             "format": if self.jpg { "jpg" } else { "png" },
             "status": self.status,
         })
     }
+}
+
+fn bend_json(b: &Bend) -> Value {
+    let mut v = json!({"style": b.style.id(), "bend": b.bend, "vertical": b.vertical});
+    if let Some(p) = b.points {
+        v["points"] = json!(p);
+    }
+    v
 }
 
 // ---------------------------------------------------------------- opening, files, export
@@ -394,6 +808,42 @@ pub fn load_photo(app: &mut PhotocraftApp, path: &str) {
         Ok(p) => {
             if let Some(d) = app.mockup.as_mut() {
                 d.set_photo(path, p);
+            }
+        }
+        Err(e) => set_status(app, e.to_string()),
+    }
+}
+
+/// The screenshot on the clipboard as the photo (kept as a PNG in the temporary folder, for the
+/// export to read).
+pub fn paste_photo(app: &mut PhotocraftApp) {
+    let Some(get) = app.services.clipboard_get_image.as_mut() else {
+        set_status(app, tl!("The clipboard can't be read here").to_string());
+        return;
+    };
+    let image = match get() {
+        Ok(Some((w, h, bytes))) => (w, h, bytes),
+        Ok(None) => {
+            set_status(app, tl!("The clipboard holds no image").to_string());
+            return;
+        }
+        Err(e) => {
+            set_status(app, e);
+            return;
+        }
+    };
+    let (w, h, bytes) = image;
+    let r = cmd::photo_from_rgba(tl!("Screenshot"), w, h, bytes).and_then(|photo| {
+        static PASTES: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+        let n = PASTES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let path = std::env::temp_dir().join(format!("dtfcraft-mockup-{}-{n}.png", std::process::id())).to_string_lossy().into_owned();
+        cmd::write_photo_png(&photo, &path)?;
+        Ok((path, photo))
+    });
+    match r {
+        Ok((path, photo)) => {
+            if let Some(d) = app.mockup.as_mut() {
+                d.set_photo(&path, photo);
             }
         }
         Err(e) => set_status(app, e.to_string()),
@@ -573,37 +1023,66 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
     {
         set_status(app, e);
     }
+    if ui.get("paste").and_then(Value::as_bool) == Some(true) {
+        paste_photo(app);
+    }
     let Some(d) = app.mockup.as_mut() else { return Ok(Value::Null) };
     if let Some(sel) = ui.get("select") {
         d.selected = sel.as_u64().map(|v| v as usize).filter(|i| *i < d.items.len());
     }
     if let Some(v) = ui.get("visual") {
         let i = v.get("index").and_then(Value::as_u64).map(|v| v as usize).or(d.selected).ok_or("no visual")?;
+        let k = d.ppcm().unwrap_or(1.0);
         let it = d.items.get_mut(i).ok_or("no such visual")?;
         if let Some(l) = v.get("lock").and_then(Value::as_bool) {
             it.lock = l;
         }
-        let ratio = it.height_cm / it.width_cm.max(1e-6);
-        if let Some(w) = f32_of(v.get("widthCm")) {
-            it.width_cm = w.clamp(0.1, 500.0);
-            if it.lock {
-                it.height_cm = (it.width_cm * ratio).clamp(0.1, 500.0);
+        if let Some(c) = v.get("corners").and_then(Value::as_array) {
+            let pts: Vec<[f64; 2]> = c.iter().filter_map(|p| point(Some(p))).collect();
+            if pts.len() == 4 {
+                it.placement.corners = [pts[0], pts[1], pts[2], pts[3]];
             }
         }
-        if let Some(h) = f32_of(v.get("heightCm")) {
-            it.height_cm = h.clamp(0.1, 500.0);
-            if it.lock && v.get("widthCm").is_none() {
-                it.width_cm = (it.height_cm / ratio.max(1e-6)).clamp(0.1, 500.0);
+        let (w, h) = it.size_px();
+        let w_cm = f32_of(v.get("widthCm")).map(|x| f64::from(x.clamp(0.1, 500.0)));
+        let h_cm = f32_of(v.get("heightCm")).map(|x| f64::from(x.clamp(0.1, 500.0)));
+        match (w_cm, h_cm) {
+            (Some(wc), Some(hc)) => it.scale(wc * k / w.max(1e-9), hc * k / h.max(1e-9)),
+            (Some(wc), None) => {
+                let sx = wc * k / w.max(1e-9);
+                it.scale(sx, if it.lock { sx } else { 1.0 });
             }
+            (None, Some(hc)) => {
+                let sy = hc * k / h.max(1e-9);
+                it.scale(if it.lock { sy } else { 1.0 }, sy);
+            }
+            (None, None) => {}
         }
-        if let Some(r) = f32_of(v.get("rotation")) {
-            it.rotation = r.clamp(-180.0, 180.0);
+        if let Some(r) = v.get("rotation").and_then(Value::as_f64).filter(|r| r.is_finite()) {
+            let now = it.rotation();
+            it.rotate(r.clamp(-180.0, 180.0) - now);
         }
         if let (Some(x), Some(y)) = (v.get("x").and_then(Value::as_f64), v.get("y").and_then(Value::as_f64)) {
-            it.center = [x, y];
+            let c = it.center();
+            it.translate([x - c[0], y - c[1]]);
+        }
+        if let Some(w) = v.get("warp") {
+            let mut b = cmd::Bend::from_json(w).map_err(|e| e.to_string())?;
+            if b.style.is_preset() && b.bend == 0.0 && w.get("bend").is_none() {
+                b.bend = DEFAULT_BEND;
+            }
+            it.placement.bend = b;
         }
         d.selected = Some(i);
         d.dirty = true;
+    }
+    if let Some(t) = ui.get("tool") {
+        d.set_tool(t.as_str().and_then(Tool::parse));
+    }
+    if ui.get("reset").and_then(Value::as_bool) == Some(true)
+        && let Some(i) = d.selected
+    {
+        d.reset(i);
     }
     if ui.get("center").and_then(Value::as_bool) == Some(true)
         && let Some(i) = d.selected
@@ -639,6 +1118,7 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
 #[derive(Default)]
 struct Actions {
     load_photo: bool,
+    paste: bool,
     add_files: bool,
     add_document: bool,
     export: bool,
@@ -651,14 +1131,26 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     if app.mockup.is_none() {
         return;
     }
-    let has_doc = app.session.active().is_some();
+    let has_doc = (app.session.active().is_some(), app.services.clipboard_get_image.is_some());
     let mut act = Actions::default();
+    // Ctrl+V (⌘V): a screenshot as the photo.
+    act.paste = !ctx.text_edit_focused()
+        && ctx.input(|i| {
+            i.events.iter().any(|e| match e {
+                egui::Event::Paste(_) | egui::Event::PasteImage(_) => true,
+                egui::Event::Key { key: egui::Key::V, pressed: true, modifiers, .. } => modifiers.command,
+                _ => false,
+            })
+        });
     light_scope(ctx, || draw(app, ctx, has_doc, &mut act));
     if act.report_bug {
         crate::beta::report(app, Some(cmd::MOCKUP));
     }
     if act.load_photo {
         pick_photo(app);
+    }
+    if act.paste {
+        paste_photo(app);
     }
     if act.add_files {
         pick_visuals(app);
@@ -693,7 +1185,7 @@ fn regions(full: ERect) -> Regions {
     Regions { header, left, canvas, right, status }
 }
 
-fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: bool, act: &mut Actions) {
+fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: (bool, bool), act: &mut Actions) {
     let screen = ctx.content_rect();
     egui::Area::new(egui::Id::unique("dtf-mockup-dialog")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
         let Some(d) = app.mockup.as_mut() else { return };
@@ -798,7 +1290,7 @@ fn num_text(v: f64, decimals: u32) -> String {
 }
 
 /// The left column: the three steps (photo, scale, visuals).
-fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens, has_doc: bool, act: &mut Actions) {
+fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens, (has_doc, can_paste): (bool, bool), act: &mut Actions) {
     ui.painter().rect_filled(rect, 0.0, t.dock);
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 12.0))));
     panel.spacing_mut().item_spacing.y = 10.0;
@@ -811,6 +1303,11 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
             step_title(ui, 1, tl!("Product Photo"), t);
             if blue_button(ui, tl!("Load a Photo (PNG, JPG)"), ui.available_width(), false).clicked() {
                 act.load_photo = true;
+            }
+            let pw = ui.available_width();
+            let r = ui.add_enabled_ui(can_paste, |ui| widgets::secondary_button(ui, tl!("Paste a Screenshot"), pw)).inner;
+            if r.on_hover_text(tl!("The image on the clipboard (Ctrl+V)")).clicked() {
+                act.paste = true;
             }
             match &d.photo {
                 Some(ph) => {
@@ -825,7 +1322,7 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
         card_frame(t).show(ui, |ui| {
             ui.set_width(ui.available_width());
             ui.spacing_mut().item_spacing.y = 6.0;
-            step_title(ui, 2, tl!("Scale"), t);
+            step_title(ui, 2, tl!("Photo Scale"), t);
             ui.add_enabled_ui(d.photo.is_some(), |ui| {
                 let label = if d.line.is_some() && !d.drawing { tl!("Draw the Line Again") } else { tl!("Draw a Reference Line on the Photo") };
                 if toggle_button(ui, label, d.drawing, ui.available_width())
@@ -858,7 +1355,8 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
             ui.set_width(ui.available_width());
             ui.spacing_mut().item_spacing.y = 6.0;
             step_title(ui, 3, tl!("Visuals"), t);
-            let scaled = d.ppcm().is_some();
+            let ppcm = d.ppcm();
+            let scaled = ppcm.is_some();
             ui.add_enabled_ui(scaled, |ui| {
                 if blue_button(ui, tl!("Import Images (PNG, SVG)"), ui.available_width(), false).clicked() {
                     act.add_files = true;
@@ -902,7 +1400,9 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
                 };
                 ui.painter().galley(pos2(img.right() + 8.0, row.top() + 7.0), name, t.text);
                 let dpi = crate::i18n::fmt(tl!("{dpi} ppi"), &[("dpi", &format!("{:.0}", it.visual.dpi))]);
-                let sub = format!("{} × {} cm · {dpi}", num_text(f64::from(it.width_cm), 1), num_text(f64::from(it.height_cm), 1));
+                let (wp, hp) = it.size_px();
+                let k = ppcm.unwrap_or(1.0);
+                let sub = format!("{} × {} cm · {dpi}", num_text(wp / k, 1), num_text(hp / k, 1));
                 ui.painter().text(pos2(img.right() + 8.0, row.top() + 27.0), Align2::LEFT_TOP, sub, FontId::proportional(11.0), t.text_faint);
                 let x = ERect::from_center_size(pos2(row.right() - 16.0, row.center().y), vec2(18.0, 18.0));
                 let xr = ui.interact(x, ui.scope_id().with(("mockup-x", i)), Sense::click());
@@ -961,6 +1461,7 @@ fn right_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(12.0, 12.0))));
     egui::ScrollArea::vertical().id_salt("mockup-right").auto_shrink([false, false]).show(&mut panel, |ui| {
         section(ui, d, SECTION_VISUAL, tl!("Selected Visual"), t, |ui, d| visual_section(ui, d, t));
+        section(ui, d, SECTION_TRANSFORM, tl!("Transform"), t, |ui, d| transform_section(ui, d, t));
         section(ui, d, SECTION_RENDER, tl!("Rendering"), t, |ui, d| render_section(ui, d, t));
         section(ui, d, SECTION_EXPORT, tl!("Export"), t, |ui, d| export_section(ui, d, t, act));
     });
@@ -971,35 +1472,34 @@ fn visual_section(ui: &mut egui::Ui, d: &mut MockupDialog, t: &Tokens) {
         ui.label(egui::RichText::new(tl!("Click a visual on the photo or in the list.")).size(11.5).color(t.text_faint));
         return;
     };
+    let k = d.ppcm().unwrap_or(1.0);
     let mut center = false;
     let mut delete = false;
     let mut changed = false;
     if let Some(it) = d.items.get_mut(i) {
         ui.label(egui::RichText::new(&it.visual.name).font(crate::theme::semibold(12.5)).color(t.text));
-        let ratio = it.height_cm / it.width_cm.max(1e-6);
-        let (mut w, mut h) = (it.width_cm, it.height_cm);
-        if number_row(ui, tl!("Width:"), &mut w, 0.1..=500.0, "cm", 2) && (w - it.width_cm).abs() > 1e-4 {
-            it.width_cm = w;
-            if it.lock {
-                it.height_cm = (w * ratio).clamp(0.1, 500.0);
-            }
+        let (wp, hp) = it.size_px();
+        let (w0, h0) = ((wp / k) as f32, (hp / k) as f32);
+        let (mut w, mut h) = (w0, h0);
+        if number_row(ui, tl!("Width:"), &mut w, 0.1..=500.0, "cm", 2) && (w - w0).abs() > 1e-4 {
+            let sx = f64::from(w / w0.max(1e-6));
+            it.scale(sx, if it.lock { sx } else { 1.0 });
             changed = true;
         }
-        if number_row(ui, tl!("Height:"), &mut h, 0.1..=500.0, "cm", 2) && (h - it.height_cm).abs() > 1e-4 {
-            it.height_cm = h;
-            if it.lock {
-                it.width_cm = (h / ratio.max(1e-6)).clamp(0.1, 500.0);
-            }
+        if number_row(ui, tl!("Height:"), &mut h, 0.1..=500.0, "cm", 2) && (h - h0).abs() > 1e-4 {
+            let sy = f64::from(h / h0.max(1e-6));
+            it.scale(if it.lock { sy } else { 1.0 }, sy);
             changed = true;
         }
         switch_row(ui, tl!("Keep Proportions"), &mut it.lock);
-        let mut r = it.rotation;
-        if number_row(ui, tl!("Rotation:"), &mut r, -180.0..=180.0, "°", 0) && (r - it.rotation).abs() > 1e-4 {
-            it.rotation = r;
+        let r0 = it.rotation() as f32;
+        let mut r = r0;
+        if number_row(ui, tl!("Rotation:"), &mut r, -180.0..=180.0, "°", 0) && (r - r0).abs() > 1e-4 {
+            it.rotate(f64::from(r - r0));
             changed = true;
         }
         let (nw, nh) = cmd::natural_size_cm(&it.visual);
-        if (f64::from(it.width_cm) - nw).abs() > 0.05 || (f64::from(it.height_cm) - nh).abs() > 0.05 {
+        if (f64::from(w) - nw).abs() > 0.05 || (f64::from(h) - nh).abs() > 0.05 {
             let text =
                 crate::i18n::fmt(tl!("Its file prints at {w} × {h} cm: this size is the mockup's only."), &[("w", &num_text(nw, 1)), ("h", &num_text(nh, 1))]);
             ui.label(egui::RichText::new(text).size(11.0).color(t.warning));
@@ -1020,6 +1520,78 @@ fn visual_section(ui: &mut egui::Ui, d: &mut MockupDialog, t: &Tokens) {
     }
     if delete {
         d.remove(i);
+    }
+}
+
+/// The transform tool in use, Warp's style, bend and direction, and Reset.
+fn transform_section(ui: &mut egui::Ui, d: &mut MockupDialog, t: &Tokens) {
+    let Some(i) = d.selected.filter(|i| *i < d.items.len()) else {
+        ui.label(egui::RichText::new(tl!("Click a visual on the photo or in the list.")).size(11.5).color(t.text_faint));
+        return;
+    };
+    let mut tool = d.tool;
+    let mut options: Vec<(Option<Tool>, &str)> = vec![(None, tl!("Move"))];
+    options.extend(Tool::ALL.iter().map(|t| (Some(*t), t.label())));
+    ui.horizontal(|ui| {
+        crate::gang_sheet_ui::fixed_label(ui, egui::RichText::new(tl!("Tool:")).color(t.text_dim), 110.0, 24.0);
+        let w = ui.available_width();
+        if widgets::dropdown_literal(ui, "mockup-tool", tl!("Tool"), &mut tool, &options, w) {
+            d.set_tool(tool);
+        }
+    });
+    let mut reset = false;
+    let mut changed = false;
+    if let Some(it) = d.items.get_mut(i) {
+        let b = &mut it.placement.bend;
+        let mut style = b.style;
+        let mut styles: Vec<(WarpStyle, &str)> = vec![(WarpStyle::None, style_label(WarpStyle::None))];
+        styles.extend(cmd::STYLES.iter().map(|s| (*s, style_label(*s))));
+        if style == WarpStyle::Custom {
+            styles.push((WarpStyle::Custom, style_label(WarpStyle::Custom)));
+        }
+        ui.horizontal(|ui| {
+            crate::gang_sheet_ui::fixed_label(ui, egui::RichText::new(tl!("Warp Style:")).color(t.text_dim), 110.0, 24.0);
+            let w = ui.available_width();
+            if widgets::dropdown_literal(ui, "mockup-warp-style", tl!("Warp Style"), &mut style, &styles, w) && style != b.style {
+                if style.is_preset() && b.bend == 0.0 {
+                    b.bend = DEFAULT_BEND;
+                }
+                b.style = style;
+                b.points = None;
+                changed = true;
+            }
+        });
+        if b.style.is_preset() {
+            let mut bend = b.bend as f32;
+            if widgets::slider_row(ui, tl!("Bend"), &mut bend, -100.0..=100.0, "%", None).changed() {
+                b.bend = f64::from(bend);
+                changed = true;
+            }
+            ui.horizontal(|ui| {
+                let w = (ui.available_width() - 8.0) / 2.0;
+                if toggle_button(ui, tl!("Horizontal"), !b.vertical, w).clicked() && b.vertical {
+                    b.vertical = false;
+                    changed = true;
+                }
+                if toggle_button(ui, tl!("Vertical"), b.vertical, w).clicked() && !b.vertical {
+                    b.vertical = true;
+                    changed = true;
+                }
+            });
+        } else if b.style == WarpStyle::Custom {
+            ui.label(egui::RichText::new(tl!("Drag the grid's points on the photo.")).size(11.0).color(t.text_faint));
+        }
+        let bw = ui.available_width();
+        if widgets::secondary_button(ui, tl!("Reset the Transform"), bw).on_hover_text(tl!("Its own print size, upright, unwarped")).clicked() {
+            reset = true;
+        }
+    }
+    ui.label(egui::RichText::new(tl!("Enter or Esc: back to moving.")).size(11.0).color(t.text_faint));
+    if changed {
+        d.dirty = true;
+    }
+    if reset {
+        d.reset(i);
     }
 }
 
@@ -1122,8 +1694,54 @@ fn pill(p: &egui::Painter, at: Pos2, text: &str, fill: Color32, color: Color32) 
     p.galley(r.center() - g.size() / 2.0, g, color);
 }
 
-/// The photo, the visuals' outlines, the reference line and the rulers; the line drawn, its ends
-/// and the visuals moved with the mouse.
+/// Where the photo lies in the canvas: its rect on screen and the screen points per photo pixel.
+fn photo_rect(canvas: ERect, pw: f32, ph: f32) -> (ERect, f32) {
+    let inner = ERect::from_min_max(canvas.min + vec2(PALETTE_W + 24.0 + RULER, RULER + 16.0), canvas.max - vec2(16.0, 16.0));
+    let z = (inner.width() / pw).min(inner.height() / ph).max(1e-4);
+    (ERect::from_center_size(inner.center(), vec2(pw * z, ph * z)), z)
+}
+
+/// The Transform palette over the canvas's top left: Edit › Transform's six tools.
+fn palette(ui: &mut egui::Ui, d: &mut MockupDialog, canvas: ERect, t: &Tokens) {
+    let rect = ERect::from_min_size(canvas.min + vec2(12.0, 12.0), vec2(PALETTE_W, 22.0 + 30.0 * Tool::ALL.len() as f32 + 24.0));
+    let p = ui.painter().clone();
+    p.rect(rect, 10.0, Color32::WHITE, Stroke::new(1.0, t.card_border), StrokeKind::Inside);
+    p.text(pos2(rect.center().x, rect.top() + 12.0), Align2::CENTER_CENTER, tl!("TRANSFORM"), crate::theme::semibold(9.5), MAGENTA);
+    let enabled = !d.items.is_empty();
+    for (k, tool) in Tool::ALL.iter().enumerate() {
+        let r = ERect::from_min_size(pos2(rect.left() + 6.0, rect.top() + 22.0 + 30.0 * k as f32), vec2(rect.width() - 12.0, 28.0));
+        let resp = ui.interact(r, ui.scope_id().with(("mockup-tool", k)), if enabled { Sense::click() } else { Sense::hover() });
+        let on = d.tool == Some(*tool);
+        if on {
+            p.rect(r, 6.0, Color32::from_rgb(251, 234, 246), Stroke::new(1.5, MAGENTA), StrokeKind::Inside);
+        } else if resp.hovered() && enabled {
+            p.rect_filled(r, 6.0, t.hover);
+        }
+        let color = if !enabled {
+            t.text_faint
+        } else if on {
+            Color32::from_rgb(156, 31, 138)
+        } else {
+            t.text
+        };
+        crate::icons::image(tool.icon(), 14.0, color).paint_at(ui, ERect::from_center_size(pos2(r.left() + 14.0, r.center().y), vec2(14.0, 14.0)));
+        p.text(
+            pos2(r.left() + 28.0, r.center().y),
+            Align2::LEFT_CENTER,
+            tool.label(),
+            if on { crate::theme::semibold(12.5) } else { crate::theme::medium(12.5) },
+            color,
+        );
+        resp.widget_info(|| egui::WidgetInfo::selected(egui::Role::Button, enabled, on, tool.label()));
+        if resp.clicked() {
+            d.set_tool(if on { None } else { Some(*tool) });
+        }
+    }
+    p.text(pos2(rect.center().x, rect.bottom() - 12.0), Align2::CENTER_CENTER, tl!("Enter or Esc: done"), FontId::proportional(10.0), t.text_faint);
+}
+
+/// The photo, the visuals' outlines, the reference line and the rulers; the line drawn, its ends,
+/// the visuals moved and transformed with the mouse.
 fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     let p = ui.painter_at(rect);
     p.rect_filled(rect, 0.0, t.canvas);
@@ -1131,9 +1749,7 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
         p.text(rect.center(), Align2::CENTER_CENTER, tl!("Start with the product's photo (step 1)."), FontId::proportional(14.0), t.text_faint);
         return;
     };
-    let inner = ERect::from_min_max(rect.min + vec2(RULER + 16.0, RULER + 16.0), rect.max - vec2(16.0, 16.0));
-    let z = (inner.width() / pw).min(inner.height() / ph).max(1e-4);
-    let photo = ERect::from_center_size(inner.center(), vec2(pw * z, ph * z));
+    let (photo, z) = photo_rect(rect, pw, ph);
     let to_screen = |q: [f64; 2]| pos2(photo.left() + q[0] as f32 * z, photo.top() + q[1] as f32 * z);
     let to_photo = |s: Pos2| [f64::from((s.x - photo.left()) / z), f64::from((s.y - photo.top()) / z)];
     if let Some(tex) = &d.shown {
@@ -1146,30 +1762,57 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
         ruler(&p, photo, true, cm_px, t);
         ruler(&p, photo, false, cm_px, t);
     }
-    // The visuals' outlines, the selected one in magenta with its size.
+    // The visuals' outlines, the selected one in magenta with its size and its tool's handles.
+    let k = ppcm.unwrap_or(1.0);
     for (i, it) in d.items.iter().enumerate() {
-        let (w, h) = d.size_px(it);
-        let (s, c) = f64::from(it.rotation).to_radians().sin_cos();
-        let corners: Vec<Pos2> = [(-w / 2.0, -h / 2.0), (w / 2.0, -h / 2.0), (w / 2.0, h / 2.0), (-w / 2.0, h / 2.0)]
-            .iter()
-            .map(|(x, y)| to_screen([it.center[0] + x * c - y * s, it.center[1] + x * s + y * c]))
-            .collect();
-        let on = d.selected == Some(i);
-        let stroke = if on { Stroke::new(1.5, MAGENTA) } else { Stroke::new(1.0, Color32::from_rgba_unmultiplied(120, 110, 140, 120)) };
-        let mut closed = corners.clone();
-        closed.push(corners[0]);
-        if on {
-            p.add(Shape::line(closed, stroke));
-            for q in &corners {
-                p.rect(ERect::from_center_size(*q, vec2(7.0, 7.0)), 1.0, Color32::WHITE, Stroke::new(1.5, MAGENTA), StrokeKind::Inside);
-            }
-            let bottom = corners.iter().map(|q| q.y).fold(f32::MIN, f32::max);
-            let mid = corners.iter().map(|q| q.x).sum::<f32>() / 4.0;
-            let size = format!("{} × {} cm", num_text(f64::from(it.width_cm), 1), num_text(f64::from(it.height_cm), 1));
-            pill(&p, pos2(mid, bottom + 14.0), &size, Color32::WHITE, t.text_dim);
-        } else {
-            p.extend(Shape::dashed_line(&closed, stroke, 4.0, 3.0));
+        let outline: Vec<Pos2> = it.outline().into_iter().map(to_screen).collect();
+        if outline.len() < 2 {
+            continue;
         }
+        let on = d.selected == Some(i);
+        if !on {
+            p.extend(Shape::dashed_line(&outline, Stroke::new(1.0, Color32::from_rgba_unmultiplied(120, 110, 140, 120)), 4.0, 3.0));
+            continue;
+        }
+        p.add(Shape::line(outline.clone(), Stroke::new(1.5, MAGENTA)));
+        let tool = d.tool;
+        if let Some(tool) = tool {
+            let hs: Vec<Pos2> = it.handles(tool).into_iter().map(to_screen).collect();
+            if tool == Tool::Warp {
+                // The warped thirds, as Edit › Transform › Warp shows them, then the control points.
+                let grid = it.grid();
+                let stroke = Stroke::new(1.0, MAGENTA.gamma_multiply(0.55));
+                for third in [1.0 / 3.0, 2.0 / 3.0] {
+                    let across: Vec<Pos2> = (0..=16).filter_map(|n| it.placement.map(grid.as_ref(), n as f64 / 16.0, third)).map(to_screen).collect();
+                    let down: Vec<Pos2> = (0..=16).filter_map(|n| it.placement.map(grid.as_ref(), third, n as f64 / 16.0)).map(to_screen).collect();
+                    p.add(Shape::line(across, stroke));
+                    p.add(Shape::line(down, stroke));
+                }
+                for q in &hs {
+                    p.circle(*q, 4.5, Color32::WHITE, Stroke::new(1.5, MAGENTA));
+                }
+            } else {
+                let shown: &[usize] = match tool {
+                    Tool::Perspective => &[0, 1, 2, 3],
+                    Tool::Skew => &[0, 1, 2, 3, 4, 5, 6, 7],
+                    _ => &[0, 1, 2, 3, 4, 5, 6, 7],
+                };
+                for &h in shown {
+                    p.rect(ERect::from_center_size(hs[h], vec2(8.0, 8.0)), 1.0, Color32::WHITE, Stroke::new(1.5, MAGENTA), StrokeKind::Inside);
+                }
+                if tool == Tool::Rotate {
+                    p.circle_stroke(to_screen(it.center()), 5.0, Stroke::new(1.5, MAGENTA));
+                }
+            }
+        }
+        let bottom = outline.iter().map(|q| q.y).fold(f32::MIN, f32::max);
+        let midx = outline.iter().map(|q| q.x).sum::<f32>() / outline.len() as f32;
+        let (w, h) = it.size_px();
+        let mut size = format!("{} × {} cm", num_text(w / k, 1), num_text(h / k, 1));
+        if let Some(tool) = tool {
+            size = format!("{size} · {}", tool.label());
+        }
+        pill(&p, pos2(midx, bottom + 14.0), &size, Color32::WHITE, t.text_dim);
     }
     // The reference line.
     if let Some([a, b]) = d.line {
@@ -1193,10 +1836,24 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
         );
     }
     // The mouse.
-    let resp = ui.interact(photo, ui.scope_id().with("mockup-photo"), Sense::click_and_drag());
+    let resp = ui.interact(rect, ui.scope_id().with("mockup-photo"), Sense::click_and_drag());
     resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Image, true, tl!("Product Photo")));
     let resp = if d.drawing { resp.on_hover_cursor(egui::CursorIcon::Crosshair) } else { resp };
     let ends = d.line.map(|[a, b]| [to_screen(a), to_screen(b)]);
+    let handle_at = |d: &MockupDialog, o: Pos2| -> Option<(usize, Tool, usize)> {
+        let tool = d.tool?;
+        let i = d.selected?;
+        let it = d.items.get(i)?;
+        let hs = it.handles(tool);
+        let usable = |h: usize| tool == Tool::Warp || !(tool == Tool::Perspective && h >= 4);
+        hs.iter()
+            .enumerate()
+            .filter(|(h, _)| usable(*h))
+            .map(|(h, q)| (h, to_screen(*q).distance(o)))
+            .filter(|(_, dd)| *dd <= GRAB)
+            .min_by(|a, b| a.1.total_cmp(&b.1))
+            .map(|(h, _)| (i, tool, h))
+    };
     let press = ui.input(|i| i.pointer.press_origin());
     if resp.drag_started()
         && let Some(o) = press
@@ -1205,35 +1862,56 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
         d.drag = if d.drawing {
             d.line = Some([q, q]);
             Some(Drag::Line)
+        } else if let Some((index, tool, handle)) = handle_at(d, o) {
+            Some(Drag::Handle(HandleDrag { index, tool, handle, from: q, start: d.items[index].placement.clone() }))
         } else if let Some(k) = ends.and_then(|e| e.iter().position(|s| s.distance(o) <= GRAB)) {
             Some(Drag::End(k))
         } else if let Some(i) = d.hit(q) {
+            if d.selected != Some(i) {
+                d.tool = None;
+            }
             d.selected = Some(i);
             d.closed[SECTION_VISUAL] = false;
-            d.items.get(i).map(|it| Drag::Move { index: i, grab: [q[0] - it.center[0], q[1] - it.center[1]] })
+            d.items.get(i).map(|it| {
+                let c = it.center();
+                Drag::Move { index: i, grab: [q[0] - c[0], q[1] - c[1]] }
+            })
+        } else if d.tool == Some(Tool::Rotate)
+            && let Some(i) = d.selected
+        {
+            // Rotate: a drag anywhere turns the selected visual.
+            Some(Drag::Handle(HandleDrag { index: i, tool: Tool::Rotate, handle: 0, from: q, start: d.items[i].placement.clone() }))
         } else {
             None
         };
     }
     if resp.dragged()
-        && let (Some(drag), Some(pos)) = (d.drag, resp.interact_pointer_pos())
+        && let (Some(drag), Some(pos)) = (d.drag.clone(), resp.interact_pointer_pos())
     {
         let q = to_photo(pos);
-        let q = [q[0].clamp(0.0, f64::from(pw)), q[1].clamp(0.0, f64::from(ph))];
+        let mods = ui.input(|i| i.modifiers);
         match drag {
             Drag::Line => {
+                let q = [q[0].clamp(0.0, f64::from(pw)), q[1].clamp(0.0, f64::from(ph))];
                 if let Some(l) = d.line.as_mut() {
                     l[1] = q;
                 }
             }
             Drag::End(k) => {
+                let q = [q[0].clamp(0.0, f64::from(pw)), q[1].clamp(0.0, f64::from(ph))];
                 if let Some(l) = d.line.as_mut() {
                     l[k] = q;
                 }
             }
             Drag::Move { index, grab } => {
                 if let Some(it) = d.items.get_mut(index) {
-                    it.center = [q[0] - grab[0], q[1] - grab[1]];
+                    let c = it.center();
+                    it.translate([q[0] - grab[0] - c[0], q[1] - grab[1] - c[1]]);
+                }
+            }
+            Drag::Handle(h) => {
+                if let Some(it) = d.items.get_mut(h.index) {
+                    it.placement = drag_handle(&h, q, it.lock != mods.shift, mods.alt, mods.shift);
                 }
             }
         }
@@ -1250,30 +1928,57 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
         }
         d.drag = None;
     }
-    if resp.clicked()
+    if (resp.clicked() || resp.secondary_clicked())
         && !d.drawing
         && let Some(pos) = resp.interact_pointer_pos()
     {
-        d.selected = d.hit(to_photo(pos));
+        let hit = d.hit(to_photo(pos));
+        if hit != d.selected && handle_at(d, pos).is_none() {
+            d.tool = None;
+            d.selected = hit;
+        }
         if d.selected.is_some() {
             d.closed[SECTION_VISUAL] = false;
         }
     }
+    // Right click: the transform tools.
+    if d.selected.is_some() {
+        resp.context_menu(|ui| {
+            for tool in Tool::ALL {
+                if ui.selectable_label(d.tool == Some(tool), tool.label()).clicked() {
+                    d.set_tool(Some(tool));
+                    ui.close();
+                }
+            }
+            ui.separator();
+            if ui.button(tl!("Reset the Transform")).clicked() {
+                if let Some(i) = d.selected {
+                    d.reset(i);
+                }
+                ui.close();
+            }
+        });
+    }
+    palette(ui, d, rect, t);
 }
 
-/// Delete removes the selected visual, the arrows move it (a mm, a cm with Shift), Esc stops
-/// drawing the line.
+/// Delete removes the selected visual, the arrows move it (a mm, a cm with Shift), Enter or Esc
+/// leaves the transform tool (Esc also stops drawing the line).
 fn keys(d: &mut MockupDialog, ctx: &egui::Context) {
-    let (del, esc, shift, arrows) = ctx.input(|i| {
+    let (del, esc, enter, shift, arrows) = ctx.input(|i| {
         (
             i.key_pressed(egui::Key::Delete) || i.key_pressed(egui::Key::Backspace),
             i.key_pressed(egui::Key::Escape),
+            i.key_pressed(egui::Key::Enter),
             i.modifiers.shift,
             [egui::Key::ArrowLeft, egui::Key::ArrowRight, egui::Key::ArrowUp, egui::Key::ArrowDown].map(|k| i.key_pressed(k)),
         )
     });
     if esc && d.drawing {
         d.drawing = false;
+    }
+    if esc || enter {
+        d.tool = None;
     }
     let Some(i) = d.selected else { return };
     if del {
@@ -1285,7 +1990,7 @@ fn keys(d: &mut MockupDialog, ctx: &egui::Context) {
     if (dx != 0.0 || dy != 0.0)
         && let Some(it) = d.items.get_mut(i)
     {
-        it.center = [it.center[0] + dx * step, it.center[1] + dy * step];
+        it.translate([dx * step, dy * step]);
         d.dirty = true;
     }
 }
@@ -1392,9 +2097,7 @@ mod tests {
         h.run_steps(2);
         // The photo's place on screen: fitted in the canvas.
         let canvas = regions(ERect::from_min_size(Pos2::ZERO, vec2(1366.0, 900.0))).canvas;
-        let inner = ERect::from_min_max(canvas.min + vec2(RULER + 16.0, RULER + 16.0), canvas.max - vec2(16.0, 16.0));
-        let z = (inner.width() / 600.0).min(inner.height() / 400.0);
-        let photo_rect = ERect::from_center_size(inner.center(), vec2(600.0 * z, 400.0 * z));
+        let (photo_rect, z) = photo_rect(canvas, 600.0, 400.0);
         let at = |x: f32, y: f32| photo_rect.min + vec2(x * z, y * z);
         let drag = |h: &mut egui_kittest::Harness<'static, (PhotocraftApp, bool)>, a: Pos2, b: Pos2| {
             let button = |pos, pressed| egui::Event::PointerButton { pos, button: egui::PointerButton::Primary, pressed, modifiers: egui::Modifiers::NONE };
@@ -1420,10 +2123,94 @@ mod tests {
         }
         add_files(&mut h.state_mut().0, &[logo]);
         h.run_steps(2);
-        let c0 = h.state().0.mockup.as_ref().unwrap().items[0].center;
+        let c0 = h.state().0.mockup.as_ref().unwrap().items[0].center();
         drag(&mut h, at(c0[0] as f32, c0[1] as f32), at(c0[0] as f32 + 50.0, c0[1] as f32 + 30.0));
-        let c1 = h.state().0.mockup.as_ref().unwrap().items[0].center;
+        let c1 = h.state().0.mockup.as_ref().unwrap().items[0].center();
         assert!((c1[0] - c0[0] - 50.0).abs() < 2.0 && (c1[1] - c0[1] - 30.0).abs() < 2.0, "{c0:?} → {c1:?}");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    /// Edit › Transform's tools on a 100 × 50 box: Scale from a corner (proportions kept or
+    /// not, from the centre with Alt), Rotate, Skew, Distort, Perspective and Warp.
+    #[test]
+    fn the_transform_tools_move_the_corners() {
+        let start = Placement { corners: cmd::rect_corners([150.0, 100.0], 100.0, 50.0, 0.0), bend: Bend::default() };
+        let drag = |tool, handle, from: [f64; 2], to: [f64; 2], prop, centered, snap| {
+            drag_handle(&HandleDrag { index: 0, tool, handle, from, start: start.clone() }, to, prop, centered, snap).corners
+        };
+        let near = |a: [f64; 2], b: [f64; 2]| (a[0] - b[0]).abs() < 1e-6 && (a[1] - b[1]).abs() < 1e-6;
+        // Bottom right dragged 50 right: half as wide again; proportions kept: half as tall again too.
+        let c = drag(Tool::Scale, 2, [200.0, 125.0], [250.0, 125.0], false, false, false);
+        assert!(near(c[0], [100.0, 75.0]) && near(c[2], [250.0, 125.0]), "{c:?}");
+        let c = drag(Tool::Scale, 2, [200.0, 125.0], [250.0, 125.0], true, false, false);
+        assert!(near(c[2], [250.0, 150.0]), "{c:?}");
+        // From the centre (Alt): both sides move.
+        let c = drag(Tool::Scale, 5, [200.0, 100.0], [250.0, 100.0], false, true, false);
+        assert!(near(c[0], [50.0, 75.0]) && near(c[1], [250.0, 75.0]), "{c:?}");
+        // Rotate a quarter turn (snapped from 88°).
+        let a = 88f64.to_radians();
+        let c = drag(Tool::Rotate, 0, [200.0, 100.0], [150.0 + 50.0 * a.cos(), 100.0 + 50.0 * a.sin()], false, false, true);
+        assert!(near(c[0], [175.0, 50.0]), "{c:?}");
+        // Skew the top side 20 right: the bottom stays.
+        let c = drag(Tool::Skew, 4, [150.0, 75.0], [170.0, 90.0], false, false, false);
+        assert!(near(c[0], [120.0, 75.0]) && near(c[1], [220.0, 75.0]) && near(c[3], [100.0, 125.0]), "{c:?}");
+        // Distort one corner freely.
+        let c = drag(Tool::Distort, 1, [200.0, 75.0], [210.0, 60.0], false, false, false);
+        assert!(near(c[1], [210.0, 60.0]) && near(c[0], [100.0, 75.0]), "{c:?}");
+        // Perspective: the top left in, the top right in as much.
+        let c = drag(Tool::Perspective, 0, [100.0, 75.0], [120.0, 77.0], false, false, false);
+        assert!(near(c[0], [120.0, 75.0]) && near(c[1], [180.0, 75.0]), "{c:?}");
+        // Warp: the grid's top middle point lifted: a custom warp.
+        let w = drag_handle(
+            &HandleDrag { index: 0, tool: Tool::Warp, handle: 1, from: [133.333, 75.0], start: start.clone() },
+            [133.333, 60.0],
+            false,
+            false,
+            false,
+        );
+        assert_eq!(w.bend.style, WarpStyle::Custom);
+        assert!(w.bend.points.unwrap()[1][1] < -0.2, "{:?}", w.bend.points);
+    }
+
+    /// A screenshot pasted from the clipboard is the photo; the tools, a warp and the corners
+    /// reach the export.
+    #[test]
+    fn a_pasted_screenshot_and_the_transforms_reach_the_export() {
+        let dir = temp_dir("paste");
+        let (_, logo) = files(&dir, 10, 10, "#ffffff");
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        app.services.clipboard_get_image = Some(Box::new(|| Ok(Some((400, 300, [200u8, 200, 200, 255].repeat(400 * 300))))));
+        open(&mut app);
+        let v = invoke(&mut app, &ctx, json!({"paste": true}));
+        assert_eq!(v["photo"]["pixels"], json!([400, 300]));
+        assert_eq!(v["photo"]["name"], tl!("Screenshot"));
+        let v = invoke(&mut app, &ctx, json!({"scale": {"from": [100, 150], "to": [300, 150], "cm": 20}, "addFiles": [logo], "tool": "warp"}));
+        assert_eq!(v["tool"], "warp");
+        let v = invoke(&mut app, &ctx, json!({"visual": {"index": 0, "warp": {"style": "arc"}, "widthCm": 10}}));
+        assert_eq!(v["visuals"][0]["warp"]["bend"], DEFAULT_BEND, "a style starts bent");
+        assert!((v["visuals"][0]["widthCm"].as_f64().unwrap() - 10.0).abs() < 1e-6);
+        // A new scale: the visual keeps its size in cm.
+        invoke(&mut app, &ctx, json!({"scale": {"cm": 40}}));
+        app.mockup.as_mut().unwrap().refresh(&ctx);
+        let v = app.mockup.as_ref().unwrap().describe();
+        assert!((v["visuals"][0]["widthCm"].as_f64().unwrap() - 10.0).abs() < 1e-6, "{v}");
+        let corners = v["visuals"][0]["corners"].clone();
+        let params = app.mockup.as_ref().unwrap().params(&app).unwrap();
+        assert_eq!(params["visuals"][0]["corners"], corners);
+        assert_eq!(params["visuals"][0]["warp"]["style"], "arc");
+        let out = dir.join("mockup.png").to_string_lossy().into_owned();
+        invoke(&mut app, &ctx, json!({"reset": true}));
+        let v = app.mockup.as_ref().unwrap().describe();
+        assert_eq!(v["visuals"][0]["warp"]["style"], "none");
+        invoke(&mut app, &ctx, json!({"export": out}));
+        assert!(app.mockup.is_none() && std::path::Path::new(&out).exists());
+        // No image on the clipboard: said, nothing changes.
+        app.services.clipboard_get_image = Some(Box::new(|| Ok(None)));
+        open(&mut app);
+        let v = invoke(&mut app, &ctx, json!({"paste": true}));
+        assert!(v["photo"].is_null());
+        assert_eq!(v["status"], tl!("The clipboard holds no image"));
         let _ = std::fs::remove_dir_all(dir);
     }
 
@@ -1437,7 +2224,7 @@ mod tests {
         let dir = temp_dir("capture");
         let (flat, _) = files(&dir, 1000, 1000, "#e9e7e2");
         let photo = std::env::var("MOCKUP_PHOTO").unwrap_or(flat);
-        for (name, full) in [("mockup", true), ("mockup_vide", false)] {
+        for (name, mode) in [("mockup", 1), ("mockup_vide", 0), ("mockup_deformer", 2)] {
             let photo = photo.clone();
             let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
@@ -1445,7 +2232,7 @@ mod tests {
                 crate::dtf_panel::dtf_craft_startup(&mut app);
                 let ctx = cc.egui_ctx.clone();
                 open(&mut app);
-                if full {
+                if mode > 0 {
                     // A club logo: a red block with a white band, and a small blue square.
                     app.run("file.new", json!({"name": "logo-club", "width": 1200, "height": 900, "resolution": 300, "background": "transparent"})).unwrap();
                     app.run("select.rect", json!({"x": 0, "y": 0, "width": 1200, "height": 900})).unwrap();
@@ -1467,6 +2254,9 @@ mod tests {
                     invoke(&mut app, &ctx, json!({"addDocument": true}));
                     invoke(&mut app, &ctx, json!({"visual": {"index": 1, "widthCm": 6, "x": w * 0.64, "y": w * 0.26}, "select": 0}));
                     invoke(&mut app, &ctx, json!({"select": 0}));
+                    if mode == 2 {
+                        invoke(&mut app, &ctx, json!({"visual": {"index": 0, "warp": {"style": "arc", "bend": 25}}, "tool": "warp"}));
+                    }
                 }
                 app.beta = Default::default();
                 app

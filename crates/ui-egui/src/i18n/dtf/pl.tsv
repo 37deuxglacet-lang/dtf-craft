@@ -512,10 +512,44 @@
 	Remove {name}	Usuń {name}
 	Rendering	Renderowanie
 	Rotation:	Obrót:
-	Scale	Skala
+	Photo Scale	Skala
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Skala: 1 cm = {px} px · Zdjęcie {w} × {h} cm · wzory: {n}
 	Set the scale first	Najpierw ustaw skalę
 	Start with the product's photo (step 1).	Zacznij od zdjęcia produktu (krok 1).
 	The garment from the front, flat or worn, in good light.	Odzież od przodu, płasko lub na osobie, dobrze oświetlona.
 	Width:	Szerokość:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px na zdjęciu · linijki w cm
+# DTF Craft (37)
+	Scale	Skaluj
+	Rotate	Obróć
+	Skew	Pochyl
+	Distort	Zniekształć
+	Perspective	Perspektywa
+	Warp	Wypaczenie
+	Move	Przesuń
+	Transform	Przekształć
+	TRANSFORM	PRZEKSZTAŁĆ
+	Tool	Narzędzie
+	Tool:	Narzędzie:
+	Warp Style	Styl wypaczenia
+	Warp Style:	Styl:
+	None	Brak
+	Arc	Łuk
+	Arch	Sklepienie
+	Bulge	Wybrzuszenie
+	Flag	Flaga
+	Inflate	Nadmuchanie
+	Custom	Własne
+	Bend	Wygięcie
+	Horizontal	Poziomo
+	Vertical	Pionowo
+	Reset the Transform	Resetuj przekształcenie
+	Its own print size, upright, unwarped	Rozmiar druku, prosto, bez wypaczenia
+	Drag the grid's points on the photo.	Przeciągaj punkty siatki na zdjęciu.
+	Enter or Esc: back to moving.	Enter lub Esc: powrót do przesuwania.
+	Enter or Esc: done	Enter lub Esc: gotowe
+	Paste a Screenshot	Wklej zrzut ekranu
+	Screenshot	Zrzut ekranu
+	The image on the clipboard (Ctrl+V)	Obraz ze schowka (Ctrl+V)
+	The clipboard holds no image	Schowek nie zawiera obrazu
+	The clipboard can't be read here	Nie można tu odczytać schowka

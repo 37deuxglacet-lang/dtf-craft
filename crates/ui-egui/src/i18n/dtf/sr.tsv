@@ -499,10 +499,44 @@
 	Remove {name}	Ukloni {name}
 	Rendering	Prikaz
 	Rotation:	Rotacija:
-	Scale	Razmera
+	Photo Scale	Razmera
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Razmera: 1 cm = {px} px · Fotografija {w} × {h} cm · motiva: {n}
 	Set the scale first	Prvo podesite razmeru
 	Start with the product's photo (step 1).	Počnite od fotografije proizvoda (korak 1).
 	The garment from the front, flat or worn, in good light.	Odevni predmet spreda, raširen ili obučen, dobro osvetljen.
 	Width:	Širina:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px na fotografiji · lenjiri u cm
+# DTF Craft (37)
+	Scale	Skaliranje
+	Rotate	Rotacija
+	Skew	Iskošenje
+	Distort	Izobličenje
+	Perspective	Perspektiva
+	Warp	Savijanje
+	Move	Pomeranje
+	Transform	Transformacija
+	TRANSFORM	TRANSFORMACIJA
+	Tool	Alat
+	Tool:	Alat:
+	Warp Style	Stil savijanja
+	Warp Style:	Stil:
+	None	Nijedan
+	Arc	Luk
+	Arch	Svod
+	Bulge	Ispupčenje
+	Flag	Zastava
+	Inflate	Naduvavanje
+	Custom	Prilagođeno
+	Bend	Savijenost
+	Horizontal	Vodoravno
+	Vertical	Uspravno
+	Reset the Transform	Poništi transformaciju
+	Its own print size, upright, unwarped	Njegova veličina za štampu, uspravno, bez savijanja
+	Drag the grid's points on the photo.	Prevlačite tačke mreže na fotografiji.
+	Enter or Esc: back to moving.	Enter ili Esc: nazad na pomeranje.
+	Enter or Esc: done	Enter ili Esc: gotovo
+	Paste a Screenshot	Nalepi snimak ekrana
+	Screenshot	Snimak ekrana
+	The image on the clipboard (Ctrl+V)	Slika iz ostave (Ctrl+V)
+	The clipboard holds no image	Ostava ne sadrži sliku
+	The clipboard can't be read here	Ostava se ovde ne može pročitati

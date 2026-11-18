@@ -528,10 +528,44 @@
 	Remove {name}	移除 {name}
 	Rendering	算繪
 	Rotation:	旋轉：
-	Scale	比例
+	Photo Scale	比例
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	比例：1 公分 = {px} 像素 · 照片 {w} × {h} 公分 · {n} 個圖案
 	Set the scale first	請先設定比例
 	Start with the product's photo (step 1).	從產品照片開始（第 1 步）。
 	The garment from the front, flat or worn, in good light.	衣物正面照，平放或穿著，光線充足。
 	Width:	寬度：
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 照片上 1 公分 = {px} 像素 · 尺規單位為公分
+# DTF Craft (37)
+	Scale	縮放
+	Rotate	旋轉
+	Skew	傾斜
+	Distort	扭曲
+	Perspective	透視
+	Warp	彎曲
+	Move	移動
+	Transform	變形
+	TRANSFORM	變形
+	Tool	工具
+	Tool:	工具：
+	Warp Style	彎曲樣式
+	Warp Style:	樣式：
+	None	無
+	Arc	弧形
+	Arch	拱形
+	Bulge	突出
+	Flag	旗幟
+	Inflate	膨脹
+	Custom	自訂
+	Bend	彎曲度
+	Horizontal	水平
+	Vertical	垂直
+	Reset the Transform	重設變形
+	Its own print size, upright, unwarped	恢復其列印尺寸，擺正，不彎曲
+	Drag the grid's points on the photo.	在照片上拖曳網格的點。
+	Enter or Esc: back to moving.	Enter 或 Esc：返回移動。
+	Enter or Esc: done	Enter 或 Esc：完成
+	Paste a Screenshot	貼上螢幕擷取畫面
+	Screenshot	螢幕擷取畫面
+	The image on the clipboard (Ctrl+V)	剪貼簿中的影像（Ctrl+V）
+	The clipboard holds no image	剪貼簿中沒有影像
+	The clipboard can't be read here	此處無法讀取剪貼簿

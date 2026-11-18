@@ -500,10 +500,44 @@
 	Remove {name}	{name} öğesini kaldır
 	Rendering	Görünüm
 	Rotation:	Döndürme:
-	Scale	Ölçek
+	Photo Scale	Ölçek
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Ölçek: 1 cm = {px} px · Fotoğraf {w} × {h} cm · {n} tasarım
 	Set the scale first	Önce ölçeği belirleyin
 	Start with the product's photo (step 1).	Ürün fotoğrafıyla başlayın (1. adım).
 	The garment from the front, flat or worn, in good light.	Giysi önden, düz serilmiş veya giyilmiş, iyi ışıkta.
 	Width:	Genişlik:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px fotoğrafta · cetveller cm cinsinden
+# DTF Craft (37)
+	Scale	Ölçekle
+	Rotate	Döndür
+	Skew	Eğ
+	Distort	Bozulma
+	Perspective	Perspektif
+	Warp	Çarpıt
+	Move	Taşı
+	Transform	Dönüştür
+	TRANSFORM	DÖNÜŞTÜR
+	Tool	Araç
+	Tool:	Araç:
+	Warp Style	Çarpıtma stili
+	Warp Style:	Stil:
+	None	Yok
+	Arc	Yay
+	Arch	Kemer
+	Bulge	Şişkinlik
+	Flag	Bayrak
+	Inflate	Şişir
+	Custom	Özel
+	Bend	Bükülme
+	Horizontal	Yatay
+	Vertical	Dikey
+	Reset the Transform	Dönüştürmeyi sıfırla
+	Its own print size, upright, unwarped	Kendi baskı boyutu, düz, çarpıtmasız
+	Drag the grid's points on the photo.	Izgaranın noktalarını fotoğraf üzerinde sürükleyin.
+	Enter or Esc: back to moving.	Enter veya Esc: taşımaya dön.
+	Enter or Esc: done	Enter veya Esc: bitti
+	Paste a Screenshot	Ekran görüntüsü yapıştır
+	Screenshot	Ekran görüntüsü
+	The image on the clipboard (Ctrl+V)	Panodaki görüntü (Ctrl+V)
+	The clipboard holds no image	Panoda görüntü yok
+	The clipboard can't be read here	Pano burada okunamıyor

@@ -519,10 +519,44 @@
 	Remove {name}	Lepas {name}
 	Rendering	Tampilan
 	Rotation:	Rotasi:
-	Scale	Skala
+	Photo Scale	Skala
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Skala: 1 cm = {px} px · Foto {w} × {h} cm · {n} desain
 	Set the scale first	Tentukan skala terlebih dahulu
 	Start with the product's photo (step 1).	Mulailah dengan foto produk (langkah 1).
 	The garment from the front, flat or worn, in good light.	Pakaian dari depan, dibentangkan atau dipakai, dengan cahaya yang baik.
 	Width:	Lebar:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px di foto · penggaris dalam cm
+# DTF Craft (37)
+	Scale	Skala
+	Rotate	Putar
+	Skew	Miringkan
+	Distort	Distorsi
+	Perspective	Perspektif
+	Warp	Lengkungkan
+	Move	Pindahkan
+	Transform	Transformasi
+	TRANSFORM	TRANSFORMASI
+	Tool	Alat
+	Tool:	Alat:
+	Warp Style	Gaya lengkungan
+	Warp Style:	Gaya:
+	None	Tidak ada
+	Arc	Busur
+	Arch	Lengkung
+	Bulge	Gembung
+	Flag	Bendera
+	Inflate	Mengembang
+	Custom	Kustom
+	Bend	Lengkungan
+	Horizontal	Horizontal
+	Vertical	Vertikal
+	Reset the Transform	Atur ulang transformasi
+	Its own print size, upright, unwarped	Ukuran cetaknya sendiri, tegak, tanpa lengkungan
+	Drag the grid's points on the photo.	Seret titik-titik kisi di foto.
+	Enter or Esc: back to moving.	Enter atau Esc: kembali ke memindahkan.
+	Enter or Esc: done	Enter atau Esc: selesai
+	Paste a Screenshot	Tempel tangkapan layar
+	Screenshot	Tangkapan layar
+	The image on the clipboard (Ctrl+V)	Gambar di papan klip (Ctrl+V)
+	The clipboard holds no image	Papan klip tidak berisi gambar
+	The clipboard can't be read here	Papan klip tidak dapat dibaca di sini

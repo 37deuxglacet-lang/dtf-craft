@@ -500,10 +500,44 @@
 	Remove {name}	Remover {name}
 	Rendering	Renderização
 	Rotation:	Rotação:
-	Scale	Escala
+	Photo Scale	Escala
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Escala: 1 cm = {px} px · Foto {w} × {h} cm · {n} artes
 	Set the scale first	Defina primeiro a escala
 	Start with the product's photo (step 1).	Comece pela foto do produto (etapa 1).
 	The garment from the front, flat or worn, in good light.	A peça de frente, estendida ou vestida, bem iluminada.
 	Width:	Largura:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px na foto · réguas em cm
+# DTF Craft (37)
+	Scale	Escala
+	Rotate	Girar
+	Skew	Inclinar
+	Distort	Distorcer
+	Perspective	Perspectiva
+	Warp	Deformação
+	Move	Mover
+	Transform	Transformar
+	TRANSFORM	TRANSFORMAR
+	Tool	Ferramenta
+	Tool:	Ferramenta:
+	Warp Style	Estilo de deformação
+	Warp Style:	Estilo:
+	None	Nenhum
+	Arc	Arco
+	Arch	Arcada
+	Bulge	Protuberância
+	Flag	Bandeira
+	Inflate	Inflar
+	Custom	Personalizado
+	Bend	Curvatura
+	Horizontal	Horizontal
+	Vertical	Vertical
+	Reset the Transform	Redefinir a transformação
+	Its own print size, upright, unwarped	Seu tamanho de impressão, reto, sem deformação
+	Drag the grid's points on the photo.	Arraste os pontos da grade na foto.
+	Enter or Esc: back to moving.	Enter ou Esc: voltar a mover.
+	Enter or Esc: done	Enter ou Esc: concluído
+	Paste a Screenshot	Colar uma captura de tela
+	Screenshot	Captura de tela
+	The image on the clipboard (Ctrl+V)	A imagem da área de transferência (Ctrl+V)
+	The clipboard holds no image	A área de transferência não contém imagem
+	The clipboard can't be read here	A área de transferência não pode ser lida aqui

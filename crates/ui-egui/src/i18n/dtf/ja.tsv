@@ -509,10 +509,44 @@
 	Remove {name}	{name} を取り除く
 	Rendering	レンダリング
 	Rotation:	回転：
-	Scale	縮尺
+	Photo Scale	縮尺
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	縮尺：1 cm = {px} px · 写真 {w} × {h} cm · デザイン {n} 点
 	Set the scale first	先に縮尺を設定してください
 	Start with the product's photo (step 1).	商品写真から始めてください（ステップ 1）。
 	The garment from the front, flat or worn, in good light.	衣類を正面から、平置きまたは着用で、明るい場所で。
 	Width:	幅：
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 写真上で 1 cm = {px} px · 定規は cm
+# DTF Craft (37)
+	Scale	拡大・縮小
+	Rotate	回転
+	Skew	ゆがみ
+	Distort	自由な形に
+	Perspective	遠近法
+	Warp	ワープ
+	Move	移動
+	Transform	変形
+	TRANSFORM	変形
+	Tool	ツール
+	Tool:	ツール：
+	Warp Style	ワープスタイル
+	Warp Style:	スタイル：
+	None	なし
+	Arc	円弧
+	Arch	アーチ
+	Bulge	でこぼこ
+	Flag	旗
+	Inflate	膨張
+	Custom	カスタム
+	Bend	カーブ
+	Horizontal	水平方向
+	Vertical	垂直方向
+	Reset the Transform	変形をリセット
+	Its own print size, upright, unwarped	印刷サイズ・まっすぐ・ワープなしに戻す
+	Drag the grid's points on the photo.	写真上でグリッドの点をドラッグしてください。
+	Enter or Esc: back to moving.	Enter または Esc：移動に戻る。
+	Enter or Esc: done	Enter または Esc：完了
+	Paste a Screenshot	スクリーンショットを貼り付け
+	Screenshot	スクリーンショット
+	The image on the clipboard (Ctrl+V)	クリップボードの画像（Ctrl+V）
+	The clipboard holds no image	クリップボードに画像がありません
+	The clipboard can't be read here	ここではクリップボードを読み取れません

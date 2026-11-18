@@ -501,10 +501,44 @@
 	Remove {name}	Odebrat {name}
 	Rendering	Vykreslení
 	Rotation:	Otočení:
-	Scale	Měřítko
+	Photo Scale	Měřítko
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Měřítko: 1 cm = {px} px · Fotografie {w} × {h} cm · motivy: {n}
 	Set the scale first	Nejprve nastavte měřítko
 	Start with the product's photo (step 1).	Začněte fotografií produktu (krok 1).
 	The garment from the front, flat or worn, in good light.	Oděv zepředu, rozložený nebo oblečený, dobře osvětlený.
 	Width:	Šířka:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px na fotografii · pravítka v cm
+# DTF Craft (37)
+	Scale	Změnit velikost
+	Rotate	Otočit
+	Skew	Zkosit
+	Distort	Deformovat
+	Perspective	Perspektiva
+	Warp	Pokřivit
+	Move	Přesunout
+	Transform	Transformace
+	TRANSFORM	TRANSFORMACE
+	Tool	Nástroj
+	Tool:	Nástroj:
+	Warp Style	Styl pokřivení
+	Warp Style:	Styl:
+	None	Žádný
+	Arc	Oblouk
+	Arch	Klenba
+	Bulge	Vyboulení
+	Flag	Vlajka
+	Inflate	Nafouknutí
+	Custom	Vlastní
+	Bend	Ohyb
+	Horizontal	Vodorovně
+	Vertical	Svisle
+	Reset the Transform	Obnovit transformaci
+	Its own print size, upright, unwarped	Jeho tisková velikost, rovně, bez pokřivení
+	Drag the grid's points on the photo.	Táhněte body mřížky na fotografii.
+	Enter or Esc: back to moving.	Enter nebo Esc: zpět k přesouvání.
+	Enter or Esc: done	Enter nebo Esc: hotovo
+	Paste a Screenshot	Vložit snímek obrazovky
+	Screenshot	Snímek obrazovky
+	The image on the clipboard (Ctrl+V)	Obrázek ze schránky (Ctrl+V)
+	The clipboard holds no image	Schránka neobsahuje obrázek
+	The clipboard can't be read here	Schránku zde nelze přečíst

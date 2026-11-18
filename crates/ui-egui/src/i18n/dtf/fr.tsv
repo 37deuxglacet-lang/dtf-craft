@@ -544,10 +544,44 @@
 	Remove {name}	Retirer {name}
 	Rendering	Rendu
 	Rotation:	Rotation :
-	Scale	Échelle
+	Photo Scale	Échelle
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Échelle : 1 cm = {px} px · Photo {w} × {h} cm · {n} visuels
 	Set the scale first	Indiquez d'abord l'échelle
 	Start with the product's photo (step 1).	Commencez par la photo du produit (étape 1).
 	The garment from the front, flat or worn, in good light.	Le vêtement de face, à plat ou porté, bien éclairé.
 	Width:	Largeur :
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px sur la photo · règles en cm
+# DTF Craft (37)
+	Scale	Mise à l'échelle
+	Rotate	Rotation
+	Skew	Inclinaison
+	Distort	Déformation
+	Perspective	Perspective
+	Warp	Déformer
+	Move	Déplacer
+	Transform	Transformation
+	TRANSFORM	TRANSFORMATION
+	Tool	Outil
+	Tool:	Outil :
+	Warp Style	Style de déformation
+	Warp Style:	Style :
+	None	Aucun
+	Arc	Arc
+	Arch	Arche
+	Bulge	Renflement
+	Flag	Drapeau
+	Inflate	Gonflement
+	Custom	Personnalisé
+	Bend	Courbure
+	Horizontal	Horizontal
+	Vertical	Vertical
+	Reset the Transform	Réinitialiser la transformation
+	Its own print size, upright, unwarped	Sa taille d'impression, droit, sans déformation
+	Drag the grid's points on the photo.	Glissez les points de la grille sur la photo.
+	Enter or Esc: back to moving.	Entrée ou Échap : retour au déplacement.
+	Enter or Esc: done	Entrée ou Échap : terminé
+	Paste a Screenshot	Coller une copie d'écran
+	Screenshot	Copie d'écran
+	The image on the clipboard (Ctrl+V)	L'image du presse-papiers (Ctrl+V)
+	The clipboard holds no image	Le presse-papiers ne contient pas d'image
+	The clipboard can't be read here	Le presse-papiers ne peut pas être lu ici

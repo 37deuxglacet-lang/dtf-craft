@@ -513,10 +513,44 @@
 	Remove {name}	{name} 제거
 	Rendering	렌더링
 	Rotation:	회전:
-	Scale	축척
+	Photo Scale	축척
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	축척: 1cm = {px}px · 사진 {w} × {h}cm · 디자인 {n}개
 	Set the scale first	먼저 축척을 설정하세요
 	Start with the product's photo (step 1).	제품 사진부터 시작하세요(1단계).
 	The garment from the front, flat or worn, in good light.	의류를 정면에서, 펼치거나 착용한 상태로, 밝은 곳에서.
 	Width:	너비:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 사진에서 1cm = {px}px · 눈금자 단위 cm
+# DTF Craft (37)
+	Scale	비율
+	Rotate	회전
+	Skew	기울이기
+	Distort	왜곡
+	Perspective	원근
+	Warp	뒤틀기
+	Move	이동
+	Transform	변형
+	TRANSFORM	변형
+	Tool	도구
+	Tool:	도구:
+	Warp Style	뒤틀기 스타일
+	Warp Style:	스타일:
+	None	없음
+	Arc	부채꼴
+	Arch	아치
+	Bulge	돌출
+	Flag	깃발
+	Inflate	부풀리기
+	Custom	사용자 정의
+	Bend	구부리기
+	Horizontal	가로
+	Vertical	세로
+	Reset the Transform	변형 재설정
+	Its own print size, upright, unwarped	원래 인쇄 크기, 똑바로, 뒤틀기 없음
+	Drag the grid's points on the photo.	사진에서 격자의 점을 드래그하세요.
+	Enter or Esc: back to moving.	Enter 또는 Esc: 이동으로 돌아가기.
+	Enter or Esc: done	Enter 또는 Esc: 완료
+	Paste a Screenshot	스크린샷 붙여넣기
+	Screenshot	스크린샷
+	The image on the clipboard (Ctrl+V)	클립보드의 이미지(Ctrl+V)
+	The clipboard holds no image	클립보드에 이미지가 없습니다
+	The clipboard can't be read here	여기서는 클립보드를 읽을 수 없습니다

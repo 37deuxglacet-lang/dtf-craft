@@ -500,10 +500,44 @@
 	Remove {name}	{name} verwijderen
 	Rendering	Weergave
 	Rotation:	Rotatie:
-	Scale	Schaal
+	Photo Scale	Schaal
 	Scale: 1 cm = {px} px · Photo {w} × {h} cm · {n} visuals	Schaal: 1 cm = {px} px · Foto {w} × {h} cm · {n} ontwerpen
 	Set the scale first	Stel eerst de schaal in
 	Start with the product's photo (step 1).	Begin met de productfoto (stap 1).
 	The garment from the front, flat or worn, in good light.	Het kledingstuk van voren, plat of gedragen, goed belicht.
 	Width:	Breedte:
 	✓ 1 cm = {px} px on the photo · rulers in cm	✓ 1 cm = {px} px op de foto · linialen in cm
+# DTF Craft (37)
+	Scale	Schalen
+	Rotate	Roteren
+	Skew	Schuintrekken
+	Distort	Vervormen
+	Perspective	Perspectief
+	Warp	Verdraaien
+	Move	Verplaatsen
+	Transform	Transformeren
+	TRANSFORM	TRANSFORMEREN
+	Tool	Gereedschap
+	Tool:	Gereedschap:
+	Warp Style	Verdraaiingsstijl
+	Warp Style:	Stijl:
+	None	Geen
+	Arc	Boog
+	Arch	Gewelf
+	Bulge	Uitstulping
+	Flag	Vlag
+	Inflate	Opblazen
+	Custom	Aangepast
+	Bend	Buiging
+	Horizontal	Horizontaal
+	Vertical	Verticaal
+	Reset the Transform	Transformatie herstellen
+	Its own print size, upright, unwarped	Het drukformaat, recht, onvervormd
+	Drag the grid's points on the photo.	Sleep de punten van het raster op de foto.
+	Enter or Esc: back to moving.	Enter of Esc: terug naar verplaatsen.
+	Enter or Esc: done	Enter of Esc: klaar
+	Paste a Screenshot	Schermafbeelding plakken
+	Screenshot	Schermafbeelding
+	The image on the clipboard (Ctrl+V)	De afbeelding op het klembord (Ctrl+V)
+	The clipboard holds no image	Het klembord bevat geen afbeelding
+	The clipboard can't be read here	Het klembord kan hier niet worden gelezen
