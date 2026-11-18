@@ -601,3 +601,11 @@
 	Zoom In (Ctrl +)	Acercar (Ctrl +)
 	Fit	Ajustar
 	The whole photo (Ctrl 0)	La foto entera (Ctrl 0)
+# DTF Craft (40)
+	Free Color	Color libre
+	Free Color {hex}	Color libre {hex}
+	Free Color…	Color libre…
+	Free color (hex)	Color libre (hex)
+	White #FFFFFF	Blanco #FFFFFF
+	Black #000000	Negro #000000
+	The whole visual (Ctrl 0)	El diseño entero (Ctrl 0)

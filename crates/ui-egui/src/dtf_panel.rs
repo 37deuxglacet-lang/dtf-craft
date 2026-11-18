@@ -36,14 +36,8 @@ pub const TABS: [&str; 7] = ["Conformity", "Cutout", "Control Background", "Tran
 
 /// The windows whose settings open locked, with the lock bar (lock, Reset, "?"): every tool but
 /// Print Conformity.
-const LOCKABLE: [&str; 6] = [
-    "filter.dtf.removeWhiteBackground",
-    "dtf.controlBackground",
-    "filter.dtf.removeSemiTransparent",
-    "dtf.defringe",
-    "dtf.sharpen",
-    "dtf.saturation",
-];
+const LOCKABLE: [&str; 6] =
+    ["filter.dtf.removeWhiteBackground", "dtf.controlBackground", "filter.dtf.removeSemiTransparent", "dtf.defringe", "dtf.sharpen", "dtf.saturation"];
 
 /// Tools applied on Apply only: Print Conformity resizes the image.
 const WITHOUT_PREVIEW: [&str; 1] = ["dtf.conformity"];
@@ -213,10 +207,8 @@ fn apply(app: &mut PhotocraftApp, command: &str) {
     let result = app.run(command, params.clone());
     // A filter that runs as a background job keeps its preview until the job lands, as when a
     // dialog is confirmed (`dialogs::confirm`).
-    let running = app
-        .session
-        .active()
-        .is_some_and(|st| app.filter_preview.as_ref().is_some_and(|p| p.key.doc == st.doc.id) && app.session.job_on(st.doc.id).is_some());
+    let running =
+        app.session.active().is_some_and(|st| app.filter_preview.as_ref().is_some_and(|p| p.key.doc == st.doc.id) && app.session.job_on(st.doc.id).is_some());
     match app.filter_preview.as_mut() {
         Some(p) if result.is_ok() && running && previewed && p.key.dialog == PREVIEW_DIALOG => p.committing = true,
         Some(p) if p.key.dialog == PREVIEW_DIALOG => app.filter_preview = None,
@@ -534,7 +526,8 @@ pub(crate) fn poll_vectorize(app: &mut PhotocraftApp, ctx: &egui::Context) {
                 ui.label(egui::RichText::new(tl!("Preparing for Vectorization")).font(crate::theme::semibold(15.0)).color(t.text));
                 ui.label(egui::RichText::new(&p.name).color(t.text_dim));
                 ui.add_space(6.0);
-                let text = if f > 0.0 { format!("{}  {} %", tl!("AI upscale…"), (f * 100.0).round() as i32) } else { tl!("Preparing the visual…").to_string() };
+                let text =
+                    if f > 0.0 { format!("{}  {} %", tl!("AI upscale…"), (f * 100.0).round() as i32) } else { tl!("Preparing the visual…").to_string() };
                 ui.add(egui::ProgressBar::new(f).text(text).animate(true));
                 ui.add_space(6.0);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -897,7 +890,8 @@ fn background_detected(app: &mut PhotocraftApp, tolerance: f64) -> bool {
         return found;
     }
     // A layer without pixels of its own (a smart object) is left to the command.
-    let found = st.doc.layer(layer).is_none_or(|l| l.surface().is_none()) || photocraft_engine::dtf_cmds::detected_background(&st.doc, layer, tolerance).is_some();
+    let found =
+        st.doc.layer(layer).is_none_or(|l| l.surface().is_none()) || photocraft_engine::dtf_cmds::detected_background(&st.doc, layer, tolerance).is_some();
     app.ui.dtf_panel.detected = Some((key, found));
     found
 }
@@ -966,7 +960,8 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
     ui.spacing_mut().item_spacing.y = 4.0;
     // The cut-out previews on the last colour picked (here or in Control Background).
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
-        let color = last_color(app).or_else(|| app.ui.dtf_panel.fields.get("dtf.controlBackground").and_then(|c| c.get("color")).and_then(Value::as_str).map(str::to_string));
+        let color = last_color(app)
+            .or_else(|| app.ui.dtf_panel.fields.get("dtf.controlBackground").and_then(|c| c.get("color")).and_then(Value::as_str).map(str::to_string));
         f.insert("previewColor".into(), json!(color.unwrap_or_else(|| PREVIEW_COLOR.to_string())));
     }
     let before = f.clone();
@@ -1006,7 +1001,10 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         let detect = f.get("detectColor").and_then(Value::as_bool).unwrap_or(true);
         let tolerance = f.get("tolerance").and_then(Value::as_f64).unwrap_or(10.0);
         if have_doc && detect && holes(&f) == 0 && !background_detected(app, tolerance) {
-            ui.label(RichText::new(tl!("No plain background detected: the background is already transparent, or pick its colour with the eyedropper.")).color(Tokens::get(ui.ctx()).warning));
+            ui.label(
+                RichText::new(tl!("No plain background detected: the background is already transparent, or pick its colour with the eyedropper."))
+                    .color(Tokens::get(ui.ctx()).warning),
+            );
         }
         // The control colour the cut-out previews on (the garment's).
         let top = ui.cursor().top();
@@ -1051,7 +1049,8 @@ pub(crate) fn tool_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: usize) 
         help(crate::widgets::checkbox(ui, &mut show_before, tl!("Show Before")), cmd, "showBefore");
         f.insert("__before".into(), json!(show_before));
     }
-    let changed = f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v)) || before.iter().any(|(k, _)| !k.starts_with("__") && !f.contains_key(k));
+    let changed =
+        f.iter().any(|(k, v)| !k.starts_with("__") && before.get(k) != Some(v)) || before.iter().any(|(k, _)| !k.starts_with("__") && !f.contains_key(k));
     // The cut-out's last state for Toggle Last State: the settings before this change (before a
     // whole slider drag), or the drag's start once the pointer is released.
     if cmd == photocraft_engine::dtf_cmds::REMOVE_WHITE {
@@ -1116,10 +1115,7 @@ mod tests {
     /// module on it, its export tracing the same pixels; the document unchanged, no copy.
     #[test]
     fn optimize_for_vectorization_opens_the_module_on_the_prepared_visual() {
-        let services = crate::Services {
-            write: Some(Box::new(|p: &str, b: &[u8]| std::fs::write(p, b).map_err(|e| e.to_string()))),
-            ..Default::default()
-        };
+        let services = crate::Services { write: Some(Box::new(|p: &str, b: &[u8]| std::fs::write(p, b).map_err(|e| e.to_string()))), ..Default::default() };
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
         app.run("file.new", json!({"width": 40, "height": 30, "resolution": 100, "background": "transparent", "name": "logo.jpg"})).unwrap();
         app.run("edit.fill", json!({"color": "#c03020"})).unwrap();
@@ -1244,7 +1240,8 @@ mod tests {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         app.run("file.new", json!({"width": 20, "height": 20, "resolution": 300, "background": "white"})).unwrap();
         let ctx = egui::Context::default();
-        let dtf: Vec<(&str, &str)> = crate::menu_catalog::CATALOG.iter().filter(|(path, _, _, id)| path == &["DTF"] && *id != "---").map(|(_, label, _, id)| (*label, *id)).collect();
+        let dtf: Vec<(&str, &str)> =
+            crate::menu_catalog::CATALOG.iter().filter(|(path, _, _, id)| path == &["DTF"] && *id != "---").map(|(_, label, _, id)| (*label, *id)).collect();
         for (cmd, tab) in TOOLS.iter().zip(TABS) {
             let label = dtf.iter().find(|(_, id)| id == cmd).map(|(l, _)| *l);
             assert_eq!(label, Some(format!("{tab}…").as_str()), "{cmd}");
@@ -1364,7 +1361,11 @@ mod tests {
         let names: Vec<String> = doc.walk().into_iter().map(|(_, _, l)| l.name.clone()).collect();
         assert!(names.iter().any(|n| n == "backfill") && names.iter().any(|n| n == "Sans fond"), "{names:?}");
         // On screen: the dark control colour where the white was, the visual where it is.
-        let rgb = photocraft_compose::flatten_to_surface(doc, photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false), None);
+        let rgb = photocraft_compose::flatten_to_surface(
+            doc,
+            photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false),
+            None,
+        );
         let hex = |x, y| rgb.pixel(x, y).iter().take(3).map(|v| format!("{:02x}", (v * 255.0).round() as u8)).collect::<String>();
         assert_eq!(hex(0, 0), "231c1c");
         assert_eq!(hex(15, 10), "ff0000");
@@ -1488,7 +1489,13 @@ mod tests {
                 for y in 8..32 {
                     for x in 8..32 {
                         let hole = (16..24).contains(&x) && (16..24).contains(&y);
-                        let c = if hole { [1.0; 3] } else if x == 15 && (16..24).contains(&y) { [1.0, 0.5, 0.5] } else { [1.0, 0.0, 0.0] };
+                        let c = if hole {
+                            [1.0; 3]
+                        } else if x == 15 && (16..24).contains(&y) {
+                            [1.0, 0.5, 0.5]
+                        } else {
+                            [1.0, 0.0, 0.0]
+                        };
                         surf.write_pixel(x, y, &[c[0], c[1], c[2], 1.0]);
                     }
                 }
@@ -1511,7 +1518,11 @@ mod tests {
         let ctx = egui::Context::default();
         assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
         let doc = app.filter_preview.as_ref().unwrap().result.as_ref().unwrap();
-        let rgb = photocraft_compose::flatten_to_surface(doc, photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false), None);
+        let rgb = photocraft_compose::flatten_to_surface(
+            doc,
+            photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false),
+            None,
+        );
         let control = crate::color_picker_ui::parse_hex(PREVIEW_COLOR).unwrap();
         for (x, y) in [(20, 20), (2, 2)] {
             assert!(rgb.pixel(x, y)[..3].iter().zip(control).all(|(a, b)| (a - b).abs() < 0.01), "({x}, {y}) {:?}", rgb.pixel(x, y));
@@ -1648,7 +1659,11 @@ mod tests {
         let ctx = egui::Context::default();
         assert!(crate::canvas::ensure_filter_preview(&mut app, 0, &ctx).is_some());
         let doc = app.filter_preview.as_ref().unwrap().result.as_ref().unwrap();
-        let rgb = photocraft_compose::flatten_to_surface(doc, photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false), None);
+        let rgb = photocraft_compose::flatten_to_surface(
+            doc,
+            photocraft_color::PixelFormat::new(photocraft_color::ColorMode::Rgb, photocraft_color::SampleType::F32, false),
+            None,
+        );
         assert_eq!(rgb.pixel(0, 0)[..3], [0.0, 0.0, 1.0]);
         // Apply doesn't hand the preview colour to the command, and remembers it.
         apply(&mut app, cmd);
@@ -1843,7 +1858,12 @@ mod tests {
         // With an illustration behind it (a drawn stand-in for a Pixabay one).
         shot(photocraft_engine::Session::new(), "accueil_illustration", &|app| {
             let (w, h) = (1280usize, 720usize);
-            let blobs = [(0.2, 0.3, 0.35, [124.0, 58.0, 237.0]), (0.75, 0.25, 0.3, [6.0, 182.0, 212.0]), (0.55, 0.8, 0.4, [245.0, 158.0, 11.0]), (0.9, 0.85, 0.25, [219.0, 39.0, 119.0])];
+            let blobs = [
+                (0.2, 0.3, 0.35, [124.0, 58.0, 237.0]),
+                (0.75, 0.25, 0.3, [6.0, 182.0, 212.0]),
+                (0.55, 0.8, 0.4, [245.0, 158.0, 11.0]),
+                (0.9, 0.85, 0.25, [219.0, 39.0, 119.0]),
+            ];
             let mut rgba = Vec::with_capacity(w * h * 4);
             for y in 0..h {
                 for x in 0..w {
@@ -2046,6 +2066,20 @@ mod tests {
         };
         shot(logo(), "analyseur_plage", &|app| sun(app, crate::color_analyzer_ui::View::Original, false));
         shot(logo(), "analyseur_plage_appliquee", &|app| sun(app, crate::color_analyzer_ui::View::Replaced, true));
+        // A free colour: the first colour to white, the picker open on the second; then zoomed.
+        shot(logo(), "analyseur_couleur_libre", &|app| {
+            analyzer(app, crate::color_analyzer_ui::View::Replaced);
+            let a = app.color_analyzer.as_mut().unwrap();
+            let hex = a.rows()[0].hex.clone();
+            a.set_free(&hex, Some([255, 255, 255]));
+            a.changing = Some(1);
+        });
+        shot(logo(), "analyseur_zoom", &|app| {
+            analyzer(app, crate::color_analyzer_ui::View::Replaced);
+            let a = app.color_analyzer.as_mut().unwrap();
+            a.zoom = 3.0;
+            a.zoom_center = [0.4, 0.45];
+        });
         // The colour sheet, as a PDF beside the shots, with the range.
         let mut app = PhotocraftApp::new(logo(), crate::Services::default());
         sun(&mut app, crate::color_analyzer_ui::View::Original, true);

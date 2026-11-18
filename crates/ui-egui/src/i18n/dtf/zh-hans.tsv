@@ -604,3 +604,11 @@
 	Zoom In (Ctrl +)	放大（Ctrl +）
 	Fit	适合
 	The whole photo (Ctrl 0)	整张照片（Ctrl 0）
+# DTF Craft (40)
+	Free Color	自由颜色
+	Free Color {hex}	自由颜色 {hex}
+	Free Color…	自由颜色…
+	Free color (hex)	自由颜色（十六进制）
+	White #FFFFFF	白色 #FFFFFF
+	Black #000000	黑色 #000000
+	The whole visual (Ctrl 0)	整个图案（Ctrl 0）

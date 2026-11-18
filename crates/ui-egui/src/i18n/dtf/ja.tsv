@@ -585,3 +585,11 @@
 	Zoom In (Ctrl +)	ズームイン（Ctrl +）
 	Fit	全体表示
 	The whole photo (Ctrl 0)	写真全体（Ctrl 0）
+# DTF Craft (40)
+	Free Color	自由な色
+	Free Color {hex}	自由な色 {hex}
+	Free Color…	自由な色…
+	Free color (hex)	自由な色（16 進）
+	White #FFFFFF	白 #FFFFFF
+	Black #000000	黒 #000000
+	The whole visual (Ctrl 0)	デザイン全体（Ctrl 0）

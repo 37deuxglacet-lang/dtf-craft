@@ -576,3 +576,11 @@
 	Zoom In (Ctrl +)	Ingrandisci (Ctrl +)
 	Fit	Adatta
 	The whole photo (Ctrl 0)	Tutta la foto (Ctrl 0)
+# DTF Craft (40)
+	Free Color	Colore libero
+	Free Color {hex}	Colore libero {hex}
+	Free Color…	Colore libero…
+	Free color (hex)	Colore libero (esadecimale)
+	White #FFFFFF	Bianco #FFFFFF
+	Black #000000	Nero #000000
+	The whole visual (Ctrl 0)	Tutta la grafica (Ctrl 0)

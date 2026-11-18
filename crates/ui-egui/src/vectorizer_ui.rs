@@ -828,9 +828,12 @@ impl Vectorizer {
                 rgb: c.rgb,
                 share: c.share * 100.0,
                 range: false,
-                reference: matches.get(i).copied().flatten().filter(|m| m.2).and_then(|(k, de, _)| {
-                    self.swatch(k).map(|s| SheetRef { name: s.name.clone(), rgb: analyzer::swatch8(s), delta_e: de })
-                }),
+                reference: matches
+                    .get(i)
+                    .copied()
+                    .flatten()
+                    .filter(|m| m.2)
+                    .and_then(|(k, de, _)| self.swatch(k).map(|s| SheetRef { name: s.name.clone(), rgb: analyzer::swatch8(s), delta_e: de })),
             })
             .collect();
         Some(ColorSheet {
@@ -1201,7 +1204,13 @@ fn preview(ui: &mut egui::Ui, v: &mut Vectorizer, area: Rect) {
         (None, Some(e)) => e.clone(),
         (None, None) => String::new(),
     };
-    ui.painter().text(pos2(status.left(), status.center().y), Align2::LEFT_CENTER, figures, FontId::proportional(12.0), if v.traced.is_some() { t.text_dim } else { t.warning });
+    ui.painter().text(
+        pos2(status.left(), status.center().y),
+        Align2::LEFT_CENTER,
+        figures,
+        FontId::proportional(12.0),
+        if v.traced.is_some() { t.text_dim } else { t.warning },
+    );
     if view.width() < 60.0 || view.height() < 60.0 {
         return;
     }
@@ -1517,7 +1526,8 @@ fn vc_settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
     });
     ui.add_space(4.0);
     ui.horizontal(|ui| {
-        ui.checkbox(&mut v.settings.vc.ignore_white, tl!("Ignore Color")).on_hover_text(tl!("The areas of this color are left out (white when the field is empty)."));
+        ui.checkbox(&mut v.settings.vc.ignore_white, tl!("Ignore Color"))
+            .on_hover_text(tl!("The areas of this color are left out (white when the field is empty)."));
         let edit = ui.add_enabled(v.settings.vc.ignore_white, egui::TextEdit::singleline(&mut v.ignore_text).hint_text("#FFFFFF").desired_width(90.0));
         if edit.lost_focus() {
             let text = v.ignore_text.trim();
@@ -1525,13 +1535,19 @@ fn vc_settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
         }
     });
     let s = &mut v.settings.vc;
-    ui.checkbox(&mut s.snap_curves_to_lines, tl!("Snap Curves to Lines")).on_hover_text(tl!("Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs."));
-    ui.checkbox(&mut s.shapes, tl!("Exact Shapes")).on_hover_text(tl!("A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape."));
+    ui.checkbox(&mut s.snap_curves_to_lines, tl!("Snap Curves to Lines"))
+        .on_hover_text(tl!("Nearly straight curves become straight lines; in Flat Logo, parts of circles become true arcs."));
+    ui.checkbox(&mut s.shapes, tl!("Exact Shapes"))
+        .on_hover_text(tl!("A circle, an ellipse, a rectangle or a regular polygon comes out as exactly that shape."));
     let gradients = matches!(s.mode, Mode::Grayscale | Mode::Color);
     ui.add_enabled(gradients, egui::Checkbox::new(&mut s.gradients, tl!("Gradients")))
         .on_hover_text(tl!("An area whose color changes evenly in one direction is one shape filled with a linear gradient."));
     if s.mode == Mode::Color && s.palette == Palette::DocumentLibrary {
-        let note = if v.book.is_some() { tl!("The colors of the reference swatch book below, at most this many.") } else { tl!("Load a swatch book to use it as the palette.") };
+        let note = if v.book.is_some() {
+            tl!("The colors of the reference swatch book below, at most this many.")
+        } else {
+            tl!("Load a swatch book to use it as the palette.")
+        };
         ui.label(RichText::new(note).small().color(if v.book.is_some() { t.text_faint } else { t.warning }));
     }
     let changed = v.settings.vc != before;
@@ -1602,12 +1618,17 @@ fn settings_ui(ui: &mut egui::Ui, v: &mut Vectorizer) -> bool {
             }
             ui.end_row();
             ui.label(tl!("Detail Level"));
-            if choice(ui, &mut v.settings.detail, &[(Detail::Low, tl!("Low Detail")), (Detail::Medium, tl!("Medium Detail")), (Detail::High, tl!("High Detail"))]) {
+            if choice(
+                ui,
+                &mut v.settings.detail,
+                &[(Detail::Low, tl!("Low Detail")), (Detail::Medium, tl!("Medium Detail")), (Detail::High, tl!("High Detail"))],
+            ) {
                 redo = Redo::Quantize;
             }
             ui.end_row();
             ui.label(tl!("Smoothing"));
-            if choice(ui, &mut v.settings.smoothing, &[(Smoothing::Curves, tl!("Curves")), (Smoothing::Corners, tl!("Sharp Corners"))]) && redo == Redo::Nothing {
+            if choice(ui, &mut v.settings.smoothing, &[(Smoothing::Curves, tl!("Curves")), (Smoothing::Corners, tl!("Sharp Corners"))]) && redo == Redo::Nothing
+            {
                 redo = Redo::Trace;
             }
             ui.end_row();
@@ -1780,12 +1801,14 @@ fn change_reference(ctx: &egui::Context, v: &mut Vectorizer) {
     };
     let current = v.matches().get(i).copied().flatten().map(|m| m.0);
     let mut search = std::mem::take(&mut v.search);
-    let pick = analyzer::swatch_picker(ctx, "dtf-vectorizer-change", rgb, analyzer::lab8(rgb), current, book, &mut search);
+    let pick = analyzer::swatch_picker(ctx, "dtf-vectorizer-change", rgb, analyzer::lab8(rgb), current, Some(book), &mut search, false);
     v.search = search;
     match pick {
         Pick::Open => return,
         Pick::Close => {}
         Pick::Chosen(choice) => v.set_swatch(&vectorize::hex(rgb), choice),
+        // No free colour in the vectorizer's picker.
+        Pick::Free(_) => {}
     }
     v.changing = None;
 }
@@ -1851,7 +1874,13 @@ mod tests {
                 for y in 8..32 {
                     for x in 6..54 {
                         let dot = (14..20).contains(&x) && (17..23).contains(&y);
-                        let c = if dot { [1.0; 3] } else if x < 30 { BLUE } else { ORANGE };
+                        let c = if dot {
+                            [1.0; 3]
+                        } else if x < 30 {
+                            BLUE
+                        } else {
+                            ORANGE
+                        };
                         surf.write_pixel(x, y, &[c[0], c[1], c[2], 1.0]);
                     }
                 }
@@ -1940,7 +1969,18 @@ mod tests {
             }
         }
         let settings = Settings { remove_background: false, ..Settings::default() };
-        let mut v = Vectorizer::new(photocraft_doc::DocId::fresh(), "vague.png", None, (w as u32, h as u32), 300.0, (7.62, 5.08), "RVB 8 bits".into(), &px, settings, None);
+        let mut v = Vectorizer::new(
+            photocraft_doc::DocId::fresh(),
+            "vague.png",
+            None,
+            (w as u32, h as u32),
+            300.0,
+            (7.62, 5.08),
+            "RVB 8 bits".into(),
+            &px,
+            settings,
+            None,
+        );
         let holes = |img: &egui::ColorImage| {
             let [iw, ih] = img.size;
             // Inside only: the outer edge is antialiased whatever the seams.
