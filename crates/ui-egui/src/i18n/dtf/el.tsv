@@ -544,3 +544,33 @@
 	The image on the clipboard (Ctrl+V)	Η εικόνα του προχείρου (Ctrl+V)
 	The clipboard holds no image	Το πρόχειρο δεν περιέχει εικόνα
 	The clipboard can't be read here	Το πρόχειρο δεν μπορεί να διαβαστεί εδώ
+# DTF Craft (38)
+	Product Zones (optional)	Ζώνες προϊόντος (προαιρετικά)
+	Select the Product (Auto)	Επιλογή προϊόντος (αυτόματα)
+	One zone for each garment or view found on the photo	Μία ζώνη για κάθε ρούχο ή όψη στη φωτογραφία
+	Polygonal Lasso	Πολυγωνικό λάσο
+	Polygonal Lasso: Click the Points	Πολυγωνικό λάσο: κάντε κλικ στα σημεία
+	A click for each point; a double click or the first point closes it; Esc cancels	Ένα κλικ ανά σημείο· διπλό κλικ ή το πρώτο σημείο το κλείνει· Esc ακυρώνει
+	New	Νέα
+	Add	Προσθήκη
+	Subtract	Αφαίρεση
+	Use the Open Document's Selection	Χρήση της επιλογής του ανοιχτού εγγράφου
+	A selection made in DTF Craft on the same photo	Επιλογή που έγινε στο DTF Craft στην ίδια φωτογραφία
+	Choose {name}	Επιλογή {name}
+	Zone name	Όνομα ζώνης
+	Invert	Αντιστροφή
+	Remove every zone	Αφαίρεση όλων των ζωνών
+	Each visual stops at the zone under its centre.	Κάθε σχέδιο σταματά στην άκρη της ζώνης κάτω από το κέντρο του.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Προαιρετικά: τα σχέδια κόβονται στην άκρη του ρούχου (μανίκια, πλάτη, χέρια).
+	Auto ({zone})	Αυτόματα ({zone})
+	Auto (none)	Αυτόματα (καμία)
+	Not Masked	Χωρίς μάσκα
+	Zone:	Ζώνη:
+	Zone	Ζώνη
+	Zone {n}	Ζώνη {n}
+	{n} zones found	Βρέθηκαν ζώνες: {n}
+	Lasso: a new zone	Λάσο: νέα ζώνη
+	Lasso: added to the chosen zone	Λάσο: προστέθηκε στην επιλεγμένη ζώνη
+	Lasso: taken from the chosen zone	Λάσο: αφαιρέθηκε από την επιλεγμένη ζώνη
+	The open document has no selection	Το ανοιχτό έγγραφο δεν έχει επιλογή
+	The open document must be the photo's size ({w} × {h} px)	Το ανοιχτό έγγραφο πρέπει να έχει το μέγεθος της φωτογραφίας ({w} × {h} px)

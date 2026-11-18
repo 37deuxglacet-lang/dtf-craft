@@ -212,7 +212,17 @@ le vêtement, à leur vraie taille.
      longueur réelle du repère en cm. La fenêtre en déduit les pixels par cm de la photo et
      affiche des règles en cm le long de la photo. Le tracé est demandé dès qu'une photo est
      chargée.
-  3. **Visuels** : PNG ou SVG importés, ou le document ouvert (aplati, rogné à ses pixels
+  3. **Zones du produit** (facultatif) : les vues du vêtement sur la photo (face, dos, côtés),
+     une zone par vue, chacune avec son nom et sa couleur. « Sélectionner le produit (auto) »
+     retire le fond uni depuis les bords de la photo (sur un fond chargé : Sélectionner le sujet
+     de PhotoCraft) et crée une zone par objet trouvé, dans l'ordre de lecture. « Lasso
+     polygonal » : un clic par point, double-clic ou premier point pour fermer, Échap annule,
+     Retour arrière retire le dernier point ; mode Nouvelle, Ajouter ou Soustraire (à la zone
+     choisie). « Reprendre la sélection du document ouvert » (document de la taille de la
+     photo) : une zone par objet. Intervertir, Effacer, renommer, retirer. Chaque visuel est
+     masqué par la zone sous son centre (recalculée quand il bouge) ; « Zone » dans « Visuel
+     sélectionné » la force ou choisit « Non masqué ». Changer de photo efface les zones.
+  4. **Visuels** : PNG ou SVG importés, ou le document ouvert (aplati, rogné à ses pixels
      visibles). Bloqués tant que l'échelle n'est pas donnée (« Indiquez d'abord l'échelle »).
      Chaque visuel arrive à sa taille d'impression (ses pixels à sa résolution, celle que
      l'outil Conformité impose à 300 ppp), au milieu du repère ; plusieurs visuels possibles.
@@ -247,7 +257,8 @@ En bêta, pas d'enregistrement de projet : l'export est le résultat.
 La commande `dtf.mockup` fait le même travail sans fenêtre : `photo`, `scale` (`from`, `to` en
 pixels de la photo, `cm`) ou `pixelsPerCm`, `visuals` (`path` ou `document`, `x`, `y` du centre,
 `widthCm`, `heightCm`, `rotation`, ou `corners` : ses 4 coins sur la photo, et `warp` : `style`,
-`bend`, `vertical`, `points` pour une grille personnalisée), `shadows`, `folds`, `opacity`,
+`bend`, `vertical`, `points` pour une grille personnalisée, et `zone` : l'indice de sa zone),
+`zones` (masques PNG de la taille de la photo, blanc dedans), `shadows`, `folds`, `opacity`,
 `output` (.png ou .jpg), `open`.
 
 ## Modules bêta et signalement des bugs

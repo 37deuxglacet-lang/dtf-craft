@@ -553,3 +553,33 @@
 	The image on the clipboard (Ctrl+V)	Obraz ze schowka (Ctrl+V)
 	The clipboard holds no image	Schowek nie zawiera obrazu
 	The clipboard can't be read here	Nie można tu odczytać schowka
+# DTF Craft (38)
+	Product Zones (optional)	Strefy produktu (opcjonalnie)
+	Select the Product (Auto)	Zaznacz produkt (auto)
+	One zone for each garment or view found on the photo	Jedna strefa dla każdej odzieży lub widoku na zdjęciu
+	Polygonal Lasso	Lasso wielokątne
+	Polygonal Lasso: Click the Points	Lasso wielokątne: klikaj punkty
+	A click for each point; a double click or the first point closes it; Esc cancels	Jedno kliknięcie na punkt; dwuklik lub pierwszy punkt zamyka; Esc anuluje
+	New	Nowa
+	Add	Dodaj
+	Subtract	Odejmij
+	Use the Open Document's Selection	Użyj zaznaczenia otwartego dokumentu
+	A selection made in DTF Craft on the same photo	Zaznaczenie wykonane w DTF Craft na tym samym zdjęciu
+	Choose {name}	Wybierz {name}
+	Zone name	Nazwa strefy
+	Invert	Odwróć
+	Remove every zone	Usuń wszystkie strefy
+	Each visual stops at the zone under its centre.	Każdy wzór kończy się na krawędzi strefy pod jego środkiem.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Opcjonalnie: wzory są przycinane na krawędzi odzieży (rękawy, plecy, ramiona).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (brak)
+	Not Masked	Bez maski
+	Zone:	Strefa:
+	Zone	Strefa
+	Zone {n}	Strefa {n}
+	{n} zones found	Znalezione strefy: {n}
+	Lasso: a new zone	Lasso: nowa strefa
+	Lasso: added to the chosen zone	Lasso: dodane do wybranej strefy
+	Lasso: taken from the chosen zone	Lasso: odjęte od wybranej strefy
+	The open document has no selection	Otwarty dokument nie ma zaznaczenia
+	The open document must be the photo's size ({w} × {h} px)	Otwarty dokument musi mieć rozmiar zdjęcia ({w} × {h} px)

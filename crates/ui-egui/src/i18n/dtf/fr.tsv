@@ -585,3 +585,33 @@
 	The image on the clipboard (Ctrl+V)	L'image du presse-papiers (Ctrl+V)
 	The clipboard holds no image	Le presse-papiers ne contient pas d'image
 	The clipboard can't be read here	Le presse-papiers ne peut pas être lu ici
+# DTF Craft (38)
+	Product Zones (optional)	Zones du produit (facultatif)
+	Select the Product (Auto)	Sélectionner le produit (auto)
+	One zone for each garment or view found on the photo	Une zone pour chaque vêtement ou vue trouvé sur la photo
+	Polygonal Lasso	Lasso polygonal
+	Polygonal Lasso: Click the Points	Lasso polygonal : cliquez les points
+	A click for each point; a double click or the first point closes it; Esc cancels	Un clic par point ; un double-clic ou le premier point ferme ; Échap annule
+	New	Nouvelle
+	Add	Ajouter
+	Subtract	Soustraire
+	Use the Open Document's Selection	Reprendre la sélection du document ouvert
+	A selection made in DTF Craft on the same photo	Une sélection faite dans DTF Craft sur la même photo
+	Choose {name}	Choisir {name}
+	Zone name	Nom de la zone
+	Invert	Intervertir
+	Remove every zone	Retirer toutes les zones
+	Each visual stops at the zone under its centre.	Chaque visuel s'arrête au bord de la zone sous son centre.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Facultatif : les visuels sont coupés au bord du vêtement (manches, dos, bras).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (aucune)
+	Not Masked	Non masqué
+	Zone:	Zone :
+	Zone	Zone
+	Zone {n}	Zone {n}
+	{n} zones found	{n} zones trouvées
+	Lasso: a new zone	Lasso : nouvelle zone
+	Lasso: added to the chosen zone	Lasso : ajouté à la zone choisie
+	Lasso: taken from the chosen zone	Lasso : retiré de la zone choisie
+	The open document has no selection	Le document ouvert n'a pas de sélection
+	The open document must be the photo's size ({w} × {h} px)	Le document ouvert doit avoir la taille de la photo ({w} × {h} px)

@@ -560,3 +560,33 @@
 	The image on the clipboard (Ctrl+V)	Gambar di papan klip (Ctrl+V)
 	The clipboard holds no image	Papan klip tidak berisi gambar
 	The clipboard can't be read here	Papan klip tidak dapat dibaca di sini
+# DTF Craft (38)
+	Product Zones (optional)	Zona produk (opsional)
+	Select the Product (Auto)	Pilih produk (otomatis)
+	One zone for each garment or view found on the photo	Satu zona untuk setiap pakaian atau tampilan di foto
+	Polygonal Lasso	Laso poligonal
+	Polygonal Lasso: Click the Points	Laso poligonal: klik titik-titiknya
+	A click for each point; a double click or the first point closes it; Esc cancels	Satu klik per titik; klik ganda atau titik pertama menutupnya; Esc membatalkan
+	New	Baru
+	Add	Tambah
+	Subtract	Kurangi
+	Use the Open Document's Selection	Gunakan seleksi dokumen yang terbuka
+	A selection made in DTF Craft on the same photo	Seleksi yang dibuat di DTF Craft pada foto yang sama
+	Choose {name}	Pilih {name}
+	Zone name	Nama zona
+	Invert	Balikkan
+	Remove every zone	Hapus semua zona
+	Each visual stops at the zone under its centre.	Setiap desain berhenti di tepi zona di bawah pusatnya.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Opsional: desain dipotong di tepi pakaian (lengan, punggung, tangan).
+	Auto ({zone})	Otomatis ({zone})
+	Auto (none)	Otomatis (tidak ada)
+	Not Masked	Tanpa masker
+	Zone:	Zona:
+	Zone	Zona
+	Zone {n}	Zona {n}
+	{n} zones found	{n} zona ditemukan
+	Lasso: a new zone	Laso: zona baru
+	Lasso: added to the chosen zone	Laso: ditambahkan ke zona terpilih
+	Lasso: taken from the chosen zone	Laso: dikurangi dari zona terpilih
+	The open document has no selection	Dokumen yang terbuka tidak punya seleksi
+	The open document must be the photo's size ({w} × {h} px)	Dokumen yang terbuka harus seukuran foto ({w} × {h} px)

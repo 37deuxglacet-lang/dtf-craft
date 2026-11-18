@@ -550,3 +550,33 @@
 	The image on the clipboard (Ctrl+V)	クリップボードの画像（Ctrl+V）
 	The clipboard holds no image	クリップボードに画像がありません
 	The clipboard can't be read here	ここではクリップボードを読み取れません
+# DTF Craft (38)
+	Product Zones (optional)	製品ゾーン（任意）
+	Select the Product (Auto)	製品を選択（自動）
+	One zone for each garment or view found on the photo	写真内の衣類やビューごとに 1 つのゾーン
+	Polygonal Lasso	多角形選択ツール
+	Polygonal Lasso: Click the Points	多角形選択ツール：点をクリック
+	A click for each point; a double click or the first point closes it; Esc cancels	点ごとにクリック、ダブルクリックか最初の点で閉じる、Esc で取り消し
+	New	新規
+	Add	追加
+	Subtract	削除
+	Use the Open Document's Selection	開いているドキュメントの選択範囲を使用
+	A selection made in DTF Craft on the same photo	同じ写真に DTF Craft で作成した選択範囲
+	Choose {name}	{name} を選択
+	Zone name	ゾーン名
+	Invert	反転
+	Remove every zone	すべてのゾーンを削除
+	Each visual stops at the zone under its centre.	各デザインは中心の下にあるゾーンの縁で切り取られます。
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	任意：デザインは衣類の縁（袖、背中、腕）で切り取られます。
+	Auto ({zone})	自動（{zone}）
+	Auto (none)	自動（なし）
+	Not Masked	マスクなし
+	Zone:	ゾーン：
+	Zone	ゾーン
+	Zone {n}	ゾーン {n}
+	{n} zones found	{n} 個のゾーンが見つかりました
+	Lasso: a new zone	選択ツール：新規ゾーン
+	Lasso: added to the chosen zone	選択ツール：選択中のゾーンに追加
+	Lasso: taken from the chosen zone	選択ツール：選択中のゾーンから削除
+	The open document has no selection	開いているドキュメントに選択範囲がありません
+	The open document must be the photo's size ({w} × {h} px)	開いているドキュメントは写真と同じサイズ（{w} × {h} px）である必要があります

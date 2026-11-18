@@ -566,3 +566,33 @@
 	The image on the clipboard (Ctrl+V)	La imagen del portapapeles (Ctrl+V)
 	The clipboard holds no image	El portapapeles no contiene ninguna imagen
 	The clipboard can't be read here	El portapapeles no se puede leer aquí
+# DTF Craft (38)
+	Product Zones (optional)	Zonas del producto (opcional)
+	Select the Product (Auto)	Seleccionar el producto (auto)
+	One zone for each garment or view found on the photo	Una zona por cada prenda o vista encontrada en la foto
+	Polygonal Lasso	Lazo poligonal
+	Polygonal Lasso: Click the Points	Lazo poligonal: haga clic en los puntos
+	A click for each point; a double click or the first point closes it; Esc cancels	Un clic por punto; doble clic o el primer punto lo cierra; Esc cancela
+	New	Nueva
+	Add	Añadir
+	Subtract	Restar
+	Use the Open Document's Selection	Usar la selección del documento abierto
+	A selection made in DTF Craft on the same photo	Una selección hecha en DTF Craft sobre la misma foto
+	Choose {name}	Elegir {name}
+	Zone name	Nombre de la zona
+	Invert	Invertir
+	Remove every zone	Quitar todas las zonas
+	Each visual stops at the zone under its centre.	Cada diseño se detiene en el borde de la zona bajo su centro.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Opcional: los diseños se recortan en el borde de la prenda (mangas, espalda, brazos).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (ninguna)
+	Not Masked	Sin máscara
+	Zone:	Zona:
+	Zone	Zona
+	Zone {n}	Zona {n}
+	{n} zones found	{n} zonas encontradas
+	Lasso: a new zone	Lazo: zona nueva
+	Lasso: added to the chosen zone	Lazo: añadido a la zona elegida
+	Lasso: taken from the chosen zone	Lazo: restado de la zona elegida
+	The open document has no selection	El documento abierto no tiene selección
+	The open document must be the photo's size ({w} × {h} px)	El documento abierto debe tener el tamaño de la foto ({w} × {h} px)

@@ -550,3 +550,33 @@
 	The image on the clipboard (Ctrl+V)	Hình trong khay nhớ tạm (Ctrl+V)
 	The clipboard holds no image	Khay nhớ tạm không có hình
 	The clipboard can't be read here	Không đọc được khay nhớ tạm ở đây
+# DTF Craft (38)
+	Product Zones (optional)	Vùng sản phẩm (tùy chọn)
+	Select the Product (Auto)	Chọn sản phẩm (tự động)
+	One zone for each garment or view found on the photo	Một vùng cho mỗi áo hoặc góc nhìn tìm thấy trên ảnh
+	Polygonal Lasso	Lasso đa giác
+	Polygonal Lasso: Click the Points	Lasso đa giác: nhấp các điểm
+	A click for each point; a double click or the first point closes it; Esc cancels	Mỗi điểm một cú nhấp; nhấp đúp hoặc điểm đầu tiên để đóng; Esc để hủy
+	New	Mới
+	Add	Thêm
+	Subtract	Bớt
+	Use the Open Document's Selection	Dùng vùng chọn của tài liệu đang mở
+	A selection made in DTF Craft on the same photo	Vùng chọn tạo trong DTF Craft trên cùng ảnh
+	Choose {name}	Chọn {name}
+	Zone name	Tên vùng
+	Invert	Đảo ngược
+	Remove every zone	Xóa mọi vùng
+	Each visual stops at the zone under its centre.	Mỗi thiết kế dừng ở mép vùng dưới tâm của nó.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Tùy chọn: thiết kế bị cắt ở mép áo (tay áo, lưng, cánh tay).
+	Auto ({zone})	Tự động ({zone})
+	Auto (none)	Tự động (không)
+	Not Masked	Không che
+	Zone:	Vùng:
+	Zone	Vùng
+	Zone {n}	Vùng {n}
+	{n} zones found	Đã tìm thấy {n} vùng
+	Lasso: a new zone	Lasso: vùng mới
+	Lasso: added to the chosen zone	Lasso: thêm vào vùng đã chọn
+	Lasso: taken from the chosen zone	Lasso: bớt khỏi vùng đã chọn
+	The open document has no selection	Tài liệu đang mở không có vùng chọn
+	The open document must be the photo's size ({w} × {h} px)	Tài liệu đang mở phải có kích thước của ảnh ({w} × {h} px)

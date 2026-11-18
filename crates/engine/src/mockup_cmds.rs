@@ -45,6 +45,10 @@ const HIGHLIGHT: f32 = 0.35;
 const MAX_LIGHTEN: f32 = 1.25;
 /// Largest side of a visual on the photo, in pixels.
 const MAX_PRINT_SIDE: i64 = 20_000;
+/// Most product zones on one mockup.
+pub const MAX_ZONES: usize = 16;
+/// An object smaller than this share of the photo is not a zone of its own.
+const MIN_OBJECT: f64 = 0.004;
 /// Most visuals on one mockup.
 const MAX_VISUALS: usize = 50;
 /// Resolution of a visual whose file records none.
@@ -430,11 +434,21 @@ pub struct Print<'a> {
     pub y: i32,
     pub width: usize,
     pub height: usize,
+    /// Its product zone: coverage 0..255 over the whole photo, row-major; the ink stops at its
+    /// edge. `None`: not masked.
+    pub zone: Option<&'a [u8]>,
 }
 
 impl<'a> From<&'a Placed> for Print<'a> {
     fn from(p: &'a Placed) -> Print<'a> {
-        Print { rgba: &p.rgba, x: p.x, y: p.y, width: p.width, height: p.height }
+        Print { rgba: &p.rgba, x: p.x, y: p.y, width: p.width, height: p.height, zone: None }
+    }
+}
+
+impl<'a> Print<'a> {
+    /// Masked by `zone` (photo-size coverage).
+    pub fn in_zone(self, zone: Option<&'a [u8]>) -> Print<'a> {
+        Print { zone, ..self }
     }
 }
 
@@ -516,7 +530,8 @@ pub fn composite(rgba: &[u8], width: usize, height: usize, light: &Light, prints
                     qy += gy * shift;
                 }
                 let px = sample(p, qx - ox, qy - oy);
-                let a = px[3] * opacity;
+                let inside = p.zone.and_then(|z| z.get(y * width + x)).map_or(1.0, |c| f32::from(*c) / 255.0);
+                let a = px[3] * opacity * inside;
                 if a <= 0.0 {
                     continue;
                 }
@@ -563,6 +578,307 @@ pub fn write_photo_png(p: &Photo, path: &str) -> Result<()> {
     Ok(())
 }
 
+// ---------------------------------------------------------------- product zones
+
+/// A polygon (photo pixels) as a zone: coverage 0..255 over a `w × h` photo, its edges smoothed
+/// (four sub-rows a pixel, exact across).
+pub fn zone_from_polygon(points: &[[f64; 2]], w: u32, h: u32) -> Vec<u8> {
+    let (w, h) = (w as usize, h as usize);
+    let mut out = vec![0u8; w * h];
+    if points.len() < 3 || w == 0 || h == 0 {
+        return out;
+    }
+    const SUB: usize = 4;
+    let y_min = points.iter().map(|p| p[1]).fold(f64::MAX, f64::min).floor().max(0.0) as usize;
+    let y_max = (points.iter().map(|p| p[1]).fold(f64::MIN, f64::max).ceil().max(0.0) as usize).min(h);
+    let mut row = vec![0.0f32; w + 1];
+    let mut xs = Vec::new();
+    for y in y_min..y_max {
+        row.iter_mut().for_each(|v| *v = 0.0);
+        for s in 0..SUB {
+            let sy = y as f64 + (s as f64 + 0.5) / SUB as f64;
+            xs.clear();
+            for k in 0..points.len() {
+                let (a, b) = (points[k], points[(k + 1) % points.len()]);
+                if (a[1] <= sy) != (b[1] <= sy) {
+                    xs.push(a[0] + (sy - a[1]) / (b[1] - a[1]) * (b[0] - a[0]));
+                }
+            }
+            xs.sort_by(f64::total_cmp);
+            for pair in xs.chunks_exact(2) {
+                let (x0, x1) = (pair[0].clamp(0.0, w as f64), pair[1].clamp(0.0, w as f64));
+                if x1 <= x0 {
+                    continue;
+                }
+                let (i0, i1) = (x0.floor() as usize, x1.floor() as usize);
+                if i0 == i1 {
+                    row[i0] += (x1 - x0) as f32;
+                } else {
+                    row[i0] += (i0 as f64 + 1.0 - x0) as f32;
+                    for v in &mut row[i0 + 1..i1] {
+                        *v += 1.0;
+                    }
+                    if i1 < w {
+                        row[i1] += (x1 - i1 as f64) as f32;
+                    }
+                }
+            }
+        }
+        for x in 0..w {
+            out[y * w + x] = (row[x] / SUB as f32 * 255.0).round().clamp(0.0, 255.0) as u8;
+        }
+    }
+    out
+}
+
+/// Adds `src` to `dst` (or takes it away).
+pub fn combine_zone(dst: &mut [u8], src: &[u8], subtract: bool) {
+    for (d, s) in dst.iter_mut().zip(src) {
+        *d = if subtract { (u16::from(*d) * u16::from(255 - *s) / 255) as u8 } else { (*d).max(*s) };
+    }
+}
+
+/// The separate objects of a zone, each a zone of its own, in reading order: row by row, left to
+/// right in a row (8-connected; the
+/// smoothed edge goes to the object it borders; specks under [`MIN_OBJECT`] of the photo are
+/// dropped).
+pub fn split_objects(mask: &[u8], w: u32, h: u32) -> Vec<Vec<u8>> {
+    let (w, h) = (w as usize, h as usize);
+    let mut label = vec![0u32; w * h];
+    let mut sizes = vec![0usize];
+    // Each object's box: left, top, right, bottom.
+    let mut boxes = vec![[usize::MAX, usize::MAX, 0, 0]];
+    let mut stack = Vec::new();
+    for start in 0..w * h {
+        if mask[start] < 128 || label[start] != 0 {
+            continue;
+        }
+        let id = sizes.len() as u32;
+        sizes.push(0);
+        boxes.push([usize::MAX, usize::MAX, 0, 0]);
+        label[start] = id;
+        stack.push(start);
+        while let Some(i) = stack.pop() {
+            sizes[id as usize] += 1;
+            let (x, y) = (i % w, i / w);
+            let b = &mut boxes[id as usize];
+            *b = [b[0].min(x), b[1].min(y), b[2].max(x), b[3].max(y)];
+            for dy in -1i64..=1 {
+                for dx in -1i64..=1 {
+                    let (nx, ny) = (x as i64 + dx, y as i64 + dy);
+                    if nx < 0 || ny < 0 || nx >= w as i64 || ny >= h as i64 {
+                        continue;
+                    }
+                    let j = ny as usize * w + nx as usize;
+                    if mask[j] >= 128 && label[j] == 0 {
+                        label[j] = id;
+                        stack.push(j);
+                    }
+                }
+            }
+        }
+    }
+    let min = ((w * h) as f64 * MIN_OBJECT) as usize;
+    let mut kept: Vec<u32> = (1..sizes.len() as u32).filter(|id| sizes[*id as usize] >= min.max(1)).collect();
+    // Rows: by top; an object whose middle is above the row's lowest bottom joins it.
+    kept.sort_by_key(|id| boxes[*id as usize][1]);
+    let mut rows: Vec<Vec<u32>> = Vec::new();
+    let mut row_bottom = 0usize;
+    for id in kept {
+        let b = boxes[id as usize];
+        let middle = (b[1] + b[3]) / 2;
+        match rows.last_mut() {
+            Some(row) if middle < row_bottom => {
+                row.push(id);
+                row_bottom = row_bottom.max(b[3]);
+            }
+            _ => {
+                rows.push(vec![id]);
+                row_bottom = b[3];
+            }
+        }
+    }
+    let mut kept: Vec<u32> = rows
+        .into_iter()
+        .flat_map(|mut row| {
+            row.sort_by_key(|id| boxes[*id as usize][0]);
+            row
+        })
+        .collect();
+    kept.truncate(MAX_ZONES);
+    kept.iter()
+        .map(|id| {
+            let mut z = vec![0u8; w * h];
+            for i in 0..w * h {
+                if label[i] == *id {
+                    z[i] = mask[i];
+                } else if mask[i] > 0 && label[i] == 0 {
+                    // The smoothed edge: kept when it touches this object.
+                    let (x, y) = (i % w, i / w);
+                    let near =
+                        (y.saturating_sub(1)..=(y + 1).min(h - 1)).any(|yy| (x.saturating_sub(1)..=(x + 1).min(w - 1)).any(|xx| label[yy * w + xx] == *id));
+                    if near {
+                        z[i] = mask[i];
+                    }
+                }
+            }
+            z
+        })
+        .collect()
+}
+
+/// The photo's product(s), found automatically, one zone per object. A packshot's plain
+/// backdrop (a uniform frame) is taken away from the edges inwards, so light garments on white
+/// are found whole; on a busy background, PhotoCraft's Select Subject.
+pub fn product_zones(photo: &Photo) -> Vec<Vec<u8>> {
+    match backdrop_mask(photo) {
+        Some(m) => split_objects(&m, photo.width, photo.height),
+        None => subject_zones(photo),
+    }
+}
+
+/// What isn't the plain backdrop: the colours of the photo's frame flood in from its edges (within
+/// a tolerance set by how even the frame is); `None` when the frame isn't plain.
+pub fn backdrop_mask(photo: &Photo) -> Option<Vec<u8>> {
+    let (w, h) = (photo.width as usize, photo.height as usize);
+    if w < 3 || h < 3 {
+        return None;
+    }
+    let px = |i: usize| [photo.rgba[i * 4], photo.rgba[i * 4 + 1], photo.rgba[i * 4 + 2]];
+    let border: Vec<usize> = (0..w).flat_map(|x| [x, (h - 1) * w + x]).chain((1..h - 1).flat_map(|y| [y * w, y * w + w - 1])).collect();
+    let median = |c: usize| {
+        let mut v: Vec<u8> = border.iter().map(|i| px(*i)[c]).collect();
+        v.sort_unstable();
+        v[v.len() / 2]
+    };
+    let bg = [median(0), median(1), median(2)];
+    let dist = |p: [u8; 3]| (0..3).map(|c| (i16::from(p[c]) - i16::from(bg[c])).unsigned_abs()).max().unwrap_or(0);
+    let mut devs: Vec<u16> = border.iter().map(|i| dist(px(*i))).collect();
+    devs.sort_unstable();
+    let p95 = devs[devs.len() * 95 / 100];
+    if p95 > 25 {
+        return None;
+    }
+    let tol = (p95 * 3 + 3).clamp(4, 30);
+    let mut back = vec![false; w * h];
+    let mut stack: Vec<usize> = border.iter().copied().filter(|i| dist(px(*i)) <= tol).collect();
+    for i in &stack {
+        back[*i] = true;
+    }
+    while let Some(i) = stack.pop() {
+        let (x, y) = (i % w, i / w);
+        let mut visit = |j: usize| {
+            if !back[j] && dist(px(j)) <= tol {
+                back[j] = true;
+                stack.push(j);
+            }
+        };
+        if x > 0 {
+            visit(i - 1);
+        }
+        if x + 1 < w {
+            visit(i + 1);
+        }
+        if y > 0 {
+            visit(i - w);
+        }
+        if y + 1 < h {
+            visit(i + w);
+        }
+    }
+    // A 3 × 3 average smooths the cut edge.
+    let mut out = vec![0u8; w * h];
+    for y in 0..h {
+        for x in 0..w {
+            let (mut n, mut inside) = (0u32, 0u32);
+            for yy in y.saturating_sub(1)..=(y + 1).min(h - 1) {
+                for xx in x.saturating_sub(1)..=(x + 1).min(w - 1) {
+                    n += 1;
+                    inside += u32::from(!back[yy * w + xx]);
+                }
+            }
+            out[y * w + x] = (inside * 255 / n) as u8;
+        }
+    }
+    out.iter().any(|v| *v >= 128).then_some(out)
+}
+
+/// The photo's product(s) by PhotoCraft's Select Subject, one zone per object.
+pub fn subject_zones(photo: &Photo) -> Vec<Vec<u8>> {
+    let r = Rect::new(0, 0, photo.width as i32, photo.height as i32);
+    let surf = Surface::from_interleaved(gang::format(), r, &photo.rgba);
+    let Some(region) = photocraft_algo::segment::subject::select_subject(&photocraft_algo::segment::SurfaceSampler(&surf), r) else { return Vec::new() };
+    split_objects(&region_mask(&region, photo.width, photo.height), photo.width, photo.height)
+}
+
+/// A selection region as a zone over a `w × h` photo.
+pub fn region_mask(region: &photocraft_algo::selection::Region, w: u32, h: u32) -> Vec<u8> {
+    let mut z = vec![0u8; w as usize * h as usize];
+    let b = region.bbox.intersect(&Rect::new(0, 0, w as i32, h as i32));
+    for y in b.y0..b.y1 {
+        for x in b.x0..b.x1 {
+            z[y as usize * w as usize + x as usize] = (region.at(x, y) * 255.0).round() as u8;
+        }
+    }
+    z
+}
+
+/// A document's selection as a zone (the document the photo's size), `None` without one.
+pub fn selection_zone(doc: &Document) -> Option<Vec<u8>> {
+    let sel = doc.selection.as_ref()?;
+    let r = Rect::new(0, 0, doc.size.width as i32, doc.size.height as i32);
+    let m = photocraft_algo::selection::mask_from_surface(Some(sel), r);
+    let z: Vec<u8> = m.iter().map(|v| (v.clamp(0.0, 1.0) * 255.0).round() as u8).collect();
+    z.iter().any(|v| *v > 0).then_some(z)
+}
+
+/// A zone reduced to `tw × th` (box average), for the preview.
+pub fn reduce_zone(z: &[u8], w: u32, h: u32, tw: u32, th: u32) -> Vec<u8> {
+    let (w, h, tw, th) = (w as usize, h as usize, tw as usize, th as usize);
+    let mut out = vec![0u8; tw * th];
+    if w == 0 || h == 0 || tw == 0 || th == 0 {
+        return out;
+    }
+    for y in 0..th {
+        let (y0, y1) = (y * h / th, ((y + 1) * h / th).max(y * h / th + 1).min(h));
+        for x in 0..tw {
+            let (x0, x1) = (x * w / tw, ((x + 1) * w / tw).max(x * w / tw + 1).min(w));
+            let mut acc = 0u32;
+            for yy in y0..y1 {
+                acc += z[yy * w + x0..yy * w + x1].iter().map(|v| u32::from(*v)).sum::<u32>();
+            }
+            let n = ((y1 - y0) * (x1 - x0)) as u32;
+            out[y * tw + x] = ((acc + n / 2) / n) as u8;
+        }
+    }
+    out
+}
+
+/// Writes a zone as a grey PNG (white inside), for the export to read.
+pub fn write_zone_png(z: &[u8], w: u32, h: u32, path: &str) -> Result<()> {
+    let rgba: Vec<u8> = z.iter().flat_map(|v| [*v, *v, *v, 255]).collect();
+    write_photo_png(&Photo { name: "zone".into(), rgba, width: w, height: h, dpi: 72.0 }, path)
+}
+
+/// A zone from a PNG mask the photo's size (white inside).
+pub fn load_zone(path: &str, w: u32, h: u32) -> Result<Vec<u8>> {
+    let p = load_photo(path)?;
+    if (p.width, p.height) != (w, h) {
+        return Err(bad(format!("{}: the zone is {} × {} px, the photo {w} × {h}", file_cmds::file_name(path), p.width, p.height)));
+    }
+    Ok(p.rgba.chunks_exact(4).map(|c| c[0]).collect())
+}
+
+/// The zone whose coverage is highest at `q` (photo pixels), `None` outside them all.
+pub fn zone_at(zones: &[&[u8]], w: u32, h: u32, q: [f64; 2]) -> Option<usize> {
+    let (x, y) = (q[0].floor(), q[1].floor());
+    if x < 0.0 || y < 0.0 || x >= f64::from(w) || y >= f64::from(h) {
+        return None;
+    }
+    let i = y as usize * w as usize + x as usize;
+    zones.iter().enumerate().filter(|(_, z)| z.get(i).is_some_and(|v| *v >= 128)).max_by_key(|(_, z)| z[i]).map(|(k, _)| k)
+}
+
 // ---------------------------------------------------------------- the command
 
 fn load_visual(s: &Session, i: usize, v: &Value) -> Result<Visual> {
@@ -601,6 +917,16 @@ fn mockup_cmd(s: &mut Session, p: &Value) -> Result<Value> {
     if list.len() > MAX_VISUALS {
         return Err(bad(format!("at most {MAX_VISUALS} visuals")));
     }
+    // The product zones, each a coverage mask the size of the photo.
+    let zone_paths = p.get("zones").and_then(Value::as_array).cloned().unwrap_or_default();
+    if zone_paths.len() > MAX_ZONES {
+        return Err(bad(format!("at most {MAX_ZONES} zones")));
+    }
+    let mut zones = Vec::new();
+    for (i, z) in zone_paths.iter().enumerate() {
+        let path = z.as_str().ok_or_else(|| bad(format!("zone {i}: a PNG path")))?;
+        zones.push(load_zone(path, photo.width, photo.height)?);
+    }
     let mut placed = Vec::new();
     let mut placements = Vec::new();
     for (i, v) in list.iter().enumerate() {
@@ -632,11 +958,17 @@ fn mockup_cmd(s: &mut Session, p: &Value) -> Result<Value> {
             Some(w) if !w.is_null() => Bend::from_json(w).map_err(|e| bad(format!("visual {i}: {e}")))?,
             _ => Bend::default(),
         };
+        let zone = match v.get("zone") {
+            None | Some(Value::Null) => None,
+            Some(z) => Some(z.as_u64().map(|z| z as usize).filter(|z| *z < zones.len()).ok_or_else(|| bad(format!("visual {i}: no zone {z}")))?),
+        };
         let placement = Placement { corners, bend };
         if let Some(pl) = place(&visual, &placement, photo.width, photo.height)? {
-            placed.push(pl);
+            placed.push((pl, zone));
         }
-        placements.push(placement.to_json());
+        let mut pj = placement.to_json();
+        pj["zone"] = json!(zone);
+        placements.push(pj);
     }
     let render = Render {
         shadows: (num(p, "shadows", DEFAULT_SHADOWS) / 100.0) as f32,
@@ -646,7 +978,7 @@ fn mockup_cmd(s: &mut Session, p: &Value) -> Result<Value> {
     crate::allocation::checkpoint("rendering a mockup")?;
     let (w, h) = (photo.width as usize, photo.height as usize);
     let light = Light::new(&photo.rgba, w, h);
-    let views: Vec<Print> = placed.iter().map(Print::from).collect();
+    let views: Vec<Print> = placed.iter().map(|(pl, z)| Print::from(pl).in_zone(z.map(|z| zones[z].as_slice()))).collect();
     let pixels = composite(&photo.rgba, w, h, &light, &views, render, ppcm);
     let name = p.get("name").and_then(Value::as_str).filter(|n| !n.trim().is_empty()).map_or_else(|| format!("{} mockup", photo.name), str::to_string);
     let mut doc = Document::new(&name, Size::new(photo.width, photo.height), ColorMode::Rgb, SampleType::U8);
@@ -676,7 +1008,7 @@ pub fn specs() -> Vec<CommandSpec> {
         label: "Mockup…",
         menu: &["DTF"],
         shortcut: None,
-        params: r##"{"photo":str (the garment's photo, a PNG or JPG path),"scale":{"from":[x,y],"to":[x,y] (a line on the photo, in its pixels),"cm":0.1..1000 (its real length)}|"pixelsPerCm":0.01..2000,"visuals":[{"path":str (a PNG or SVG)|"document":int,"x":px,"y":px (its centre on the photo; default the photo's centre),"widthCm":0.1..500,"heightCm":0.1..500 (one alone keeps the proportions; default its own print size),"rotation":-360..360=0 (degrees, clockwise),"corners":[[x,y]×4] (in place of x/y/size/rotation: clockwise from the top left, photo pixels),"warp":{"style":"arc|arch|bulge|flag|inflate|custom","bend":-100..100,"vertical":bool,"points":[[u,v]×16] (custom: the 4×4 control grid in the visual's box units)}}],"shadows":0..100=60,"folds":0..100=35,"opacity":0..100=95,"name":str,"output":str (a .png or .jpg path),"open":bool=true}"##,
+        params: r##"{"photo":str (the garment's photo, a PNG or JPG path),"scale":{"from":[x,y],"to":[x,y] (a line on the photo, in its pixels),"cm":0.1..1000 (its real length)}|"pixelsPerCm":0.01..2000,"visuals":[{"path":str (a PNG or SVG)|"document":int,"x":px,"y":px (its centre on the photo; default the photo's centre),"widthCm":0.1..500,"heightCm":0.1..500 (one alone keeps the proportions; default its own print size),"rotation":-360..360=0 (degrees, clockwise),"corners":[[x,y]×4] (in place of x/y/size/rotation: clockwise from the top left, photo pixels),"warp":{"style":"arc|arch|bulge|flag|inflate|custom","bend":-100..100,"vertical":bool,"points":[[u,v]×16] (custom: the 4×4 control grid in the visual's box units)},"zone":int (index in `zones`: the ink stops at its edge; none: not masked)}],"zones":[str] (product zones: PNG masks the photo's size, white inside),"shadows":0..100=60,"folds":0..100=35,"opacity":0..100=95,"name":str,"output":str (a .png or .jpg path),"open":bool=true}"##,
         enabled: crate::commands::always,
         run: mockup_cmd,
         journal: true,
@@ -780,7 +1112,7 @@ mod tests {
         }
         let light = Light::new(&photo, w, h);
         let ink = square(40, [60, 160, 230]);
-        let print = Print { rgba: &ink, x: 40, y: 10, width: 40, height: 40 };
+        let print = Print { rgba: &ink, x: 40, y: 10, width: 40, height: 40, zone: None };
         let out = composite(&photo, w, h, &light, &[print], Render { shadows: 1.0, folds: 0.0, opacity: 1.0 }, 10.0);
         let (dark, lit) = (at(&out, w, 45, 30), at(&out, w, 75, 30));
         let sum = |p: [u8; 4]| u32::from(p[0]) + u32::from(p[1]) + u32::from(p[2]);
@@ -789,12 +1121,65 @@ mod tests {
         // Folds move the ink along the light: striped ink shifts on the light step.
         let stripes: Vec<u8> = (0..40 * 40).flat_map(|i| if (i % 40) % 4 < 2 { [0, 0, 0, 255] } else { [255, 255, 255, 255] }).collect();
         let at_step = |folds: f32| {
-            let print = Print { rgba: &stripes, x: 40, y: 10, width: 40, height: 40 };
+            let print = Print { rgba: &stripes, x: 40, y: 10, width: 40, height: 40, zone: None };
             composite(&photo, w, h, &light, &[print], Render { shadows: 0.0, folds, opacity: 1.0 }, 10.0)
         };
         let (flat, folded) = (at_step(0.0), at_step(1.0));
         assert!((57..63).any(|x| at(&flat, w, x, 30) != at(&folded, w, x, 30)), "moved on the step");
         assert_eq!(at(&flat, w, 45, 30), at(&folded, w, 45, 30), "not where the fabric is flat");
+    }
+
+    /// A lasso polygon makes a smoothed zone; two objects split into two zones, left to right;
+    /// the ink stops at its zone's edge.
+    #[test]
+    fn zones_split_and_mask_the_ink() {
+        let (w, h) = (100u32, 60u32);
+        let z = zone_from_polygon(&[[10.0, 10.0], [40.5, 10.0], [40.5, 50.0], [10.0, 50.0]], w, h);
+        assert_eq!(z[30 * 100 + 20], 255);
+        assert_eq!(z[30 * 100 + 5], 0);
+        assert_eq!(z[30 * 100 + 40], 128, "half the edge pixel");
+        let mut both = zone_from_polygon(&[[60.0, 5.0], [90.0, 5.0], [90.0, 55.0], [60.0, 55.0]], w, h);
+        combine_zone(&mut both, &z, false);
+        let parts = split_objects(&both, w, h);
+        assert_eq!(parts.len(), 2);
+        assert_eq!(parts[0][30 * 100 + 20], 255, "the left one first");
+        assert_eq!(parts[0][30 * 100 + 70], 0);
+        assert_eq!(parts[0][30 * 100 + 40], 128, "with its smoothed edge");
+        let mut cut = both.clone();
+        combine_zone(&mut cut, &parts[1], true);
+        assert_eq!(cut[30 * 100 + 70], 0);
+        assert_eq!(zone_at(&[&parts[0], &parts[1]], w, h, [75.0, 30.0]), Some(1));
+        assert_eq!(zone_at(&[&parts[0], &parts[1]], w, h, [50.0, 30.0]), None);
+        // A print across the left zone's edge stops there.
+        let photo = flat(100, 60, [200, 200, 200]);
+        let light = Light::new(&photo, 100, 60);
+        let ink = flat(40, 20, [0, 0, 0]);
+        let print = Print { rgba: &ink, x: 20, y: 20, width: 40, height: 20, zone: Some(&parts[0]) };
+        let out = composite(&photo, 100, 60, &light, &[print], Render { shadows: 0.0, folds: 0.0, opacity: 1.0 }, 10.0);
+        assert_eq!(at(&out, 100, 30, 30)[0], 0, "inside");
+        assert_eq!(at(&out, 100, 50, 30)[0], 200, "outside its zone");
+        assert_eq!(reduce_zone(&parts[0], w, h, 50, 30)[15 * 50 + 10], 255);
+    }
+
+    /// Light garments on a white backdrop: one zone each, found from the backdrop.
+    #[test]
+    fn products_on_a_plain_backdrop_are_found() {
+        let (w, h) = (120u32, 60u32);
+        let mut rgba = flat(120, 60, [254, 254, 254]);
+        for (x0, x1) in [(10, 50), (70, 110)] {
+            for y in 10..50 {
+                for x in x0..x1 {
+                    let i = (y * 120 + x) * 4;
+                    rgba[i..i + 3].copy_from_slice(&[238, 237, 242]);
+                }
+            }
+        }
+        let photo = Photo { name: "tee".into(), rgba, width: w, height: h, dpi: 72.0 };
+        let zones = product_zones(&photo);
+        assert_eq!(zones.len(), 2);
+        assert_eq!(zones[0][30 * 120 + 30], 255);
+        assert_eq!(zones[1][30 * 120 + 90], 255);
+        assert_eq!(zones[0][30 * 120 + 60], 0);
     }
 
     #[test]
@@ -857,6 +1242,20 @@ mod tests {
         let surf = s.active().unwrap().doc.layers[0].surface().unwrap().clone();
         assert!(surf.read_region(Rect::new(290, 190, 291, 191))[0] < 0.2, "the corners' box is covered");
         assert!(s.execute(MOCKUP, json!({"photo": photo, "pixelsPerCm": 10, "visuals": [{"path": logo, "corners": [[0, 0], [1, 1]]}]})).is_err());
+        // A zone: the ink stops at its edge.
+        let zone = dir.join("zone.png").to_string_lossy().into_owned();
+        write_zone_png(&zone_from_polygon(&[[0.0, 0.0], [200.0, 0.0], [200.0, 300.0], [0.0, 300.0]], 400, 300), 400, 300, &zone).unwrap();
+        let r = s
+            .execute(
+                MOCKUP,
+                json!({"photo": photo, "pixelsPerCm": 10, "zones": [zone], "visuals": [{"path": logo, "corners": [[150, 100], [250, 100], [250, 200], [150, 200]], "zone": 0}], "shadows": 0, "folds": 0, "opacity": 100}),
+            )
+            .unwrap();
+        assert_eq!(r["visuals"][0]["zone"], 0);
+        let surf = s.active().unwrap().doc.layers[0].surface().unwrap().clone();
+        assert!(surf.read_region(Rect::new(170, 150, 171, 151))[0] < 0.2, "inside the zone");
+        assert!(surf.read_region(Rect::new(230, 150, 231, 151))[0] > 0.95, "outside it");
+        assert!(s.execute(MOCKUP, json!({"photo": photo, "pixelsPerCm": 10, "zones": [zone], "visuals": [{"path": logo, "zone": 3}]})).is_err());
         // A pasted screenshot written as a PNG is a photo.
         let shot = photo_from_rgba("Screenshot", 4, 2, vec![0, 0, 0, 0].repeat(8)).unwrap();
         assert_eq!(&shot.rgba[..4], &[255, 255, 255, 255], "transparent pixels on white");

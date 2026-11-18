@@ -561,3 +561,33 @@
 	The image on the clipboard (Ctrl+V)	Das Bild in der Zwischenablage (Strg+V)
 	The clipboard holds no image	Die Zwischenablage enthält kein Bild
 	The clipboard can't be read here	Die Zwischenablage kann hier nicht gelesen werden
+# DTF Craft (38)
+	Product Zones (optional)	Produktbereiche (optional)
+	Select the Product (Auto)	Produkt auswählen (automatisch)
+	One zone for each garment or view found on the photo	Ein Bereich für jedes Kleidungsstück bzw. jede Ansicht im Foto
+	Polygonal Lasso	Polygon-Lasso
+	Polygonal Lasso: Click the Points	Polygon-Lasso: Punkte anklicken
+	A click for each point; a double click or the first point closes it; Esc cancels	Ein Klick je Punkt; Doppelklick oder der erste Punkt schließt; Esc bricht ab
+	New	Neu
+	Add	Hinzufügen
+	Subtract	Abziehen
+	Use the Open Document's Selection	Auswahl des geöffneten Dokuments übernehmen
+	A selection made in DTF Craft on the same photo	Eine in DTF Craft auf demselben Foto erstellte Auswahl
+	Choose {name}	{name} wählen
+	Zone name	Name des Bereichs
+	Invert	Umkehren
+	Remove every zone	Alle Bereiche entfernen
+	Each visual stops at the zone under its centre.	Jedes Motiv endet am Rand des Bereichs unter seiner Mitte.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Optional: Die Motive werden am Rand des Kleidungsstücks abgeschnitten (Ärmel, Rücken, Arme).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (keiner)
+	Not Masked	Nicht maskiert
+	Zone:	Bereich:
+	Zone	Bereich
+	Zone {n}	Bereich {n}
+	{n} zones found	{n} Bereiche gefunden
+	Lasso: a new zone	Lasso: neuer Bereich
+	Lasso: added to the chosen zone	Lasso: zum gewählten Bereich hinzugefügt
+	Lasso: taken from the chosen zone	Lasso: vom gewählten Bereich abgezogen
+	The open document has no selection	Das geöffnete Dokument hat keine Auswahl
+	The open document must be the photo's size ({w} × {h} px)	Das geöffnete Dokument muss die Größe des Fotos haben ({w} × {h} px)

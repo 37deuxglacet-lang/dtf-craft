@@ -554,3 +554,33 @@
 	The image on the clipboard (Ctrl+V)	클립보드의 이미지(Ctrl+V)
 	The clipboard holds no image	클립보드에 이미지가 없습니다
 	The clipboard can't be read here	여기서는 클립보드를 읽을 수 없습니다
+# DTF Craft (38)
+	Product Zones (optional)	제품 영역(선택 사항)
+	Select the Product (Auto)	제품 선택(자동)
+	One zone for each garment or view found on the photo	사진에서 찾은 의류나 보기마다 영역 하나
+	Polygonal Lasso	다각형 올가미
+	Polygonal Lasso: Click the Points	다각형 올가미: 점을 클릭하세요
+	A click for each point; a double click or the first point closes it; Esc cancels	점마다 클릭, 더블클릭이나 첫 점으로 닫기, Esc로 취소
+	New	새로
+	Add	추가
+	Subtract	빼기
+	Use the Open Document's Selection	열린 문서의 선택 영역 사용
+	A selection made in DTF Craft on the same photo	같은 사진에 DTF Craft에서 만든 선택 영역
+	Choose {name}	{name} 선택
+	Zone name	영역 이름
+	Invert	반전
+	Remove every zone	모든 영역 제거
+	Each visual stops at the zone under its centre.	각 디자인은 중심 아래 영역의 가장자리에서 잘립니다.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	선택 사항: 디자인이 의류 가장자리(소매, 뒤판, 팔)에서 잘립니다.
+	Auto ({zone})	자동({zone})
+	Auto (none)	자동(없음)
+	Not Masked	마스크 없음
+	Zone:	영역:
+	Zone	영역
+	Zone {n}	영역 {n}
+	{n} zones found	영역 {n}개 찾음
+	Lasso: a new zone	올가미: 새 영역
+	Lasso: added to the chosen zone	올가미: 선택한 영역에 추가
+	Lasso: taken from the chosen zone	올가미: 선택한 영역에서 빼기
+	The open document has no selection	열린 문서에 선택 영역이 없습니다
+	The open document must be the photo's size ({w} × {h} px)	열린 문서는 사진과 같은 크기({w} × {h}px)여야 합니다

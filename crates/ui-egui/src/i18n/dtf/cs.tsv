@@ -542,3 +542,33 @@
 	The image on the clipboard (Ctrl+V)	Obrázek ze schránky (Ctrl+V)
 	The clipboard holds no image	Schránka neobsahuje obrázek
 	The clipboard can't be read here	Schránku zde nelze přečíst
+# DTF Craft (38)
+	Product Zones (optional)	Zóny produktu (volitelné)
+	Select the Product (Auto)	Vybrat produkt (automaticky)
+	One zone for each garment or view found on the photo	Jedna zóna pro každý oděv nebo pohled na fotografii
+	Polygonal Lasso	Mnohoúhelníkové laso
+	Polygonal Lasso: Click the Points	Mnohoúhelníkové laso: klikejte body
+	A click for each point; a double click or the first point closes it; Esc cancels	Jedno kliknutí na bod; dvojklik nebo první bod uzavře; Esc zruší
+	New	Nová
+	Add	Přidat
+	Subtract	Odečíst
+	Use the Open Document's Selection	Použít výběr otevřeného dokumentu
+	A selection made in DTF Craft on the same photo	Výběr vytvořený v DTF Craft na stejné fotografii
+	Choose {name}	Vybrat {name}
+	Zone name	Název zóny
+	Invert	Invertovat
+	Remove every zone	Odebrat všechny zóny
+	Each visual stops at the zone under its centre.	Každý motiv končí na okraji zóny pod svým středem.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Volitelné: motivy se ořežou na okraji oděvu (rukávy, záda, paže).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (žádná)
+	Not Masked	Bez masky
+	Zone:	Zóna:
+	Zone	Zóna
+	Zone {n}	Zóna {n}
+	{n} zones found	Nalezené zóny: {n}
+	Lasso: a new zone	Laso: nová zóna
+	Lasso: added to the chosen zone	Laso: přidáno ke zvolené zóně
+	Lasso: taken from the chosen zone	Laso: odečteno od zvolené zóny
+	The open document has no selection	Otevřený dokument nemá výběr
+	The open document must be the photo's size ({w} × {h} px)	Otevřený dokument musí mít velikost fotografie ({w} × {h} px)

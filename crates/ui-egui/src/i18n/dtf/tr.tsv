@@ -541,3 +541,33 @@
 	The image on the clipboard (Ctrl+V)	Panodaki görüntü (Ctrl+V)
 	The clipboard holds no image	Panoda görüntü yok
 	The clipboard can't be read here	Pano burada okunamıyor
+# DTF Craft (38)
+	Product Zones (optional)	Ürün bölgeleri (isteğe bağlı)
+	Select the Product (Auto)	Ürünü seç (otomatik)
+	One zone for each garment or view found on the photo	Fotoğraftaki her giysi veya görünüm için bir bölge
+	Polygonal Lasso	Çokgen kement
+	Polygonal Lasso: Click the Points	Çokgen kement: noktalara tıklayın
+	A click for each point; a double click or the first point closes it; Esc cancels	Her nokta için bir tık; çift tık veya ilk nokta kapatır; Esc iptal eder
+	New	Yeni
+	Add	Ekle
+	Subtract	Çıkar
+	Use the Open Document's Selection	Açık belgenin seçimini kullan
+	A selection made in DTF Craft on the same photo	Aynı fotoğraf üzerinde DTF Craft'ta yapılmış bir seçim
+	Choose {name}	{name} seç
+	Zone name	Bölge adı
+	Invert	Ters çevir
+	Remove every zone	Tüm bölgeleri kaldır
+	Each visual stops at the zone under its centre.	Her tasarım, merkezinin altındaki bölgenin kenarında durur.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	İsteğe bağlı: tasarımlar giysinin kenarında kesilir (kollar, sırt, kollar).
+	Auto ({zone})	Otomatik ({zone})
+	Auto (none)	Otomatik (yok)
+	Not Masked	Maskesiz
+	Zone:	Bölge:
+	Zone	Bölge
+	Zone {n}	Bölge {n}
+	{n} zones found	{n} bölge bulundu
+	Lasso: a new zone	Kement: yeni bölge
+	Lasso: added to the chosen zone	Kement: seçilen bölgeye eklendi
+	Lasso: taken from the chosen zone	Kement: seçilen bölgeden çıkarıldı
+	The open document has no selection	Açık belgede seçim yok
+	The open document must be the photo's size ({w} × {h} px)	Açık belge fotoğrafın boyutunda olmalı ({w} × {h} px)

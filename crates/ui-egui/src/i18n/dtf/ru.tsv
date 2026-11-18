@@ -559,3 +559,33 @@
 	The image on the clipboard (Ctrl+V)	Изображение из буфера обмена (Ctrl+V)
 	The clipboard holds no image	В буфере обмена нет изображения
 	The clipboard can't be read here	Буфер обмена здесь не читается
+# DTF Craft (38)
+	Product Zones (optional)	Зоны изделия (необязательно)
+	Select the Product (Auto)	Выделить изделие (авто)
+	One zone for each garment or view found on the photo	По зоне на каждое изделие или вид на фото
+	Polygonal Lasso	Прямолинейное лассо
+	Polygonal Lasso: Click the Points	Прямолинейное лассо: щёлкайте точки
+	A click for each point; a double click or the first point closes it; Esc cancels	Щелчок на каждую точку; двойной щелчок или первая точка замыкает; Esc отменяет
+	New	Новая
+	Add	Добавить
+	Subtract	Вычесть
+	Use the Open Document's Selection	Взять выделение открытого документа
+	A selection made in DTF Craft on the same photo	Выделение, сделанное в DTF Craft на том же фото
+	Choose {name}	Выбрать {name}
+	Zone name	Название зоны
+	Invert	Инвертировать
+	Remove every zone	Убрать все зоны
+	Each visual stops at the zone under its centre.	Каждый макет обрезается по краю зоны под его центром.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Необязательно: макеты обрезаются по краю изделия (рукава, спина, руки).
+	Auto ({zone})	Авто ({zone})
+	Auto (none)	Авто (нет)
+	Not Masked	Без маски
+	Zone:	Зона:
+	Zone	Зона
+	Zone {n}	Зона {n}
+	{n} zones found	Найдено зон: {n}
+	Lasso: a new zone	Лассо: новая зона
+	Lasso: added to the chosen zone	Лассо: добавлено к выбранной зоне
+	Lasso: taken from the chosen zone	Лассо: вычтено из выбранной зоны
+	The open document has no selection	В открытом документе нет выделения
+	The open document must be the photo's size ({w} × {h} px)	Открытый документ должен быть размером с фото ({w} × {h} пикс.)

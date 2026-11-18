@@ -158,6 +158,48 @@ struct Item {
     cache: Option<(i64, i64, Surface)>,
     /// It placed on the preview.
     placed: Option<Placed>,
+    /// Which product zone masks it.
+    zone: ZoneChoice,
+}
+
+/// The product zone that masks a visual.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ZoneChoice {
+    /// The zone under its centre (none there: not masked).
+    Auto,
+    /// Not masked.
+    Off,
+    Zone(usize),
+}
+
+/// A product zone (a view of the garment): its name and coverage over the photo (0..255, the
+/// photo's size), and the same on the preview.
+struct Zone {
+    name: String,
+    mask: Vec<u8>,
+    preview: Vec<u8>,
+}
+
+/// How a closed lasso changes the zones: a new zone, or added to / taken from the chosen one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ZoneMode {
+    New,
+    Add,
+    Subtract,
+}
+
+/// The zones' colours on the photo.
+const ZONE_COLORS: [Color32; 6] = [
+    Color32::from_rgb(192, 58, 168),
+    Color32::from_rgb(47, 111, 224),
+    Color32::from_rgb(22, 140, 72),
+    Color32::from_rgb(222, 120, 20),
+    Color32::from_rgb(120, 70, 200),
+    Color32::from_rgb(200, 40, 40),
+];
+
+fn zone_color(k: usize) -> Color32 {
+    ZONE_COLORS[k % ZONE_COLORS.len()]
 }
 
 fn dist(a: [f64; 2], b: [f64; 2]) -> f64 {
@@ -463,6 +505,8 @@ struct PhotoState {
     /// The preview's pixels per photo pixel.
     k: f64,
     light: Light,
+    /// The photo itself (Select the Product works on it).
+    full: Photo,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -501,6 +545,16 @@ pub struct MockupDialog {
     /// The preview needs rendering again.
     dirty: bool,
     shown: Option<TextureHandle>,
+    /// The product zones, the chosen one (Add / Subtract, Invert), how a lasso changes them.
+    zones: Vec<Zone>,
+    zone_sel: Option<usize>,
+    zone_mode: ZoneMode,
+    /// The polygonal lasso is on; its points so far (photo pixels).
+    lassoing: bool,
+    lasso: Vec<[f64; 2]>,
+    /// The zones' edges drawn over the preview, rebuilt when they change.
+    overlay: Option<TextureHandle>,
+    overlay_dirty: bool,
 }
 
 impl MockupDialog {
@@ -523,6 +577,13 @@ impl MockupDialog {
             drag: None,
             dirty: true,
             shown: None,
+            zones: Vec::new(),
+            zone_sel: None,
+            zone_mode: ZoneMode::New,
+            lassoing: false,
+            lasso: Vec::new(),
+            overlay: None,
+            overlay_dirty: true,
         }
     }
 
@@ -567,9 +628,18 @@ impl MockupDialog {
         }
         let (preview, k) = photo.reduced(PREVIEW_SIDE);
         let light = Light::new(&preview.rgba, preview.width as usize, preview.height as usize);
-        self.photo = Some(PhotoState { path: path.to_string(), name: photo.name, width: w, height: h, preview, k, light });
+        self.photo = Some(PhotoState { path: path.to_string(), name: photo.name.clone(), width: w, height: h, preview, k, light, full: photo });
         self.line = None;
         self.sized_at = None;
+        // The zones were drawn on the old photo.
+        self.zones.clear();
+        self.zone_sel = None;
+        self.lasso.clear();
+        self.lassoing = false;
+        self.overlay_dirty = true;
+        for it in &mut self.items {
+            it.zone = ZoneChoice::Auto;
+        }
         self.drawing = true;
         self.status = tl!("Draw the reference line on the photo").to_string();
         self.dirty = true;
@@ -602,6 +672,7 @@ impl MockupDialog {
             tex: None,
             cache: None,
             placed: None,
+            zone: ZoneChoice::Auto,
         });
         self.sized_at = Some(ppcm);
         self.selected = Some(self.items.len() - 1);
@@ -664,8 +735,174 @@ impl MockupDialog {
         (0..self.items.len()).rev().find(|i| self.items[*i].contains(q))
     }
 
+    /// The zone masking item `i`: its own choice, else the zone under its centre.
+    fn zone_of(&self, i: usize) -> Option<usize> {
+        let it = self.items.get(i)?;
+        match it.zone {
+            ZoneChoice::Off => None,
+            ZoneChoice::Zone(k) => (k < self.zones.len()).then_some(k),
+            ZoneChoice::Auto => {
+                let ph = self.photo.as_ref()?;
+                let masks: Vec<&[u8]> = self.zones.iter().map(|z| z.mask.as_slice()).collect();
+                cmd::zone_at(&masks, ph.width, ph.height, it.center())
+            }
+        }
+    }
+
+    /// A new zone (full-size coverage); its name the next free "Zone n".
+    fn push_zone(&mut self, mask: Vec<u8>) {
+        let Some(ph) = &self.photo else { return };
+        if self.zones.len() >= cmd::MAX_ZONES || !mask.iter().any(|v| *v >= 128) {
+            return;
+        }
+        let preview = cmd::reduce_zone(&mask, ph.width, ph.height, ph.preview.width, ph.preview.height);
+        let mut n = self.zones.len() + 1;
+        while self.zones.iter().any(|z| z.name == zone_default_name(n)) {
+            n += 1;
+        }
+        self.zones.push(Zone { name: zone_default_name(n), mask, preview });
+        self.zone_sel = Some(self.zones.len() - 1);
+        self.zones_changed();
+    }
+
+    /// The zone `k`'s coverage replaced (empty: the zone goes).
+    fn set_zone_mask(&mut self, k: usize, mask: Vec<u8>) {
+        let Some(ph) = &self.photo else { return };
+        if !mask.iter().any(|v| *v >= 128) {
+            self.remove_zone(k);
+            return;
+        }
+        let preview = cmd::reduce_zone(&mask, ph.width, ph.height, ph.preview.width, ph.preview.height);
+        if let Some(z) = self.zones.get_mut(k) {
+            z.mask = mask;
+            z.preview = preview;
+        }
+        self.zones_changed();
+    }
+
+    fn remove_zone(&mut self, k: usize) {
+        if k >= self.zones.len() {
+            return;
+        }
+        self.zones.remove(k);
+        for it in &mut self.items {
+            it.zone = match it.zone {
+                ZoneChoice::Zone(j) if j == k => ZoneChoice::Auto,
+                ZoneChoice::Zone(j) if j > k => ZoneChoice::Zone(j - 1),
+                z => z,
+            };
+        }
+        self.zone_sel = match self.zone_sel {
+            Some(s) if s == k => None,
+            Some(s) if s > k => Some(s - 1),
+            s => s,
+        };
+        self.zones_changed();
+    }
+
+    fn clear_zones(&mut self) {
+        while !self.zones.is_empty() {
+            self.remove_zone(self.zones.len() - 1);
+        }
+    }
+
+    /// The zone `k` turned inside out (over the photo).
+    fn invert_zone(&mut self, k: usize) {
+        if let Some(z) = self.zones.get(k) {
+            let inv: Vec<u8> = z.mask.iter().map(|v| 255 - v).collect();
+            self.set_zone_mask(k, inv);
+        }
+    }
+
+    /// The closed lasso applied as the mode says.
+    fn close_lasso(&mut self) {
+        let pts = std::mem::take(&mut self.lasso);
+        let Some(ph) = &self.photo else { return };
+        if pts.len() < 3 {
+            return;
+        }
+        let poly = cmd::zone_from_polygon(&pts, ph.width, ph.height);
+        match (self.zone_mode, self.zone_sel.filter(|k| *k < self.zones.len())) {
+            (ZoneMode::Add, Some(k)) | (ZoneMode::Subtract, Some(k)) => {
+                let mut m = self.zones[k].mask.clone();
+                cmd::combine_zone(&mut m, &poly, self.zone_mode == ZoneMode::Subtract);
+                self.set_zone_mask(k, m);
+            }
+            (ZoneMode::Subtract, None) => {}
+            _ => self.push_zone(poly),
+        }
+    }
+
+    /// The product(s) found on the photo, one zone each, in place of the zones.
+    fn auto_zones(&mut self) -> usize {
+        let Some(ph) = &self.photo else { return 0 };
+        let found = cmd::product_zones(&ph.full);
+        self.clear_zones();
+        let n = found.len();
+        for z in found {
+            self.push_zone(z);
+        }
+        n
+    }
+
+    fn zones_changed(&mut self) {
+        self.overlay_dirty = true;
+        self.dirty = true;
+    }
+
+    /// The zones' edges (and the chosen zone lightly tinted) at the preview's size.
+    fn refresh_overlay(&mut self, ctx: &egui::Context) {
+        if !self.overlay_dirty {
+            return;
+        }
+        self.overlay_dirty = false;
+        let Some(ph) = &self.photo else {
+            self.overlay = None;
+            return;
+        };
+        if self.zones.is_empty() {
+            self.overlay = None;
+            return;
+        }
+        let (w, h) = (ph.preview.width as usize, ph.preview.height as usize);
+        let mut px = vec![Color32::TRANSPARENT; w * h];
+        // The edge a few preview pixels thick: still a line once the photo is fitted on screen.
+        let r = (w.max(h) / 500).max(1);
+        for (k, z) in self.zones.iter().enumerate() {
+            let c = zone_color(k);
+            let on = self.zone_sel == Some(k);
+            for y in 0..h {
+                for x in 0..w {
+                    let i = y * w + x;
+                    if z.preview[i] < 128 {
+                        continue;
+                    }
+                    let edge = x < r
+                        || y < r
+                        || x + r >= w
+                        || y + r >= h
+                        || z.preview[i - r] < 128
+                        || z.preview[i + r] < 128
+                        || z.preview[i - r * w] < 128
+                        || z.preview[i + r * w] < 128;
+                    if edge {
+                        px[i] = c;
+                    } else if on {
+                        px[i] = Color32::from_rgba_unmultiplied(c.r(), c.g(), c.b(), 12);
+                    }
+                }
+            }
+        }
+        let img = egui::ColorImage { size: [w, h], source_size: egui::vec2(w as f32, h as f32), pixels: px };
+        match &mut self.overlay {
+            Some(tex) => tex.set(img, egui::TextureOptions::LINEAR),
+            None => self.overlay = Some(ctx.load_texture("mockup-zones", img, egui::TextureOptions::LINEAR)),
+        }
+    }
+
     /// The preview rendered again, if anything changed.
     fn refresh(&mut self, ctx: &egui::Context) {
+        self.refresh_overlay(ctx);
         for (i, it) in self.items.iter_mut().enumerate() {
             if let Some(img) = it.thumb.take() {
                 it.tex = Some(ctx.load_texture(format!("mockup-thumb-{i}-{}", it.visual.name), img, egui::TextureOptions::LINEAR));
@@ -707,7 +944,13 @@ impl MockupDialog {
                 }
             }
         }
-        let prints: Vec<Print> = self.items.iter().filter_map(|it| it.placed.as_ref().map(Print::from)).collect();
+        let zone_of: Vec<Option<usize>> = (0..self.items.len()).map(|i| self.zone_of(i)).collect();
+        let prints: Vec<Print> = self
+            .items
+            .iter()
+            .zip(&zone_of)
+            .filter_map(|(it, z)| it.placed.as_ref().map(|p| Print::from(p).in_zone(z.and_then(|k| self.zones.get(k)).map(|z| z.preview.as_slice()))))
+            .collect();
         let (w, h) = (ph.preview.width as usize, ph.preview.height as usize);
         let out = cmd::composite(&ph.preview.rgba, w, h, &ph.light, &prints, self.render(), pp);
         let img = egui::ColorImage::from_rgba_unmultiplied([w, h], &out);
@@ -728,7 +971,8 @@ impl MockupDialog {
             return Err(tl!("Add a visual first").to_string());
         }
         let mut visuals = Vec::new();
-        for it in &self.items {
+        let zone_of: Vec<Option<usize>> = (0..self.items.len()).map(|i| self.zone_of(i)).collect();
+        for (k, it) in self.items.iter().enumerate() {
             let mut v = match &it.origin {
                 Origin::File(path) => json!({"path": path}),
                 Origin::Document(id) => {
@@ -743,6 +987,7 @@ impl MockupDialog {
             };
             v["corners"] = json!(it.placement.corners);
             v["warp"] = bend_json(&it.placement.bend);
+            v["zone"] = json!(zone_of[k]);
             visuals.push(v);
         }
         Ok(json!({
@@ -764,11 +1009,15 @@ impl MockupDialog {
             "lengthCm": self.length_cm,
             "pixelsPerCm": self.ppcm(),
             "drawing": self.drawing,
-            "visuals": self.items.iter().map(|it| {
+            "visuals": self.items.iter().enumerate().map(|(i, it)| {
                 let (w, h) = it.size_px();
                 let c = it.center();
-                json!({"name": it.visual.name, "x": c[0], "y": c[1], "widthCm": w / k, "heightCm": h / k, "lock": it.lock, "rotation": it.rotation(), "corners": it.placement.corners, "warp": bend_json(&it.placement.bend)})
+                let choice = match it.zone { ZoneChoice::Auto => json!("auto"), ZoneChoice::Off => json!("none"), ZoneChoice::Zone(z) => json!(z) };
+                json!({"name": it.visual.name, "x": c[0], "y": c[1], "widthCm": w / k, "heightCm": h / k, "lock": it.lock, "rotation": it.rotation(), "corners": it.placement.corners, "warp": bend_json(&it.placement.bend), "zoneChoice": choice, "zone": self.zone_of(i)})
             }).collect::<Vec<_>>(),
+            "zones": self.zones.iter().map(|z| json!({"name": z.name})).collect::<Vec<_>>(),
+            "zoneSelected": self.zone_sel,
+            "lasso": {"on": self.lassoing, "points": self.lasso.len()},
             "selected": self.selected,
             "tool": self.tool.map(Tool::id),
             "render": {"shadows": self.shadows, "folds": self.folds, "opacity": self.opacity},
@@ -776,6 +1025,10 @@ impl MockupDialog {
             "status": self.status,
         })
     }
+}
+
+fn zone_default_name(n: usize) -> String {
+    crate::i18n::fmt(tl!("Zone {n}"), &[("n", &n.to_string())])
 }
 
 fn bend_json(b: &Bend) -> Value {
@@ -848,6 +1101,29 @@ pub fn paste_photo(app: &mut PhotocraftApp) {
         }
         Err(e) => set_status(app, e.to_string()),
     }
+}
+
+/// The open document's selection as zones (one per object): the document must be the photo's size.
+pub fn zones_from_document(app: &mut PhotocraftApp) -> Result<usize, String> {
+    let st = app.session.active().ok_or(tl!("Open a document first"))?;
+    let d = app.mockup.as_ref().ok_or("Mockup isn't open")?;
+    let ph = d.photo.as_ref().ok_or(tl!("Load a photo first"))?;
+    if (st.doc.size.width, st.doc.size.height) != (ph.width, ph.height) {
+        return Err(crate::i18n::fmt(
+            tl!("The open document must be the photo's size ({w} × {h} px)"),
+            &[("w", &ph.width.to_string()), ("h", &ph.height.to_string())],
+        ));
+    }
+    let zone = cmd::selection_zone(&st.doc).ok_or(tl!("The open document has no selection"))?;
+    let (w, h) = (ph.width, ph.height);
+    let parts = cmd::split_objects(&zone, w, h);
+    let n = parts.len();
+    if let Some(d) = app.mockup.as_mut() {
+        for z in parts {
+            d.push_zone(z);
+        }
+    }
+    Ok(n)
 }
 
 /// PNG and SVG visuals from disk; failures go to the status line.
@@ -939,6 +1215,18 @@ fn pick_visuals(app: &mut PhotocraftApp) {
 fn export_to(app: &mut PhotocraftApp, path: &str) -> Result<Value, String> {
     let d = app.mockup.as_ref().ok_or("Mockup isn't open")?;
     let mut params = d.params(app)?;
+    // The zones go to the render as PNG masks in the temporary folder.
+    if let Some(ph) = &d.photo
+        && !d.zones.is_empty()
+    {
+        let mut paths = Vec::new();
+        for (k, z) in d.zones.iter().enumerate() {
+            let path = std::env::temp_dir().join(format!("dtfcraft-mockup-zone-{}-{k}.png", std::process::id())).to_string_lossy().into_owned();
+            cmd::write_zone_png(&z.mask, ph.width, ph.height, &path).map_err(|e| e.to_string())?;
+            paths.push(path);
+        }
+        params["zones"] = json!(paths);
+    }
     params["output"] = json!(path);
     match app.run(cmd::MOCKUP, params) {
         Ok(v) => {
@@ -1026,6 +1314,53 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
     if ui.get("paste").and_then(Value::as_bool) == Some(true) {
         paste_photo(app);
     }
+    if ui.get("zonesFromDocument").and_then(Value::as_bool) == Some(true)
+        && let Err(e) = zones_from_document(app)
+    {
+        set_status(app, e);
+    }
+    if let Some(z) = ui.get("zones")
+        && let Some(d) = app.mockup.as_mut()
+    {
+        if z.get("auto").and_then(Value::as_bool) == Some(true) {
+            let n = d.auto_zones();
+            d.status = crate::i18n::fmt(tl!("{n} zones found"), &[("n", &n.to_string())]);
+        }
+        if let Some(m) = z.get("mode").and_then(Value::as_str) {
+            d.zone_mode = match m {
+                "add" => ZoneMode::Add,
+                "subtract" => ZoneMode::Subtract,
+                _ => ZoneMode::New,
+            };
+        }
+        if let Some(k) = z.get("select") {
+            d.zone_sel = k.as_u64().map(|k| k as usize).filter(|k| *k < d.zones.len());
+            d.overlay_dirty = true;
+        }
+        if let Some(pts) = z.get("lasso").and_then(Value::as_array) {
+            d.lasso = pts.iter().filter_map(|p| point(Some(p))).collect();
+            d.close_lasso();
+        }
+        if let Some(on) = z.get("lassoOn").and_then(Value::as_bool) {
+            d.lassoing = on && d.photo.is_some();
+            d.lasso.clear();
+        }
+        if let Some(k) = z.get("invert").and_then(Value::as_u64) {
+            d.invert_zone(k as usize);
+        }
+        if let Some(k) = z.get("remove").and_then(Value::as_u64) {
+            d.remove_zone(k as usize);
+        }
+        if z.get("clear").and_then(Value::as_bool) == Some(true) {
+            d.clear_zones();
+        }
+        if let (Some(k), Some(name)) =
+            (z.get("rename").and_then(|r| r.get("index")).and_then(Value::as_u64), z.get("rename").and_then(|r| r.get("name")).and_then(Value::as_str))
+            && let Some(zone) = d.zones.get_mut(k as usize)
+        {
+            zone.name = name.to_string();
+        }
+    }
     let Some(d) = app.mockup.as_mut() else { return Ok(Value::Null) };
     if let Some(sel) = ui.get("select") {
         d.selected = sel.as_u64().map(|v| v as usize).filter(|i| *i < d.items.len());
@@ -1065,6 +1400,13 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
         if let (Some(x), Some(y)) = (v.get("x").and_then(Value::as_f64), v.get("y").and_then(Value::as_f64)) {
             let c = it.center();
             it.translate([x - c[0], y - c[1]]);
+        }
+        if let Some(z) = v.get("zone") {
+            it.zone = match z {
+                Value::Number(n) => ZoneChoice::Zone(n.as_u64().unwrap_or(0) as usize),
+                Value::String(s) if s == "none" => ZoneChoice::Off,
+                _ => ZoneChoice::Auto,
+            };
         }
         if let Some(w) = v.get("warp") {
             let mut b = cmd::Bend::from_json(w).map_err(|e| e.to_string())?;
@@ -1117,6 +1459,7 @@ fn control(app: &mut PhotocraftApp, ui: &Value) -> Result<Value, String> {
 
 #[derive(Default)]
 struct Actions {
+    zones_from_document: bool,
     load_photo: bool,
     paste: bool,
     add_files: bool,
@@ -1131,7 +1474,8 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     if app.mockup.is_none() {
         return;
     }
-    let has_doc = (app.session.active().is_some(), app.services.clipboard_get_image.is_some());
+    let has_doc =
+        (app.session.active().is_some(), app.services.clipboard_get_image.is_some(), app.session.active().is_some_and(|st| st.doc.selection.is_some()));
     let mut act = Actions::default();
     // Ctrl+V (⌘V): a screenshot as the photo.
     act.paste = !ctx.text_edit_focused()
@@ -1151,6 +1495,12 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     }
     if act.paste {
         paste_photo(app);
+    }
+    if act.zones_from_document {
+        match zones_from_document(app) {
+            Ok(n) => set_status(app, crate::i18n::fmt(tl!("{n} zones found"), &[("n", &n.to_string())])),
+            Err(e) => set_status(app, e),
+        }
     }
     if act.add_files {
         pick_visuals(app);
@@ -1185,7 +1535,7 @@ fn regions(full: ERect) -> Regions {
     Regions { header, left, canvas, right, status }
 }
 
-fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: (bool, bool), act: &mut Actions) {
+fn draw(app: &mut PhotocraftApp, ctx: &egui::Context, has_doc: (bool, bool, bool), act: &mut Actions) {
     let screen = ctx.content_rect();
     egui::Area::new(egui::Id::unique("dtf-mockup-dialog")).order(egui::Order::Foreground).fixed_pos(screen.min).show(ctx, |ui| {
         let Some(d) = app.mockup.as_mut() else { return };
@@ -1290,7 +1640,7 @@ fn num_text(v: f64, decimals: u32) -> String {
 }
 
 /// The left column: the three steps (photo, scale, visuals).
-fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens, (has_doc, can_paste): (bool, bool), act: &mut Actions) {
+fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens, (has_doc, can_paste, doc_sel): (bool, bool, bool), act: &mut Actions) {
     ui.painter().rect_filled(rect, 0.0, t.dock);
     let mut panel = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 12.0))));
     panel.spacing_mut().item_spacing.y = 10.0;
@@ -1350,11 +1700,18 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
                 }
             }
         });
-        // 3. The visuals.
+        // 3. The product zones (optional).
         card_frame(t).show(ui, |ui| {
             ui.set_width(ui.available_width());
             ui.spacing_mut().item_spacing.y = 6.0;
-            step_title(ui, 3, tl!("Visuals"), t);
+            step_title(ui, 3, tl!("Product Zones (optional)"), t);
+            zones_card(ui, d, t, doc_sel, act);
+        });
+        // 4. The visuals.
+        card_frame(t).show(ui, |ui| {
+            ui.set_width(ui.available_width());
+            ui.spacing_mut().item_spacing.y = 6.0;
+            step_title(ui, 4, tl!("Visuals"), t);
             let ppcm = d.ppcm();
             let scaled = ppcm.is_some();
             ui.add_enabled_ui(scaled, |ui| {
@@ -1434,6 +1791,93 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
     });
 }
 
+/// Step 3: Select the Product (one zone per object found), the polygonal lasso and its mode,
+/// the open document's selection, the zones (renamed, removed), Invert and Clear.
+fn zones_card(ui: &mut egui::Ui, d: &mut MockupDialog, t: &Tokens, doc_sel: bool, act: &mut Actions) {
+    let has_photo = d.photo.is_some();
+    ui.add_enabled_ui(has_photo, |ui| {
+        let w = ui.available_width();
+        if blue_button(ui, tl!("Select the Product (Auto)"), w, false).on_hover_text(tl!("One zone for each garment or view found on the photo")).clicked() {
+            let n = d.auto_zones();
+            d.status = crate::i18n::fmt(tl!("{n} zones found"), &[("n", &n.to_string())]);
+        }
+        let label = if d.lassoing { tl!("Polygonal Lasso: Click the Points") } else { tl!("Polygonal Lasso") };
+        if toggle_button(ui, label, d.lassoing, w)
+            .on_hover_text(tl!("A click for each point; a double click or the first point closes it; Esc cancels"))
+            .clicked()
+        {
+            d.lassoing = !d.lassoing;
+            d.lasso.clear();
+            if d.lassoing {
+                d.drawing = false;
+                d.tool = None;
+            }
+        }
+        ui.horizontal(|ui| {
+            let bw = (ui.available_width() - 2.0 * ui.spacing().item_spacing.x) / 3.0;
+            for (mode, name) in [(ZoneMode::New, tl!("New")), (ZoneMode::Add, tl!("Add")), (ZoneMode::Subtract, tl!("Subtract"))] {
+                let ok = mode == ZoneMode::New || d.zone_sel.is_some();
+                if ui.add_enabled_ui(ok, |ui| toggle_button(ui, name, d.zone_mode == mode, bw)).inner.clicked() {
+                    d.zone_mode = mode;
+                }
+            }
+        });
+        let r = ui.add_enabled_ui(doc_sel, |ui| widgets::secondary_button(ui, tl!("Use the Open Document's Selection"), w)).inner;
+        if r.on_hover_text(tl!("A selection made in DTF Craft on the same photo")).clicked() {
+            act.zones_from_document = true;
+        }
+    });
+    let mut remove = None;
+    let mut pick = None;
+    let row_w = ui.available_width();
+    for k in 0..d.zones.len() {
+        let on = d.zone_sel == Some(k);
+        ui.horizontal(|ui| {
+            let (dot, resp) = ui.allocate_exact_size(vec2(18.0, 24.0), Sense::click());
+            ui.painter().circle(dot.center(), if on { 7.0 } else { 5.5 }, zone_color(k), Stroke::new(if on { 2.0 } else { 0.0 }, Color32::WHITE));
+            let pick_name = crate::i18n::fmt(tl!("Choose {name}"), &[("name", &d.zones[k].name)]);
+            resp.widget_info(|| egui::WidgetInfo::selected(egui::Role::Button, true, on, &pick_name));
+            if resp.clicked() {
+                pick = Some(k);
+            }
+            let name_w = (row_w - 18.0 - 24.0 - 3.0 * ui.spacing().item_spacing.x - 10.0).max(40.0);
+            let field = egui::TextEdit::singleline(&mut d.zones[k].name).desired_width(name_w).font(egui::FontId::proportional(12.5));
+            let r = ui.add(field).accessible_name(tl!("Zone name"));
+            if r.gained_focus() {
+                pick = Some(k);
+            }
+            let x = widgets::secondary_button(ui, "×", 22.0);
+            let remove_name = crate::i18n::fmt(tl!("Remove {name}"), &[("name", &d.zones[k].name)]);
+            if x.on_hover_text(&remove_name).clicked() {
+                remove = Some(k);
+            }
+        });
+    }
+    if let Some(k) = pick {
+        d.zone_sel = Some(k);
+        d.overlay_dirty = true;
+    }
+    if let Some(k) = remove {
+        d.remove_zone(k);
+    }
+    if !d.zones.is_empty() {
+        ui.horizontal(|ui| {
+            let bw = (ui.available_width() - ui.spacing().item_spacing.x) / 2.0;
+            if ui.add_enabled_ui(d.zone_sel.is_some(), |ui| widgets::secondary_button(ui, tl!("Invert"), bw)).inner.clicked()
+                && let Some(k) = d.zone_sel
+            {
+                d.invert_zone(k);
+            }
+            if widgets::secondary_button(ui, tl!("Clear"), bw).on_hover_text(tl!("Remove every zone")).clicked() {
+                d.clear_zones();
+            }
+        });
+        ui.label(egui::RichText::new(tl!("Each visual stops at the zone under its centre.")).size(11.0).color(GREEN));
+    } else if has_photo {
+        ui.label(egui::RichText::new(tl!("Optional: the visuals are cut at the garment's edge (sleeves, back, arms).")).size(11.0).color(t.text_faint));
+    }
+}
+
 /// A section of the right column: a card whose title row opens or closes it.
 fn section(ui: &mut egui::Ui, d: &mut MockupDialog, k: usize, title: &str, t: &Tokens, body: impl FnOnce(&mut egui::Ui, &mut MockupDialog)) {
     card_frame(t).show(ui, |ui| {
@@ -1473,6 +1917,18 @@ fn visual_section(ui: &mut egui::Ui, d: &mut MockupDialog, t: &Tokens) {
         return;
     };
     let k = d.ppcm().unwrap_or(1.0);
+    let zone_names: Vec<String> = d.zones.iter().map(|z| z.name.clone()).collect();
+    let auto_zone = {
+        let saved = d.items.get(i).map(|it| it.zone);
+        if let Some(it) = d.items.get_mut(i) {
+            it.zone = ZoneChoice::Auto;
+        }
+        let z = d.zone_of(i);
+        if let (Some(it), Some(s)) = (d.items.get_mut(i), saved) {
+            it.zone = s;
+        }
+        z
+    };
     let mut center = false;
     let mut delete = false;
     let mut changed = false;
@@ -1492,6 +1948,23 @@ fn visual_section(ui: &mut egui::Ui, d: &mut MockupDialog, t: &Tokens) {
             changed = true;
         }
         switch_row(ui, tl!("Keep Proportions"), &mut it.lock);
+        if !zone_names.is_empty() {
+            let mut choice = it.zone;
+            let auto = match auto_zone {
+                Some(k) => crate::i18n::fmt(tl!("Auto ({zone})"), &[("zone", &zone_names[k])]),
+                None => tl!("Auto (none)").to_string(),
+            };
+            let mut options: Vec<(ZoneChoice, &str)> = vec![(ZoneChoice::Auto, auto.as_str()), (ZoneChoice::Off, tl!("Not Masked"))];
+            options.extend(zone_names.iter().enumerate().map(|(k, n)| (ZoneChoice::Zone(k), n.as_str())));
+            ui.horizontal(|ui| {
+                crate::gang_sheet_ui::fixed_label(ui, egui::RichText::new(tl!("Zone:")).color(t.text_dim), 110.0, 24.0);
+                let w = ui.available_width();
+                if widgets::dropdown_literal(ui, "mockup-visual-zone", tl!("Zone"), &mut choice, &options, w) {
+                    it.zone = choice;
+                    changed = true;
+                }
+            });
+        }
         let r0 = it.rotation() as f32;
         let mut r = r0;
         if number_row(ui, tl!("Rotation:"), &mut r, -180.0..=180.0, "°", 0) && (r - r0).abs() > 1e-4 {
@@ -1755,6 +2228,9 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     if let Some(tex) = &d.shown {
         p.image(tex.id(), photo, ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
     }
+    if let Some(tex) = &d.overlay {
+        p.image(tex.id(), photo, ERect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
+    }
     p.rect_stroke(photo, 0.0, Stroke::new(1.0, t.card_border), StrokeKind::Outside);
     let ppcm = d.ppcm();
     if let Some(k) = ppcm {
@@ -1838,6 +2314,11 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     // The mouse.
     let resp = ui.interact(rect, ui.scope_id().with("mockup-photo"), Sense::click_and_drag());
     resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Image, true, tl!("Product Photo")));
+    if d.lassoing {
+        lasso(d, &p, &resp, photo, z);
+        palette(ui, d, rect, t);
+        return;
+    }
     let resp = if d.drawing { resp.on_hover_cursor(egui::CursorIcon::Crosshair) } else { resp };
     let ends = d.line.map(|[a, b]| [to_screen(a), to_screen(b)]);
     let handle_at = |d: &MockupDialog, o: Pos2| -> Option<(usize, Tool, usize)> {
@@ -1962,6 +2443,49 @@ fn canvas(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens) {
     palette(ui, d, rect, t);
 }
 
+/// The polygonal lasso on the photo: a click adds a point, a click on the first point or a double
+/// click closes it (into a zone, as the mode says); the outline so far follows the pointer.
+fn lasso(d: &mut MockupDialog, p: &egui::Painter, resp: &egui::Response, photo: ERect, z: f32) {
+    let to_screen = |q: [f64; 2]| pos2(photo.left() + q[0] as f32 * z, photo.top() + q[1] as f32 * z);
+    let to_photo = |s: Pos2| [f64::from((s.x - photo.left()) / z), f64::from((s.y - photo.top()) / z)];
+    let resp = resp.clone().on_hover_cursor(egui::CursorIcon::Crosshair);
+    if resp.double_clicked() {
+        // The second click of the double click added a point: it closes instead.
+        d.lasso.pop();
+        d.close_lasso();
+    } else if resp.clicked()
+        && let Some(pos) = resp.interact_pointer_pos()
+    {
+        let first = d.lasso.first().map(|q| to_screen(*q));
+        if d.lasso.len() >= 3 && first.is_some_and(|f| f.distance(pos) <= GRAB) {
+            d.close_lasso();
+        } else {
+            let q = to_photo(pos);
+            let (w, h) = d.photo.as_ref().map_or((0.0, 0.0), |ph| (f64::from(ph.width), f64::from(ph.height)));
+            d.lasso.push([q[0].clamp(0.0, w), q[1].clamp(0.0, h)]);
+        }
+    }
+    let mut pts: Vec<Pos2> = d.lasso.iter().map(|q| to_screen(*q)).collect();
+    if let Some(hover) = resp.hover_pos()
+        && !pts.is_empty()
+    {
+        pts.push(hover);
+    }
+    if pts.len() >= 2 {
+        p.extend(Shape::dashed_line(&pts, Stroke::new(1.5, Color32::BLACK), 5.0, 4.0));
+        p.extend(Shape::dashed_line_with_offset(&pts, Stroke::new(1.5, Color32::WHITE), &[5.0], &[4.0], 4.5));
+    }
+    if let Some(f) = d.lasso.first() {
+        p.circle(to_screen(*f), 5.0, Color32::WHITE, Stroke::new(1.5, MAGENTA));
+    }
+    let hint = match d.zone_mode {
+        ZoneMode::New => tl!("Lasso: a new zone"),
+        ZoneMode::Add => tl!("Lasso: added to the chosen zone"),
+        ZoneMode::Subtract => tl!("Lasso: taken from the chosen zone"),
+    };
+    pill(p, pos2(photo.center().x, photo.top() + 18.0), hint, Color32::from_rgb(255, 248, 214), Color32::from_rgb(107, 86, 0));
+}
+
 /// Delete removes the selected visual, the arrows move it (a mm, a cm with Shift), Enter or Esc
 /// leaves the transform tool (Esc also stops drawing the line).
 fn keys(d: &mut MockupDialog, ctx: &egui::Context) {
@@ -1974,6 +2498,20 @@ fn keys(d: &mut MockupDialog, ctx: &egui::Context) {
             [egui::Key::ArrowLeft, egui::Key::ArrowRight, egui::Key::ArrowUp, egui::Key::ArrowDown].map(|k| i.key_pressed(k)),
         )
     });
+    if d.lassoing {
+        // Esc drops the points (then the lasso), Backspace the last point, Enter closes.
+        if esc {
+            if d.lasso.is_empty() {
+                d.lassoing = false;
+            }
+            d.lasso.clear();
+        } else if del {
+            d.lasso.pop();
+        } else if enter {
+            d.close_lasso();
+        }
+        return;
+    }
     if esc && d.drawing {
         d.drawing = false;
     }
@@ -2214,6 +2752,55 @@ mod tests {
         let _ = std::fs::remove_dir_all(dir);
     }
 
+    /// Lasso zones: a new one, one taken away from; a visual stops at the zone under its centre
+    /// (or the one chosen, or none); the zones reach the export.
+    #[test]
+    fn zones_mask_the_visuals_and_reach_the_export() {
+        let dir = temp_dir("zones");
+        let (photo, logo) = files(&dir, 400, 300, "#d8d8d8");
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+        let ctx = egui::Context::default();
+        open(&mut app);
+        invoke(&mut app, &ctx, json!({"photo": photo, "scale": {"from": [0, 10], "to": [100, 10], "cm": 10}}));
+        // Two zones: left and right halves; a strip taken from the left one.
+        let v = invoke(&mut app, &ctx, json!({"zones": {"lasso": [[0, 0], [200, 0], [200, 300], [0, 300]]}}));
+        assert_eq!(v["zones"].as_array().unwrap().len(), 1);
+        invoke(&mut app, &ctx, json!({"zones": {"mode": "new", "lasso": [[200, 0], [400, 0], [400, 300], [200, 300]]}}));
+        let v = invoke(
+            &mut app,
+            &ctx,
+            json!({"zones": {"select": 0, "mode": "subtract", "lasso": [[0, 0], [50, 0], [50, 300], [0, 300]], "rename": {"index": 0, "name": "Face"}}}),
+        );
+        assert_eq!(v["zones"][0]["name"], "Face");
+        // A visual on the left half, across the middle: masked by "Face".
+        let v = invoke(&mut app, &ctx, json!({"addFiles": [logo], "visual": {"index": 0, "x": 190, "y": 150, "widthCm": 6}}));
+        assert_eq!(v["visuals"][0]["zone"], 0);
+        assert_eq!(v["visuals"][0]["zoneChoice"], "auto");
+        app.mockup.as_mut().unwrap().refresh(&ctx);
+        let params = app.mockup.as_ref().unwrap().params(&app).unwrap();
+        assert_eq!(params["visuals"][0]["zone"], 0);
+        let out = dir.join("zones.png").to_string_lossy().into_owned();
+        invoke(&mut app, &ctx, json!({"render": {"shadows": 0, "folds": 0, "opacity": 100}, "export": out}));
+        let st = app.session.active().unwrap();
+        let surf = st.doc.layers[0].surface().unwrap();
+        let red = |x: i32| surf.read_region(photocraft_geom::Rect::new(x, 150, x + 1, 151));
+        assert!(red(180)[0] > 0.7 && red(180)[1] < 0.2, "inside Face: {:?}", red(180));
+        assert!(red(210)[0] < 0.9 && red(210)[1] > 0.7, "past Face's edge: the photo, {:?}", red(210));
+        // Chosen: not masked.
+        open(&mut app);
+        invoke(
+            &mut app,
+            &ctx,
+            json!({"photo": photo, "scale": {"from": [0, 10], "to": [100, 10], "cm": 10}, "zones": {"lasso": [[0, 0], [200, 0], [200, 300], [0, 300]]}}),
+        );
+        let v = invoke(&mut app, &ctx, json!({"addFiles": [logo], "visual": {"index": 0, "x": 190, "y": 150, "zone": "none"}}));
+        assert!(v["visuals"][0]["zone"].is_null());
+        // A new photo clears the zones.
+        let v = invoke(&mut app, &ctx, json!({"photo": photo}));
+        assert_eq!(v["zones"].as_array().unwrap().len(), 0);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
     /// Screenshots for review (`DTF_VISUALS=<folder>`, the photo from `MOCKUP_PHOTO` if set): the
     /// window in French with a photo, its scale and two visuals, the first selected; then empty.
     #[test]
@@ -2224,7 +2811,8 @@ mod tests {
         let dir = temp_dir("capture");
         let (flat, _) = files(&dir, 1000, 1000, "#e9e7e2");
         let photo = std::env::var("MOCKUP_PHOTO").unwrap_or(flat);
-        for (name, mode) in [("mockup", 1), ("mockup_vide", 0), ("mockup_deformer", 2)] {
+        for (name, mode) in [("mockup", 1), ("mockup_vide", 0), ("mockup_deformer", 2), ("mockup_zones", 3)] {
+            let photo = if mode == 3 { std::env::var("MOCKUP_PHOTO4").unwrap_or_else(|_| photo.clone()) } else { photo.clone() };
             let photo = photo.clone();
             let mut h = egui_kittest::Harness::builder().with_size(vec2(1440.0, 900.0)).with_max_steps(64).wgpu().build_eframe(move |cc| {
                 PhotocraftApp::setup_context(&cc.egui_ctx, Default::default());
@@ -2256,6 +2844,15 @@ mod tests {
                     invoke(&mut app, &ctx, json!({"select": 0}));
                     if mode == 2 {
                         invoke(&mut app, &ctx, json!({"visual": {"index": 0, "warp": {"style": "arc", "bend": 25}}, "tool": "warp"}));
+                    }
+                    if mode == 3 {
+                        // The four views: one zone each; the logo across the front view's sleeve.
+                        invoke(&mut app, &ctx, json!({"scale": {"from": [337, 219], "to": [636, 219], "cm": 52}}));
+                        app.mockup.as_mut().unwrap().refresh(&ctx);
+                        let v = invoke(&mut app, &ctx, json!({"zones": {"auto": true}}));
+                        eprintln!("zones found: {}", v["zones"]);
+                        invoke(&mut app, &ctx, json!({"visual": {"index": 0, "widthCm": 30, "x": 600, "y": 250}, "zones": {"select": 0}}));
+                        invoke(&mut app, &ctx, json!({"visual": {"index": 1, "widthCm": 8, "x": 1100, "y": 200}, "select": 0}));
                     }
                 }
                 app.beta = Default::default();

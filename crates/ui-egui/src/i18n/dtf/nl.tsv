@@ -541,3 +541,33 @@
 	The image on the clipboard (Ctrl+V)	De afbeelding op het klembord (Ctrl+V)
 	The clipboard holds no image	Het klembord bevat geen afbeelding
 	The clipboard can't be read here	Het klembord kan hier niet worden gelezen
+# DTF Craft (38)
+	Product Zones (optional)	Productzones (optioneel)
+	Select the Product (Auto)	Product selecteren (automatisch)
+	One zone for each garment or view found on the photo	Eén zone voor elk kledingstuk of elke weergave op de foto
+	Polygonal Lasso	Veelhoeklasso
+	Polygonal Lasso: Click the Points	Veelhoeklasso: klik de punten
+	A click for each point; a double click or the first point closes it; Esc cancels	Eén klik per punt; dubbelklik of het eerste punt sluit; Esc annuleert
+	New	Nieuw
+	Add	Toevoegen
+	Subtract	Aftrekken
+	Use the Open Document's Selection	Selectie van het geopende document gebruiken
+	A selection made in DTF Craft on the same photo	Een selectie gemaakt in DTF Craft op dezelfde foto
+	Choose {name}	{name} kiezen
+	Zone name	Naam van de zone
+	Invert	Omkeren
+	Remove every zone	Alle zones verwijderen
+	Each visual stops at the zone under its centre.	Elk ontwerp stopt aan de rand van de zone onder zijn midden.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Optioneel: de ontwerpen worden afgesneden aan de rand van het kledingstuk (mouwen, rug, armen).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (geen)
+	Not Masked	Niet gemaskeerd
+	Zone:	Zone:
+	Zone	Zone
+	Zone {n}	Zone {n}
+	{n} zones found	{n} zones gevonden
+	Lasso: a new zone	Lasso: nieuwe zone
+	Lasso: added to the chosen zone	Lasso: toegevoegd aan de gekozen zone
+	Lasso: taken from the chosen zone	Lasso: afgetrokken van de gekozen zone
+	The open document has no selection	Het geopende document heeft geen selectie
+	The open document must be the photo's size ({w} × {h} px)	Het geopende document moet het formaat van de foto hebben ({w} × {h} px)

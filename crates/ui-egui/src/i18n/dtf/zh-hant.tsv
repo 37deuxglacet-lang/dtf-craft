@@ -569,3 +569,33 @@
 	The image on the clipboard (Ctrl+V)	剪貼簿中的影像（Ctrl+V）
 	The clipboard holds no image	剪貼簿中沒有影像
 	The clipboard can't be read here	此處無法讀取剪貼簿
+# DTF Craft (38)
+	Product Zones (optional)	產品區域（選用）
+	Select the Product (Auto)	選取產品（自動）
+	One zone for each garment or view found on the photo	照片中每件衣物或每個視圖一個區域
+	Polygonal Lasso	多邊形套索
+	Polygonal Lasso: Click the Points	多邊形套索：點按各點
+	A click for each point; a double click or the first point closes it; Esc cancels	每點按一下；按兩下或按第一個點封閉；Esc 取消
+	New	新增
+	Add	增加
+	Subtract	減去
+	Use the Open Document's Selection	使用開啟文件的選取範圍
+	A selection made in DTF Craft on the same photo	在 DTF Craft 中對同一照片所做的選取範圍
+	Choose {name}	選擇 {name}
+	Zone name	區域名稱
+	Invert	反轉
+	Remove every zone	移除所有區域
+	Each visual stops at the zone under its centre.	每個圖案在其中心下方區域的邊緣截止。
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	選用：圖案在衣物邊緣（袖子、背面、手臂）處被裁切。
+	Auto ({zone})	自動（{zone}）
+	Auto (none)	自動（無）
+	Not Masked	不遮色
+	Zone:	區域：
+	Zone	區域
+	Zone {n}	區域 {n}
+	{n} zones found	找到 {n} 個區域
+	Lasso: a new zone	套索：新區域
+	Lasso: added to the chosen zone	套索：加入所選區域
+	Lasso: taken from the chosen zone	套索：從所選區域減去
+	The open document has no selection	開啟的文件沒有選取範圍
+	The open document must be the photo's size ({w} × {h} px)	開啟的文件必須與照片尺寸相同（{w} × {h} 像素）

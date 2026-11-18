@@ -569,3 +569,33 @@
 	The image on the clipboard (Ctrl+V)	剪贴板中的图像（Ctrl+V）
 	The clipboard holds no image	剪贴板中没有图像
 	The clipboard can't be read here	此处无法读取剪贴板
+# DTF Craft (38)
+	Product Zones (optional)	产品区域（可选）
+	Select the Product (Auto)	选择产品（自动）
+	One zone for each garment or view found on the photo	照片中每件服装或每个视图一个区域
+	Polygonal Lasso	多边形套索
+	Polygonal Lasso: Click the Points	多边形套索：点击各点
+	A click for each point; a double click or the first point closes it; Esc cancels	每点单击一次；双击或单击第一个点闭合；Esc 取消
+	New	新建
+	Add	添加
+	Subtract	减去
+	Use the Open Document's Selection	使用打开文档的选区
+	A selection made in DTF Craft on the same photo	在 DTF Craft 中对同一照片所做的选区
+	Choose {name}	选择 {name}
+	Zone name	区域名称
+	Invert	反转
+	Remove every zone	移除所有区域
+	Each visual stops at the zone under its centre.	每个图案在其中心下方区域的边缘截止。
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	可选：图案在服装边缘（袖子、背面、手臂）处被裁切。
+	Auto ({zone})	自动（{zone}）
+	Auto (none)	自动（无）
+	Not Masked	不遮罩
+	Zone:	区域：
+	Zone	区域
+	Zone {n}	区域 {n}
+	{n} zones found	找到 {n} 个区域
+	Lasso: a new zone	套索：新区域
+	Lasso: added to the chosen zone	套索：添加到所选区域
+	Lasso: taken from the chosen zone	套索：从所选区域减去
+	The open document has no selection	打开的文档没有选区
+	The open document must be the photo's size ({w} × {h} px)	打开的文档必须与照片尺寸相同（{w} × {h} 像素）

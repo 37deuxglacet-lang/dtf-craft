@@ -540,3 +540,33 @@
 	The image on the clipboard (Ctrl+V)	Slika iz ostave (Ctrl+V)
 	The clipboard holds no image	Ostava ne sadrži sliku
 	The clipboard can't be read here	Ostava se ovde ne može pročitati
+# DTF Craft (38)
+	Product Zones (optional)	Zone proizvoda (neobavezno)
+	Select the Product (Auto)	Izaberi proizvod (automatski)
+	One zone for each garment or view found on the photo	Jedna zona za svaki odevni predmet ili prikaz na fotografiji
+	Polygonal Lasso	Poligonalni laso
+	Polygonal Lasso: Click the Points	Poligonalni laso: kliknite tačke
+	A click for each point; a double click or the first point closes it; Esc cancels	Jedan klik po tački; dvoklik ili prva tačka zatvara; Esc otkazuje
+	New	Nova
+	Add	Dodaj
+	Subtract	Oduzmi
+	Use the Open Document's Selection	Koristi izbor otvorenog dokumenta
+	A selection made in DTF Craft on the same photo	Izbor napravljen u DTF Craft na istoj fotografiji
+	Choose {name}	Izaberi {name}
+	Zone name	Naziv zone
+	Invert	Obrni
+	Remove every zone	Ukloni sve zone
+	Each visual stops at the zone under its centre.	Svaki motiv staje na ivici zone ispod svog središta.
+	Optional: the visuals are cut at the garment's edge (sleeves, back, arms).	Neobavezno: motivi se seku na ivici odevnog predmeta (rukavi, leđa, ruke).
+	Auto ({zone})	Auto ({zone})
+	Auto (none)	Auto (nijedna)
+	Not Masked	Bez maske
+	Zone:	Zona:
+	Zone	Zona
+	Zone {n}	Zona {n}
+	{n} zones found	Pronađeno zona: {n}
+	Lasso: a new zone	Laso: nova zona
+	Lasso: added to the chosen zone	Laso: dodato izabranoj zoni
+	Lasso: taken from the chosen zone	Laso: oduzeto od izabrane zone
+	The open document has no selection	Otvoreni dokument nema izbor
+	The open document must be the photo's size ({w} × {h} px)	Otvoreni dokument mora biti veličine fotografije ({w} × {h} px)
