@@ -225,7 +225,7 @@ pub fn sheet_content(ui: &mut egui::Ui, command: &str) {
         ui.set_width(ui.available_width());
         for (title, text) in [("À quoi ça sert", sheet.what), ("Quand l'utiliser", sheet.when), ("Réglages conseillés", sheet.advice)] {
             ui.label(RichText::new(title).strong());
-            ui.label(RichText::new(text).color(t.text_dim));
+            ui.label(RichText::new(crate::dtf_keys::keys(text)).color(t.text_dim));
             ui.add_space(4.0);
         }
         // DTF Craft: training on this tool, or a change to it (in French).
@@ -237,7 +237,7 @@ pub fn sheet_content(ui: &mut egui::Ui, command: &str) {
 /// A setting's tooltip over the rows drawn since `top` (from `ui.cursor().top()` before them):
 /// shown while the pointer is over them, without taking their clicks or drags.
 pub fn tip_over(ui: &mut egui::Ui, command: &str, key: &str, top: f32) {
-    let Some(text) = tip(command, key) else { return };
+    let Some(text) = tip(command, key).map(crate::dtf_keys::keys) else { return };
     let bottom = ui.cursor().top();
     if bottom <= top {
         return;
@@ -245,5 +245,5 @@ pub fn tip_over(ui: &mut egui::Ui, command: &str, key: &str, top: f32) {
     let rect = egui::Rect::from_x_y_ranges(ui.max_rect().x_range(), top..=bottom);
     let id = ui.scope_id().with(("dtf-help-tip", command, key));
     // Also over locked (disabled) settings.
-    ui.interact(rect, id, egui::Sense::hover()).on_hover_text(text).on_disabled_hover_text(text);
+    ui.interact(rect, id, egui::Sense::hover()).on_hover_text(&text).on_disabled_hover_text(&text);
 }

@@ -1079,15 +1079,15 @@ fn preview(ui: &mut egui::Ui, a: &mut ColorAnalyzer, area: Rect) {
     ui.painter().rect(bar_r, 8.0, t.chrome, Stroke::new(1.0, t.separator), egui::StrokeKind::Inside);
     let mut bar = ui.new_child(egui::UiBuilder::new().max_rect(bar_r.shrink2(vec2(4.0, 3.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
     bar.spacing_mut().item_spacing.x = 4.0;
-    if bar.add_sized(vec2(26.0, 22.0), egui::Button::new("−")).on_hover_text(tl!("Zoom Out (Ctrl −)")).clicked() {
+    if bar.add_sized(vec2(26.0, 22.0), egui::Button::new("−")).on_hover_text(crate::dtf_keys::keys(tl!("Zoom Out (Ctrl −)"))).clicked() {
         step(a, -1, space.center());
     }
     let (lr, _) = bar.allocate_exact_size(vec2(52.0, 22.0), Sense::hover());
     bar.painter().text(lr.center(), Align2::CENTER_CENTER, format!("{} %", pct.round()), FontId::proportional(12.0), t.text);
-    if bar.add_sized(vec2(26.0, 22.0), egui::Button::new("+")).on_hover_text(tl!("Zoom In (Ctrl +)")).clicked() {
+    if bar.add_sized(vec2(26.0, 22.0), egui::Button::new("+")).on_hover_text(crate::dtf_keys::keys(tl!("Zoom In (Ctrl +)"))).clicked() {
         step(a, 1, space.center());
     }
-    if bar.add_enabled(a.zoom > 1.0001, egui::Button::new(tl!("Fit")).min_size(vec2(66.0, 22.0))).on_hover_text(tl!("The whole visual (Ctrl 0)")).clicked() {
+    if bar.add_enabled(a.zoom > 1.0001, egui::Button::new(tl!("Fit")).min_size(vec2(66.0, 22.0))).on_hover_text(crate::dtf_keys::keys(tl!("The whole visual (Ctrl 0)"))).clicked() {
         a.zoom = 1.0;
         a.zoom_center = [0.5, 0.5];
     }

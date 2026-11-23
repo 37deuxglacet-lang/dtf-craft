@@ -1,0 +1,89 @@
+name: DTF Craft (macOS)
+
+# Builds DTF Craft for macOS (universal: Apple silicon + Intel) as a drag-to-Applications DMG
+# (packaging/macos/dtf-package.sh). Same circuit as the Windows build: the DMG is NOT attached to
+# GitHub releases; it is kept as a 1-day workflow artifact and, on tags or manual runs, uploaded to
+# the Nuxit hosting (FTPS) when the NUXIT_FTP_* secrets are set.
+#
+# Signing: without the MACOS_* / APPLE_* secrets the app is signed ad hoc (test phase: macOS asks to
+# allow it once). With an Apple Developer ID they are signed and notarized, nothing else to change:
+#   APPLE_CERTIFICATE (base64 .p12), APPLE_CERTIFICATE_PASSWORD, APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
+on:
+  push:
+    branches: [main, dtf-craft, version-mac]
+    tags: ["*"]
+  workflow_dispatch:
+    inputs:
+      upload_name:
+        description: "Nom de version pour l'envoi sur Nuxit (ex. 1.1 ; vide = pas d'envoi)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 150
+    env:
+      CARGO_TERM_COLOR: always
+      NUXIT_FTP_HOST: ${{ secrets.NUXIT_FTP_HOST }}
+      NUXIT_FTP_USER: ${{ secrets.NUXIT_FTP_USER }}
+      NUXIT_FTP_PASSWORD: ${{ secrets.NUXIT_FTP_PASSWORD }}
+      NUXIT_FTP_DIR: ${{ secrets.NUXIT_FTP_DIR }}
+      # The start screen's Pixabay illustration: the API key, built into the app (empty: no illustration).
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      # The interface translations, as in the Windows build (crates/ui-egui/build.rs).
+      - name: Translations (craft-i18n)
+        run: |
+          rev=$(tr -d '[:space:]' < craft-i18n.rev)
+          git init -q craft-i18n
+          git -C craft-i18n fetch -q --depth 1 https://github.com/storytold/craft-i18n "$rev"
+          git -C craft-i18n checkout -q FETCH_HEAD
+          echo "CRAFT_I18N_DIR=${GITHUB_WORKSPACE}/craft-i18n" >> "$GITHUB_ENV"
+          echo "CRAFT_I18N_REQUIRED=1" >> "$GITHUB_ENV"
+      - name: Rust toolchain (Apple silicon + Intel)
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+      - name: Tests (DTF)
+        run: |
+          cargo test --release -p photocraft-algo --lib -- dtf upscale
+          cargo test --release -p photocraft-engine --lib dtf_cmds
+          cargo test --release -p photocraft-ui-egui --lib shortcut_text
+      - name: Signing certificate (when the secrets are set)
+        if: env.APPLE_CERTIFICATE != ''
+        run: packaging/macos/import-cert.sh
+      - name: Build and package (DMG)
+        run: packaging/macos/dtf-package.sh --arch universal
+      - name: Check (SHA-256, architectures, signature)
+        continue-on-error: true
+        run: |
+          dmg=dist/release/dtf-craft-macos-universal.dmg
+          echo "::notice title=SHA-256::$(shasum -a 256 "$dmg")"
+          echo "::notice title=Architectures::$(lipo -archs "target/macos-package/DTF Craft.app/Contents/MacOS/DTF Craft")"
+          echo "::notice title=Signature::$(codesign -dv "target/macos-package/DTF Craft.app" 2>&1 | grep -E 'Identifier|Signature' | tr '\n' ' ')"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dtf-craft-macos-universal
+          path: dist/release/dtf-craft-macos-universal.dmg
+          retention-days: 1
+      - name: Upload to Nuxit (tags or manual run)
+        if: env.NUXIT_FTP_HOST != '' && (startsWith(github.ref, 'refs/tags/') || inputs.upload_name != '')
+        run: |
+          name="${{ inputs.upload_name }}"
+          [ -n "$name" ] || name="${{ github.ref_name }}"
+          curl --fail --ssl-reqd --ftp-create-dirs \
+            --user "${NUXIT_FTP_USER}:${NUXIT_FTP_PASSWORD}" \
+            -T dist/release/dtf-craft-macos-universal.dmg \
+            "ftp://${NUXIT_FTP_HOST}/${NUXIT_FTP_DIR}/dtf-craft-macos-universal-$name.dmg"

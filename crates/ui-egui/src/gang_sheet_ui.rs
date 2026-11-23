@@ -3040,7 +3040,7 @@ fn tool_palette(ui: &mut egui::Ui, d: &mut GangSheetDialog, area: ERect, t: &Tok
                         24 | 25 => blocks >= 3,
                         _ => on,
                     };
-                    if tool_button(ui, icon, tip, enabled, angle, mirror).clicked() {
+                    if tool_button(ui, icon, &crate::dtf_keys::keys(tip), enabled, angle, mirror).clicked() {
                         op = Some(*id);
                     }
                 }
@@ -3334,7 +3334,7 @@ fn multi_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, list: &[usize], t: &T
             if ui
                 .add_enabled_ui(!one_group, |ui| widgets::primary_button(ui, tl!("Group the Selection"), bw))
                 .inner
-                .on_hover_text(tl!("Group (Ctrl+G)"))
+                .on_hover_text(crate::dtf_keys::keys(tl!("Group (Ctrl+G)")))
                 .clicked()
             {
                 d.checkpoint(None);
@@ -3343,13 +3343,13 @@ fn multi_panel(ui: &mut egui::Ui, d: &mut GangSheetDialog, list: &[usize], t: &T
             if ui
                 .add_enabled_ui(d.any_grouped(list), |ui| widgets::secondary_button(ui, tl!("Ungroup"), bw))
                 .inner
-                .on_hover_text(tl!("Ungroup (Ctrl+Shift+G)"))
+                .on_hover_text(crate::dtf_keys::keys(tl!("Ungroup (Ctrl+Shift+G)")))
                 .clicked()
             {
                 d.checkpoint(None);
                 d.ungroup();
             }
-            if widgets::secondary_button(ui, tl!("Duplicate"), bw).on_hover_text(tl!("Duplicate (Ctrl+D)")).clicked() {
+            if widgets::secondary_button(ui, tl!("Duplicate"), bw).on_hover_text(crate::dtf_keys::keys(tl!("Duplicate (Ctrl+D)"))).clicked() {
                 d.checkpoint(None);
                 d.duplicate_block(list);
             }

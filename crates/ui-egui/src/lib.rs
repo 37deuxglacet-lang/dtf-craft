@@ -67,6 +67,8 @@ pub mod beta;
 /// DTF Craft: DTF › Flat Color…'s own rows (protected colours, preview views).
 pub mod dtf_flat_ui;
 pub mod dtf_help;
+/// DTF Craft: shortcuts named in the DTF texts in the platform's notation (⌘ on macOS).
+pub mod dtf_keys;
 /// DTF Craft: the DTF windows' own wording where PhotoCraft has the same English string.
 pub mod dtf_i18n;
 /// DTF Craft: its start screen (PhotoCraft's `canvas::start_screen` hands over to it).
