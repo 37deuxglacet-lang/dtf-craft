@@ -14,7 +14,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 
 | File | DTF change |
 |---|---|
-| `ATTRIBUTION.md` | DTF Craft's three Lucide icons counted in the icon row |
+| `ATTRIBUTION.md` | DTF Craft's three Lucide icons counted in the icon row; DTF Craft's DMG window row |
 | `Cargo.lock` | dependencies of the DTF modules |
 | `LICENSE-MIT` | DTF Craft copyright line |
 | `NOTICE` | DTF Craft notice and base |
@@ -112,7 +112,7 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 | `crates/ui-egui/src/widgets/tests.rs` | test of the typed-only field |
 | `crates/ui-egui/src/widgets/units.rs` | typed-only number fields (Gang Sheet) |
 
-## Added (45)
+## Added (54)
 
 - `.github/workflows/dtf-craft-windows.yml`
 - `DTF-CRAFT.md`
@@ -159,6 +159,15 @@ The DTF code lives in the added files; the PhotoCraft files below only hook it i
 - `crates/io/src/svg/dtf.rs`
 - `crates/ui-egui/src/dtf_home.rs`
 - `crates/ui-egui/src/i18n/dtf/*.tsv` (the DTF strings of each language, added to the craft-i18n catalogs at build)
+- `.github/workflows/dtf-craft-macos.yml` (macOS build: universal DMG)
+- `crates/ui-egui/src/dtf_keys.rs` (shortcuts in the DTF texts shown as ⌘ on macOS)
+- `packaging/macos/dtf-package.sh`
+- `packaging/macos/dtf-Info.plist.in`
+- `packaging/macos/dmg/README-DTF.md`
+- `packaging/macos/dmg/dtf-background.svg`
+- `packaging/macos/dmg/dtf-background.tiff`
+- `packaging/macos/dmg/dtf-generate.py`
+- `packaging/macos/dmg/dtf-layout.DS_Store`
 
 ## Removed (11)
 

@@ -1680,7 +1680,7 @@ fn left_column(ui: &mut egui::Ui, d: &mut MockupDialog, rect: ERect, t: &Tokens,
             }
             let pw = ui.available_width();
             let r = ui.add_enabled_ui(can_paste, |ui| widgets::secondary_button(ui, tl!("Paste a Screenshot"), pw)).inner;
-            if r.on_hover_text(tl!("The image on the clipboard (Ctrl+V)")).clicked() {
+            if r.on_hover_text(crate::dtf_keys::keys(tl!("The image on the clipboard (Ctrl+V)"))).clicked() {
                 act.paste = true;
             }
             match &d.photo {
@@ -2610,17 +2610,17 @@ fn zoom_bar(ui: &mut egui::Ui, d: &mut MockupDialog, inner: ERect, t: &Tokens) {
     let mut bar = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(4.0, 3.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
     bar.spacing_mut().item_spacing.x = 4.0;
     let z = d.zoom_now().unwrap_or(1.0);
-    if widgets::secondary_button(&mut bar, "−", 26.0).on_hover_text(tl!("Zoom Out (Ctrl −)")).clicked() {
+    if widgets::secondary_button(&mut bar, "−", 26.0).on_hover_text(crate::dtf_keys::keys(tl!("Zoom Out (Ctrl −)"))).clicked() {
         d.zoom_step(-1, None);
     }
     let pct = format!("{} %", (z * 100.0).round());
     let (lr, _) = bar.allocate_exact_size(vec2(52.0, 22.0), Sense::hover());
     bar.painter().text(lr.center(), Align2::CENTER_CENTER, pct, FontId::proportional(12.0), t.text);
-    if widgets::secondary_button(&mut bar, "+", 26.0).on_hover_text(tl!("Zoom In (Ctrl +)")).clicked() {
+    if widgets::secondary_button(&mut bar, "+", 26.0).on_hover_text(crate::dtf_keys::keys(tl!("Zoom In (Ctrl +)"))).clicked() {
         d.zoom_step(1, None);
     }
     let fit = bar.add_enabled_ui(d.view.is_some(), |ui| widgets::secondary_button(ui, tl!("Fit"), 66.0)).inner;
-    if fit.on_hover_text(tl!("The whole photo (Ctrl 0)")).clicked() {
+    if fit.on_hover_text(crate::dtf_keys::keys(tl!("The whole photo (Ctrl 0)"))).clicked() {
         d.view = None;
     }
 }

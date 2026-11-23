@@ -66,7 +66,7 @@ fn set_last_color(app: &mut PhotocraftApp, hex: &str) {
 /// A tab's own control's tooltip (`dtf_help::tip`).
 fn help(response: egui::Response, cmd: &str, key: &str) -> egui::Response {
     match crate::dtf_help::tip(cmd, key) {
-        Some(text) => response.on_hover_text(text),
+        Some(text) => response.on_hover_text(crate::dtf_keys::keys(text)),
         None => response,
     }
 }
