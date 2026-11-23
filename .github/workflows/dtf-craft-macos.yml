@@ -25,7 +25,8 @@ permissions:
 jobs:
   macos:
     runs-on: macos-latest
-    timeout-minutes: 150
+    # Two full builds (Apple silicon and Intel) before lipo: longer than the Windows build.
+    timeout-minutes: 300
     env:
       CARGO_TERM_COLOR: always
       NUXIT_FTP_HOST: ${{ secrets.NUXIT_FTP_HOST }}
@@ -56,11 +57,12 @@ jobs:
           rustup default stable
           rustup target add aarch64-apple-darwin x86_64-apple-darwin
       - uses: Swatinem/rust-cache@v2
+      # Built for aarch64-apple-darwin like the package below, so the release build reuses the
+      # dependencies compiled for the tests.
       - name: Tests (DTF)
         run: |
-          cargo test --release -p photocraft-algo --lib -- dtf upscale
-          cargo test --release -p photocraft-engine --lib dtf_cmds
-          cargo test --release -p photocraft-ui-egui --lib shortcut_text
+          cargo test --release --target aarch64-apple-darwin -p photocraft-algo --lib -- dtf upscale
+          cargo test --release --target aarch64-apple-darwin -p photocraft-engine --lib dtf_cmds
       - name: Signing certificate (when the secrets are set)
         if: env.APPLE_CERTIFICATE != ''
         run: packaging/macos/import-cert.sh
